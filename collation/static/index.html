@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=8" />
+
+  <title>Collation Editor</title>
+  <meta name="description" content="Collation and Apparatus Editor" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <script>
+    var SITE_DOMAIN = "http://localhost:8080";
+    var staticUrl = SITE_DOMAIN + '/collation/';
+  </script>
+  <script type="text/javascript" src="collation/js/jquery-3.3.1.min.js"></script>
+	<link rel=stylesheet href="collation/pure-release-1.0.0/pure-min.css" type="text/css"/>
+  <script type="text/javascript" src="collation/CE_core/js/collation_editor.js"></script>
+  <script type="text/javascript">
+    var servicesFile = 'js/local_services.js';
+    collation_editor.init();
+  </script>
+
+</head>
+<body oncontextmenu="return false;">
+	<div id="header" class="collation_header"><h1 id="stage_id">Collation</h1><h1 id="project_name"></h1><div id="login_status"></div></div>
+	<div id="container">
+	<p>Loading, Please wait.</p>
+
+	<br/>
+	<br/>
+	</div>
+
+  	<div id="footer">
+
+	</div>
+	<div id="tool_tip" class="tooltip">
+
+	</div>
+</body>
+</html>
