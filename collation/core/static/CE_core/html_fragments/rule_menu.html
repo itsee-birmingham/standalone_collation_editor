@@ -1,0 +1,25 @@
+<div class="dialogue_form_header">Regularise {original_text} to {normalised_text}</div>
+<form class="pure-form" id="regularisation_menu">
+	<input type="hidden" name="unit" id="unit" value="{unit_data}"/>
+	<label>Scope:
+		<select id="scope" name="scope">
+
+        </select>
+    </label>
+    <br/>
+    <label>Class:
+       <select id="class" name="class">
+
+       </select>
+    </label>
+    <br/>
+    <fieldset id="conditions" class="data_group">
+
+    </fieldset>
+    <label for="comments">Comments</label>
+    <br/>
+    <textarea name="comments" id="comments" style="width: 95%;" rows="2"></textarea>
+    <br/>
+    <input class="pure-button dialogue-form-button" id="cancel_button" type="button" value="Cancel"/>
+    <input class="pure-button dialogue-form-button" id="save_rule_button" type="button" value="Save"/>
+</form>
