@@ -1,0 +1,463 @@
+/* This should be moved to a configurable file
+.has_punctuation {
+	color: red;
+}
+*/
+
+.missing {
+    color: red;
+}
+
+form {
+    padding: 7px;
+}
+
+td.nav {
+	font-size: 20pt;
+}
+
+div#drag {
+	padding: 0px 0px 0px 0px;
+}
+
+
+div#message_panel {
+	float: left;
+	margin-top: 7px;
+	margin-left: 20px;
+	padding: 3px 3px 3px 3px;
+
+}
+
+div#message_panel.warning {
+	border: 1px solid red;
+}
+
+span.saved_version {
+	color: green;
+	text-decoration: underline;
+}
+
+.tooltip {
+	background-color: #F4F4F4;
+	border: 1px solid #CCC;
+	width: 400px;
+	padding: 5px;
+	display:none;
+	position:absolute;
+}
+
+img#loadingbar {
+    margin: 0;
+    padding: 0;
+    vertical-align: bottom;
+}
+
+span.highlighted_reading {
+    padding-left: 10px;
+}
+
+th {
+	font-weight: normal;
+}
+
+tr.hidden {
+	display: none;
+}
+
+td {
+	vertical-align: top;
+}
+
+td.space {
+	min-width: 30px;
+}
+
+table.variant_unit {
+	background: silver;
+	width: 100%;
+	border: 2px solid silver;
+}
+
+span.triangle {
+	float: right;
+	padding-left: 5px;
+	cursor: pointer;
+}
+
+
+div.row {
+	border: 1px solid silver;
+}
+
+td div {
+	border: 1px solid silver;
+}
+
+td div.spacer {
+	border: none;
+}
+
+.regularised {
+	color: gray;
+}
+
+.regularised_global {
+    color: gray;
+}
+
+.subreading_form {
+	position:fixed;
+	top:40px;
+ 	left:60px;
+ 	width:300px;
+ 	padding: 5px;
+ 	background-color: white;
+	border: 2px solid blue;
+	border-radius:4px;
+}
+
+
+
+.label_form {
+    position: fixed;
+    background-color: white;
+    border: 2px solid blue;
+    border-radius:4px;
+}
+
+.label_form #new_label {
+    width: 100px;
+}
+
+.wit_form {
+	/*position:fixed;
+ 	width: 300px;*/
+ 	top: 30px;
+ 	/*padding: 5px;
+ 	background-color: white;
+	border: 2px solid blue;
+	border-radius:4px;*/
+}
+
+#wit_scroller {
+	margin-top: 15px;
+	margin-bottom: 15px;
+	overflow: auto;
+	border: 2px inset grey;
+}
+
+td.highlight {
+	color: blue;
+}
+
+tr.number_row {
+	border-bottom: 1px solid gray;
+}
+
+div#test {
+	width: 100px;
+}
+
+input#expand_collapse_button, input#show_hide_subreadings_button, input#show_hide_otherreadings_button, input#show_hide_regularisations_button {
+	float:left;
+}
+
+span#extra_buttons {
+	display: inline-block;
+	float: left;
+}
+
+input#expand_collapse_button {
+	margin-left: 10px;
+}
+
+div.wit_column, div.saved_column {
+	float: left;
+	padding: 10px;
+}
+
+label.lac {
+	color: gray;
+	font-style: italic;
+}
+
+tr.top , li.top{
+	border-bottom: 1px solid gray;
+
+}
+
+div.reg_word {
+    display: inline-block;
+}
+
+div.drag_div {
+	background: silver;
+}
+
+.gap {
+    color: black;
+}
+
+td.number, td.space, td.NAword {
+	text-align: center;
+}
+
+li.subreading, tr.subreading, tr.perma_subreading {
+    padding-left: 20px;
+    color: grey;
+}
+
+tr.regularised {
+    color: grey;
+}
+
+tr.deleted {
+    color: red;
+}
+
+/** reordering table */
+
+
+table#reorder_table td, table#reorder_table th {
+	border: 1px solid black;
+	background: silver;
+	padding: 5px;
+}
+
+/* setting variants */
+
+ul {
+	list-style-type: none;
+	padding: 0px;
+	margin: 0px;
+}
+
+div.unit, div.split_unit, div.split_unit_a, div.overlap_split_unit, div.overlap_split_unit_a, div.split_omlac_unit, div.overlap_unit, div.split_deleted_unit, div.split_overlapped_unit, div.gap_unit, div.split_duplicate_unit {
+	background: silver;
+	border: 1px solid silver;
+	padding: 5px;
+	margin-bottom: 10px;
+}
+
+li.hidden {
+	display: none;
+}
+
+td {
+	white-space: nowrap;
+}
+
+td#split_readings {
+	background: #E9967A;
+	margin-top: 20px;
+	padding: 20px;
+}
+
+
+/* raw JSON stuff */
+
+table#raw_json td {
+	padding: 3px;
+	border: 1px solid black;
+}
+
+#redips_clone {
+	background: silver;
+	display: none;
+}
+
+
+
+/* settings */
+.settings_dialogue {
+	bottom:50px;
+ 	right:5px;
+ 	width:300px;
+}
+
+/* context menu */
+ul.SimpleContextMenu {
+	display: none;
+	position: absolute;
+	margin: 0px;
+	padding: 0px;
+	font-family: arial;
+	font-size: 12pt;
+	list-style-type: none;
+	border-top: 1px solid #000000;
+	border-left: 1px solid #000000;
+	border-right: 1px solid #000000;
+}
+
+ul.SimpleContextMenu li {
+	border-bottom: 1px solid #000000;
+}
+
+/*note: if you change width here it needs to be changed in js code for contextmenu in the function _show */
+ul.SimpleContextMenu li span {
+	display: block;
+	width: 110px;
+	padding: 2px 10px 3px 10px;
+	text-decoration: none;
+	color: #000000;
+	background: #eeeeee;
+}
+
+ul.SimpleContextMenu li span:hover {
+	text-decoration: none;
+	color: #000000;
+	background: #FFBB55;
+}
+
+/* load saved collation page */
+table#saved_collations {
+	width: 95%;
+	margin-top: 20px;
+	margin-left: 20px;
+}
+
+table#saved_collations td,  table#saved_collations th {
+	padding: 10px 10px 10px 10px;
+	border: solid 1px silver;
+}
+
+li.highlighted > div {
+    background: #FFBB55;
+}
+
+tr.highlighted > td > div {
+	background: #FFBB55;
+}
+
+tr.highlighted > td > div {
+    border: 1px solid #FFBB55;
+}
+
+td > div.spanlike {
+    width: 95%;
+}
+
+td > div.clone {
+    width: 95%;
+}
+
+div.clone {
+    padding-left: 2px;
+}
+
+td.main_reading, td.overlap_main_reading {
+    width: 100%;
+}
+
+#single_witness_reading {
+	background: white;
+	left: 10px;
+	font-family: arial;
+	overflow-y: auto;
+	height: 30px;
+}
+
+table.collation_overview {
+	margin-bottom: 15px;
+  /*border-collapse: separate;
+  border-spacing: 2px;*/
+  border: 0;
+
+}
+
+table.collation_overview td {
+  padding: 1px;
+}
+
+table.variant_unit td {
+    padding: 0;
+}
+
+
+div.highlighted_unit {
+	border: 2px solid red;
+}
+
+
+#global_exceptions_list form {
+    padding: 6px;
+    margin: 0;
+}
+
+#global_exceptions_list form input[type='checkbox']{
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+.checkbox-label {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.reg_form {
+ 	top: 30px;
+}
+
+.dialogue_form_header {
+    background: #B0C4DE;
+    padding: 5px;
+    margin-bottom: 3px;
+}
+
+.dialogue_form {
+    position: fixed;
+    font-family: arial;
+    background: whitesmoke;
+    border: 1px solid black;
+}
+
+.dialogue-form-button {
+  background-color: #C0C0C0;
+  color: black;
+  margin-right: 10px;
+  margin-top: 10px;
+}
+
+div#global_exceptions {
+  left: 20px;
+}
+
+div#error_panel {
+	position: fixed;
+	font-family: arial;
+	width: 200px;
+	padding: 2px;
+}
+
+div#error_panel.warning, div#error_panel.warning div.dialogue_form_header {
+	background: crimson;
+  border: 0px;
+}
+
+div#error_panel.error, div#error_panel.error div.dialogue_form_header {
+	background: gold;
+  border: 0px;
+}
+
+div#error_panel.clear, div#error_panel.clear div.dialogue_form_header {
+	background: green;
+  border: 0px;
+}
+
+span#message_summary {
+	padding: 2px;
+}
+
+div#error_header {
+	background: blue;
+}
+
+div#error_message_panel {
+	background: whitesmoke;
+	padding: 4px;
+}
+
+span#error_coll_ex, span#global_exceptions_ex {
+	float: right;
+}
