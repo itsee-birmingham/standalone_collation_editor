@@ -4,6 +4,10 @@
 }
 */
 
+textarea {
+  resize: vertical;
+}
+
 .missing {
     color: red;
 }
@@ -131,13 +135,17 @@ td div.spacer {
 }
 
 .wit_form {
-	/*position:fixed;
- 	width: 300px;*/
  	top: 30px;
- 	/*padding: 5px;
- 	background-color: white;
-	border: 2px solid blue;
-	border-radius:4px;*/
+}
+
+.wit_form .inline-label {
+  display: inline-block;
+  width: 80px;
+  margin-top: 5px;
+}
+
+.wit_form input {
+  margin-top: 5px;
 }
 
 #wit_scroller {
@@ -274,7 +282,16 @@ table#raw_json td {
 	bottom:50px;
  	right:5px;
  	width:300px;
+  font-size: 15px;
 }
+
+.settings_dialogue .inline-label {
+  display: inline-block;
+  width: 80px;
+  margin-top: 5px;
+
+}
+
 
 /* context menu */
 ul.SimpleContextMenu {
@@ -397,6 +414,25 @@ div.highlighted_unit {
 
 .reg_form {
  	top: 30px;
+  font-size: 15px;
+}
+
+.reg_form .inline-label {
+  display: inline-block;
+  width: 50px;
+}
+
+.reg_form .inline-select {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.reg_form fieldset {
+  margin-top: 3px;
+}
+
+#regularisation_menu {
+  width: 300px;
 }
 
 .dialogue_form_header {
