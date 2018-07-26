@@ -1632,8 +1632,10 @@ CL = (function() {
     wit_menu.setAttribute('id', 'wit_form');
     wit_menu.setAttribute('class', 'wit_form dragdiv dialogue_form');
     witnesses = sortWitnesses(getAllReadingWitnesses(reading));
-
-    witness_html = ['<div class="dialogue_form_header">' + details.header + '</div><form class="pure-form" id="select_wit_form">'];
+    witness_html = ['<div class="dialogue_form_header">' + details.header + '</div><form id="select_wit_form">'];
+    witness_html.push('<label>Selected reading: </label><span>');
+    witness_html.push(CL.extractWitnessText(reading));
+    witness_html.push('</span>');
     if (witnesses.length > 1 && (!details.hasOwnProperty('witness_select') || details.witness_select !== false)) {
       witness_html.push('<div id="wit_scroller"><input type="checkbox" id="wit_select_all">Select All</input><br/>');
       for (i = 0; i < witnesses.length; i += 1) {
@@ -1651,8 +1653,8 @@ CL = (function() {
     if (details.type === 'overlap') {
       //witness_html.push('<label>Duplicate reading? <input type="checkbox" id="duplicate" name="duplicate"/></label><br/><br/>');
     } else if (details.type === 'SVsubreading' || details.type === 'ORsubreading') {
-      witness_html.push('<label>Parent reading: <select name="parent_reading" id="parent_reading"></select></label><br/><br/>');
-      witness_html.push('<label>Details: <input disabled="disabled" type="text" name="reading_details" id="reading_details"/></label><br/></br/>');
+      witness_html.push('<label class="inline-label">Parent reading:</label><select name="parent_reading" id="parent_reading"></select><br/><br/>');
+      witness_html.push('<label class="inline-label">Details:</label><input disabled="disabled" type="text" name="reading_details" id="reading_details"/><br/></br/>');
       sub_types = getRuleClasses('subreading', true, 'value', 'identifier');
       if (Object.keys(sub_types).length > 1) {
         witness_html.push('<label>Subreading type: <select name="subreading_type" id="subreading_select"></select></label><br/><br/>');
@@ -1661,15 +1663,15 @@ CL = (function() {
         witness_html.push('<input type="hidden" id="subreading_type" name="subreading_type" value="' + id + '"/>');
       }
     } else if (details.type !== 'duplicate') {
-      witness_html.push('<label>Parent reading: <select name="parent_reading" id="parent_reading"></select></label><br/>');
-      witness_html.push('<label>Details: <input disabled="disabled" type="text" name="reading_details" id="reading_details"/></label><br/></br/>');
+      witness_html.push('<label class="inline-label">Parent reading:</label><select name="parent_reading" id="parent_reading"></select><br/>');
+      witness_html.push('<label class="inline-label">Details:</label><input disabled="disabled" type="text" name="reading_details" id="reading_details"/><br/></br/>');
     }
     witness_html.push('<input class="pure-button dialogue-form-button" id="close_button" type="button" value="Cancel"/>');
     witness_html.push('<input class="pure-button dialogue-form-button" id="select_button" type="button" value="' + details.button + '"/></form>');
     wit_menu.innerHTML = witness_html.join('');
     document.getElementsByTagName('body')[0].appendChild(wit_menu);
     window_height = window.innerHeight;
-    menu_height = window_height - 200;
+    menu_height = window_height - 300;
     if (menu_height < 50) {
       menu_height = 50;
     }
@@ -1782,7 +1784,7 @@ CL = (function() {
             type = data[key];
           } else if (key === 'reading_details') {
             extra_details = data[key].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-          } else if (key !== 'parent_reading' && data.hasOwnProperty(key)) {
+          } else if (key !== 'parent_reading' && data.hasOwnProperty(key) && data[key] !== null) {
             witness_list.push(key);
           }
         }
@@ -4032,14 +4034,14 @@ CL = (function() {
     settings_div = document.createElement('div');
     settings_div.setAttribute('id', 'settings');
     settings_div.setAttribute('class', 'dialogue_form settings_dialogue');
-    settings_div.innerHTML = '<div class="dialogue_form_header"><span id="settings_title">Algorithm Settings</span></div><form id="settings_form" class="pure-form">' +
-      '<label for="algorithm">Algorithm</label><select id="algorithm" name="algorithm">' +
+    settings_div.innerHTML = '<div class="dialogue_form_header"><span id="settings_title">Algorithm Settings</span></div><form id="settings_form">' +
+      '<label class="inline-label" for="algorithm">Algorithm:</label><select id="algorithm" name="algorithm">' +
       '<option value="auto">Auto</option><option value="dekker">Dekker</option><option value="needleman-wunsch">Needleman-Wunsch</option>' +
       '</select><br/>' +
-      '<label for="fuzzy_match">Use fuzzy matching</label><input class="boolean" name="fuzzy_match" id="fuzzy_match" type="checkbox"/><br/>' +
-      '<label for="distance">Distance</label><input size="4" class="string" name="distance" id="distance" type="text"/><br/>' +
-      '<input class="pure-button dialogue-form-button" type="button" id="save_settings" value="save"/>' +
-      '<input class="pure-button dialogue-form-button" type="button" id="close_settings" value="cancel"/></form>';
+      '<label class="inline-label" for="fuzzy_match">Use fuzzy matching:</label><input class="boolean" name="fuzzy_match" id="fuzzy_match" type="checkbox"/><br/>' +
+      '<label class="inline-label" for="distance">Distance:</label><input size="4" class="string" name="distance" id="distance" type="text"/><br/>' +
+      '<input class="pure-button dialogue-form-button" type="button" id="save_settings" value="Save"/>' +
+      '<input class="pure-button dialogue-form-button" type="button" id="close_settings" value="Cancel"/></form>';
     document.getElementsByTagName('body')[0].appendChild(settings_div);
     if (document.getElementById('algorithm')) {
       document.getElementById('algorithm').value = CL.algorithmSettings.algorithm;

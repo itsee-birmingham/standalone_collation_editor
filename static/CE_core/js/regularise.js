@@ -1003,7 +1003,7 @@ RG = (function() {
 
   _setUpRuleMenu = function(rd, classes, selected, create_function) {
     var left_pos, window_width, rule_scopes, conditions_html, i, id, setting;
-    document.getElementById('reg_form').style.width = '300px';
+    //document.getElementById('reg_form').style.width = '300px';
     window_width = window.innerWidth;
     left_pos = rd.td.current.offsetLeft + rd.obj.redips.container.offsetParent.offsetLeft - document.getElementById('scroller').scrollLeft;
     if (left_pos + parseInt(document.getElementById('reg_form').style.width) >= window_width) {
@@ -1021,8 +1021,9 @@ RG = (function() {
       conditions_html = [];
       for (i = 0; i < CL.ruleConditions.configs.length; i += 1) {
         id = 'conditions_' + CL.ruleConditions.configs[i].id;
-        conditions_html.push('<label for="' + id + '">' + CL.ruleConditions.configs[i].label);
+        conditions_html.push('<label for="' + id + '">');
         conditions_html.push('<input type="checkbox" class="boolean" id="' + id + '" name="' + id + '"/>');
+        conditions_html.push(CL.ruleConditions.configs[i].label);
         conditions_html.push('</label><br/>');
       }
       document.getElementById('conditions').innerHTML = conditions_html.join('');
