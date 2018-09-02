@@ -29,10 +29,6 @@ OR = (function() {
 
   /**create and show the reorder readings display
    *
-   * required:
-   * data - JSON data structure of variation units
-   * context - the verse in the format: B04K6V23
-   *
    * optional:
    * container - the HTML element to put the html result in
    *              (defaults to body if not supplied or can't find it)
