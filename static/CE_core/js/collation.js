@@ -1377,7 +1377,7 @@ CL = (function() {
     if (CL.project.hasOwnProperty('extraFooterButtons') && CL.project.extraFooterButtons.hasOwnProperty(stage)) {
       for (i = 0; i < CL.project.extraFooterButtons[stage].length; i += 1) {
         if (CL.project.extraFooterButtons[stage][i].hasOwnProperty('id')) {
-          html.push('<input class="pure_button" type="button" id="' + CL.project.extraFooterButtons[stage][i].id + '" value="');
+          html.push('<input class="pure-button left_foot" type="button" id="' + CL.project.extraFooterButtons[stage][i].id + '" value="');
           if (CL.project.extraFooterButtons[stage][i].hasOwnProperty('label')) {
             html.push(CL.project.extraFooterButtons[stage][i].label);
           } else {
@@ -1389,7 +1389,7 @@ CL = (function() {
     } else if (CL.services.hasOwnProperty('extraFooterButtons') && CL.services.extraFooterButtons.hasOwnProperty(stage)) {
       for (i = 0; i < CL.services.extraFooterButtons[stage].length; i += 1) {
         if (CL.services.extraFooterButtons[stage][i].hasOwnProperty('id')) {
-          html.push('<input class="pure_button" type="button" id="' + CL.services.extraFooterButtons[stage][i].id + '" value="');
+          html.push('<input class="pure-button left_foot" type="button" id="' + CL.services.extraFooterButtons[stage][i].id + '" value="');
           if (CL.services.extraFooterButtons[stage][i].hasOwnProperty('label')) {
             html.push(CL.services.extraFooterButtons[stage][i].label);
           } else {
