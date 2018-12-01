@@ -688,7 +688,7 @@ CL = (function() {
         }
         i += 1;
       } else if (i === unit_index) { //we do have a variant for this word
-        if (unit.readings.length > 1 ||
+        if (unit.readings.length > 0 ||
           //this is now set to always show units regardless of whether they have variation
           //the unused logic is left in incase we want to revert to the old way sometime
           (format === 'reorder') ||
