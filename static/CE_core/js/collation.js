@@ -51,7 +51,8 @@ CL = (function() {
   getSpecifiedAncestor, hideTooltip, addHoverEvents, markReading, showSplitWitnessMenu,
   markStandoffReading, findUnitPosById, findReadingById, applyPreStageChecks,
   makeStandoffReading, doMakeStandoffReading, makeMainReading, getOrderedAppLines,
-  loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses;
+  loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses,
+  calculatePosition;
 
   //private function declarations
   let _initialiseEditor, _initialiseProject, _setProjectConfig, _setDisplaySettings,
@@ -68,7 +69,7 @@ CL = (function() {
    _addNavEvent, _findLatestStageVerse, _loadLatestStageVerse, _removeOverlappedReadings,
    _applySettings, _getApprovalSettings, _compareReadings,
    _disableEventPropagation, _showCollationSettings, _checkWitnesses, _getScrollPosition,
-   _getMousePosition, _calculatePosition, _displayWitnessesHover, _getWitnessesForReading,
+   _getMousePosition, _displayWitnessesHover, _getWitnessesForReading,
    _findStandoffWitness, _findReadingPosById, _getPreStageChecks, _makeRegDecisionsStandoff,
    _contextInputOnload;
 
@@ -4158,7 +4159,7 @@ CL = (function() {
     return position;
   };
 
-  _calculatePosition = function(e, element) {
+  calculatePosition = function(e, element) {
     var width, position, scroll_position;
     element.style.left = '-1000px';
     element.style.top = '-1000px';
@@ -4192,7 +4193,7 @@ CL = (function() {
     } else {
       return;
     }
-    _calculatePosition(event, element);
+    calculatePosition(event, element);
     element.style.display = "block";
     event.stopPropagation();
   };
@@ -4402,6 +4403,7 @@ CL = (function() {
     collateData: collateData,
     context: context,
     data: data,
+    calculatePosition: calculatePosition, 
 
     setServiceProvider: setServiceProvider,
     expandFillPageClients: expandFillPageClients,
