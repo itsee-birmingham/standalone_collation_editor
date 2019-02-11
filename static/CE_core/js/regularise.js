@@ -7,10 +7,9 @@ RG = (function() {
   let showRegularisations = false;
 
   //private variable declarations
-  let _rules = [],
+  let _rules = {},
       _forDeletion = [],
-      _forGlobalExceptions = [],
-      _ruleWordsSummary = {};
+      _forGlobalExceptions = [];
 
   //public function declarations
   let getCollationData, getUnitData, recollate, showVerseCollation, allRuleStacksEmpty;
@@ -22,7 +21,7 @@ RG = (function() {
   _highlightWitness, _addNewToken, _getWordIndexForWitness, _createRule, _getDisplaySettingValue,
   _setUpRuleMenu, _getRuleScopes, _getSuffix, _makeMenu, _redipsInitRegularise,
   _getAncestorRow, _showGlobalExceptions, _removeGlobalExceptions, _scheduleAddGlobalException,
-  _scheduleRuleDeletion, _addContextMenuHandlers, _showCollationTable;
+  _scheduleRuleDeletion, _deleteUnappliedRule, _addContextMenuHandlers, _showCollationTable;
 
   //*********  public functions *********
 
@@ -62,7 +61,7 @@ RG = (function() {
   getUnitData = function(data, id, start, end, options) {
     var i, html, j, k, l, decisions, rows, cells, row_list, temp, events, max_length, row_id, type,
       subrow_id, colspan, hand, class_string, div_class_string, witness, id_dict, key, words, reg_class,
-      highlighted, cells_dict, rule_cells, keys_to_sort, class_list;
+      highlighted, cells_dict, rule_cells, keys_to_sort, class_list, variant_unit_id;
     if (typeof options === 'undefined') {
       options = {};
     }
@@ -109,13 +108,12 @@ RG = (function() {
           max_length = data[i].text.length;
         }
         for (j = 0; j < data[i].text.length; j += 1) {
+          variant_unit_id = 'variant_unit_' + id + '_r' + i + '_w' + j;
           div_class_string = '';
           if (i > 0) {
             class_list = ['drag', 'clone', 'reg_word'];
-            //WORKING PLACE HERE
-            //TODO: this is the place to apply any classes added during regularisation such as colouring in the words with punctuation
-            if (_hasRuleApplied(data[i].text[j])) {
-              class_list.push('regularised');
+            if (_hasRuleApplied(variant_unit_id)) {
+              class_list.push('regularisation_staged');
             }
             class_list.push(_getDisplayClasses(data[i].text[j]));
             div_class_string = ' class="' + class_list.join(' ') + '" ';
@@ -125,7 +123,7 @@ RG = (function() {
           if (words[j][words[j].reading[0]].hasOwnProperty('gap_before') && words[j].hasOwnProperty('combined_gap_before')) {
             cells.push('<div class="gap spanlike"> &lt;' + words[j][words[j].reading[0]].gap_details + '&gt; </div>');
           }
-          cells.push('<div ' + div_class_string + 'id="variant_unit_' + id + '_r' + i + '_w' + j + '">' + _getToken(words[j]) + '</div>');
+          cells.push('<div ' + div_class_string + 'id="' + variant_unit_id + '">' + _getToken(words[j]) + '</div>');
           if (words[j][words[j].reading[0]].hasOwnProperty('gap_after') && (j < words.length - 1 || words[j].hasOwnProperty('combined_gap_after'))) {
             cells.push('<div class="gap spanlike"> &lt;' + words[j][words[j].reading[0]].gap_details + '&gt; </div>');
           }
@@ -228,7 +226,6 @@ RG = (function() {
         document.getElementById('scroller').scrollTop
       ];
     }
-    _ruleWordsSummary = {};
     if ($.isEmptyObject(CL.collateData)) {
       getCollationData('units', scroll_offset, function() {
         _runCollation(CL.collateData, 'units', scroll_offset);
@@ -259,6 +256,9 @@ RG = (function() {
     });
     SimpleContextMenu.attach('regularised_global', function() {
       return _makeMenu('regularised_global');
+    });
+    SimpleContextMenu.attach('regularisation_staged', function() {
+      return _makeMenu('regularisation_staged');
     });
     CL.lacOmFix();
     temp = CL.getUnitLayout(CL.data.apparatus, 1, 'regularise', options);
@@ -395,7 +395,7 @@ RG = (function() {
   };
 
   allRuleStacksEmpty = function() {
-    if (_rules.length > 0 || _forDeletion.length > 0 || _forGlobalExceptions.length > 0) {
+    if (!$.isEmptyObject(_rules) || _forDeletion.length > 0 || _forGlobalExceptions.length > 0) {
       return false;
     }
     return true;
@@ -427,14 +427,9 @@ RG = (function() {
     result_callback(lac_transcriptions);
   };
 
-  _hasRuleApplied = function(word) {
-    var i, j;
-    for (i = 0; i < word.reading.length; i += 1) {
-      if (_ruleWordsSummary.hasOwnProperty(word.reading[i])) {
-        if (_ruleWordsSummary[word.reading[i]].hasOwnProperty('index') && _ruleWordsSummary[word.reading[i]].index.indexOf(word[word.reading[i]].index) !== -1) {
-          return true;
-        }
-      }
+  _hasRuleApplied = function(id) {
+    if (_rules.hasOwnProperty(id)) {
+      return true;
     }
     return false;
   };
@@ -492,10 +487,18 @@ RG = (function() {
   };
 
   _runCollation = function(collation_data, output, scroll_offset) {
-    CL.services.updateRuleset(_forDeletion, _forGlobalExceptions, _rules, CL.context, function() {
+    var rule_list;
+    //put all the rules in a sinlge list
+    rule_list = [];
+    for (let key in _rules) {
+      if (_rules.hasOwnProperty(key)) {
+        rule_list.push.apply(rule_list, _rules[key]);
+      }
+    }
+    CL.services.updateRuleset(_forDeletion, _forGlobalExceptions, rule_list, CL.context, function() {
       _forDeletion = [];
       _forGlobalExceptions = [];
-      _rules = [];
+      _rules = {};
       _fetchRules(collation_data, function(rules) {
         _doRunCollation(collation_data, rules, output, scroll_offset);
       });
@@ -767,18 +770,7 @@ RG = (function() {
 
   _createRule = function(data, user, original_text, normalised_text, unit, reading, word, witnesses) {
     var rule, rules, witness, context, i, j, reconstructed_readings;
-    //first we work out which tokens we have regularised so we can keep them greyed out if the page has to be redrawn for any reason
-    for (i = 0; i < witnesses.length; i += 1) {
-      if (!_ruleWordsSummary.hasOwnProperty(witnesses[i])) {
-        _ruleWordsSummary[witnesses[i]] = {};
-      }
-      if (_ruleWordsSummary[witnesses[i]].hasOwnProperty('index')) {
-        _ruleWordsSummary[witnesses[i]].index.push(_getWordIndexForWitness(unit, reading, word, witnesses[i]));
-      } else {
-        _ruleWordsSummary[witnesses[i]].index = [_getWordIndexForWitness(unit, reading, word, witnesses[i])];
-      }
-    }
-    //now sort text out so that anything we turned to &lt; or &gt; get stored as < and >
+    //sort text out so that anything we turned to &lt; or &gt; get stored as < and >
     //TODO: I'm not sure we even use original_text anymore - check and streamline?
     original_text = original_text;
     normalised_text = normalised_text.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
@@ -877,12 +869,13 @@ RG = (function() {
       reg_menu, scope, clas, comments, witnesses, context, unit_data,
       witness, unit, reading, word, original, original_text, suffix,
       reg_rules, key, new_reg_rules, selected, ignore_supplied, ignore_unclear,
-      create_function, original_display_text;
+      create_function, original_display_text, word_id;
     rd = REDIPS.drag;
     rd.init(id);
     rd.event.dropped = function() {
       clone = document.getElementById(rd.obj.id);
       original = document.getElementById(rd.objOld.id);
+      word_id = rd.objOld.id;
       normalised_form = rd.td.target.childNodes[0];
       //if we are normalising to a typed in value
       if (normalised_form.tagName === 'INPUT') {
@@ -938,11 +931,14 @@ RG = (function() {
           data['class'] = 'none';
         }
         CL.services.getUserInfo(function(user) {
-          _rules.push.apply(_rules, _createRule(data, user, original_text, normalised_text, unit, reading, word, witnesses));
+          //FIX: here
+          _rules[word_id] = _createRule(data, user, original_text, normalised_text, unit, reading, word, witnesses)
+          //_rules.push.apply(_rules, _createRule(data, user, original_text, normalised_text, unit, reading, word, witnesses));
         });
+
         document.getElementsByTagName('body')[0].removeChild(document.getElementById('reg_form'));
         rd.enableDrag(false, rd.objOld);
-        $(original).addClass('regularised');
+        $(original).addClass('regularisation_staged');
         $(original.parentNode).addClass('mark');
         //add witnesses to normalised form in data structure
         new_unit_data = rd.td.target.firstChild.id;
@@ -1092,6 +1088,9 @@ RG = (function() {
     if (menu_name === 'regularised_global') {
       document.getElementById('context_menu').innerHTML = '<li id="add_exception"><span>Add exception</span></li><li id="delete_rule"><span>Delete rule</span></li>';
     }
+    if (menu_name === 'regularisation_staged') {
+      document.getElementById('context_menu').innerHTML = '<li id="delete_unapplied_rule"><span>Delete rule</span></li>';
+    }
     _addContextMenuHandlers();
     return 'context_menu';
   };
@@ -1189,6 +1188,15 @@ RG = (function() {
     $(row).addClass('deleted');
   };
 
+  _deleteUnappliedRule = function() {
+    var element, row;
+    element = SimpleContextMenu._target_element;
+    delete _rules[element.id];
+    $(element.parentNode).removeClass('mark');
+    $(element).removeClass('regularisation_staged');
+    console.log(_rules)
+  };
+
   _scheduleRuleDeletion = function() {
     var i, j, element, row, rule_id, unit_num, row_num, word_num, rule_type, word_data, key, witness_data, witnesses, ok;
     element = SimpleContextMenu._target_element;
@@ -1255,6 +1263,17 @@ RG = (function() {
         CL.hideTooltip();
       });
     }
+    if (document.getElementById('delete_unapplied_rule')) {
+      $('#delete_unapplied_rule').off('click.dur_c');
+      $('#delete_unapplied_rule').off('mouseover.dur_mo');
+      $('#delete_unapplied_rule').on('click.dur_c', function(event) {
+        _deleteUnappliedRule();
+      });
+      $('#delete_unapplied_rule').on('mouseover.dur_mo', function(event) {
+        CL.hideTooltip();
+      });
+    }
+
   };
 
   _showCollationTable = function(data, context, container) {

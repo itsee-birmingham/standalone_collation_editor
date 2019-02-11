@@ -102,13 +102,7 @@ td div.spacer {
 	border: none;
 }
 
-.regularised {
-	color: gray;
-}
 
-.regularised_global {
-    color: gray;
-}
 
 .subreading_form {
 	position:fixed;
@@ -220,9 +214,19 @@ tr.regularised {
     color: grey;
 }
 
+tr.regularised_global {
+    color: gray;
+}
+
 tr.deleted {
     color: red;
 }
+
+div.regularisation_staged {
+	color: gray;
+}
+
+
 
 /** reordering table */
 
