@@ -246,6 +246,10 @@ SV = (function () {
 	calculateUnitLengths = function (app_id, options) {
 		var i, j, app, top_line, id, start, first_hit, gap_before, last_end, length, gap_counts, highest_gap, gap_after,
 		previous_unit_gap_after, previous_unit_start, previous_unit_end, original_column_lengths;
+
+		if (options === undefined) {
+			options = {};
+		}
 		top_line = CL.data.apparatus;
 		app = CL.data[app_id];
 

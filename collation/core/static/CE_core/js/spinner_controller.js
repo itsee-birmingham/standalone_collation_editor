@@ -1,3 +1,4 @@
+
 var SPN = (function () {
 
 	//TODO: consider updating spin.js or moving to something else
@@ -55,4 +56,5 @@ var SPN = (function () {
 
 
     };
+
 }());
