@@ -21,7 +21,8 @@ RG = (function() {
   _highlightWitness, _addNewToken, _getWordIndexForWitness, _createRule, _getDisplaySettingValue,
   _setUpRuleMenu, _getRuleScopes, _getSuffix, _makeMenu, _redipsInitRegularise,
   _getAncestorRow, _showGlobalExceptions, _removeGlobalExceptions, _scheduleAddGlobalException,
-  _scheduleRuleDeletion, _deleteUnappliedRule, _addContextMenuHandlers, _showCollationTable;
+  _scheduleRuleDeletion, _deleteUnappliedRule, _addContextMenuHandlers, _showCollationTable,
+  _scheduleSelectedRulesDeletion;
 
   //*********  public functions *********
 
@@ -129,7 +130,6 @@ RG = (function() {
           }
           if (RG.showRegularisations) {
             id_dict = {};
-            cells.push('<table><tbody>');
             for (k = 0; k < data[i].witnesses.length; k += 1) {
               witness = data[i].witnesses[k];
               if (data[i].text[j].hasOwnProperty(witness) && data[i].text[j][witness].hasOwnProperty('decision_details')) {
@@ -146,6 +146,11 @@ RG = (function() {
                   }
                 }
               }
+            }
+            if (Object.keys(id_dict).length > 1) {
+              cells.push('<table><tbody class="selectable">');
+            } else {
+              cells.push('<table><tbody>');
             }
             keys_to_sort = [];
             cells_dict = {};
@@ -251,6 +256,9 @@ RG = (function() {
       'preventDefault': true,
       'preventForms': false
     });
+    SimpleContextMenu.attach('ui-selected', function() {
+      return _makeMenu('group_delete');
+    });
     SimpleContextMenu.attach('regularised', function() {
       return _makeMenu('regularised');
     });
@@ -260,6 +268,7 @@ RG = (function() {
     SimpleContextMenu.attach('regularisation_staged', function() {
       return _makeMenu('regularisation_staged');
     });
+
     CL.lacOmFix();
     temp = CL.getUnitLayout(CL.data.apparatus, 1, 'regularise', options);
     header = CL.getCollationHeader(CL.data, temp[1], false);
@@ -369,6 +378,11 @@ RG = (function() {
       }
       i += 1;
     }
+    $('.selectable').selectable({
+      'cancel': 'regularised_global',
+      selected: function(event, ui) {$(ui.selected).removeClass('regularised');},
+      unselected: function(event, ui) {$(ui.unselected).addClass('regularised');}
+    });
     $('#highlighted').on('change', function(event) {
       _highlightWitness(event.target.value);
     });
@@ -1091,6 +1105,10 @@ RG = (function() {
     if (menu_name === 'regularisation_staged') {
       document.getElementById('context_menu').innerHTML = '<li id="delete_unapplied_rule"><span>Delete rule</span></li>';
     }
+    if (menu_name === 'group_delete') {
+      document.getElementById('context_menu').innerHTML = '<li id="delete_selected_rules"><span>Delete selected rules</span></li>';
+    }
+
     _addContextMenuHandlers();
     return 'context_menu';
   };
@@ -1189,17 +1207,25 @@ RG = (function() {
   };
 
   _deleteUnappliedRule = function() {
-    var element, row;
+    var element;
     element = SimpleContextMenu._target_element;
     delete _rules[element.id];
     $(element.parentNode).removeClass('mark');
     $(element).removeClass('regularisation_staged');
-    console.log(_rules)
   };
 
-  _scheduleRuleDeletion = function() {
+  _scheduleSelectedRulesDeletion = function () {
+    $('tr.ui-selected').each(function () {
+      _scheduleRuleDeletion(this);
+      $(this.parentNode).removeClass('ui-selected');
+    });
+  };
+
+  _scheduleRuleDeletion = function(element) {
     var i, j, element, row, rule_id, unit_num, row_num, word_num, rule_type, word_data, key, witness_data, witnesses, ok;
-    element = SimpleContextMenu._target_element;
+    if (element === undefined) {
+      element = SimpleContextMenu._target_element;
+    }
     row = _getAncestorRow(element);
     unit_num = row.id.substring(row.id.indexOf('_unit_') + 6, row.id.indexOf('_row_'));
     row_num = row.id.substring(row.id.indexOf('_row_') + 5, row.id.indexOf('_word_'));
@@ -1273,8 +1299,19 @@ RG = (function() {
         CL.hideTooltip();
       });
     }
-
+    if (document.getElementById('delete_selected_rules')) {
+      $('#delete_selected_rules').off('click.dsr_c');
+      $('#delete_selected_rules').off('mouseover.dsr_mo');
+      $('#delete_selected_rules').on('click.dsr_c', function(event) {
+        _scheduleSelectedRulesDeletion();
+      });
+      $('#delete_selected_rules').on('mouseover.dsr_mo', function(event) {
+        CL.hideTooltip();
+      });
+    }
   };
+
+
 
   _showCollationTable = function(data, context, container) {
     var i, j, k, html, column, row, witnesses;

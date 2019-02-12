@@ -16,6 +16,18 @@ form {
     padding: 7px;
 }
 
+tr.ui-selected  {
+  color: salmon;
+}
+
+tr.ui-unselecting {
+  color: gray;
+}
+
+tr.ui-selecting  {
+  background: darkgray;
+}
+
 td.nav {
 	font-size: 20pt;
 }
