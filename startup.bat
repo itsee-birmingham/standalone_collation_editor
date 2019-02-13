@@ -1,6 +1,5 @@
 SET BASEDIR="%CD%"
 echo %BASEDIR%
 
-start java -classpath collatex/lib/\* -Dapp.name="collatex-server" -Dapp.repo="collatex/lib" -Dapp.home="collatex" -Dbasedir="collatex" eu.interedition.collatex.http.Server
-
+start java -jar collatex/collatex-tools-1.8-SNAPSHOT.jar -S
 python3 bottle_server.py %BASEDIR%

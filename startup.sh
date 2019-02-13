@@ -1,7 +1,7 @@
 #!/bin/bash
 BASEDIR=$(pwd)
 
-java -classpath collatex/lib/\* -Dapp.name="collatex-server" -Dapp.repo="collatex/lib" -Dapp.home="collatex" -Dbasedir="collatex" eu.interedition.collatex.http.Server &
+java -jar collatex/collatex-tools-1.8-SNAPSHOT.jar -S &
 COLLATEXPID=$!
 
 python3 bottle_server.py $BASEDIR
