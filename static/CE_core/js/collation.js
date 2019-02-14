@@ -2548,10 +2548,8 @@ CL = (function() {
   };
 
   _setProjectConfig = function(project) {
-    CL.project = {
-      //'ruleClasses': project.ruleClasses,
-      'book_name': project.book_name,
-    };
+    CL.project = {};
+
     //TODO DEPRECATE _id (for id) and project (for name) in future release
     if (project.hasOwnProperty('_id')) {
       CL.project.id = project._id;
@@ -2566,6 +2564,9 @@ CL = (function() {
       CL.project.name = project.name;
     }
     //end deprecation
+    if (project.hasOwnProperty('book_name')) {
+      CL.project.book_name = project.book_name;
+    }
     if (project.hasOwnProperty('witnessSort')) {
       CL.project.witnessSort = project.witnessSort;
     }
@@ -4403,7 +4404,7 @@ CL = (function() {
     collateData: collateData,
     context: context,
     data: data,
-    calculatePosition: calculatePosition, 
+    calculatePosition: calculatePosition,
 
     setServiceProvider: setServiceProvider,
     expandFillPageClients: expandFillPageClients,
