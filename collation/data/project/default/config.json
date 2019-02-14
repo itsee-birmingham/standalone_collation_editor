@@ -72,14 +72,7 @@
     },
 
 
-"witnesses": [
-        "NT_GRC_basetext_B04",
-        "NT_GRC_1_B04",
-        "NT_GRC_13_B04",
-        "NT_GRC_18_B04",
-        "NT_GRC_22_B04"
-],
-    "iwitnesses": [
+"witnesses": 
         "NT_GRC_basetext_B04",
         "NT_GRC_1_B04",
         "NT_GRC_13_B04",
