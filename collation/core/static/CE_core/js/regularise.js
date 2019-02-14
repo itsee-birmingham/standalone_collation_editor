@@ -1215,8 +1215,9 @@ RG = (function() {
   };
 
   _scheduleSelectedRulesDeletion = function () {
-    $('tr.ui-selected').each(function () {
+    $('tr.ui-selected').each(function () { //if this is not limited to tr we also get the td and add rules twice which breaks everything
       _scheduleRuleDeletion(this);
+      //remove the class so it is not selected again if we delete more
       $(this.parentNode).removeClass('ui-selected');
     });
   };
