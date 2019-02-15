@@ -327,3 +327,8 @@ There are many other settings that can be added to the project configuration and
   "base_text": "document_3"
 }
 ```
+
+Referencing
+---
+
+To cite the standalone collation editor please use the DOI: [![DOI](https://zenodo.org/badge/142014378.svg)](https://zenodo.org/badge/latestdoi/142014378)
