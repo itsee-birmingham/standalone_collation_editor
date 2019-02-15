@@ -290,12 +290,12 @@ If this is a gap before the very first extant word in the given unit then you mu
 
 The project configurations are located at `collation/data/project`.
 
-In this directory there can be a number of different project directories each must contain a `config,json` file. The project supplied for the example is called `default`. You can replace this configuration witho your own of add a new project. If you add a new project then you will need to edit the file at `collation/static/js/local_services.js` to change line 361 which should read
+In this directory there can be a number of different project directories each must contain a `config.json` file. The project supplied for the example is called `default`. You can replace this configuration with your own or add a new directory for a second project. If you add a new project then you will need to edit the file at `collation/static/js/local_services.js` to change line 361 which should read
 ```
 _current_project = 'default';  
 ```
 
-and replace 'default' with the string that matched your project directory.
+and replace 'default' with the string that matched your project directory. This means you can have lots of different project configurations stored and select the one that you want to run by editing this file.
 
 The minimum information required in the project configuration is
 
@@ -305,6 +305,9 @@ The minimum information required in the project configuration is
 - **editors** *[array]* - a list of all users with permission to edit this project. For the standalone version leave this as a list with just 'default' in it.
 - **witnesses** *[array]* - a list of all of the documents whose text is to be collated. The string used should be the one you chose for the directory name and the \_id value in  the metadata.json file.
 - **base_text** *[string]* - the id of the document you want to use as a base text. This must be one of the documents in the list of witnesses for the project.
+
+There are many other settings that can be added to the project configuration and customisations of the collation editor are also specified in this file. These will be documented in the collation_editor_core readme file.
+
 
 ##### Simple project configuration example
 
