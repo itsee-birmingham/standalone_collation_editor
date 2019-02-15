@@ -8,71 +8,7 @@
     "base_text": "NT_GRC_basetext_B04",
     "managingEditor": "default",
     "editors": ["default"],
-    "ilocal_python_implementations": {
-        "prepare_t": {
-            "python_file": "collation.greek_implementations",
-            "class_name": "PrepareData",
-            "function": "prepare_t"
-        },
-        "set_rule_string": {
-            "python_file": "collation.greek_implementations",
-            "class_name": "PrepareData",
-            "function": "set_rule_string"
-        }
-    },
-    "irule_conditions": {
-        "python_file": "collation.greek_implementations",
-        "class_name": "RuleConditions",
-        "configs": [
-            {
-                "id": "ignore_supplied",
-                "label": "Ignore supplied markers",
-                "linked_to_settings": true,
-                "setting_id": "view_supplied",
-                "function": "ignore_supplied",
-                "apply_when": true,
-                "check_by_default": false,
-                "type": "string_application"
-            },
-            {
-                "id": "ignore_unclear",
-                "label": "Ignore unclear markers",
-                "linked_to_settings": true,
-                "setting_id": "view_unclear",
-                "function": "ignore_unclear",
-                "apply_when": true,
-                "check_by_default": false,
-                "type": "string_application"
-            },
-            {
-                "id": "only_nomsac",
-                "label": "Only apply to Nomina Sacra",
-                "linked_to_settings": false,
-                "function": "match_nomsac",
-                "apply_when": true,
-                "check_by_default": false,
-                "type": "boolean"
-            }
-        ]
-    },
-    "idisplaySettings": {
-        "python_file": "collation.core.default_implementations",
-        "class_name": "ApplySettings",
-        "configs": [
-            {
-    			    	  	"id": "view_supplied",
-                            "label": "view supplied text",
-                            "function": "hide_supplied_text",
-                            "menu_pos": 1,
-                            "execution_pos": 2,
-                            "check_by_default": true,
-                            "apply_when": false
-    			      }
-        ]
-    },
-
-
-"witnesses": 
+    "witnesses": [
         "NT_GRC_basetext_B04",
         "NT_GRC_1_B04",
         "NT_GRC_13_B04",
