@@ -323,5 +323,4 @@ The minimum information required in the project configuration is
               ],
   "base_text": "document_3"
 }
-
 ```
