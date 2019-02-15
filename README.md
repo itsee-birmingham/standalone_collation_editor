@@ -4,6 +4,8 @@ This code is the core of the collation editor. The code in this repository is no
 It needs to be embedded into a larger platform with a database or similar storage. The connections are made with a services file writen in Javascript. Further configuration of settings and other options can also be provided if needed. Data input is all in JSON.
 
 
+
+
 Dependencies
 ---
 
