@@ -198,7 +198,11 @@ class PostProcessor(Regulariser):
                     if text == 'None':
                         new_readings[text] = {'text': []}
                     else:
-                        new_readings[text] = {'text': [readings_list[j]['text'][i]]}
+                        try:
+                            new_readings[text] = {'text': [readings_list[j]['text'][i]]}
+                        except:
+                            sys.stderr.write('**** Problem with readings_list[j][text] array max: {}'.format(len(readings_list[j]['text'])) + '; i: {}'.format(i))
+                            new_readings[text] = {'text': []}
                     new_readings[text]['witnesses'] = readings_list[j]['witnesses']
             all_witnesses = copy.copy(witnesses)
             for key in new_readings:
