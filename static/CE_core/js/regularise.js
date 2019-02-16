@@ -627,6 +627,12 @@ RG = (function() {
     //
     // } else {
       result_callback = function(data) {
+        if (data === null) {
+          alert(CL.context + ' does not collate.');
+          SPN.remove_loading_overlay();
+          location.reload();
+          return;
+        }
         CL.data = data;
         CL.data = _integrateLacOmReadings(CL.data);
         CL.dataSettings.base_text_siglum = data.overtext_name;
@@ -637,10 +643,10 @@ RG = (function() {
         }
       };
     // }
-    options.error = function() {
-      alert(CL.context + ' does not collate.');
-      SPN.remove_loading_overlay();
-    };
+    // options.error = function() {
+    //   alert(CL.context + ' does not collate.');
+    //   SPN.remove_loading_overlay();
+    // };
     CL.services.doCollation(CL.context, options, result_callback);
   };
 
