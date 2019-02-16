@@ -3,6 +3,7 @@
 
 """
 from functools import partial
+from .exceptions import DataInputException
 import copy
 import decimal
 import re
@@ -201,8 +202,8 @@ class PostProcessor(Regulariser):
                         try:
                             new_readings[text] = {'text': [readings_list[j]['text'][i]]}
                         except:
-                            sys.stderr.write('**** Problem with readings_list[j][text] array max: {}'.format(len(readings_list[j]['text'])) + '; i: {}'.format(i))
-                            new_readings[text] = {'text': []}
+                            print('**** Problem with readings_list[j][text] array max: {} '.format(len(readings_list[j]['text'])) + '; i: {}'.format(i), file=sys.stderr)
+                            raise DataInputException('Error likely to have been caused by input data')
                     new_readings[text]['witnesses'] = readings_list[j]['witnesses']
             all_witnesses = copy.copy(witnesses)
             for key in new_readings:
