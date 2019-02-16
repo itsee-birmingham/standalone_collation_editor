@@ -141,6 +141,7 @@ RG = (function() {
                       'scope': data[i].text[j][witness].decision_details[l].scope,
                       't': data[i].text[j][witness].decision_details[l].t.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
                       'n': data[i].text[j][witness].decision_details[l].n.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
+                      'class': data[i].text[j][witness].decision_details[l].class.replace(/[^a-zA-Z]'/g, '_'),
                       'witnesses': [witness]
                     };
                   }
@@ -165,6 +166,7 @@ RG = (function() {
                 if (_hasDeletionScheduled(key)) {
                   reg_class += 'deleted ';
                 }
+		reg_class += 'regclass_'+id_dict[key].class + ' ';
                 highlighted = '';
                 if (id_dict[key].witnesses.length > 1) {
                   id_dict[key].witnesses = CL.sortWitnesses(id_dict[key].witnesses);
@@ -192,7 +194,7 @@ RG = (function() {
                 } else {
                   cells_dict[id_dict[key].witnesses[0]] = [rule_cells.join(' ')];
                 }
-                events[subrow_id] = id_dict[key].scope + ': ' + _getRegWitsAsString(id_dict[key].witnesses);
+                events[subrow_id] = id_dict[key].scope + ': ' + _getRegWitsAsString(id_dict[key].witnesses) + ' (' + id_dict[key].class + ')';
               }
             }
             keys_to_sort = CL.sortWitnesses(keys_to_sort);
@@ -625,6 +627,12 @@ RG = (function() {
     //
     // } else {
       result_callback = function(data) {
+        if (data === null) {
+          alert(CL.context + ' does not collate.');
+          SPN.remove_loading_overlay();
+          location.reload();
+          return;
+        }
         CL.data = data;
         CL.data = _integrateLacOmReadings(CL.data);
         CL.dataSettings.base_text_siglum = data.overtext_name;
@@ -635,10 +643,10 @@ RG = (function() {
         }
       };
     // }
-    options.error = function() {
-      alert(CL.context + ' does not collate.');
-      SPN.remove_loading_overlay();
-    };
+    // options.error = function() {
+    //   alert(CL.context + ' does not collate.');
+    //   SPN.remove_loading_overlay();
+    // };
     CL.services.doCollation(CL.context, options, result_callback);
   };
 
