@@ -16,6 +16,18 @@ form {
     padding: 7px;
 }
 
+tr.ui-selected  {
+  color: salmon;
+}
+
+tr.ui-unselecting {
+  color: gray;
+}
+
+tr.ui-selecting  {
+  background: darkgray;
+}
+
 td.nav {
 	font-size: 20pt;
 }
@@ -102,13 +114,7 @@ td div.spacer {
 	border: none;
 }
 
-.regularised {
-	color: gray;
-}
 
-.regularised_global {
-    color: gray;
-}
 
 .subreading_form {
 	position:fixed;
@@ -220,9 +226,19 @@ tr.regularised {
     color: grey;
 }
 
+tr.regularised_global {
+    color: gray;
+}
+
 tr.deleted {
     color: red;
 }
+
+div.regularisation_staged {
+	color: gray;
+}
+
+
 
 /** reordering table */
 

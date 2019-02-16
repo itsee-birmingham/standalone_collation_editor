@@ -29,10 +29,6 @@ OR = (function() {
 
   /**create and show the reorder readings display
    *
-   * required:
-   * data - JSON data structure of variation units
-   * context - the verse in the format: B04K6V23
-   *
    * optional:
    * container - the HTML element to put the html result in
    *              (defaults to body if not supplied or can't find it)
@@ -760,10 +756,12 @@ OR = (function() {
     };
 
     _editLabel = function(rdg_details, menu_pos) {
-      var left, top, label_form, html, new_label;
+      var left, top, label_form, html, new_label, reading, current_label;
       left = menu_pos.left;
       top = menu_pos.top;
       label_form = document.createElement('div');
+      reading = CL.data[rdg_details[1]][rdg_details[0]].readings[rdg_details[2]];
+      current_label = reading.label;
       label_form.setAttribute('id', 'label_form');
       label_form.setAttribute('class', 'label_form');
       html = [];
@@ -780,7 +778,7 @@ OR = (function() {
       top = parseInt(top) - document.getElementById('scroller').scrollTop;
       document.getElementById('label_form').style.left = left + 'px';
       document.getElementById('label_form').style.top = top + 'px';
-      document.getElementById('new_label').value = ''; //clear the text box just in case there is hangover
+      document.getElementById('new_label').value = current_label; //populate field with current label value
       $('#close_button').on('click', function(event) {
         document.getElementsByTagName('body')[0].removeChild(document.getElementById('label_form'));
       });

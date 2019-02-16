@@ -8,6 +8,7 @@ CL = (function() {
       container = null,
       displaySettings = {},
       displaySettingsDetails = [],
+      ruleClasses = null,
       ruleConditions = [],
       localPythonFunctions = {},
       overlappedOptions = [],
@@ -50,11 +51,12 @@ CL = (function() {
   getSpecifiedAncestor, hideTooltip, addHoverEvents, markReading, showSplitWitnessMenu,
   markStandoffReading, findUnitPosById, findReadingById, applyPreStageChecks,
   makeStandoffReading, doMakeStandoffReading, makeMainReading, getOrderedAppLines,
-  loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses;
+  loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses,
+  calculatePosition;
 
   //private function declarations
   let _initialiseEditor, _initialiseProject, _setProjectConfig, _setDisplaySettings,
-   _setLocalPythonFunctions, _setRuleConditions, _setOverlappedOptions,
+   _setLocalPythonFunctions, _setRuleClasses, _setRuleConditions, _setOverlappedOptions,
    _includeJavascript, _prepareCollation, _findSaved, _getContextFromInputForm,
    _getWitnessesFromInputForm, _showSavedVersions, _getSavedRadio, _makeSavedCollationTable,
    _loadSavedCollation, _getSubreadingWitnessData, _findStandoffRegularisationText,
@@ -67,7 +69,7 @@ CL = (function() {
    _addNavEvent, _findLatestStageVerse, _loadLatestStageVerse, _removeOverlappedReadings,
    _applySettings, _getApprovalSettings, _compareReadings,
    _disableEventPropagation, _showCollationSettings, _checkWitnesses, _getScrollPosition,
-   _getMousePosition, _calculatePosition, _displayWitnessesHover, _getWitnessesForReading,
+   _getMousePosition, _displayWitnessesHover, _getWitnessesForReading,
    _findStandoffWitness, _findReadingPosById, _getPreStageChecks, _makeRegDecisionsStandoff,
    _contextInputOnload;
 
@@ -498,19 +500,13 @@ CL = (function() {
     }
     return null;
   };
-
+  //TODO: sort out this mess of what is called what and snake vs camel for regularisation_classes and ruleClasses and rule_classes!!!!
   //TODO: is this the most efficient way to do this?
   //rule_classes could at least be set once in project config even if we have to cycle through them every time here
   getRuleClasses = function(test_key, test_value, key, data) {
     var i, j, classes, list, rule_classes;
     classes = {};
-    if (CL.project.hasOwnProperty('ruleClasses') && CL.project.ruleClasses !== undefined) {
-      rule_classes = CL.project.ruleClasses;
-    } else if (CL.services.hasOwnProperty('ruleClasses')) {
-      rule_classes = CL.services.ruleClasses;
-    } else {
-      rule_classes = DEF.ruleClasses;
-    }
+    rule_classes = CL.ruleClasses;
     for (i = 0; i < rule_classes.length; i += 1) {
       if (rule_classes[i][test_key] === test_value || typeof test_key === 'undefined') {
         if ($.type(data) === 'string') {
@@ -603,23 +599,25 @@ CL = (function() {
   };
 
   addTriangleFunctions = function(format) {
-    var triangles, i;
+    var triangles;
     $('.triangle').on('click.collapse', function(event) {
       _collapseUnit(event.target.id, format);
       _disableEventPropagation(event);
     });
-    if (_collapsed === true) {
-      _collapseAll(format);
-      document.getElementById('expand_collapse_button').value = 'expand all';
-      $('#expand_collapse_button').on('click.expand_all', function(event) {
-        _expandAll(format);
-      });
-    } else {
-      _expandAll(format);
-      document.getElementById('expand_collapse_button').value = 'collapse all';
-      $('#expand_collapse_button').on('click.collapse_all', function(event) {
+    if (document.getElementById('expand_collapse_button')) {
+      if (_collapsed === true) {
         _collapseAll(format);
-      });
+        document.getElementById('expand_collapse_button').value = 'expand all';
+        $('#expand_collapse_button').on('click.expand_all', function(event) {
+          _expandAll(format);
+        });
+      } else {
+        _expandAll(format);
+        document.getElementById('expand_collapse_button').value = 'collapse all';
+        $('#expand_collapse_button').on('click.collapse_all', function(event) {
+          _collapseAll(format);
+        });
+      }
     }
   };
 
@@ -691,7 +689,7 @@ CL = (function() {
         }
         i += 1;
       } else if (i === unit_index) { //we do have a variant for this word
-        if (unit.readings.length > 1 ||
+        if (unit.readings.length > 0 ||
           //this is now set to always show units regardless of whether they have variation
           //the unused logic is left in incase we want to revert to the old way sometime
           (format === 'reorder') ||
@@ -740,7 +738,10 @@ CL = (function() {
           if (unit.hasOwnProperty('created') && unit.created === true) {
             unit_data_options.created = true;
           }
-          if (format === 'regularise') {
+          if (options.hasOwnProperty('getUnitDataFunction')) {
+            unit_data_options.format = format;
+            unit_data = options.getUnitDataFunction(unit.readings, id_string, unit.start, unit.end, unit_data_options);
+          } else if (format === 'regularise') {
             unit_data = RG.getUnitData(unit.readings, id_string, unit.start, unit.end, unit_data_options);
           } else if (format === 'set_variants') {
             unit_data_options.td_id = td_id;
@@ -1044,7 +1045,10 @@ CL = (function() {
           if (!unitHasText(unit)) {
             unit_data_options.gap_unit = true;
           }
-          if (format === 'regularise') {
+          if (options.hasOwnProperty('getUnitDataFunction')) {
+            unit_data_options.format = format;
+            unit_data = options.getUnitDataFunction(unit.readings, id_string, unit.start, unit.end, unit_data_options);
+          } else if (format === 'regularise') {
             unit_data = RG.getUnitData(unit.readings, id_string, unit.start, unit.end, unit_data_options);
           } else if (format === 'set_variants') {
             unit_data = SV.getUnitData(unit.readings, id_string, unit.start, unit.end, unit_data_options);
@@ -1374,7 +1378,7 @@ CL = (function() {
     if (CL.project.hasOwnProperty('extraFooterButtons') && CL.project.extraFooterButtons.hasOwnProperty(stage)) {
       for (i = 0; i < CL.project.extraFooterButtons[stage].length; i += 1) {
         if (CL.project.extraFooterButtons[stage][i].hasOwnProperty('id')) {
-          html.push('<input class="pure_button" type="button" id="' + CL.project.extraFooterButtons[stage][i].id + '" value="');
+          html.push('<input class="pure-button left_foot" type="button" id="' + CL.project.extraFooterButtons[stage][i].id + '" value="');
           if (CL.project.extraFooterButtons[stage][i].hasOwnProperty('label')) {
             html.push(CL.project.extraFooterButtons[stage][i].label);
           } else {
@@ -1386,7 +1390,7 @@ CL = (function() {
     } else if (CL.services.hasOwnProperty('extraFooterButtons') && CL.services.extraFooterButtons.hasOwnProperty(stage)) {
       for (i = 0; i < CL.services.extraFooterButtons[stage].length; i += 1) {
         if (CL.services.extraFooterButtons[stage][i].hasOwnProperty('id')) {
-          html.push('<input class="pure_button" type="button" id="' + CL.services.extraFooterButtons[stage][i].id + '" value="');
+          html.push('<input class="pure-button left_foot" type="button" id="' + CL.services.extraFooterButtons[stage][i].id + '" value="');
           if (CL.services.extraFooterButtons[stage][i].hasOwnProperty('label')) {
             html.push(CL.services.extraFooterButtons[stage][i].label);
           } else {
@@ -1452,6 +1456,9 @@ CL = (function() {
     var unit_details_regex, m, details;
     unit_details_regex = /(variant|drag)_unit_(\d+)(_app_)?(\d+)?(_reading_|_row_)?(\d+)?/;
     m = id.match(unit_details_regex);
+    if (m === null) {
+      console.log(unit_details_regex)
+    }
     details = [parseInt(m[2], 10)];
     if (typeof m[4] !== 'undefined') {
       details.push('apparatus' + m[4]);
@@ -1564,7 +1571,7 @@ CL = (function() {
     if (CL.project.hasOwnProperty('witnessSort')) {
       //use a project function if there is one
       CL.run_function(CL.project.witnessSort, [witnesses]);
-    } else if (CL.services.hasOwnProperty('witnessSort')) {
+    } else if (CL.services && CL.services.hasOwnProperty('witnessSort')) {
       //or use the default for the services if there is one
       CL.run_function(CL.services.witnessSort, [witnesses]);
     } else {
@@ -2292,7 +2299,7 @@ CL = (function() {
   };
 
   addIndexHandlers = function() {
-    if (document.getElementById('switch_project_button')) {
+    if (document.getElementById('switch_project_button') && CL.services.hasOwnProperty('switchProject')) {
       CL.services.switchProject();
     }
     if (document.getElementById('collation_settings')) {
@@ -2541,10 +2548,8 @@ CL = (function() {
   };
 
   _setProjectConfig = function(project) {
-    CL.project = {
-      'ruleClasses': project.ruleClasses,
-      'book_name': project.book_name,
-    };
+    CL.project = {};
+
     //TODO DEPRECATE _id (for id) and project (for name) in future release
     if (project.hasOwnProperty('_id')) {
       CL.project.id = project._id;
@@ -2559,6 +2564,9 @@ CL = (function() {
       CL.project.name = project.name;
     }
     //end deprecation
+    if (project.hasOwnProperty('book_name')) {
+      CL.project.book_name = project.book_name;
+    }
     if (project.hasOwnProperty('witnessSort')) {
       CL.project.witnessSort = project.witnessSort;
     }
@@ -2590,10 +2598,24 @@ CL = (function() {
         'form': 'CE_core/html_fragments/default_index_input.html'
       };
     }
+    _setRuleClasses(project);
     _setDisplaySettings(project);
     _setLocalPythonFunctions(project);
     _setRuleConditions(project);
     _setOverlappedOptions(project);
+  };
+
+  _setRuleClasses = function(project) {
+    if (project.hasOwnProperty('ruleClasses') && project.ruleClasses !== undefined) {
+      CL.ruleClasses = project.ruleClasses;
+    } else if (project.hasOwnProperty('regularisation_classes') && project.regularisation_classes !== undefined) {
+      //a temporary thing while we sort out names of settings!!
+      CL.ruleClasses = project.regularisation_classes;
+    } else if (CL.services && CL.services.hasOwnProperty('ruleClasses')) {
+      CL.ruleClasses = CL.services.ruleClasses;
+    } else {
+      CL.ruleClasses = DEF.ruleClasses;
+    }
   };
 
   _setDisplaySettings = function(project) {
@@ -4138,7 +4160,7 @@ CL = (function() {
     return position;
   };
 
-  _calculatePosition = function(e, element) {
+  calculatePosition = function(e, element) {
     var width, position, scroll_position;
     element.style.left = '-1000px';
     element.style.top = '-1000px';
@@ -4172,7 +4194,7 @@ CL = (function() {
     } else {
       return;
     }
-    _calculatePosition(event, element);
+    calculatePosition(event, element);
     element.style.display = "block";
     event.stopPropagation();
   };
@@ -4382,6 +4404,7 @@ CL = (function() {
     collateData: collateData,
     context: context,
     data: data,
+    calculatePosition: calculatePosition,
 
     setServiceProvider: setServiceProvider,
     expandFillPageClients: expandFillPageClients,

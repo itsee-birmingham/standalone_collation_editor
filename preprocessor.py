@@ -3,6 +3,7 @@ import sys
 import importlib
 import json
 import warnings
+from .exceptions import DataInputException
 from collation.core.postprocessor import PostProcessor
 import urllib.request
 from collation.core.regulariser import Regulariser
@@ -197,8 +198,6 @@ class PreProcessor(Regulariser):
                 alignment_table =  json.loads(collatex_response.decode('utf-8')) #json.loads(collatex_response)#
             except AttributeError: #python returns a string rather than bytes
                 alignment_table =  json.loads(collatex_response)
-            except ValueError:
-                return self.return_error(collatex_response)
 
             #get overtext details
             overtext_details = self.get_overtext(verse)
@@ -220,8 +219,12 @@ class PreProcessor(Regulariser):
             local_python_functions=self.local_python_functions,
             rule_conditions_config=self.rule_conds_config
             )
-        output = pp.produce_variant_units()
+        try:
+            output = pp.produce_variant_units()            
+        except DataInputException :
+            raise DataInputException
         return output
+
 
 
     def get_overtext(self, verse):
