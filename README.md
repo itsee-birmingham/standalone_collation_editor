@@ -291,6 +291,8 @@ If this is a gap before the very first extant word in the given unit then you mu
 The project configurations are located at `collation/data/project`.
 
 In this directory there can be a number of different project directories each must contain a `config.json` file. The project supplied for the example is called `default`. You can replace this configuration with your own or add a new directory for a second project. If you add a new project then you will need to edit the file at `collation/static/js/local_services.js` to change line 361 which should read
+
+
 ```
 _current_project = 'default';  
 ```

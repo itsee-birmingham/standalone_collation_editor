@@ -121,8 +121,10 @@ def collation(app, context):
         rule_conditions_config = None
 
     p = PreProcessor(display_settings_config, local_python_functions, rule_conditions_config)
-    output = p.process_witness_list(data_input, requested_witnesses, rules, basetext_transcription, project, display_settings, collate_settings, accept)
-    print(output)
+    try:
+        output = p.process_witness_list(data_input, requested_witnesses, rules, basetext_transcription, project, display_settings, collate_settings, accept)
+    except:
+        abort(500, "Data Input Exception")
     response.content_type = 'application/json'
     return json.dumps(output)#, default=json_util.default)
 
