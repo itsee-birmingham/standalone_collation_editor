@@ -1,6 +1,6 @@
 collation_editor = (function() {
 
-  //function called on document ready
+  //must be called when system is ready to load and critically *after* staticUrl has been set
   var init = function(callback) {
     $.when(
       $.getScript( staticUrl + 'CE_core/js/collation_forms.js'),
