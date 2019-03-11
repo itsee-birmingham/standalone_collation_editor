@@ -1656,6 +1656,7 @@ SV = (function () {
 	_doMoveSingleReading = function (target_location, original_location, unit_num, rd) {
 		var scroll_offset, witnesses, i, newunit, readings, unit2, reading, added, problems, warning_mess,
 		rdg_details, replacement_readings, newunit_id, newunit_pos;
+
 		//move the single reading
 		scroll_offset = [document.getElementById('scroller').scrollLeft,
 		                 document.getElementById('scroller').scrollTop];
@@ -1663,8 +1664,8 @@ SV = (function () {
 		//get some details we need to check for overlap
 		unit2 = CL.data.apparatus[unit_num];
 		rdg_details = CL.getUnitAppReading(rd.obj.id);
-		//get the reading you've moved
-		reading = unit2.readings[rdg_details[2]];
+		//get the reading you've moved and copy it otherwise prepareForOperation will lose data
+		reading = JSON.parse(JSON.stringify(unit2.readings[rdg_details[2]]));
 		if (!reading.hasOwnProperty('overlap_status') || reading.overlap_status === 'duplicate') {
 			if ((!_targetHasOverlapConflict(target_location, unit_num, reading) && !_sourceHasOverlapConflict(unit_num, reading)) ||
 					(_allOverlapsMatch(target_location, unit_num) && reading.text.length > 0)) { //last condition allows movement to gaps within the same overlap unit set
