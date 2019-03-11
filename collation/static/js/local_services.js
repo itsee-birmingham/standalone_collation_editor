@@ -30,11 +30,11 @@ local_services = (function() {
   };
 
   //TODO: remove private stuff from here if we stick with a single model
-  getVerseData = function(verse, witness_list, private_witnesses, success_callback) {
+  getVerseData = function(context, witnesses, private_witnesses, success_callback) {
     if (private_witnesses) {
       return success_callback([], RG.calculate_lac_wits);
     }
-    _load_witnesses(verse, witness_list, function(results) {
+    _load_witnesses(context, witnesses, function(results) {
       success_callback(results, RG.calculate_lac_wits);
     });
   };
