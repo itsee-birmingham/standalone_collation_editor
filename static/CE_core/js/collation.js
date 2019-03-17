@@ -1371,7 +1371,7 @@ CL = (function() {
     }
   };
 
-  //TODO: this should be called at all stages currently just called in SV
+
   addExtraFooterButtons = function(stage) {
     var i, html;
     html = [];
