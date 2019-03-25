@@ -1095,6 +1095,7 @@ RG = (function() {
       if (rule_classes[i].value === decision_class) {
         if (rule_classes[i].hasOwnProperty('suffixed_sigla') &&
             rule_classes[i].suffixed_sigla === true &&
+            rule_classes[i].hasOwnProperty('identifier') &&
             typeof rule_classes[i].identifier !== 'undefined') {
           suffix += rule_classes[i].identifier;
         }
