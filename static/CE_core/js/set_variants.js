@@ -1946,7 +1946,7 @@ SV = (function () {
 		if (witness_equality && overlap_boundaries && overlap_status_agreement) {
 			if (keep_id === true) {
 				//combine the reference ids in the top apparatus
-				SV.combine_apparatus_ids(unit1._id, unit2._id);
+				_combineApparatusIds(unit1._id, unit2._id);
 			}
 			combined_gap_before_subreadings = [];
 			combined_gap_after_subreadings = [];
