@@ -47,7 +47,7 @@ var DEF = (function () {
           "create_in_RG": true,
           "create_in_SV": true,
           "create_in_OR": true,
-          "suffixed_sigla": false
+          "suffixed_sigla": false,
           "suffixed_label": false,
           "suffixed_reading": false,
           "subreading": false,
@@ -65,7 +65,7 @@ var DEF = (function () {
                   "function": "ignore_supplied",
                   "apply_when": true,
                   "check_by_default": false,
-                  "type": "string_application"
+                  "type": "string_application",
                   "linked_to_settings": true,
                   "setting_id": "view_supplied",
 
@@ -76,7 +76,7 @@ var DEF = (function () {
                   "function": "ignore_unclear",
                   "apply_when": true,
                   "check_by_default": false,
-                  "type": "string_application"
+                  "type": "string_application",
                   "linked_to_settings": true,
                   "setting_id": "view_unclear",
 
