@@ -442,10 +442,15 @@ local_services = (function() {
             context: verse,
             tei: '',
             siglum: j[k].siglum,
-            transcription_id: j[k].transcription_id,
             transcription_siglum: j[k].transcription_siglum,
             witnesses: j[k].witnesses
           };
+          //a fudge so exsiting and new data structures still work. Eventually all should just be transcription including the key in doc_wit
+          if (j[k].hasOwnProperty('transcription')) {
+            doc_wit.transcription_id = j[k].transcription;
+          } else {
+            doc_wit.transcription_id = j[k].transcription_id
+          }
           results.push(doc_wit);
         }
       }
