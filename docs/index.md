@@ -1,4 +1,4 @@
-This Wiki provides detailed information about the use of the standalone collation editor. 
+These pages provide detailed information about the use of the standalone collation editor. 
 
 Installation and start-up details can be found in the readme file in the main repository.
 
