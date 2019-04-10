@@ -1,6 +1,8 @@
 Introduction
 ---
-This is a standalone version of the collation editor. It works with the local file system on your computer. A small example of a single Greek verse is included as a sample file.
+This is a standalone version of the collation editor. It works with the local file system on your computer. A small example of a single Greek verse is included as a sample file. 
+
+The collation editor is a GUI wrapper around [CollateX](https://collatex.net/). A version of that software is included in the standalone collation editor.
 
 
 Requirements
