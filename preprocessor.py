@@ -11,7 +11,7 @@ from collation.core.regulariser import Regulariser
 
 class PreProcessor(Regulariser):
 
-    def __init__(self, display_settings_config=None, local_python_functions=None, rule_conditions_config=None):
+    def __init__(self, display_settings_config=None, local_python_functions=None, rule_conditions_config=None, split_single_reading_units=False): #last arg just to be compatible with dev branch
         self.display_settings_config = display_settings_config
         self.local_python_functions = local_python_functions
         self.rule_conds_config = rule_conditions_config
@@ -220,7 +220,7 @@ class PreProcessor(Regulariser):
             rule_conditions_config=self.rule_conds_config
             )
         try:
-            output = pp.produce_variant_units()            
+            output = pp.produce_variant_units()
         except DataInputException :
             raise DataInputException
         return output
