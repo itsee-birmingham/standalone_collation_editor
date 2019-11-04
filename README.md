@@ -657,6 +657,9 @@ This function tells the collation editor how to extract the list of witnesses fr
 
 This default behaviour can be overridden by providing this function in the services. It cannot be overwritten in the project settings so the function must work for all projects you host. The function must return an array containing the ids of the documents selected to be collated.
 
+- #### ```getApparatusForContext()```
+
+This function can be used to override the default in the collation editor core code. It takes as an argument a success callback which can be used in conjunction with the export settings to control the export process. Can be useful if a CSRF token is required to download the output.
 
 Data Structures
 ---
@@ -675,9 +678,7 @@ Much of this is explained above but I will put more of a step by step guide here
 
 
 
-
-
-Upgrading to collation_editor_core 1.0.0 from deprecated collation_editor
+Upgrading to collation_editor_core 1.0.x from deprecated collation_editor
 ---
 
 This code is not backwards compatible with early versions of the code archived at https://github.com/itsee-birmingham/collation_editor
@@ -687,3 +688,48 @@ Code changes are largely the conversion of function names from snake case to cam
 There are also some required changes to the data structures that the collation editor uses. Most of these changes are deprecated so they will continue to work but support will be removed in future versions. Some changes are required now.
 
 I will try to list all of the changes required now and those that are deprecated below. If you find any other problems while upgrading please let me know by opening an issue in the github repository.
+
+#### Changes to the initialisation
+
+The inclusion of the editor and initialisation of the editor has changed. Please follow the initialisation instructions above to correct this.
+
+#### New service functions required
+
+- getCurrentEditingProject - described in the service file documentation above
+
+
+#### New optional service functions
+
+- getWitnessesFromInputForm - descibed in the service file documentation above
+- getApparatusForContext - descibed in the service file documentation above
+- localCollationFunction - descibed in the service file documentation above
+
+#### Changes to service functions
+
+- doCollation does not need context in url to collation server
+- getUserInfoByIds needs to return 'id' in user model rather than '\_id'
+
+
+#### Changes to keys required/suggested in data models (most are deprecated and carry warnings but will be removed in future versions)
+
+- project model
+  - 'id' should be used rather than '\_id'
+  - 'name' should be used rather than 'project'
+  - 'basetext' should be used rather than 'base_text'
+
+- decision/rule model
+  - 'id' should be used rather than '\_id'.  **this change must be made either in the data or in the services file as 'id' is now used for rule deletion not _id**
+  - '\_model' no longer required/used
+  - 'active' no longer required/used
+  - use 'created_time' for sorting rather than '\_meta.\_last_modified_time' (both still work for now but \_meta is deprecated)
+
+- collation model
+  - '\_model' no longer required/used
+  - 'id' is used in the collation editor rather than '\_id' (this can be fixed in services by switching it if the database models need to stay the same)
+  - should provide 'user' which is the id of the user owning the collation
+
+- user model
+  - 'id' should be used rather than '\_id'
+
+- collation unit model
+  - data for collation should use 'transcription' rather than 'transcription_id'
