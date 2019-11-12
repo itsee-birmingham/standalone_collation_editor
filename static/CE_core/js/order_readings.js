@@ -1155,7 +1155,7 @@ OR = (function() {
         $('#mark_as_' + key).off('click.' + key + '_c');
         $('#mark_as_' + key).off('mouseover.' + key + '_mo');
         $('#mark_as_' + key).on('click.' + key + '_c', function(event) {
-          var element, div, unit, unit_pos, rdg_details, reading_pos, reading, reading_details;
+          var element, app_id, div, unit, unit_pos, rdg_details, reading_pos, reading, reading_details;
           element = SimpleContextMenu._target_element;
           div = CL.getSpecifiedAncestor(element, 'TR');
           rdg_details = CL.getUnitAppReading(div.id);
