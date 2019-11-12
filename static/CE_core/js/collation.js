@@ -1759,10 +1759,9 @@ CL = (function() {
     //Populate the subreading type dropdown
     if (document.getElementById('subreading_select')) {
       subreading_classes = [];
-      //TODO: check this can use CL.project.ruleClasses
-      for (i = 0; i < CL.project.ruleClasses.length; i += 1) {
-        if (CL.project.ruleClasses[i].create_in_SV === true && CL.project.ruleClasses[i].subreading === true) {
-          subreading_classes.push(CL.project.ruleClasses[i]);
+      for (i = 0; i < CL.ruleClasses.length; i += 1) {
+        if (CL.ruleClasses[i].create_in_SV === true && CL.ruleClasses[i].subreading === true) {
+          subreading_classes.push(CL.ruleClasses[i]);
         }
       }
       cforms.populateSelect(subreading_classes, document.getElementById('subreading_select'), {'value_key': 'value', 'text_keys': 'name', 'add_select': false});
