@@ -379,7 +379,7 @@ class PostProcessor(Regulariser):
                 try:
                     start_index = int(base_reading[0][self.overtext_name]['index'])
                     end_index = int(base_reading[-1][self.overtext_name]['index'])
-                except KeyError, IndexError, ValueError:
+                except (KeyError, IndexError, ValueError):
                     print('**** Problem witness: {}'.format(self.overtext_name), file=sys.stderr)
                     start_index = previous_index + 1
                     end_index = previous_index + 1

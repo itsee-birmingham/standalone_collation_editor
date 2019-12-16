@@ -253,10 +253,10 @@ class PreProcessor(Regulariser):
                 readings.append(witness['id'])
             if '{}*'.format(verse['siglum']) in readings:
                 return ['{}*'.format(verse['siglum']),
-                        [verse['witnesses'][readings.index('{}*'format(verse['siglum']))]]
+                        [verse['witnesses'][readings.index('{}*'.format(verse['siglum']))]]
                         ]
             elif '{}T'.format(verse['siglum']) in readings:
-                return ['{}T'format(verse['siglum']),
+                return ['{}T'.format(verse['siglum']),
                         [verse['witnesses'][readings.index('{}T'.format(verse['siglum']))]]
                         ]
             else:
