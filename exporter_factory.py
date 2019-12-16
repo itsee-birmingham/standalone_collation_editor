@@ -1,4 +1,4 @@
- #-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import importlib
 
 
@@ -20,7 +20,6 @@ class ExporterFactory (object):
             self.ignore_basetext = False
         MyClass = getattr(importlib.import_module(module_name), class_name)
         self.exporter = MyClass()
-
 
     def export_data(self, data, format='positive_xml'):
         return getattr(self.exporter, self.exporter_function)(data, format, self.ignore_basetext)

@@ -1,9 +1,10 @@
-#-*- coding: utf-8 -*-
-import xml.etree.ElementTree as etree
-#from lxml import etree
+# -*- coding: utf-8 -*-
 import re
 import codecs
 import json
+# using etree rather than lxml here to reduce dependencies in core code
+import xml.etree.ElementTree as etree
+
 
 class Exporter(object):
 
@@ -14,8 +15,9 @@ class Exporter(object):
                 output.append(etree.tostring(self.get_unit_xml(unit, ignore_basetext, True), 'utf-8'))
             else:
                 output.append(etree.tostring(self.get_unit_xml(unit, ignore_basetext), 'utf-8'))
-        return b'<?xml version=\'1.0\' encoding=\'utf-8\'?><TEI xmlns="http://www.tei-c.org/ns/1.0">%s</TEI>' % b'\n'.join(output).replace(b'<?xml version=\'1.0\' encoding=\'utf-8\'?>', b'')
-
+        return b'<?xml version=\'1.0\' encoding=\'utf-8\'?>' \
+               b'<TEI xmlns="http://www.tei-c.org/ns/1.0">{}' \
+               b'</TEI>'.format(b'\n'.join(output).replace(b'<?xml version=\'1.0\' encoding=\'utf-8\'?>', b''))
 
     def get_text(self, reading, type=None):
         if type == 'subreading':
@@ -34,7 +36,7 @@ class Exporter(object):
         return text
 
     def get_witnesses(self, reading, missing):
-        witnesses = ['%s%s' % (x, reading['suffixes'][i]) for i, x in enumerate(reading['witnesses'])]
+        witnesses = ['{}{}'.format(x, reading['suffixes'][i]) for i, x in enumerate(reading['witnesses'])]
         for miss in missing:
             if miss in witnesses:
                 witnesses.remove(miss)
@@ -50,7 +52,7 @@ class Exporter(object):
             rdg.set('type', text[1])
         rdg.text = text[0]
         pos = i+1
-        rdg.set('varSeq', '%s' % pos)
+        rdg.set('varSeq', '{}'.format(pos))
         if len(witnesses) > 0:
             rdg.set('wit', ' '.join(witnesses))
             wit = etree.Element('wit')
@@ -61,28 +63,31 @@ class Exporter(object):
             rdg.append(wit)
         return rdg
 
-
-    def get_unit_xml(self, entry, ignore_basetext, negative_apparatus=False, overlap_status_to_ignore=['overlapped', 'deleted'], consolidate_om_verse=True, consolidate_lac_verse=True, include_lemma_when_no_variants=False):
+    def get_unit_xml(self, entry, ignore_basetext, negative_apparatus=False,
+                     overlap_status_to_ignore=['overlapped', 'deleted'], consolidate_om_verse=True,
+                     consolidate_lac_verse=True, include_lemma_when_no_variants=False):
         context = entry['context']
         basetext_siglum = entry['structure']['overtext'][0]['id']
 
         apparatus = entry['structure']['apparatus'][:]
 
-        #make sure we append lines in order
-        ordered_keys = [];
+        # make sure we append lines in order
+        ordered_keys = []
         for key in entry['structure']:
-            if re.match('apparatus\d+', key) != None:
+            if re.match(r'apparatus\d+', key) is not None:
                 ordered_keys.append(int(key.replace('apparatus', '')))
         ordered_keys.sort()
 
         for num in ordered_keys:
-            apparatus.extend(entry['structure']['apparatus%d' % num])
+            apparatus.extend(entry['structure']['apparatus{}'.format(num)])
 
-        vtree = etree.fromstring('<ab xml:id="%s-APP"></ab>' % (context))
-        #here deal with the whole verse lac and om and only use witnesses elsewhere not in these lists
+        vtree = etree.fromstring('<ab xml:id="{}-APP"></ab>'.format(context))
+        # here deal with the whole verse lac and om and only use witnesses elsewhere not in these lists
         missing = []
         if consolidate_om_verse or consolidate_lac_verse:
-            app = etree.fromstring('<app type="lac" n="%s"><lem wit="editorial">Whole verse</lem></app>' % (context))
+            app = etree.fromstring('<app type="lac" n="{}">'
+                                   '<lem wit="editorial">Whole verse</lem>'
+                                   '</app>'.format(context))
 
             if consolidate_lac_verse:
                 if len(entry['structure']['lac_readings']) > 0:
@@ -119,13 +124,15 @@ class Exporter(object):
 
             vtree.append(app)
 
-        if ignore_basetext: #if we are ignoring the basetext add it to our missing list so it isn't listed (except n lemma)
+        if ignore_basetext:
+            # if we are ignoring the basetext add it to our missing list so it isn't listed (except n lemma)
             missing.append(basetext_siglum)
-        apparatus = sorted(apparatus, key=lambda d: (d['start'], -d['end'])) #this sort will change the order of the overlap units so longest starting at each index point comes first
+        # this sort will change the order of the overlap units so longest starting at each index point comes first
+        apparatus = sorted(apparatus, key=lambda d: (d['start'], -d['end']))
         for unit in apparatus:
             start = unit['start']
             end = unit['end']
-            app = etree.fromstring('<app type="main" n="%s" from="%s" to="%s"></app>' % (context, start, end))
+            app = etree.fromstring('<app type="main" n="{}" from="{}" to="{}"></app>'.format(context, start, end))
             lem = etree.Element('lem')
             lem.set('wit', basetext_siglum)
             text = self.get_text(unit['readings'][0])
@@ -138,8 +145,10 @@ class Exporter(object):
                 readings = True
             for i, reading in enumerate(unit['readings']):
                 wits = self.get_witnesses(reading, missing)
-                if negative_apparatus == True:
-                    if (len(wits) > 0 or reading['label'] == 'a') and ('overlap_status' not in reading or reading['overlap_status'] not in overlap_status_to_ignore):
+                if negative_apparatus is True:
+                    if (len(wits) > 0 or reading['label'] == 'a') \
+                            and ('overlap_status' not in reading
+                                 or reading['overlap_status'] not in overlap_status_to_ignore):
                         if reading['label'] == 'a':
                             wits = []
                         if len(wits) > 0:
@@ -151,10 +160,14 @@ class Exporter(object):
                                 wits = self.get_witnesses(subreading, missing)
                                 if len(wits) > 0:
                                     readings = True
-                                    app.append(self.make_reading(subreading, i, '%s%s' % (reading['label'], subreading['suffix']), wits, 'subreading'))
-
+                                    app.append(self.make_reading(subreading, i,
+                                                                 '{}{}'.format(reading['label'], subreading['suffix']),
+                                                                 wits, 'subreading'))
                 else:
-                    if (len(wits) > 0 or reading['label'] == 'a') and ('overlap_status' not in reading or reading['overlap_status'] not in overlap_status_to_ignore):
+                    if ((len(wits) > 0 or reading['label'] == 'a')
+                       and ('overlap_status' not in reading
+                            or reading['overlap_status'] not in overlap_status_to_ignore)):
+
                         if len(wits) > 0:
                             readings = True
                         app.append(self.make_reading(reading, i, reading['label'], wits))
@@ -164,7 +177,9 @@ class Exporter(object):
                                 wits = self.get_witnesses(subreading, missing)
                                 if len(wits) > 0:
                                     readings = True
-                                    app.append(self.make_reading(subreading, i, '%s%s' % (reading['label'], subreading['suffix']), wits, 'subreading'))
+                                    app.append(self.make_reading(subreading, i,
+                                                                 '{}{}'.format(reading['label'], subreading['suffix']),
+                                                                 wits, 'subreading'))
 
             if readings:
                 vtree.append(app)

@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """Algorithm for post-collate processing.
 
 """
@@ -13,7 +13,7 @@ from collation.core.regulariser import Regulariser
 
 
 class PostProcessor(Regulariser):
-    """Convert alignment table (into zarks and then) into variant units."""
+    """Convert alignment table into variant units."""
 
     def __init__(self,
                  alignment_table,
@@ -53,10 +53,8 @@ class PostProcessor(Regulariser):
         MyClass = getattr(importlib.import_module(module_name), class_name)
         self.apply_settings_instance = MyClass()
 
-
-
     ###########################################################
-    #this is starting function
+    # this is the starting function
     def produce_variant_units(self):
         """Produce variant units for display and editing."""
         variant_readings = self.create_readings_sets()
@@ -83,10 +81,10 @@ class PostProcessor(Regulariser):
             token['reading'].remove(witness)
         return reading
 
-    #in the python we only care about embedded gaps not the ones at the edge of each unit
-    #so we don't need to worry about gap_before as they are always before the first word and never embedded
+    # in the python we only care about embedded gaps not the ones at the edge of each unit
+    # so we don't need to worry about gap_before as they are always before the first word and never embedded
     def extract_text_with_gaps(self, text_list, witness):
-        text = [];
+        text = []
         for i, token in enumerate(text_list):
             if i == 0 or i == len(text_list)-1:
                 text.append(token['interface'])
@@ -101,18 +99,18 @@ class PostProcessor(Regulariser):
         readings = {}
         reading_sets = []
 
-        #temporary fix to turn 'sigils' key in old collateX output to 'witnesses' for testing with both versions
+        # temporary fix to turn 'sigils' key in old collateX output to 'witnesses' for testing with both versions
         if 'sigils' in self.alignment_table:
             self.alignment_table['witnesses'] = self.alignment_table['sigils']
         for z, unit in enumerate(self.alignment_table['table']):
-            #first build a dictionary with text string as key to reading structure
+            # first build a dictionary with text string as key to reading structure
             variant_unit = []
             readings = {}
             for i, witness in enumerate(unit):
                 witness = self.process_witness_tokens(witness)
                 try:
                     reading = ' '.join([self.get_token_text(token) for token in witness])
-                except:
+                except TypeError:
                     reading = 'None'
                     witness = []
                 if reading in readings.keys():
@@ -122,9 +120,9 @@ class PostProcessor(Regulariser):
                     readings[reading] = {'witnesses': [self.alignment_table['witnesses'][i]],
                                          'text': self.restructure_tokens(witness)
                                          }
-            #now check to see if these units need to be smaller and split if needed
+            # now check to see if these units need to be smaller and split if needed
             readings_list = self.check_unit_splits(readings)
-            #now build the variant reading structure
+            # now build the variant reading structure
             for unit in readings_list:
                 variant_unit = []
                 for key in unit.keys():
@@ -133,17 +131,16 @@ class PostProcessor(Regulariser):
                     else:
                         variant_unit.append(unit[key])
                 reading_sets.append(variant_unit)
-        #next line was an experiment to try chunking myself.
-        #reading_sets = self.check_adjacent_shared_units(reading_sets)
+        # next line was an experiment to try chunking myself.
+        # reading_sets = self.check_adjacent_shared_units(reading_sets)
         return reading_sets
-
 
     def get_token_text(self, token):
         """Turn a token into a string."""
         if isinstance(token, dict):
             try:
                 return token['interface']
-            except:
+            except KeyError:
                 return token['t']
         else:
             return None
@@ -155,45 +152,44 @@ class PostProcessor(Regulariser):
             for witness in data['reading']:
                 if witness not in witnesses:
                     witnesses.append(witness)
-        except:
+        except KeyError:
             for token in data:
                 for witness in token['reading']:
                     if witness not in witnesses:
                         witnesses.append(witness)
         return witnesses
 
-
     def combine_lists(self, list1, list2):
         return list1 + list(set(list2) - set(list1))
 
-
     def split_unit_into_single_words(self, readings_list, matrix, highest):
-        """Split unit into single words (columns of matrix) and use vertically_combine_readings to combine any resulting shared units """
-        #TODO: make work with matrices of different lengths
-        #get a full set of witnesses
+        """Split unit into single words (columns of matrix) and use
+        vertically_combine_readings to combine any resulting shared units """
+        # TODO: make work with matrices of different lengths
+        # get a full set of witnesses
         witnesses = []
         for reading in readings_list:
             witnesses.extend(reading['witnesses'])
         witnesses = list(set(witnesses))
         readings = []
-        for i in range(0, highest): # i is matrix columns
-            new_readings = {} # new dictionary (basically a unit) for each column
-            for j in range(0, len(matrix)): #j is matrix rows
-                if matrix[j] == None or matrix[j][0] == 'None': #first is for collate 1.5 second for 1.3
+        for i in range(0, highest):  # i is matrix columns
+            new_readings = {}  # new dictionary (basically a unit) for each column
+            for j in range(0, len(matrix)):  # j is matrix rows
+                if matrix[j] is None or matrix[j][0] == 'None':  # first is for collate 1.5 second for 1.3
                     text = 'None'
                 else:
                     try:
                         text = matrix[j][i]
-                    except:
+                    except KeyError:
                         text = 'None'
                 if text in new_readings.keys():
                     if text == 'None':
-                        new_readings[text]['witnesses'] = self.combine_lists(new_readings[text]['witnesses'], \
+                        new_readings[text]['witnesses'] = self.combine_lists(new_readings[text]['witnesses'],
                                                                              readings_list[j]['witnesses'])
                     else:
-                        new_readings[text]['text'] = self.vertically_merge_tokens(new_readings[text]['text'], \
+                        new_readings[text]['text'] = self.vertically_merge_tokens(new_readings[text]['text'],
                                                                                   [readings_list[j]['text'][i]])
-                        new_readings[text]['witnesses'] = self.combine_lists(new_readings[text]['witnesses'], \
+                        new_readings[text]['witnesses'] = self.combine_lists(new_readings[text]['witnesses'],
                                                                              readings_list[j]['witnesses'])
                 else:
                     if text == 'None':
@@ -201,8 +197,9 @@ class PostProcessor(Regulariser):
                     else:
                         try:
                             new_readings[text] = {'text': [readings_list[j]['text'][i]]}
-                        except:
-                            print('**** Problem with readings_list[j][text] array max: {} '.format(len(readings_list[j]['text'])) + '; i: {}'.format(i), file=sys.stderr)
+                        except KeyError:
+                            print('**** Problem with readings_list[j][text] array max: {0}; i: {1}'
+                                  .format(len(readings_list[j]['text']), i), file=sys.stderr)
                             raise DataInputException('Error likely to have been caused by input data')
                     new_readings[text]['witnesses'] = readings_list[j]['witnesses']
             all_witnesses = copy.copy(witnesses)
@@ -210,7 +207,7 @@ class PostProcessor(Regulariser):
                 for wit in new_readings[key]['witnesses']:
                     try:
                         all_witnesses.remove(wit)
-                    except:
+                    except ValueError:
                         pass
             if len(all_witnesses) > 0:
                 if 'None' in new_readings.keys():
@@ -221,25 +218,22 @@ class PostProcessor(Regulariser):
             readings.append(new_readings)
         return readings
 
-
     def vertically_merge_tokens(self, existing_tokens, new_tokens):
         for i, token in enumerate(new_tokens):
-#             existing_tokens[i]['siglum'].extend(token['siglum'])
             for reading in token['reading']:
                 existing_tokens[i][reading] = token[reading]
                 existing_tokens[i]['reading'].append(reading)
         return existing_tokens
 
-
     def check_unit_splits(self, readings):
         """Works out whether any units need further splitting and sends them off to restructure_unit"""
         token_matches = []
         base_text = 'None'
-        #if we have at least two actual readings (not including empty readings)
+        # if we have at least two actual readings (not including empty readings)
         if len(readings.keys()) > 1 and 'None' not in readings.keys() or \
-                 len(readings.keys()) > 2 and 'None' in readings.keys():
-            matrix = [] #a token matrix one row per reading one column per token
-            readings_list = [] # the full reading data in same order as matrix
+           len(readings.keys()) > 2 and 'None' in readings.keys():
+            matrix = []  # a token matrix one row per reading one column per token
+            readings_list = []  # the full reading data in same order as matrix
             for reading in readings.keys():
                 if len(reading.split()) > 0:
                     matrix.append(reading.split())
@@ -248,36 +242,36 @@ class PostProcessor(Regulariser):
                 if self.overtext_name in readings[reading]['witnesses']:
                     base_text = matrix[-1]
                 readings_list.append(readings[reading])
-            highest = 0;
-            lowest = 100000;
+            highest = 0
+            lowest = 100000
             for row in matrix:
-                if row != None:
+                if row is not None:
                     highest = max(len(row), highest)
                     if row[0] != 'None':
                         lowest = min(len(row), lowest)
-            if highest > 1: #if at least one reading has more than one word
+            if highest > 1:  # if at least one reading has more than one word
                 lengths = []
-                #return self.split_unit_into_single_words(readings_list, matrix, highest)
-                #TODO: remove this condition once split unit into single words works with differing lengths
+                # return self.split_unit_into_single_words(readings_list, matrix, highest)
+                # TODO: remove this condition once split unit into single words works with differing lengths
                 if lowest == highest:
                     # if all the readings are the same length
                     return self.split_unit_into_single_words(readings_list, matrix, highest)
                 else:
                     if base_text != 'None':
-                        #if its not an addition
+                        # if its not an addition
                         return self.split_unit_into_single_words(readings_list, matrix, highest)
                     else:
-                        #this is an addition so doesn't need splitting
+                        # this is an addition so doesn't need splitting
                         return [readings]
             else:
-                #this is a single word unit so just return existing readings
+                # this is a single word unit so just return existing readings
                 return [readings]
         else:
-            #there is only one reading in this unit (therefore all read a - a shared unit) so just return existing readings
+            # there is only one reading in this unit (therefore all read a - a shared unit)
+            # so just return existing readings
             return [readings]
 
-
-    #may not ever need this actually
+    # may not ever need this actually
     def horizontal_combine(self, units):
         new_unit = [units[0]]
         for i in range(1, len(units)):
@@ -285,8 +279,7 @@ class PostProcessor(Regulariser):
             new_unit['text'].append(units[i]['text'])
         return new_unit
 
-
-    #TODO: may not even need this - wait for example to switch on
+    # TODO: may not even need this - wait for example to switch on
     def check_adjacent_shared_units(self, reading_sets):
         new_readings = []
         saved = []
@@ -312,7 +305,7 @@ class PostProcessor(Regulariser):
     def restructure_tokens(self, witness):
         """restructure the tokens so to move MS specific details into a secondary level"""
         new_witness = []
-        if witness == None:
+        if witness is None:
             return witness
         for token in witness:
             reading = token['reading']
@@ -327,8 +320,8 @@ class PostProcessor(Regulariser):
 
     def combine_readings(self, existing_reading, new_reading):
         """combine a new readings with an existing reading token by token"""
-        combined_reading= []
-        if existing_reading == None:
+        combined_reading = []
+        if existing_reading is None:
             return None
         for i, token in enumerate(existing_reading):
             combined_reading.append(self.combine_tokens(token, new_reading[i]))
@@ -365,28 +358,29 @@ class PostProcessor(Regulariser):
         previous_index = 0
         for i, unit in enumerate(variant_units):
             base_reading = unit[0]['text']
-            if not len(base_reading) or (\
-                    (self.lac_readings != None and self.overtext_name in self.lac_readings) \
-                    or (self.om_readings != None and self.overtext_name in self.om_readings)):
-                #we are looking at an addition so odd numbers
+            if not len(base_reading) or (
+                    (self.lac_readings is not None and self.overtext_name in self.lac_readings)
+                    or (self.om_readings is not None and self.overtext_name in self.om_readings)):
+                # we are looking at an addition so odd numbers
                 start_index = previous_index + 1
                 end_index = previous_index + 1
                 if start_index == last_addition:
-                    #get the next sub index
+                    # get the next sub index
                     sub_index = self.get_next_sub_index(variant_units[i-1])
                 last_addition = previous_index + 1
             else:
-                #this is an even numbered unit so reset subindex
+                # this is an even numbered unit so reset subindex
                 sub_index = 1
 
                 # we have a base text so just get the start and end from base text indexes!
                 # If the data is not what the system expects then this can fail (Troy found this) so try: except:
-                # used to report errors and use the logic from if above instead - ultimately data needs fixing in these cases
+                # used to report errors and use the logic from if above instead
+                # ultimately data needs fixing in these cases
                 try:
                     start_index = int(base_reading[0][self.overtext_name]['index'])
                     end_index = int(base_reading[-1][self.overtext_name]['index'])
-                except:
-                    print('**** Problem witness: %s' % self.overtext_name, file=sys.stderr)
+                except KeyError, IndexError, ValueError:
+                    print('**** Problem witness: {}'.format(self.overtext_name), file=sys.stderr)
                     start_index = previous_index + 1
                     end_index = previous_index + 1
                 previous_index = end_index
@@ -402,25 +396,24 @@ class PostProcessor(Regulariser):
 
         return anchored_readings
 
-
     def reindex_unit(self, unit, start, end, sub_index_start=1):
         """Make the token indexes match the anchored reading."""
         if start % 2 == 0 and start != end:
             for reading in unit:
                 index = start
                 for token in reading['text']:
-                    token['index'] = '%d' % index
+                    token['index'] = '{}'.format(index)
                     index += 2
-            return '%s' % start
+            return '{}'.format(start)
 
         for reading in unit:
-            #TODO: do we need to do this if there is only one word? also could we throw multi-word ones back to collate
-            #and let it do better aligning?
+            # TODO: do we need to do this if there is only one word? also could we throw multi-word ones back to collate
+            # and let it do better aligning?
             i = sub_index_start
             for token in reading['text']:
-                token['index'] = '%s.%s' % (start, i)
+                token['index'] = '{}.{}'.format(start, i)
                 i += 1
-        return '%s.%s' % (start, sub_index_start)
+        return '{}.{}'.format(start, sub_index_start)
 
     def format_output(self, anchored_readings):
         """Format it nicely."""
@@ -432,7 +425,7 @@ class PostProcessor(Regulariser):
                 'hand_id_map': self.hand_id_map}
 
     def apply_settings(self, token):
-        #set up a base string for interface (this may change later with the settings)
+        # set up a base string for interface (this may change later with the settings)
         if 'n' in token:
             token['interface'] = token['n']
         elif 'original' in token:
@@ -440,10 +433,10 @@ class PostProcessor(Regulariser):
         else:
             token['interface'] = token['t']
 
-        #display_settings_config is already in execution order
+        # display_settings_config is already in execution order
         for setting in self.display_settings_config['configs']:
-            if setting['id'] in self.settings and setting['apply_when'] == True \
-                    or setting['id'] not in self.settings and setting['apply_when'] == False:
+            if setting['id'] in self.settings and setting['apply_when'] is True \
+                    or setting['id'] not in self.settings and setting['apply_when'] is False:
 
                 token = getattr(self.apply_settings_instance, setting['function'])(token)
         token['interface'] = token['interface'].replace('<', '&lt;').replace('>', '&gt;')
@@ -455,70 +448,36 @@ class PostProcessor(Regulariser):
         else:
             new_witness = []
             for token in witness:
-                #here check if there is a post-collate rule for the word, if there is use it if not use settings
+                # here check if there is a post-collate rule for the word, if there is use it if not use settings
                 hit, normalised, details = self.regularise_token(token, self.decisions, 'post-collate')
-                if hit == True:
-                    #make sure rule string is the current last n value so new rules chain properly
+                if hit is True:
+                    # make sure rule string is the current last n value so new rules chain properly
                     token['rule_string'] = details[-1]['n']
-                    if details != None:
+                    if details is not None:
                         try:
                             token['decision_class'].extend([c['class'] for c in details])
-                        except:
+                        except KeyError:
                             token['decision_class'] = [c['class'] for c in details]
                         try:
                             token['decision_details'].extend(details)
-                        except:
+                        except KeyError:
                             token['decision_details'] = details
                     token['interface'] = normalised.replace('<', '&lt;').replace('>', '&gt;')
                 else:
                     token = self.set_rule_string(token)
-                    #create the word we will see in the interface
+                    # create the word we will see in the interface
                     self.apply_settings(token)
                 new_witness.append(token)
             return new_witness
 
     def set_rule_string(self, token):
         if self.local_python_functions and 'set_rule_string' in self.local_python_functions:
-            return getattr(self.set_rule_string_instance, self.local_python_functions['set_rule_string']['function'])(token, self.settings, self.display_settings_config)
+            return getattr(self.set_rule_string_instance,
+                           self.local_python_functions['set_rule_string']['function']
+                           )(token, self.settings, self.display_settings_config)
         else:
             if 'n' in token:
                 token['rule_string'] = token['n']
             else:
                 token['rule_string'] = token['t']
             return token
-
-#     #the plan was to get rid of this but js needs to follow suite as it currently expects this marking (SV does not use it)
-#     def identify_regularised_readings(self, variant_readings):
-#         """find all the regularised readings (basically anything that has a rule applied
-#         and identify them at token level)"""
-#         for unit in variant_readings:
-#             extras = {}
-#             for i, reading in enumerate(unit):
-#                 for witness in reading['witnesses']:
-#                     for j, token in enumerate(reading['text']):
-#                         if 'decision_class' in token[witness].keys():
-#                             token['regularised'] = True
-#                         if len(reading['witnesses']) > 0 and len(reading['text']) > 0: #we only care if there is more than one witness to the reading and it has multiple words
-#                             if j > 0 and j < len(reading['text'])-1: #we don't care about the first or last words of the unit
-#                                 if 'gap_after' in token[witness].keys():
-#                                     #make a new reading
-#                                     gapped_text = self.extract_text_with_gaps(reading['text'], witness)
-#                                     if gapped_text in extras:
-#                                         extras[gapped_text] = self.merge_extra_reading(reading['text'], witness, extras[gapped_text])
-#                                     else:
-#                                         extras[gapped_text] = self.create_extra_reading(reading['text'], witness)
-#
-#             if len(extras.keys()) > 0:
-#                 #add in the new readings - can all go on the end no issue with position
-#                 for rdg in extras.keys():
-#                     for wit in extras[rdg]['witnesses']:
-#                         for j, reading in enumerate(unit):
-#                             if wit in reading['witnesses']:
-#                                 reading['witnesses'].remove(wit)
-#                                 if len(reading['witnesses']) == 0:
-#                                     unit.remove(reading)
-#                                 else:
-#                                     for token in reading['text']:
-#                                         del token[wit]
-#                     unit.append(extras[rdg])
-#         return variant_readings
