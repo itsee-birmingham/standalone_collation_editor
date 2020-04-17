@@ -54,12 +54,12 @@ class PreProcessor(Regulariser):
             if 'transcription_identifier' in transcription_verse:
                 try:
                     lac_witnesses.remove(transcription_verse['transcription_identifier'])
-                except KeyError:
+                except ValueError:
                     pass
             else:
                 try:
                     lac_witnesses.remove(transcription_verse['transcription'])
-                except KeyError:
+                except ValueError:
                     pass
 
             # now find your base text.
