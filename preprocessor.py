@@ -24,7 +24,7 @@ class PreProcessor(Regulariser):
                              project, settings, collation_settings, accept):
         self.settings = settings
         data = data_input['data']
-        witnesses = {}  # added to fix broken thing
+        witnesses = {}
         collatable_witnesses = []
         om_witnesses = []
         lac_hands = []
@@ -96,7 +96,7 @@ class PreProcessor(Regulariser):
                 for reading in reversed(trans_verse):
                     if reading is None:
                         trans_verse.remove(reading)
-            except KeyError:
+            except (KeyError, TypeError):
                 om_witnesses.append(transcription_verse['siglum'])
                 if 'transcription_identifier' in transcription_verse:
                     hand_to_transcript_map[transcription_verse['siglum']] = \
