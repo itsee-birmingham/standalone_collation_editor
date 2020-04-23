@@ -98,7 +98,7 @@ class PreProcessor(Regulariser):
                 for reading in reversed(trans_verse):
                     if reading is None:
                         trans_verse.remove(reading)
-            except (KeyError, TypeError):
+            except Exception:
                 om_witnesses.append(transcription_verse['siglum'])
                 if 'transcription_identifier' in transcription_verse:
                     hand_to_transcript_map[transcription_verse['siglum']] = \

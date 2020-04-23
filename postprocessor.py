@@ -180,7 +180,7 @@ class PostProcessor(Regulariser):
                 else:
                     try:
                         text = matrix[j][i]
-                    except KeyError:
+                    except IndexError:
                         text = 'None'
                 if text in new_readings.keys():
                     if text == 'None':
@@ -197,7 +197,7 @@ class PostProcessor(Regulariser):
                     else:
                         try:
                             new_readings[text] = {'text': [readings_list[j]['text'][i]]}
-                        except KeyError:
+                        except Exception:
                             print('**** Problem with readings_list[j][text] array max: {0}; i: {1}'
                                   .format(len(readings_list[j]['text']), i), file=sys.stderr)
                             raise DataInputException('Error likely to have been caused by input data')
@@ -379,7 +379,7 @@ class PostProcessor(Regulariser):
                 try:
                     start_index = int(base_reading[0][self.overtext_name]['index'])
                     end_index = int(base_reading[-1][self.overtext_name]['index'])
-                except (KeyError, IndexError, ValueError):
+                except Exception:
                     print('**** Problem witness: {}'.format(self.overtext_name), file=sys.stderr)
                     start_index = previous_index + 1
                     end_index = previous_index + 1
