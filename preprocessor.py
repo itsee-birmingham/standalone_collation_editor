@@ -64,12 +64,14 @@ class PreProcessor(Regulariser):
 
             # now find your base text.
             # this is obtained by matching the basetext_transcription supplied in the project
-            # settings with the trascription_id value in the verse if this matches and either
-            # the duplicate_pos key is not present or it is present and == 1 then we have a base text.
+            # settings with the trascription or transcription_identifier
+            # value in the verse if this matches and either the duplicate_pos key is
+            # not present or it is present and == 1 then we have a base text.
             # it is not clear how the NTVMR will supply duplicate verses because I don't think they
             # have thought about it yet so this may not work accurately for their stuff
             # however it shouldn't break it just might not always select the first occurrence.
-            if transcription_verse['transcription'] == basetext_transcription:
+            if (transcription_verse['transcription'] == basetext_transcription
+                    or transcription_verse['transcription_identifier'] == basetext_transcription):
                 if verse is None and ('duplicate_position' not in transcription_verse
                                       or transcription_verse['duplicate_position'] is None
                                       or transcription_verse['duplicate_position'] == 1):
