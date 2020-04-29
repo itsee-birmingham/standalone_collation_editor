@@ -73,7 +73,9 @@ class Regulariser(object):
                         and (token['index'] == str(decision['context']['word'])
                         and token['reading'] == decision['context']['witness'])):
                     decision_matches.append(decision)
-        # order by time last modified
+        # order by time last modified or created for newer data
+        # TODO: perhaps always better to do created time otherwise adding exception
+        # to a global rule will change the order for all verses
         if len(decision_matches) > 1:
             decision_matches.sort(key=lambda x: x['_meta']['_last_modified_time'] if '_meta' in x else x['created_time'])
 
