@@ -26,7 +26,8 @@ class PostProcessor(Regulariser):
                  decisions,
                  display_settings_config,
                  local_python_functions,
-                 rule_conditions_config
+                 rule_conditions_config,
+                 split_single_reading_units
                  ):
 
         self.alignment_table = alignment_table
@@ -47,6 +48,7 @@ class PostProcessor(Regulariser):
             self.set_rule_string_instance = MyClass()
         else:
             self.local_python_functions = None
+        self.split_single_reading_units = split_single_reading_units
         Regulariser.__init__(self, rule_conditions_config, local_python_functions)
         module_name = self.display_settings_config['python_file']
         class_name = self.display_settings_config['class_name']
@@ -230,8 +232,11 @@ class PostProcessor(Regulariser):
         token_matches = []
         base_text = 'None'
         # if we have at least two actual readings (not including empty readings)
-        if len(readings.keys()) > 1 and 'None' not in readings.keys() or \
-           len(readings.keys()) > 2 and 'None' in readings.keys():
+        # it seems that at some point we got empty readings as 'None' and now they are '' so
+        # testing for both until I work out what is going on
+        # TODO: revisit this to check 'None'/'' distinction
+        if len(readings.keys()) > 1 and ('None' not in readings.keys() and '' not in readings.keys()) or \
+           len(readings.keys()) > 2 and ('None' in readings.keys() or '' in readings.keys()):
             matrix = []  # a token matrix one row per reading one column per token
             readings_list = []  # the full reading data in same order as matrix
             for reading in readings.keys():
@@ -268,8 +273,23 @@ class PostProcessor(Regulariser):
                 return [readings]
         else:
             # there is only one reading in this unit (therefore all read a - a shared unit)
-            # so just return existing readings
-            return [readings]
+            # so just return existing readings except when the setting tells us to
+            # In particular this is always True when we are combining new witnesses
+            # into existing collations when we always want the new reading in smallest chunks possible
+            if (len([x for x in readings.keys() if x != '' and x != 'None']) == 1
+                    and self.split_single_reading_units is True):
+                for key in readings:
+                    if len(key.split(' ')) == len(readings[key]['text']):
+                        token_list = key.split(' ')
+                        witnesses = readings[key]['witnesses']
+                        new_readings = [{token_list[i]: {'witnesses': witnesses,
+                                                         'text': [readings[key]['text'][i]]
+                                                         }} for i in range(0, len(token_list))]
+                        return new_readings
+                    else:
+                        return [readings]
+            else:
+                return [readings]
 
     # may not ever need this actually
     def horizontal_combine(self, units):
