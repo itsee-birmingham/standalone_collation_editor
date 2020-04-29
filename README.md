@@ -718,7 +718,7 @@ The inclusion of the editor and initialisation of the editor has changed. Please
   - 'basetext' should be used rather than 'base_text'
 
 - decision/rule model
-  - 'id' should be used rather than '\_id'.  **this change must be made either in the data or in the services file as 'id' is now used for rule deletion not _id**
+  - 'id' should be used rather than '\_id'.  **this change must be made either in the data or in the services file as 'id' is now used for rule deletion not _id** **Collation objects saved in early versions of the software also need to be updated to use id instead of _id in any items in 'decision_details' array if they are to be fully functional in this version**
   - '\_model' no longer required/used
   - 'active' no longer required/used
   - use 'created_time' for sorting rather than '\_meta.\_last_modified_time' (both still work for now but \_meta is deprecated)
