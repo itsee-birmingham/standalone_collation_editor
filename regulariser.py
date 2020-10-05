@@ -61,18 +61,19 @@ class Regulariser(object):
             if '_id' in decision:
                 print('deprecated - use \'id\' for rules not \'_id\'', file=sys.stderr)
                 decision['id'] = decision['_id']
+            # I have taken this out because it stops post-collate rules correctly chaining before any pre-collate ones
             # we are not recording subtypes anymore so we need to check here t against n
-            if (self.prepare_t(decision['t']) != decision['n'] and stage == 'pre-collate') \
-                    or (self.prepare_t(decision['t']) == decision['n'] and stage == 'post-collate'):
+            # if (self.prepare_t(decision['t']) != decision['n'] and stage == 'pre-collate') \
+            #         or (self.prepare_t(decision['t']) == decision['n'] and stage == 'post-collate'):
 
-                if decision['scope'] == u'always' \
-                    or decision['scope'] == u'verse' \
-                    or (decision['scope'] == u'manuscript'
-                        and token['reading'] == decision['context']['witness']) \
-                    or (decision['scope'] == u'once'
-                        and (token['index'] == str(decision['context']['word'])
-                        and token['reading'] == decision['context']['witness'])):
-                    decision_matches.append(decision)
+            if decision['scope'] == u'always' \
+                or decision['scope'] == u'verse' \
+                or (decision['scope'] == u'manuscript'
+                    and token['reading'] == decision['context']['witness']) \
+                or (decision['scope'] == u'once'
+                    and (token['index'] == str(decision['context']['word'])
+                    and token['reading'] == decision['context']['witness'])):
+                decision_matches.append(decision)
         # order by time last modified or created for newer data
         # TODO: perhaps always better to do created time otherwise adding exception
         # to a global rule will change the order for all verses
