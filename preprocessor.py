@@ -143,7 +143,7 @@ class PreProcessor(Regulariser):
         print('There are {} decisions'.format(len(decisions)), file=sys.stderr)
         for witness in witnesses['collatable']:
             for token in witness['tokens']:
-                hit, normalised, details = self.regularise_token(token, decisions, 'pre-collate')
+                hit, normalised, details = self.regularise_token(token, decisions)
                 if hit:
                     token['n'] = normalised
                     if details != 'None':

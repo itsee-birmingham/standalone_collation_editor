@@ -427,8 +427,8 @@ class PostProcessor(Regulariser):
             return '{}'.format(start)
 
         for reading in unit:
-            # TODO: do we need to do this if there is only one word? also could we throw multi-word ones back to collate
-            # and let it do better aligning?
+            # TODO: do we need to do this if there is only one word? also could we throw multi-word ones back to
+            # collate nd let it do better aligning?
             i = sub_index_start
             for token in reading['text']:
                 token['index'] = '{}.{}'.format(start, i)
@@ -468,21 +468,9 @@ class PostProcessor(Regulariser):
         else:
             new_witness = []
             for token in witness:
-                # here check if there is a post-collate rule for the word, if there is use it if not use settings
-                hit, normalised, details = self.regularise_token(token, self.decisions, 'post-collate')
-                if hit is True:
-                    # make sure rule string is the current last n value so new rules chain properly
-                    token['rule_string'] = details[-1]['n']
-                    if details is not None:
-                        try:
-                            token['decision_class'].extend([c['class'] for c in details])
-                        except KeyError:
-                            token['decision_class'] = [c['class'] for c in details]
-                        try:
-                            token['decision_details'].extend(details)
-                        except KeyError:
-                            token['decision_details'] = details
-                    token['interface'] = normalised.replace('<', '&lt;').replace('>', '&gt;')
+                if 'decision_details' in token and len(token['decision_details']) > 0:
+                    token['rule_string'] = token['decision_details'][-1]['n']
+                    token['interface'] = token['decision_details'][-1]['n'].replace('<', '&lt;').replace('>', '&gt;')
                 else:
                     token = self.set_rule_string(token)
                     # create the word we will see in the interface
