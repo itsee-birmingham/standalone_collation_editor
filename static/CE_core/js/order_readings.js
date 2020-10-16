@@ -1559,7 +1559,7 @@ OR = (function() {
       for (key in CL.data) {
         if (key.match(/apparatus\d*/g) !== null) {
           if (unit === null) {
-            unit = findUnitById(key, id);
+            unit = CL.findUnitById(key, id);
             if (unit !== null) {
               return [unit, key];
             }
