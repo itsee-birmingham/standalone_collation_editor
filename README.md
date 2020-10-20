@@ -36,6 +36,10 @@ Dependencies
 - Pure css
 - collateX (by default the Java web services are used but this is configurable)
 
+Installation
+---
+For the python import statements to work this repository must be a subdirectory of a folder with the name ```collation```.
+
 Initialising the collation editor
 ---
 
