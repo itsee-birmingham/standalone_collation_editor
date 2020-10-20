@@ -72,7 +72,8 @@ class PreProcessor(Regulariser):
             # have thought about it yet so this may not work accurately for their stuff
             # however it shouldn't break it just might not always select the first occurrence.
             if (transcription_verse['transcription'] == basetext_transcription
-                    or transcription_verse['transcription_identifier'] == basetext_transcription):
+                    or ('transcription_identifier' in transcription_verse
+                        and transcription_verse['transcription_identifier'] == basetext_transcription)):
                 if verse is None and ('duplicate_position' not in transcription_verse
                                       or transcription_verse['duplicate_position'] is None
                                       or transcription_verse['duplicate_position'] == 1):
