@@ -1458,7 +1458,7 @@ CL = (function() {
     unit_details_regex = /(variant|drag)_unit_(\d+)(_app_)?(\d+)?(_reading_|_row_)?(\d+)?/;
     m = id.match(unit_details_regex);
     if (m === null) {
-      console.log(unit_details_regex)
+      console.log(unit_details_regex);
     }
     details = [parseInt(m[2], 10)];
     if (typeof m[4] !== 'undefined') {
@@ -4343,7 +4343,7 @@ CL = (function() {
     }
 
 
-    
+
     //now implement your algorithm and push each result to the standoff reading
     //work out the text at this stage as part of that - text should be before the rules are applied so first one has none applied etc.
     standoff_reading = _getReadingHistory(classes, details, standoff_reading, rule_details, type, subreading_types, reading, witness, subreading);
