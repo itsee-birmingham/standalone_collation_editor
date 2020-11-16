@@ -596,6 +596,7 @@ RG = (function() {
     options.display_settings = displaySettings;
     options.display_settings_config = CL.displaySettingsDetails;
     options.rule_conditions_config = CL.ruleConditions;
+    options.debug = CL.debug;
 
     algorithm_settings = {};
     for (setting in CL.algorithmSettings) {
@@ -606,47 +607,22 @@ RG = (function() {
       }
     }
     options.algorithm_settings = algorithm_settings;
-    //TODO: this needs deleting or moving to services
-    // if (output === 'table') {
-    //   if (document.getElementById('book').value !== 'none' &&
-    //     document.getElementById('chapter').value !== 'none' &&
-    //     document.getElementById('verse').value !== 'none') {
-    //
-    //     CL.context = document.getElementById('book').value + 'K' +
-    //       document.getElementById('chapter').value +
-    //       'V' + document.getElementById('verse').value;
-    //
-    //     result_callback = function(data) {
-    //
-    //       _showCollationTable(CL.data, CL.context, document.getElementById('container'));
-    //     };
-    //     options.accept = 'json';
-    //   } else {
-    //     return;
-    //   }
-    //
-    // } else {
-      result_callback = function(data) {
-        if (data === null) {
-          alert(CL.context + ' does not collate.');
-          SPN.remove_loading_overlay();
-          location.reload();
-          return;
-        }
-        CL.data = data;
-        CL.data = _integrateLacOmReadings(CL.data);
-        CL.dataSettings.base_text_siglum = data.overtext_name;
-        showVerseCollation(CL.data, CL.context, document.getElementById('container'));
-        if (scroll_offset !== undefined) {
-          document.getElementById('scroller').scrollLeft = scroll_offset[0];
-          document.getElementById('scroller').scrollTop = scroll_offset[1];
-        }
-      };
-    // }
-    // options.error = function() {
-    //   alert(CL.context + ' does not collate.');
-    //   SPN.remove_loading_overlay();
-    // };
+    result_callback = function(data) {
+      if (data === null) {
+        alert(CL.context + ' does not collate.');
+        SPN.remove_loading_overlay();
+        location.reload();
+        return;
+      }
+      CL.data = data;
+      CL.data = _integrateLacOmReadings(CL.data);
+      CL.dataSettings.base_text_siglum = data.overtext_name;
+      showVerseCollation(CL.data, CL.context, document.getElementById('container'));
+      if (scroll_offset !== undefined) {
+        document.getElementById('scroller').scrollLeft = scroll_offset[0];
+        document.getElementById('scroller').scrollTop = scroll_offset[1];
+      }
+    };
     CL.services.doCollation(CL.context, options, result_callback);
   };
 

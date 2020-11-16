@@ -28,7 +28,8 @@ CL = (function() {
       project = {},
       collateData = {},
       context = '',
-      data = {};
+      data = {},
+      debug = false;
 
 
   //private variable declarations
@@ -58,7 +59,7 @@ CL = (function() {
   let _initialiseEditor, _initialiseProject, _setProjectConfig, _setDisplaySettings,
    _setLocalPythonFunctions, _setRuleClasses, _setRuleConditions, _setOverlappedOptions,
    _includeJavascript, _prepareCollation, _findSaved, _getContextFromInputForm,
-   _getWitnessesFromInputForm, _showSavedVersions, _getSavedRadio, _makeSavedCollationTable,
+   _getWitnessesFromInputForm, _getDebugSetting, _showSavedVersions, _getSavedRadio, _makeSavedCollationTable,
    _loadSavedCollation, _getSubreadingWitnessData, _findStandoffRegularisationText,
    _collapseUnit, _expandUnit, _expandAll, _collapseAll, _getEmptyCell, _mergeDicts,
    _getUnitData, _hasGapBefore, _hasGapAfter, _getAllEmptyReadingWitnesses, _containsEmptyReading,
@@ -2715,6 +2716,7 @@ CL = (function() {
     if (context && base_text !== 'none') {
       CL.context = context;
       CL.dataSettings.witness_list = _getWitnessesFromInputForm();
+      CL.debug = _getDebugSetting();
       RG.getCollationData(output, 0);
     }
   };
@@ -2767,6 +2769,13 @@ CL = (function() {
         return witnessList;
       }
     }
+  };
+
+  _getDebugSetting = function () {
+    if (CL.services.hasOwnProperty('getDebugSetting')) {
+      return CL.services.getDebugSetting();
+    }
+    return false;
   };
 
   _showSavedVersions = function(data, context) {
@@ -4543,6 +4552,7 @@ CL = (function() {
     context: context,
     data: data,
     calculatePosition: calculatePosition,
+    debug: debug,
 
     setServiceProvider: setServiceProvider,
     expandFillPageClients: expandFillPageClients,

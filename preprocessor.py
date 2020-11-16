@@ -188,7 +188,8 @@ class PreProcessor(Regulariser):
             options = {'outputFormat': accept,
                        'algorithm': algorithm,
                        'tokenComparator': tokenComparator,
-                       'collatexHost': collation_settings['host']
+                       'collatexHost': collation_settings['host'],
+                       'debug': collation_settings['debug']
                        }
             collatex_response = self.do_collate(witness_list, options)
 
@@ -275,6 +276,15 @@ class PreProcessor(Regulariser):
             print('tokenComparator - {}'.format(options['tokenComparator']), file=sys.stderr)
         except KeyError:
             pass
+        if 'debug' in options and options['debug'] is True:
+            problem_wits = []
+            for wit in data['witnesses']:
+                for token in wit['tokens']:
+                    if token['t'] == '':
+                        problem_wits.append(wit['id'])
+            if len(problem_wits) > 0:
+                raise DataInputException('There is a problem with an empty token in the following '
+                                         'witness(es): {}'.format(', '.join(problem_wits)))
 
         if (self.local_python_functions
                 and 'local_collation_function' in self.local_python_functions):
@@ -308,8 +318,8 @@ class PreProcessor(Regulariser):
             req = urllib.request.Request(target)
             req.add_header('content-type', 'application/json')
             req.add_header('Accept', accept_header)
-            response = urllib.request.urlopen(req, json_witnesses.encode('utf-8'))
 
+            response = urllib.request.urlopen(req, json_witnesses.encode('utf-8'))
             return response.read()
 
     def convert_header_argument(self, accept):
