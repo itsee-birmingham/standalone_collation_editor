@@ -101,20 +101,14 @@ class PostProcessor(Regulariser):
         readings = {}
         reading_sets = []
 
-        # temporary fix to turn 'sigils' key in old collateX output to 'witnesses' for testing with both versions
-        if 'sigils' in self.alignment_table:
-            self.alignment_table['witnesses'] = self.alignment_table['sigils']
         for z, unit in enumerate(self.alignment_table['table']):
             # first build a dictionary with text string as key to reading structure
             variant_unit = []
             readings = {}
             for i, witness in enumerate(unit):
                 witness = self.process_witness_tokens(witness)
-                try:
-                    reading = ' '.join([self.get_token_text(token) for token in witness])
-                except TypeError:
-                    reading = 'None'
-                    witness = []
+                reading = ' '.join([self.get_token_text(token) for token in witness])
+
                 if reading in readings.keys():
                     readings[reading]['witnesses'].append(self.alignment_table['witnesses'][i])
                     readings[reading]['text'] = self.combine_readings(readings[reading]['text'], witness)
@@ -177,15 +171,15 @@ class PostProcessor(Regulariser):
         for i in range(0, highest):  # i is matrix columns
             new_readings = {}  # new dictionary (basically a unit) for each column
             for j in range(0, len(matrix)):  # j is matrix rows
-                if matrix[j] is None or matrix[j][0] == 'None':  # first is for collate 1.5 second for 1.3
-                    text = 'None'
+                if matrix[j] is None:
+                    text = ''
                 else:
                     try:
                         text = matrix[j][i]
                     except IndexError:
-                        text = 'None'
+                        text = ''
                 if text in new_readings.keys():
-                    if text == 'None':
+                    if text == '':
                         new_readings[text]['witnesses'] = self.combine_lists(new_readings[text]['witnesses'],
                                                                              readings_list[j]['witnesses'])
                     else:
@@ -194,7 +188,7 @@ class PostProcessor(Regulariser):
                         new_readings[text]['witnesses'] = self.combine_lists(new_readings[text]['witnesses'],
                                                                              readings_list[j]['witnesses'])
                 else:
-                    if text == 'None':
+                    if text == '':
                         new_readings[text] = {'text': []}
                     else:
                         try:
@@ -212,11 +206,11 @@ class PostProcessor(Regulariser):
                     except ValueError:
                         pass
             if len(all_witnesses) > 0:
-                if 'None' in new_readings.keys():
-                    new_readings['None']['witnesses'].extend(all_witnesses)
+                if '' in new_readings.keys():
+                    new_readings['']['witnesses'].extend(all_witnesses)
                 else:
-                    new_readings['None'] = {'text': []}
-                    new_readings['None']['witnesses'] = all_witnesses
+                    new_readings[''] = {'text': []}
+                    new_readings['']['witnesses'] = all_witnesses
             readings.append(new_readings)
         return readings
 
@@ -230,13 +224,10 @@ class PostProcessor(Regulariser):
     def check_unit_splits(self, readings):
         """Works out whether any units need further splitting and sends them off to restructure_unit"""
         token_matches = []
-        base_text = 'None'
+        base_text = None
         # if we have at least two actual readings (not including empty readings)
-        # it seems that at some point we got empty readings as 'None' and now they are '' so
-        # testing for both until I work out what is going on
-        # TODO: revisit this to check 'None'/'' distinction
-        if len(readings.keys()) > 1 and ('None' not in readings.keys() and '' not in readings.keys()) or \
-           len(readings.keys()) > 2 and ('None' in readings.keys() or '' in readings.keys()):
+        if len(readings.keys()) > 1 and ('' not in readings.keys()) or \
+           len(readings.keys()) > 2 and ('' in readings.keys()):
             matrix = []  # a token matrix one row per reading one column per token
             readings_list = []  # the full reading data in same order as matrix
             for reading in readings.keys():
@@ -252,7 +243,8 @@ class PostProcessor(Regulariser):
             for row in matrix:
                 if row is not None:
                     highest = max(len(row), highest)
-                    if row[0] != 'None':
+                    # I don't know what is expected here - it used to test for 'None'. It might not be needed at all
+                    if row[0] != '' and row[0] is not None:
                         lowest = min(len(row), lowest)
             if highest > 1:  # if at least one reading has more than one word
                 lengths = []
@@ -262,7 +254,7 @@ class PostProcessor(Regulariser):
                     # if all the readings are the same length
                     return self.split_unit_into_single_words(readings_list, matrix, highest)
                 else:
-                    if base_text != 'None':
+                    if base_text is not None:
                         # if its not an addition
                         return self.split_unit_into_single_words(readings_list, matrix, highest)
                     else:
@@ -276,7 +268,7 @@ class PostProcessor(Regulariser):
             # so just return existing readings except when the setting tells us to
             # In particular this is always True when we are combining new witnesses
             # into existing collations when we always want the new reading in smallest chunks possible
-            if (len([x for x in readings.keys() if x != '' and x != 'None']) == 1
+            if (len([x for x in readings.keys() if x != '']) == 1
                     and self.split_single_reading_units is True):
                 for key in readings:
                     if len(key.split(' ')) == len(readings[key]['text']):

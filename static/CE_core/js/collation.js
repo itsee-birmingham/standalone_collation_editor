@@ -3930,21 +3930,21 @@ CL = (function() {
   };
 
   //not used at the moment
-  _removeOverlappedReadings = function() {
-    var apparatus, i, j;
-    apparatus = CL.data.apparatus;
-    for (i = 0; i < apparatus.length; i += 1) {
-      for (j = 0; j < apparatus[i].readings.length; j += 1) {
-        if (apparatus[i].readings[j].hasOwnProperty('overlap')) {
-          apparatus[i].readings[j] = 'None';
-        }
-      }
-      while (apparatus[i].readings.indexOf('None') !== -1) {
-        apparatus[i].readings.splice(apparatus[i].readings.indexOf('None'), 1);
-      }
-    }
-    CL.data.apparatus = apparatus;
-  };
+  // _removeOverlappedReadings = function() {
+  //   var apparatus, i, j;
+  //   apparatus = CL.data.apparatus;
+  //   for (i = 0; i < apparatus.length; i += 1) {
+  //     for (j = 0; j < apparatus[i].readings.length; j += 1) {
+  //       if (apparatus[i].readings[j].hasOwnProperty('overlap')) {
+  //         apparatus[i].readings[j] = 'None';
+  //       }
+  //     }
+  //     while (apparatus[i].readings.indexOf('None') !== -1) {
+  //       apparatus[i].readings.splice(apparatus[i].readings.indexOf('None'), 1);
+  //     }
+  //   }
+  //   CL.data.apparatus = apparatus;
+  // };
 
   /** apply the current display settings to the given token */
   _applySettings = function(word) {

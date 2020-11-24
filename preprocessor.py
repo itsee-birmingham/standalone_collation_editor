@@ -147,7 +147,7 @@ class PreProcessor(Regulariser):
                 hit, normalised, details = self.regularise_token(token, decisions)
                 if hit:
                     token['n'] = normalised
-                    if details != 'None':
+                    if details is not None:
                         try:
                             token['decision_class'].extend([c['class'] for c in details])
                         except KeyError:
