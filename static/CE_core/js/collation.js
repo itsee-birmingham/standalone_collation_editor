@@ -715,11 +715,18 @@ CL = (function() {
           } else {
             id_string = String(j);
           }
-          unit_data_options = {
-            'overlap': true,
-            'col_length': options.overlap_details[unit._id].col_length,
-            'unit_id': unit._id
-          };
+          if (options.hasOwnProperty('getUnitDataOptions')) {
+            unit_data_options = options.getUnitDataOptions;
+            unit_data_options.overlap = true;
+            unit_data_options.col_length = options.overlap_details[unit._id].col_length;
+            unit_data_options.unit_id = unit._id;
+          } else {
+            unit_data_options = {
+              'overlap': true,
+              'col_length': options.overlap_details[unit._id].col_length,
+              'unit_id': unit._id
+            };
+          }
           if (app > 1) {
             unit_data_options.app_id = 'apparatus' + app;
           } else {
@@ -751,8 +758,8 @@ CL = (function() {
             spacer_rows.push(SV.getSpacerUnitData(id_string, unit.start, unit.end));
           } else if (format === 'reorder') {
             unit_data = OR.getUnitData(unit.readings, id_string, format, unit.start, unit.end, unit_data_options);
-          } else if (format === 'version' || format === 'version_additions' || format === 'other_version_additions') {
-            unit_data = VER.get_unit_data(unit.readings, id_string, format, unit.start, unit.end, unit_data_options);
+          // } else if (format === 'version' || format === 'version_additions' || format === 'other_version_additions') {
+          //   unit_data = VER.get_unit_data(unit.readings, id_string, format, unit.start, unit.end, unit_data_options);
           } else {
             unit_data = _getUnitData(unit.readings, id_string, format, unit.start, unit.end, unit_data_options);
           }
@@ -1013,9 +1020,14 @@ CL = (function() {
           } else {
             id_string = String(j);
           }
-          unit_data_options = {
-            'unit_id': unit._id
-          };
+          if (options.hasOwnProperty('getUnitDataOptions')) {
+            unit_data_options = options.getUnitDataOptions;
+            unit_data_options.unit_id = unit._id;
+          } else {
+            unit_data_options = {
+              'unit_id': unit._id
+            };
+          }
           if (app > 1) {
             unit_data_options.app_id = 'apparatus' + app;
           } else {
