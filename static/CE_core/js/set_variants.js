@@ -2699,7 +2699,7 @@ SV = (function () {
 						read2 = k;
 					} else if (move_reading === true) {
 						//readings 2 could be a single reading from another unit and not have a reading for all witnesses
-						read2 = null;
+						read2 = 'None';
 					}
 				}
 				//need to make a fake new reading in order to extract the text
@@ -2708,12 +2708,12 @@ SV = (function () {
 				if (readings1[read1].hasOwnProperty('overlap_status')) {
 					text = text + '_' + readings1[read1].overlap_status;
 				}
-				if (read2 !== null && readings2[read2].hasOwnProperty('overlap_status')) {
+				if (read2 !== 'None' && readings2[read2].hasOwnProperty('overlap_status')) {
 					text = text + '_' + readings2[read2].overlap_status;
 				}
 				//now if we don't have any text which is possible use the reading positions in each unit as key (keeps all our different om/lac etc. reading separate)
 				if (text.length === 0) {
-					if (move_reading === true && read2 === null) {
+					if (move_reading === true && read2 === 'None') {
 						text = read1;
 					} else {
 						text = read1 + '-' + read2;
@@ -2728,7 +2728,7 @@ SV = (function () {
 							'witnesses' : [witness],
 							'text' : _combineReadingText(readings1, readings2,  [read1, read2], witness, [])
 					};
-					if (read2 !== null) { //we only need to worry about which one to chose if we have two readings
+					if (read2 !== 'None') { //we only need to worry about which one to chose if we have two readings
 						if (readings1[read1].hasOwnProperty('overlap_status') && readings2[read2].hasOwnProperty('overlap_status')) {
 							if (readings1[read1].overlap_status === readings2[read2].overlap_status) {
 								new_rdg.overlap_status = readings1[read1].overlap_status;
@@ -2778,11 +2778,11 @@ SV = (function () {
 		words = [];
 		for (i = 0; i < pattern.length; i += 1) {
 			if (i === 0) {
-				if (pattern[i] !== null) {
+				if (pattern[i] !== 'None') {
 					words.push.apply(words, readings1[pattern[i]].text);
 				}
 			} else {
-				if (pattern[i] !== null) {
+				if (pattern[i] !== 'None') {
 					words.push.apply(words, readings2[pattern[i]].text);
 				}
 			}
