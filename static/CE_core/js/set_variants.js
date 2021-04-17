@@ -1855,8 +1855,8 @@ SV = (function () {
 						if (!CL.data.apparatus[unit_num].hasOwnProperty('split_readings')) {
 							_doMoveWholeUnit(target_location, original_location, unit_num);
 						} else {
-							prepareForOperation();
-							_addToUndoStack(CL.data);
+							// prepareForOperation();
+							// _addToUndoStack(CL.data);
 							_doMoveSingleReading(target_location, original_location, unit_num, rd);
 						}
 					} else {
