@@ -50,7 +50,7 @@ CL = (function() {
   addStageLinks, addExtraFooterButtons, makeVerseLinks, getUnitAppReading, setList,
   getActiveUnitWitnesses, getExporterSettings, saveCollation, sortWitnesses,
   getSpecifiedAncestor, hideTooltip, addHoverEvents, markReading, showSplitWitnessMenu,
-  markStandoffReading, findUnitPosById, findReadingById, applyPreStageChecks,
+  markStandoffReading, findUnitPosById, findReadingById, findReadingPosById, applyPreStageChecks,
   makeStandoffReading, doMakeStandoffReading, makeMainReading, getOrderedAppLines,
   loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses,
   calculatePosition;
@@ -71,7 +71,7 @@ CL = (function() {
    _applySettings, _getApprovalSettings, _compareReadings,
    _disableEventPropagation, _showCollationSettings, _checkWitnesses, _getScrollPosition,
    _getMousePosition, _displayWitnessesHover, _getWitnessesForReading,
-   _findStandoffWitness, _findReadingPosById, _getPreStageChecks, _makeRegDecisionsStandoff,
+   _findStandoffWitness, _getPreStageChecks, _makeRegDecisionsStandoff,
    _contextInputOnload, _getReadingHistory, _getNextTargetRuleInfo, _removeAppliedRules,
    _getHistoricalReading;
 
@@ -1892,7 +1892,7 @@ CL = (function() {
     apparatus = reading_details.app_id;
     unit = findUnitById(apparatus, reading_details.unit_id);
     parent = findReadingById(unit, parent_id);
-    SR.loseSubreadings(); //must always lose subreadings first or find subreadings doesn't find them all!
+    SR.loseSubreadings(); // must always lose subreadings first or find subreadings doesn't find them all!
     SR.findSubreadings({
       'unit_id': unit._id
     }); //we need this to see if we have any!
@@ -2084,7 +2084,7 @@ CL = (function() {
     if (typeof options === 'undefined') {
       options = {};
     }
-    parent_pos = _findReadingPosById(unit, parent._id);
+    parent_pos = findReadingPosById(unit, parent._id);
     subreading = parent.subreadings[subtype][subreading_pos];
 
     if (typeof options.witnesses !== 'undefined') {
@@ -4284,7 +4284,7 @@ CL = (function() {
     return null;
   };
 
-  _findReadingPosById = function(unit, id) {
+  findReadingPosById = function(unit, id) {
     var i;
     for (i = 0; i < unit.readings.length; i += 1) {
       if (unit.readings[i].hasOwnProperty('_id') && unit.readings[i]._id === id) {
@@ -4614,6 +4614,7 @@ CL = (function() {
     markStandoffReading: markStandoffReading,
     findUnitPosById: findUnitPosById,
     findReadingById: findReadingById,
+    findReadingPosById: findReadingPosById,
     applyPreStageChecks: applyPreStageChecks,
     makeStandoffReading: makeStandoffReading,
     doMakeStandoffReading: doMakeStandoffReading,

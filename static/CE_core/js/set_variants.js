@@ -1651,8 +1651,7 @@ SV = (function () {
 		return false;
 	};
 
-	/** reposition an single reading to a different index point (this only works to odd numbered index point)*/
-	//TODO: need to prevent this happening when overlaps are present below
+	/** reposition a single reading to a different index point (this only works to odd numbered index point)*/
 	_doMoveSingleReading = function (target_location, original_location, unit_num, rd) {
 		var scroll_offset, witnesses, i, newunit, readings, unit2, reading, added, problems, warning_mess,
 		rdg_details, replacement_readings, newunit_id, newunit_pos;
@@ -1839,6 +1838,8 @@ SV = (function () {
 	/** move the unit to a new location (when dropped on the number) */
 	_moveUnit = function (rd) {
 		var unit_details, unit_num, unit, target_location, original_location, error_mess, scroll_offset, temp;
+		console.log('_moveUnit');
+		console.log(rd)
 		//then move the element
 		scroll_offset = [document.getElementById('scroller').scrollLeft,
 		                 document.getElementById('scroller').scrollTop];
@@ -2463,20 +2464,26 @@ SV = (function () {
 	_moveReading = function (units, rd) {
 		var i, app_id, unit1, unit2, unit2_reading_letters, unit2_reading_pos, problems, warning_mess,
 		reading, added, newunit, real_readings, scroll_offset, target_location, original_location,
-		witnesses, new_om_reading, key, do_move_out, do_move_in, replacement_readings;
+		witnesses, new_om_reading, key, do_move_out, do_move_in, replacement_readings, readingId;
 		scroll_offset = [document.getElementById('scroller').scrollLeft,
 		                 document.getElementById('scroller').scrollTop];
-		prepareForOperation();
 		//at this point both units are from same apparatus
 		app_id = units[0][1];
-
 		//first in merge list is always the target, second is always the one you moved
 		//so you are moving the second one and taking position from first
 		unit1 = CL.data[app_id][units[0][0]];
 		unit2 = CL.data[app_id][units[1][0]];
 		unit2_reading_pos = units[1][2];
 		//get the reading you've moved (as a list for later merging)
+		//TODO: is there any good reason why reading is made into a list?
 		reading = [unit2.readings[unit2_reading_pos]];
+		readingId = reading[0]._id;
+
+		prepareForOperation();
+		//Now get the real reading and position following the prepare operation
+		reading = [CL.findReadingById(unit2, readingId)];
+		unit2_reading_pos = CL.findReadingPosById(unit2, readingId);
+
 		witnesses = reading[0].witnesses.join(',');
 		if (!reading[0].hasOwnProperty('overlap_status') || reading[0].overlap_status === 'duplicate') {
 			do_move_out = true;
@@ -3910,7 +3917,7 @@ SV = (function () {
 		var scroll_offset, i, unit_number, app_id, unit, parent_pos, subtype, subreading_pos, parent_reading, subreading, options;
 		if ($.isArray(id_string)) {
 			//this section deals with making things a main reading in the context of removing the offset marked subreadings from the
-			//field of play in prepare_for_operation()
+			//field of play in prepareForOperation()
 			//sort by row then type then subrow always working from the bottom to the top
 			id_string.sort(_subreadingIdSort);
 			//send each item on list in turn to CL.makeMainReading(id_string, false);
