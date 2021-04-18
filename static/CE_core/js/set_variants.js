@@ -1654,7 +1654,7 @@ SV = (function () {
 	/** reposition a single reading to a different index point (this only works to odd numbered index point)*/
 	_doMoveSingleReading = function (target_location, original_location, unit_num, rd) {
 		var scroll_offset, witnesses, i, newunit, readings, unit2, reading, added, problems, warning_mess,
-		rdg_details, replacement_readings, newunit_id, newunit_pos;
+		rdg_details, replacement_readings, newunit_id, newunit_pos, reading_pos;
 
 		//move the single reading
 		scroll_offset = [document.getElementById('scroller').scrollLeft,
@@ -1671,6 +1671,9 @@ SV = (function () {
 
 				prepareForOperation();
 				_addToUndoStack(CL.data);
+				//now get the position of the reading after running prepareForOperation
+				reading_pos = CL.findReadingPosById(unit2, reading._id)
+
 				//get all the witnesses
 				witnesses = [];
 				for (i = 0; i < CL.data.apparatus[unit_num].readings.length; i += 1) {
@@ -1715,8 +1718,9 @@ SV = (function () {
 				}
 
 				newunit.readings = readings;
-				//remove original
-				unit2.readings.splice(rdg_details[2], 1);
+				// remove original making sure you get the current position of the reading that has
+				// moved (after prepareForOperation)
+				unit2.readings.splice(reading_pos, 1);
 				//replace it with an om reading or two depending on overlap status
 				replacement_readings = _getReplacementOmReading(unit2, reading);
 				for (i = 0; i < replacement_readings.length; i += 1) {
@@ -1750,7 +1754,7 @@ SV = (function () {
 				//sort the apparatus again - it is important to do this twice (before and after reindexing) but the reason eludes me just now
 				CL.data.apparatus.sort(_compareFirstWordIndexes);
 				unprepareForOperation();
-				checkBugStatus('move', 'reading ' + rdg_details[2] + ' with witnesses ' + witnesses.join(', ') +  ' from unit ' + unit_num + ' to index ' + target_location + ' in apparatus.');
+				checkBugStatus('move', 'reading ' + reading_pos + ' with witnesses ' + witnesses.join(', ') +  ' from unit ' + unit_num + ' to index ' + target_location + ' in apparatus.');
 				problems = _checkWordOrderIntegrity(original_location, target_location, reading.witnesses);
 				if (problems.length > 0) {
 					warning_mess = 'WARNING: Moving the reading has created word order problems in following witnesses: ' + problems.join(', ');
@@ -1838,8 +1842,7 @@ SV = (function () {
 	/** move the unit to a new location (when dropped on the number) */
 	_moveUnit = function (rd) {
 		var unit_details, unit_num, unit, target_location, original_location, error_mess, scroll_offset, temp;
-		console.log('_moveUnit');
-		console.log(rd)
+
 		//then move the element
 		scroll_offset = [document.getElementById('scroller').scrollLeft,
 		                 document.getElementById('scroller').scrollTop];
@@ -1935,6 +1938,7 @@ SV = (function () {
 		var newunit, index, i, j, unit1, unit2, warning_mess, error_mess, problems, warning_unit, scroll_offset,
 		combined_gap_before_subreadings, combined_gap_after_subreadings, combined_gap_before_subreadings_details, key,
 		witness_equality, overlap_boundaries, overlap_status_agreement;
+
 		scroll_offset = [document.getElementById('scroller').scrollLeft,
 		                 document.getElementById('scroller').scrollTop];
 		//make sure unit 1 is leftmost and unit 2 is rightmost
@@ -2709,9 +2713,11 @@ SV = (function () {
 						read2 = null;
 					}
 				}
+
 				//need to make a fake new reading in order to extract the text
 				new_rdg = {'text': _orderUnitText(readings1, readings2, [read1, read2], witness)};
 				text = CL.extractWitnessText(new_rdg, {'witness': witness, 'reading_type': 'mainreading'});
+
 				if (readings1[read1].hasOwnProperty('overlap_status')) {
 					text = text + '_' + readings1[read1].overlap_status;
 				}
@@ -3823,13 +3829,12 @@ SV = (function () {
 										if (data.marked_readings[type][k].apparatus === key) { //if in right apparatus row
 											if (typeof unit_details === 'undefined' || unit_details.unit_id === data.marked_readings[type][k].unit_id) {
 												if (data.marked_readings[type][k].start ===  apparatus[i].start &&
-														data.marked_readings[type][k].end ===  apparatus[i].end &&
+															data.marked_readings[type][k].end ===  apparatus[i].end
 												        //the following line might raise concerns if the unit_id every changes in SV (it might not change until approve so could be okay here) we have already checked apparatus line so no problem with sharing ids in different lines
-														data.marked_readings[type][k].unit_id === apparatus[i]._id) { //if unit extent is correct
-	                                                if (!data.marked_readings[type][k].hasOwnProperty('first_word_index') || data.marked_readings[type][k].first_word_index === apparatus[i].first_word_index) { //check position within index point if indicated
-
+																// && data.marked_readings[type][k].unit_id === apparatus[i]._id]
+															) { //if unit extent is correct
+													  if (!data.marked_readings[type][k].hasOwnProperty('first_word_index') || data.marked_readings[type][k].first_word_index === apparatus[i].first_word_index) { //check position within index point if indicated
 	    												temp = _getPosInUnitSet(i, key);
-
 	    												//we are in the matching unit and all is fine with extents
 	    												//so we can now make the marked reading a main reading again
 	    												//loop through readings until we find one that matches the marked parent
@@ -3888,7 +3893,6 @@ SV = (function () {
 									}
 								}
 							}
-
 							if (!$.isEmptyObject(make_main_ids)) {
 								make_main_ids_list = [];
 								for (id_key in make_main_ids) {
