@@ -2256,7 +2256,7 @@ CL = (function() {
   };
 
   getOrderedAppLines = function() {
-    var key, numbers, i, app_ids;
+    var key, numbers, app_ids;
     numbers = [];
     app_ids = [];
     for (key in CL.data) {
@@ -2266,8 +2266,8 @@ CL = (function() {
         }
       }
     }
-    numbers.sort();
-    for (i = 0; i < numbers.length; i += 1) {
+    numbers.sort((a, b) => a - b);
+    for (let i=0; i<numbers.length; i+=1) {
       app_ids.push('apparatus' + numbers[i]);
     }
     return app_ids;
