@@ -727,8 +727,8 @@ SV = (function () {
 	 *  the standoff mark no longer applies) and by merging all non-standoff subreadings
 	 *  into their parents so we don't have to worry about them.
 	 */
-	prepareForOperation = function (unit_details) {
-		_removeOffsetSubreadings(unit_details); //this runs find_subreadings
+	prepareForOperation = function () {
+		_removeOffsetSubreadings(); //this runs find_subreadings
 		SR.loseSubreadings();
 	};
 
@@ -3808,103 +3808,102 @@ SV = (function () {
 	 * a) we do not want to have to faff with subreadings during combine and split operations
 	 * b) We cannot just subsume them into parents as with other subreadings because they need to become main readings if their unit extent changes.
 	 * */
-	_removeOffsetSubreadings = function (unit_details) {
-		var data, key, id_key, apparatus, unit, type, temp, readings, parent, i, j, k, l, sr, app_string, subreading_id, row_num, make_main_ids, make_main_ids_list;
-		//need to lose subreadings first as for some reason running find subreadings when they are already found looses witnesses
-		//if you fix that bug you can stop running _lose_subreadings first. You always need to find them because the rest of the function works on the basis they are there
-		SR.loseSubreadings();
-		SR.findSubreadings();
-		data = CL.data;
-		for (key in data) {
-			if (data.hasOwnProperty(key)) {
-				if (key.indexOf('apparatus') !== -1) {
-					if (typeof unit_details === 'undefined' || unit_details.app_id === key) {
-						apparatus = data[key];
-						for (i = 0; i < apparatus.length; i += 1) {
-							make_main_ids = {};
-							//loop through standoff readings
-							for (type in data.marked_readings) {
-								if (data.marked_readings.hasOwnProperty(type)) {
-									for (k = 0; k < data.marked_readings[type].length; k += 1) {
-										if (data.marked_readings[type][k].apparatus === key) { //if in right apparatus row
-											if (typeof unit_details === 'undefined' || unit_details.unit_id === data.marked_readings[type][k].unit_id) {
-												if (data.marked_readings[type][k].start ===  apparatus[i].start &&
-															data.marked_readings[type][k].end ===  apparatus[i].end
-												        //the following line might raise concerns if the unit_id every changes in SV (it might not change until approve so could be okay here) we have already checked apparatus line so no problem with sharing ids in different lines
-																// && data.marked_readings[type][k].unit_id === apparatus[i]._id]
-															) { //if unit extent is correct
-													  if (!data.marked_readings[type][k].hasOwnProperty('first_word_index') || data.marked_readings[type][k].first_word_index === apparatus[i].first_word_index) { //check position within index point if indicated
-	    												temp = _getPosInUnitSet(i, key);
-	    												//we are in the matching unit and all is fine with extents
-	    												//so we can now make the marked reading a main reading again
-	    												//loop through readings until we find one that matches the marked parent
-	    												readings = apparatus[i].readings;
-	    												//find the parent
-	    												for (j = 0; j < readings.length; j += 1) {
-	    													if (data.marked_readings[type][k].parent_text !== '') {
-	    														if (CL.extractWitnessText(readings[j], {'app_id': key, 'unit_id': apparatus[i]._id}) === data.marked_readings[type][k].parent_text) {
-	    															parent = readings[j];
-	    															row_num = j;
-	    														}
-	    													} else {
-	    														if (readings[j].text.length === 0) {
-	    															if (!data.marked_readings[type][k].hasOwnProperty('om_details') && !readings[j].hasOwnProperty('details')) {
-	    																parent = readings[j];
-	    																row_num = j;
-	    															} else if (readings[j].details === data.marked_readings[type][k].om_details) {
-	    																parent = readings[j];
-	    																row_num = j;
-	    															}
-	    														}
-	    													}
-	    												}
-	    												//Because we are calling _find_subreadings at the start we will always have our readings available as subreadings
-	    												if (parent.hasOwnProperty('subreadings')) {
-	    													//make it a main reading
-	    													if (key === 'apparatus') {
-	    														app_string = '';
-	    													} else {
-	    														app_string = 'app_' + key.replace('apparatus', '') + '_';
-	    													}
-	    													for (sr in readings[row_num].subreadings) {
-	    														if (readings[row_num].subreadings.hasOwnProperty(sr)) {
-	    															if (sr === type) { //this may need to change if we allow chaining here
-	    																for (l = 0; l < readings[row_num].subreadings[sr].length; l += 1) {
-	    																	//TODO: this must be witness specific and only change the target witness - all others must be left alone!
-	    																	if (readings[row_num].subreadings[sr][l].witnesses.indexOf(data.marked_readings[type][k].witness) !== -1) {
-	    																		subreading_id = 'unit_' + i + '_' + app_string + 'row_' + row_num + '_type_' + type + '_subrow_' + l;
-	    																		if (make_main_ids.hasOwnProperty(subreading_id)) {
-	    																			make_main_ids[subreading_id].push(data.marked_readings[type][k].witness);
-	    																		} else {
-	    																			make_main_ids[subreading_id] = [data.marked_readings[type][k].witness];
-	    																		}
-	    																	}
-	    																}
-	    															}
-	    														}
-	    													}
-	    												} else {
-	    													console.log('For some reason we don\'t have any subreadings for the parent we found');
-	    												}
-	    											}
-												}
-											}
-										}
-									}
-								}
-							}
-							if (!$.isEmptyObject(make_main_ids)) {
-								make_main_ids_list = [];
-								for (id_key in make_main_ids) {
-									make_main_ids_list.push(id_key);
-								}
-								_makeMainReading(make_main_ids_list, make_main_ids);
-							}
-						}
-					}
-				}
-			}
-		}
+	_removeOffsetSubreadings = function() {
+	  var data, key, id_key, apparatus, unit, type, temp, readings, parent, i, j, k, l, sr, app_string, subreading_id, row_num, make_main_ids, make_main_ids_list;
+	  //need to lose subreadings first as for some reason running find subreadings when they are already found looses witnesses
+	  //if you fix that bug you can stop running _lose_subreadings first. You always need to find them because the rest of the function works on the basis they are there
+	  SR.loseSubreadings();
+	  SR.findSubreadings();
+	  data = CL.data;
+	  for (key in data) {
+	    if (data.hasOwnProperty(key)) {
+	      if (key.indexOf('apparatus') !== -1) {
+	        apparatus = data[key];
+	        for (i = 0; i < apparatus.length; i += 1) {
+	          make_main_ids = {};
+	          //loop through standoff readings
+	          for (type in data.marked_readings) {
+	            if (data.marked_readings.hasOwnProperty(type)) {
+	              for (k = 0; k < data.marked_readings[type].length; k += 1) {
+	                if (data.marked_readings[type][k].apparatus === key) { //if in right apparatus row
+	                  if (data.marked_readings[type][k].start === apparatus[i].start &&
+	                    data.marked_readings[type][k].end === apparatus[i].end
+	                    //the following line might raise concerns if the unit_id every changes in SV (it might not change until approve so could be okay here) we have already checked apparatus line so no problem with sharing ids in different lines
+	                    // && data.marked_readings[type][k].unit_id === apparatus[i]._id]
+	                  ) { //if unit extent is correct
+	                    if (!data.marked_readings[type][k].hasOwnProperty('first_word_index') || data.marked_readings[type][k].first_word_index === apparatus[i].first_word_index) { //check position within index point if indicated
+	                      temp = _getPosInUnitSet(i, key);
+	                      //we are in the matching unit and all is fine with extents
+	                      //so we can now make the marked reading a main reading again
+	                      //loop through readings until we find one that matches the marked parent
+	                      readings = apparatus[i].readings;
+	                      //find the parent
+	                      for (j = 0; j < readings.length; j += 1) {
+	                        if (data.marked_readings[type][k].parent_text !== '') {
+	                          if (CL.extractWitnessText(readings[j], {
+	                              'app_id': key,
+	                              'unit_id': apparatus[i]._id
+	                            }) === data.marked_readings[type][k].parent_text) {
+	                            parent = readings[j];
+	                            row_num = j;
+	                          }
+	                        } else {
+	                          if (readings[j].text.length === 0) {
+	                            if (!data.marked_readings[type][k].hasOwnProperty('om_details') && !readings[j].hasOwnProperty('details')) {
+	                              parent = readings[j];
+	                              row_num = j;
+	                            } else if (readings[j].details === data.marked_readings[type][k].om_details) {
+	                              parent = readings[j];
+	                              row_num = j;
+	                            }
+	                          }
+	                        }
+	                      }
+	                      //Because we are calling _find_subreadings at the start we will always have our readings available as subreadings
+	                      if (parent.hasOwnProperty('subreadings')) {
+	                        //make it a main reading
+	                        if (key === 'apparatus') {
+	                          app_string = '';
+	                        } else {
+	                          app_string = 'app_' + key.replace('apparatus', '') + '_';
+	                        }
+	                        for (sr in readings[row_num].subreadings) {
+	                          if (readings[row_num].subreadings.hasOwnProperty(sr)) {
+	                            if (sr === type) { //this may need to change if we allow chaining here
+	                              for (l = 0; l < readings[row_num].subreadings[sr].length; l += 1) {
+	                                //TODO: this must be witness specific and only change the target witness - all others must be left alone!
+	                                if (readings[row_num].subreadings[sr][l].witnesses.indexOf(data.marked_readings[type][k].witness) !== -1) {
+	                                  subreading_id = 'unit_' + i + '_' + app_string + 'row_' + row_num + '_type_' + type + '_subrow_' + l;
+	                                  if (make_main_ids.hasOwnProperty(subreading_id)) {
+	                                    make_main_ids[subreading_id].push(data.marked_readings[type][k].witness);
+	                                  } else {
+	                                    make_main_ids[subreading_id] = [data.marked_readings[type][k].witness];
+	                                  }
+	                                }
+	                              }
+	                            }
+	                          }
+	                        }
+	                      } else {
+	                        console.log('For some reason we don\'t have any subreadings for the parent we found');
+	                      }
+	                    }
+	                  }
+	                }
+	              }
+	            }
+	          }
+	          if (!$.isEmptyObject(make_main_ids)) {
+	            make_main_ids_list = [];
+	            for (id_key in make_main_ids) {
+	              make_main_ids_list.push(id_key);
+	            }
+	            _makeMainReading(make_main_ids_list, make_main_ids);
+	          }
+	        }
+	      }
+	    }
+	  }
 	};
 
 	_hasStandoffSubreading = function (reading) {

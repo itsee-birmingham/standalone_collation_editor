@@ -1955,10 +1955,7 @@ CL = (function() {
     //			console.log('RESULT OF _LOSE_SUBREADINGS BELOW')
     //			console.log(JSON.parse(JSON.stringify(CL.data)))
     //now check that we don't have any shared readings (need to prepare and unprepare for this)
-    SV.prepareForOperation({
-      'app_id': apparatus,
-      'unit_id': unit._id
-    });
+    SV.prepareForOperation();
     //			console.log('now we have prepared')
     //			console.log(JSON.parse(JSON.stringify(CL.data)))
     SV.unsplitUnitWitnesses(reading_details.unit_pos, 'apparatus');

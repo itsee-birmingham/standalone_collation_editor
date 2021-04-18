@@ -899,10 +899,7 @@ OR = (function() {
         'delete_offset': true
       };
       CL.makeMainReading(unit, parent_reading, subtype, subreading_pos, options);
-      SV.prepareForOperation({
-        'app_id': app_id,
-        'unit_id': unit._id
-      });
+      SV.prepareForOperation();
       SV.unsplitUnitWitnesses(unit_number, app_id);
       SV.unprepareForOperation();
       relabelReadings(unit.readings, true);
