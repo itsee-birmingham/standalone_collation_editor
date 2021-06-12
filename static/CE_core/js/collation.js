@@ -1152,19 +1152,15 @@ CL = (function() {
   };
 
   getHighlightedText = function(witness) {
-    var i, j, k, temp, transcription_id, hand, text, display_hand, verse, is_private;
+    var i, j, k, temp, transcription_id, hand, text, display_hand, verse;
     temp = witness.split('|');
     transcription_id = temp[0];
     hand = temp[1];
     text = [];
     display_hand = hand;
     document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + display_hand + ':</b><img id="loadingbar" src="' + staticUrl + 'CE_core/images/loadingbar.gif"/></span>';
-    if (hand.search('_private') === -1) {
-      is_private = false;
-    } else {
-      is_private = true;
-    }
-    CL.services.getVerseData(CL.context, [transcription_id], is_private, function(transcriptions) {
+
+    CL.services.getVerseData(CL.context, [transcription_id], function(transcriptions) {
       if (transcriptions.length > 0) {
         for (i = 0; i < transcriptions.length; i += 1) {
           verse = transcriptions[i];

@@ -1,4 +1,5 @@
 /*jshint esversion: 6 */
+var testing;
 
 RG = (function() {
   "use strict";
@@ -12,43 +13,40 @@ RG = (function() {
       _forGlobalExceptions = [];
 
   //public function declarations
-  let getCollationData, getUnitData, recollate, showVerseCollation, allRuleStacksEmpty;
+  let getCollationData, getUnitData, recollate, runCollation, showVerseCollation, allRuleStacksEmpty;
 
   //private function declarations
   let _calculateLacWits, _hasRuleApplied, _getDisplayClasses, _getToken, _getWordTokenForWitness,
-  _hasDeletionScheduled, _getRegWitsAsString, _runCollation, _integrateLacOmReadings,
+  _hasDeletionScheduled, _getRegWitsAsString, _integrateLacOmReadings,
   _doRunCollation, _showSettings, _fetchRules, _removeUnrequiredData, _showRegularisations,
   _highlightWitness, _addNewToken, _getWordIndexForWitness, _createRule, _getDisplaySettingValue,
   _setUpRuleMenu, _getRuleScopes, _getSuffix, _makeMenu, _redipsInitRegularise,
   _getAncestorRow, _showGlobalExceptions, _removeGlobalExceptions, _scheduleAddGlobalException,
   _scheduleRuleDeletion, _deleteUnappliedRule, _addContextMenuHandlers, _showCollationTable,
-  _scheduleSelectedRulesDeletion;
+  _scheduleSelectedRulesDeletion, _addFooterFunctions, _highlightAddedWitness;
 
   //*********  public functions *********
 
   getCollationData = function(output, scroll_offset, callback) {
     CL.container = document.getElementById('container');
-    CL.services.getVerseData(CL.context, CL.dataSettings.witness_list, false, function(verse_data) {
-      var collation_data;
-      collation_data = verse_data;
-      //TODO: remove this call since we don't have separate private transcriptions now
-      CL.services.getVerseData(CL.context, CL.dataSettings.witness_list, true, function(verse_data, lac_wits_function) {
-        collation_data.push.apply(collation_data, verse_data);
+    CL.services.getVerseData(CL.context, CL.dataSettings.witness_list, function(collation_data) {
         _calculateLacWits(collation_data, function(lac_witness_list) {
           CL.services.getSiglumMap(lac_witness_list, function(lac_witnesses) {
             CL.collateData = {
-              'data': collation_data,
+              'data': collation_data.results,
               'lac_witnesses': lac_witnesses
             };
+            if (collation_data.hasOwnProperty('special_categories')) {
+              CL.collateData.special_categories = collation_data.special_categories;
+            }
             if (typeof callback !== 'undefined') {
               callback();
             } else {
-              _runCollation(CL.collateData, output, scroll_offset);
+              runCollation(CL.collateData, output, scroll_offset);
             }
           });
         });
       });
-    });
   };
 
   /** get the data for the unit of this type
@@ -235,10 +233,10 @@ RG = (function() {
     }
     if ($.isEmptyObject(CL.collateData)) {
       getCollationData('units', scroll_offset, function() {
-        _runCollation(CL.collateData, 'units', scroll_offset);
+        runCollation(CL.collateData, 'units', scroll_offset);
       }); //collation_source, output, scroll_offset, callback
     } else {
-      _runCollation(CL.collateData, 'units', scroll_offset);
+      runCollation(CL.collateData, 'units', scroll_offset);
     }
   };
 
@@ -502,7 +500,7 @@ RG = (function() {
     return new_wits.join(', ');
   };
 
-  _runCollation = function(collation_data, output, scroll_offset) {
+  runCollation = function(collation_data, output, scroll_offset) {
     var rule_list;
     //put all the rules in a sinlge list
     rule_list = [];
@@ -1340,18 +1338,75 @@ RG = (function() {
 
 
   //priv-e
+  if (testing) {
+    return {
 
-  return {
+      showRegularisations: showRegularisations,
+      runCollation: runCollation,
 
-    showRegularisations: showRegularisations,
+      getCollationData: getCollationData,
+      getUnitData: getUnitData,
+      recollate: recollate,
+      showVerseCollation: showVerseCollation,
+      allRuleStacksEmpty: allRuleStacksEmpty,
 
-    getCollationData: getCollationData,
-    getUnitData: getUnitData,
-    recollate: recollate,
-    showVerseCollation: showVerseCollation,
-    allRuleStacksEmpty: allRuleStacksEmpty,
+      //private variables
+      _rules: _rules,
+      _forDeletion: _forDeletion,
+      _forGlobalExceptions: _forGlobalExceptions,
 
-  };
+      //private functions
+      _calculateLacWits: _calculateLacWits,
+      _hasRuleApplied: _hasRuleApplied,
+      _getDisplayClasses: _getDisplayClasses,
+      _getToken: _getToken,
+      _getWordTokenForWitness: _getWordTokenForWitness,
+      _hasDeletionScheduled: _hasDeletionScheduled,
+      _getRegWitsAsString: _getRegWitsAsString,
+      _integrateLacOmReadings: _integrateLacOmReadings,
+      _doRunCollation: _doRunCollation,
+      _showSettings: _showSettings,
+      _fetchRules: _fetchRules,
+      _removeUnrequiredData: _removeUnrequiredData,
+      _showRegularisations: _showRegularisations,
+      _highlightWitness: _highlightWitness,
+      _addNewToken: _addNewToken,
+      _getWordIndexForWitness: _getWordIndexForWitness,
+      _createRule: _createRule,
+      _getDisplaySettingValue: _getDisplaySettingValue,
+      _setUpRuleMenu: _setUpRuleMenu,
+      _getRuleScopes: _getRuleScopes,
+      _getSuffix: _getSuffix,
+      _makeMenu: _makeMenu,
+      _redipsInitRegularise: _redipsInitRegularise,
+      _getAncestorRow: _getAncestorRow,
+      _showGlobalExceptions: _showGlobalExceptions,
+      _removeGlobalExceptions: _removeGlobalExceptions,
+      _scheduleAddGlobalException: _scheduleAddGlobalException,
+      _scheduleRuleDeletion: _scheduleRuleDeletion,
+      _deleteUnappliedRule: _deleteUnappliedRule,
+      _addContextMenuHandlers: _addContextMenuHandlers,
+      _showCollationTable: _showCollationTable,
+      _scheduleSelectedRulesDeletion: _scheduleSelectedRulesDeletion,
+      _addFooterFunctions: _addFooterFunctions,
+      _highlightAddedWitness: _highlightAddedWitness,
+
+    };
+  } else {
+
+    return {
+
+      showRegularisations: showRegularisations,
+      runCollation: runCollation,
+
+      getCollationData: getCollationData,
+      getUnitData: getUnitData,
+      recollate: recollate,
+      showVerseCollation: showVerseCollation,
+      allRuleStacksEmpty: allRuleStacksEmpty,
+
+    };
+  }
 
 }());
 
