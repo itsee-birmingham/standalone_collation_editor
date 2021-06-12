@@ -355,8 +355,13 @@ table#saved_collations td,  table#saved_collations th {
 	border: solid 1px silver;
 }
 
+table#saved_collations td.added, table#saved_collations td.removed, table#saved_collations td.both {
+  	color: red;
+}
+
+
 li.highlighted > div {
-    background: #FFBB55;
+  background: #FFBB55;
 }
 
 tr.highlighted > td > div {
@@ -364,8 +369,20 @@ tr.highlighted > td > div {
 }
 
 tr.highlighted > td > div {
-    border: 1px solid #FFBB55;
+  border: 1px solid #FFBB55;
 }
+
+li.added_highlighted > div {
+  color: sienna;
+  font-weight: bold;
+}
+
+tr.added_highlighted > td > div {
+	color: sienna;
+  font-weight: bold;
+}
+
+
 
 td > div.spanlike {
     width: 95%;
@@ -428,6 +445,11 @@ div.highlighted_unit {
   vertical-align: middle;
 }
 
+#remove_witnesses_div {
+  top: 60px;
+  font-size: 15px;
+}
+
 .reg_form {
  	top: 30px;
   font-size: 15px;
@@ -445,6 +467,10 @@ div.highlighted_unit {
 
 .reg_form fieldset {
   margin-top: 3px;
+}
+
+.reg_form #rule_creation_warning {
+  color: maroon;
 }
 
 #regularisation_menu {
