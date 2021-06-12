@@ -15,7 +15,7 @@ body.waiting,  body.waiting div input {
     font-size: 12pt;
 }
 
-#header h1#stage_id  {
+#header h1#stage_id {
     float: left;
 }
 
@@ -51,17 +51,16 @@ body.waiting,  body.waiting div input {
 
 
 
-div.project_header {
+.project_header {
     background: #CC99FF;
 }
 
-div.versional_editor_header {
+.versional_editor_header {
     background: lightblue;
 }
 
 
-
-div.admin_header {
+.admin_header {
     background: #CCCCFF;
 }
 
@@ -97,13 +96,13 @@ div#login_status {
     font-size: 11pt;
 }
 
-div#container {
+#container {
     padding-top: 10px;
     padding-bottom: 50px;
 }
 
 
-div#container, div#scroller {
+#container, #scroller {
     overflow: auto;
     position: relative;
 }
