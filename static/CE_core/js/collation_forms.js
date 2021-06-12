@@ -193,6 +193,7 @@ cforms = (function () {
    *              falls through list until it finds one in the data or comma separates numbered fields if object
    * selected = optional argument to say which of the options should be selected
    * add_select = a boolean as to whether to add 'select' with value 'none' to the head of the data list
+   * select_label_text = a string to display in the visible drop down with value 'none' only used if add_select is true - if none supplied 'Select' will be used
    * reactivate = a boolean saying whether this select be reactivated once it is populated*/
   populateSelect = function (data, select, options) {
     var options_html, value_key, text_keys, i, j, template, mapping, text_key, inner_template, inner_template_list, option_text, inner_mapping, option_text_list;
@@ -202,7 +203,11 @@ cforms = (function () {
     options_html = '';
     //this is added by default, add_select must be false to exclude it
     if (!options.hasOwnProperty('add_select') || options.add_select === true) {
-      options_html += '<option value="none">select</option>';
+      if (options.add_select === true && options.hasOwnProperty('select_label_details')) {
+        options_html += '<option value="' + options.select_label_details.value + '">' + options.select_label_details.label + '</option>';
+      } else {
+        options_html += '<option value="none">select</option>';
+      }
     }
 
     value_key = options.hasOwnProperty('value_key') ? options.value_key : undefined;
