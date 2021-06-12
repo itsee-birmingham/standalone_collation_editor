@@ -27,26 +27,51 @@ RG = (function() {
 
   //*********  public functions *********
 
+  // getCollationData = function(output, scroll_offset, callback) {
+  //   CL.container = document.getElementById('container');
+  //   CL.services.getVerseData(CL.context, CL.dataSettings.witness_list, false, function(verse_data) {
+  //     var collation_data;
+  //     collation_data = verse_data;
+  //     //TODO: remove this call since we don't have separate private transcriptions now
+  //     CL.services.getVerseData(CL.context, CL.dataSettings.witness_list, true, function(verse_data, lac_wits_function) {
+  //       collation_data.push.apply(collation_data, verse_data);
+  //       _calculateLacWits(collation_data, function(lac_witness_list) {
+  //         CL.services.getSiglumMap(lac_witness_list, function(lac_witnesses) {
+  //           CL.collateData = {
+  //             'data': collation_data,
+  //             'lac_witnesses': lac_witnesses
+  //           };
+  //           if (typeof callback !== 'undefined') {
+  //             callback();
+  //           } else {
+  //             runCollation(CL.collateData, output, scroll_offset);
+  //           }
+  //         });
+  //       });
+  //     });
+  //   });
+  // };
+
   getCollationData = function(output, scroll_offset, callback) {
     CL.container = document.getElementById('container');
     CL.services.getVerseData(CL.context, CL.dataSettings.witness_list, function(collation_data) {
-        _calculateLacWits(collation_data, function(lac_witness_list) {
-          CL.services.getSiglumMap(lac_witness_list, function(lac_witnesses) {
-            CL.collateData = {
-              'data': collation_data.results,
-              'lac_witnesses': lac_witnesses
-            };
-            if (collation_data.hasOwnProperty('special_categories')) {
-              CL.collateData.special_categories = collation_data.special_categories;
-            }
-            if (typeof callback !== 'undefined') {
-              callback();
-            } else {
-              runCollation(CL.collateData, output, scroll_offset);
-            }
-          });
+      _calculateLacWits(collation_data, function(lac_witness_list) {
+        CL.services.getSiglumMap(lac_witness_list, function(lac_witnesses) {
+          CL.collateData = {
+            'data': collation_data.results,
+            'lac_witnesses': lac_witnesses
+          };
+          if (collation_data.hasOwnProperty('special_categories')) {
+            CL.collateData.special_categories = collation_data.special_categories;
+          }
+          if (typeof callback !== 'undefined') {
+            callback();
+          } else {
+            runCollation(CL.collateData, output, scroll_offset);
+          }
         });
       });
+    });
   };
 
   /** get the data for the unit of this type
@@ -59,15 +84,15 @@ RG = (function() {
    * */
   getUnitData = function(data, id, start, end, options) {
     var i, html, j, k, l, decisions, rows, cells, row_list, temp, events, max_length, row_id, type,
-      subrow_id, colspan, hand, class_string, div_class_string, witness, id_dict, key, words, reg_class,
+      subrow_id, colspan, highlighted_hand, classes, div_class_string, witness, id_dict, key, words, reg_class,
       highlighted, cells_dict, rule_cells, keys_to_sort, class_list, variant_unit_id;
-    if (typeof options === 'undefined') {
+    if (options === undefined) {
       options = {};
     }
     if (options.hasOwnProperty('highlighted_wit')) {
-      hand = options.highlighted_wit.split('|')[1];
+      highlighted_hand = options.highlighted_wit.split('|')[1];
     } else {
-      hand = null;
+      highlighted_hand = null;
     }
     html = [];
     row_list = [];
@@ -82,15 +107,17 @@ RG = (function() {
       if (i === 0) {
         cells.push('<tr><td class="mark" colspan="MX_LN"><span id="toggle_variant_' + id + '" class="triangle">&#9650;</span></td></tr>');
       }
-      class_string = '';
-      if (data[i].witnesses.indexOf(hand) != -1 && i === 0) {
-        class_string = ' class="top highlighted" ';
-      } else if (data[i].witnesses.indexOf(hand) != -1) {
-        class_string = ' class="highlighted" ';
-      } else if (i === 0) {
-        class_string = ' class="top" ';
+      classes = [];
+      if (i === 0) {
+        classes.push('top');
       }
-      cells.push('<tr id="' + row_id + '"' + class_string + '>');
+      if (data[i].witnesses.indexOf(highlighted_hand) != -1) {
+        classes.push('highlighted');
+      }
+      if (options.hasOwnProperty('highlighted_added_wits') && data[i].witnesses.filter(x => options.highlighted_added_wits.includes(x)).length > 0) {
+				classes.push('added_highlighted');
+			}
+      cells.push('<tr id="' + row_id + '" class="' + classes.join(' ') + '">');
       cells.push('<td class="mark"><div class="spanlike">' + CL.getAlphaId(i) + '. </div></td>');
       if (data[i].text.length === 0) {
         if (i === 0) {
@@ -109,8 +136,14 @@ RG = (function() {
         for (j = 0; j < data[i].text.length; j += 1) {
           variant_unit_id = 'variant_unit_' + id + '_r' + i + '_w' + j;
           div_class_string = '';
-          if (i > 0) {
+
+          class_list = [];
+          //if we are in witnessAdding mode only allow regularisation of readings that have added witnesses (the rules will only be made with the added ones not the full set)
+          if (i > 0 && (CL.witnessAddingMode === false || (CL.witnessAddingMode === true && data[i].witnesses.filter(x => CL.witnessesAdded.includes(x)).length > 0))) {
             class_list = ['drag', 'clone', 'reg_word'];
+          }
+
+          if (i > 0) {
             if (_hasRuleApplied(variant_unit_id)) {
               class_list.push('regularisation_staged');
             }
@@ -164,7 +197,7 @@ RG = (function() {
                 if (_hasDeletionScheduled(key)) {
                   reg_class += 'deleted ';
                 }
-		reg_class += 'regclass_'+id_dict[key].class + ' ';
+		            reg_class += 'regclass_'+id_dict[key].class + ' ';
                 highlighted = '';
                 if (id_dict[key].witnesses.length > 1) {
                   id_dict[key].witnesses = CL.sortWitnesses(id_dict[key].witnesses);
@@ -172,18 +205,18 @@ RG = (function() {
                 if (keys_to_sort.indexOf(id_dict[key].witnesses[0]) === -1) {
                   keys_to_sort.push(id_dict[key].witnesses[0]);
                 }
-                if (id_dict[key].witnesses.indexOf(hand) !== -1) {
+                if (id_dict[key].witnesses.indexOf(highlighted_hand) !== -1) {
                   highlighted = 'highlighted ';
                 }
                 subrow_id = row_id + '_word_' + j + '_rule_' + key;
                 rule_cells.push('<tr class="' + reg_class + highlighted + '" id="' + subrow_id + '"><td>');
-                if (id_dict[key].witnesses.indexOf(hand) !== -1) {
+                if (id_dict[key].witnesses.indexOf(highlighted_hand) !== -1) {
                   rule_cells.push('<div class="spanlike">');
                 }
-                rule_cells.push(id_dict[key].t.replace(/_/g, '&#803;'));
+                rule_cells.push(CL.project.prepareDisplayString(id_dict[key].t));
                 rule_cells.push(' &#9654; ');
-                rule_cells.push(id_dict[key].n.replace(/_/g, '&#803;'));
-                if (id_dict[key].witnesses.indexOf(hand) !== -1) {
+                rule_cells.push(CL.project.prepareDisplayString(id_dict[key].n));
+                if (id_dict[key].witnesses.indexOf(highlighted_hand) !== -1) {
                   rule_cells.push('</div>');
                 }
                 rule_cells.push('</td></tr>');
@@ -213,7 +246,9 @@ RG = (function() {
     html.push('<table class="variant_unit" id="variant_unit_' + id + '">');
     html.push(rows.join('').replace(/MX_LN/g, String(max_length + 1)));
     //html.push(utils.TEMPLATE.replace_all(rows.join(''), 'MX_LN', String(max_length + 1)));
-    html.push('<tr><td class="mark" colspan="' + (max_length + 1) + '"><span id="add_reading_' + id + '">+</span></td></tr>');
+    if (CL.witnessEditingMode === false) {
+      html.push('<tr><td class="mark" colspan="' + (max_length + 1) + '"><span id="add_reading_' + id + '">+</span></td></tr>');
+    }
     html.push('</table>');
     html.push('</div></td>');
     return [html, row_list, events];
@@ -231,19 +266,25 @@ RG = (function() {
         document.getElementById('scroller').scrollTop
       ];
     }
-    if ($.isEmptyObject(CL.collateData)) {
-      getCollationData('units', scroll_offset, function() {
+    if (CL.witnessAddingMode !== true) {
+      if ($.isEmptyObject(CL.collateData)) {
+        getCollationData('units', scroll_offset, function() {
+          runCollation(CL.collateData, 'units', scroll_offset);
+        });
+      } else {
         runCollation(CL.collateData, 'units', scroll_offset);
-      }); //collation_source, output, scroll_offset, callback
+      }
     } else {
-      runCollation(CL.collateData, 'units', scroll_offset);
+      CL.prepareAdditionalCollation(CL.existingCollation, CL.dataSettings.witness_list);
     }
   };
 
   showVerseCollation = function(data, context, container, options) {
     var html, i, last_row, tr, temp, event_rows, row, triangles, bk, ch, v, nextCh, nextV, prevCh, prevV,
-      header, unit_events, key, global_exceptions_html, show_hide_regularisations_button_text;
+      header, unit_events, key, global_exceptions_html, show_hide_regularisations_button_text,
+      remove_wits_form, wits, footerHtml, preselected_added_highlight;
     console.log(JSON.parse(JSON.stringify(data)));
+    CL.stage = 'regularise';
 
     if (typeof options === 'undefined') {
       options = {};
@@ -251,24 +292,56 @@ RG = (function() {
     if (!options.hasOwnProperty('highlighted_wit') && CL.highlighted !== 'none') {
       options.highlighted_wit = CL.highlighted;
     }
+    if (CL.witnessAddingMode === true) {
+			//this sets this a default so that when all is highlighted this will work - any data specified in options will override it
+      CL.highlightedAdded = JSON.parse(JSON.stringify(CL.witnessesAdded));
+		}
+    if (CL.witnessAddingMode === true && !options.hasOwnProperty('highlighted_added_wits')) {
+      options.highlighted_added_wits = CL.highlightedAdded;
+    }
+
     options.sort = true;
     SimpleContextMenu.setup({
       'preventDefault': true,
       'preventForms': false
     });
-    SimpleContextMenu.attach('ui-selected', function() {
-      return _makeMenu('group_delete');
-    });
-    SimpleContextMenu.attach('regularised', function() {
-      return _makeMenu('regularised');
-    });
-    SimpleContextMenu.attach('regularised_global', function() {
-      return _makeMenu('regularised_global');
-    });
-    SimpleContextMenu.attach('regularisation_staged', function() {
-      return _makeMenu('regularisation_staged');
-    });
-
+    if (CL.witnessEditingMode === false || CL.witnessAddingMode === true) {
+      SimpleContextMenu.attach('ui-selected', function() {
+        return _makeMenu('group_delete');
+      });
+      SimpleContextMenu.attach('regularised', function() {
+        return _makeMenu('regularised');
+      });
+      SimpleContextMenu.attach('regularised_global', function() {
+        return _makeMenu('regularised_global');
+      });
+      SimpleContextMenu.attach('regularisation_staged', function() {
+        return _makeMenu('regularisation_staged');
+      });
+    }
+    //remove the witness removal window if shown
+    if (document.getElementById('remove_witnesses_div')) {
+      document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
+    }
+    if (CL.witnessEditingMode === true) {
+      wits = CL.checkWitnessesAgainstProject(CL.dataSettings.witness_list, CL.project.witnesses);
+      if (wits[0] === false) {
+        if ((wits[1] === 'removed' || wits[1] === 'both') && CL.witnessRemovingMode === true) {
+          $.get(staticUrl + 'CE_core/html_fragments/remove_witnesses_form.html', function(html) {
+            if (!document.getElementById('remove_witnesses_div')) {
+              remove_wits_form = document.createElement('div');
+            } else {
+              remove_wits_form = document.getElementById('remove_witnesses_div');
+            }
+            remove_wits_form.setAttribute('id', 'remove_witnesses_div');
+            remove_wits_form.setAttribute('class', 'dragdiv remove_witnesses_div dialogue_form');
+            remove_wits_form.innerHTML = html;
+            document.getElementsByTagName('body')[0].appendChild(remove_wits_form);
+            CL.setUpRemoveWitnessesForm(wits[2], data, 'regularised');
+          }, 'text');
+        }
+      }
+    }
     CL.lacOmFix();
     temp = CL.getUnitLayout(CL.data.apparatus, 1, 'regularise', options);
     header = CL.getCollationHeader(CL.data, temp[1], false);
@@ -299,19 +372,118 @@ RG = (function() {
       show_hide_regularisations_button_text = 'show regularisations';
     }
     $('#footer').addClass('pure-form'); //this does the styling of the select elements in the footer using pure (they cannot be styled individually)
-    document.getElementById('footer').innerHTML = '<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>' +
-      '<button class="pure-button left_foot" id="show_hide_regularisations_button">' + show_hide_regularisations_button_text + '</button>' +
-      '<span id="stage_links"></span>' +
-      '<span id="extra_buttons"></span>' +
-      '<button class="pure-button right_foot" id="go_to_sv_button">move to set variants</button>' +
-      '<button class="pure-button right_foot" id="save_button">save</button>' +
-      '<button class="pure-button right_foot" id="recollate_button" type="button">recollate</button>' +
-      '<button class="pure-button right_foot" id="settings_button">settings</button>' +
-      '<select class="right_foot" id="highlighted" name="highlighted"></select>';
+    footerHtml = [];
+    if (CL.project.hasOwnProperty('showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
+      footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+    }
+    if (CL.witnessEditingMode === false || CL.witnessAddingMode === true) {
+      footerHtml.push('<button class="pure-button left_foot" id="show_hide_regularisations_button">' + show_hide_regularisations_button_text + '</button>');
+    }
+    if (CL.witnessEditingMode === false) {
+      footerHtml.push('<span id="extra_buttons"></span>');
+      footerHtml.push('<span id="stage_links"></span>');
+    }
+    if (CL.witnessEditingMode === true) {
+      footerHtml.push('<button class="pure-button right_foot" id="return_to_saved_table_button">Return to summary table</button>');
+    } else {
+      footerHtml.push('<button class="pure-button right_foot" id="go_to_sv_button">move to set variants</button>');
+    }
+    footerHtml.push('<button class="pure-button right_foot" id="save_button">save</button>');
+    if (CL.witnessEditingMode === false || CL.witnessAddingMode === true) {
+      footerHtml.push('<button class="pure-button right_foot" id="recollate_button" type="button">recollate</button>');
+      footerHtml.push('<button class="pure-button right_foot" id="settings_button">settings</button>');
+    }
+    footerHtml.push('<select class="right_foot" id="highlighted" name="highlighted"></select>');
+    if (CL.witnessAddingMode === true && CL.witnessesAdded.length > 0) {
+			footerHtml.push('<select class="right_foot" id="added_highlight" name="added_highlight"></select>');
+		}
+    document.getElementById('footer').innerHTML = footerHtml.join('');
 
     SPN.remove_loading_overlay();
     CL.addExtraFooterButtons('regularised');
     CL.addStageLinks();
+    _addFooterFunctions();
+
+    CL.addTriangleFunctions('table');
+    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected':options.highlighted_wit, 'add_select': true, 'select_label_details': {'label': 'highlight witness', 'value': 'none' }});
+    if (CL.witnessAddingMode === true && CL.witnessesAdded.length > 0) {
+			if (options.highlighted_added_wits.length === 1) {
+				preselected_added_highlight = options.highlighted_added_wits[0];
+			} else {
+				preselected_added_highlight = 'all';
+			}
+			cforms.populateSelect(CL.sortWitnesses(CL.witnessesAdded), document.getElementById('added_highlight'), {'selected': preselected_added_highlight, 'add_select': true, 'select_label_details': {'label': 'highlight all added witnesses', 'value': 'all'}})
+		}
+
+    //TODO: probably better in for loop
+    if (CL.witnessRemovingMode !== true) {
+      i = 0;
+      while (i <= temp[4]) {
+        if (document.getElementById('drag' + i) !== null) {
+          _redipsInitRegularise('drag' + i);
+        }
+        if (document.getElementById('add_reading_' + i) !== null) {
+          _addNewToken(document.getElementById('add_reading_' + i));
+        }
+        i += 1;
+      }
+    }
+    $('.selectable').selectable({
+      'cancel': 'regularised_global',
+      selected: function(event, ui) {$(ui.selected).removeClass('regularised');},
+      unselected: function(event, ui) {$(ui.unselected).addClass('regularised');}
+    });
+    $('#highlighted').on('change', function(event) {
+      _highlightWitness(event.target.value);
+    });
+    if (document.getElementById('added_highlight')) {
+			$('#added_highlight').on('change', function (event) {_highlightAddedWitness(event.target.value)});
+		}
+    _showRegularisations();
+
+    CL.makeVerseLinks();
+
+    event_rows = temp[2];
+    for (i = 0; i < event_rows.length; i += 1) {
+      row = document.getElementById(event_rows[i]);
+      if (row !== null) {
+        CL.addHoverEvents(row);
+      }
+    }
+    unit_events = temp[3];
+    for (key in unit_events) {
+      if (unit_events.hasOwnProperty(key)) {
+        row = document.getElementById(key);
+        if (row) {
+          CL.addHoverEvents(row, unit_events[key]);
+        }
+      }
+    }
+  };
+
+  /** highlight a witness that has been added or highlight all added witnesses with 'all' (only in CL.witnessAddingMode), called from select box in page footer */
+  _highlightAddedWitness = function (witness) {
+    var scroll_offset, witnesses;
+    scroll_offset = [document.getElementById('scroller').scrollLeft,
+                     document.getElementById('scroller').scrollTop];
+
+    if (witness === 'all') {
+      witnesses = CL.witnessesAdded;
+    } else {
+      witnesses = [witness];
+    }
+    CL.highlightedAdded = witnesses;
+    showVerseCollation(CL.data, CL.context, CL.container, {'highlighted_added_wits': witnesses});
+
+    document.getElementById('scroller').scrollLeft = scroll_offset[0];
+    document.getElementById('scroller').scrollTop = scroll_offset[1];
+  };
+
+  _addFooterFunctions = function () {
+    //TODO: this code is repeated in SV - put in function?
+    $('#return_to_saved_table_button').on('click', function() {
+      	CL.returnToSummaryTable();
+    });
     $('#go_to_sv_button').on('click',
       function(event) {
         var extra_results;
@@ -365,48 +537,9 @@ RG = (function() {
       function(event) {
         CL.saveCollation('regularised');
       });
-    CL.addTriangleFunctions('table');
-    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected':options.highlighted_wit});
-    //TODO: probably better in for loop
-    i = 0;
-    while (i <= temp[4]) {
-      if (document.getElementById('drag' + i) !== null) {
-        _redipsInitRegularise('drag' + i);
-      }
-      if (document.getElementById('add_reading_' + i) !== null) {
-        _addNewToken(document.getElementById('add_reading_' + i));
-      }
-      i += 1;
-    }
-    $('.selectable').selectable({
-      'cancel': 'regularised_global',
-      selected: function(event, ui) {$(ui.selected).removeClass('regularised');},
-      unselected: function(event, ui) {$(ui.unselected).addClass('regularised');}
-    });
-    $('#highlighted').on('change', function(event) {
-      _highlightWitness(event.target.value);
-    });
-    _showRegularisations();
-
-    CL.makeVerseLinks();
-
-    event_rows = temp[2];
-    for (i = 0; i < event_rows.length; i += 1) {
-      row = document.getElementById(event_rows[i]);
-      if (row !== null) {
-        CL.addHoverEvents(row);
-      }
-    }
-    unit_events = temp[3];
-    for (key in unit_events) {
-      if (unit_events.hasOwnProperty(key)) {
-        row = document.getElementById(key);
-        if (row) {
-          CL.addHoverEvents(row, unit_events[key]);
-        }
-      }
-    }
   };
+
+
 
   allRuleStacksEmpty = function() {
     if (!$.isEmptyObject(_rules) || _forDeletion.length > 0 || _forGlobalExceptions.length > 0) {
@@ -422,17 +555,17 @@ RG = (function() {
   _calculateLacWits = function(collation_data, result_callback) {
     var i, transcription_id, lac_transcriptions;
     lac_transcriptions = JSON.parse(JSON.stringify(CL.dataSettings.witness_list));
-    if (collation_data[0].hasOwnProperty('transcription_id')) {
+    if (collation_data.results[0].hasOwnProperty('transcription_id')) {
       console.warn('The use of \'transcription_id\' is deprecated. \'transcription\' should be used instead.');
     }
-    for (i = 0; i < collation_data.length; i += 1) {
+    for (i = 0; i < collation_data.results.length; i += 1) {
       //TODO: remove first condition and keep final two when transcription_id key no longer supported
-      if (collation_data[i].hasOwnProperty('transcription_id')) {
-        transcription_id = collation_data[i].transcription_id;
-      } else if (collation_data[i].hasOwnProperty('transcription_identifier')) {
-        transcription_id = collation_data[i].transcription_identifier;
+      if (collation_data.results[i].hasOwnProperty('transcription_id')) {
+        transcription_id = collation_data.results[i].transcription_id;
+      } else if (collation_data.results[i].hasOwnProperty('transcription_identifier')) {
+        transcription_id = collation_data.results[i].transcription_identifier;
       } else {
-        transcription_id = collation_data[i].transcription;
+        transcription_id = collation_data.results[i].transcription;
       }
       if (lac_transcriptions.indexOf(transcription_id) !== -1) {
         lac_transcriptions.splice(lac_transcriptions.indexOf(transcription_id), 1);
@@ -463,12 +596,12 @@ RG = (function() {
    * interface > n > t */
   _getToken = function(dict) {
     if (dict.hasOwnProperty('interface')) {
-      return dict['interface'].replace(/_/g, '&#803;');
+      return CL.project.prepareDisplayString(dict['interface']);
     }
     if (dict.hasOwnProperty('n')) {
-      return dict.n.replace(/_/g, '&#803;');
+      return CL.project.prepareDisplayString(dict.n);
     }
-    return dict.t.replace(/_/g, '&#803;');
+    return CL.project.prepareDisplayString(dict.t);
   };
 
   _getWordTokenForWitness = function(unit, reading, word) {
@@ -500,9 +633,9 @@ RG = (function() {
     return new_wits.join(', ');
   };
 
-  runCollation = function(collation_data, output, scroll_offset) {
+  runCollation = function(collation_data, output, scroll_offset, callback) {
     var rule_list;
-    //put all the rules in a sinlge list
+    //put all the rules in a single list
     rule_list = [];
     for (let key in _rules) {
       if (_rules.hasOwnProperty(key)) {
@@ -514,47 +647,62 @@ RG = (function() {
       _forGlobalExceptions = [];
       _rules = {};
       _fetchRules(collation_data, function(rules) {
-        _doRunCollation(collation_data, rules, output, scroll_offset);
+        _doRunCollation(collation_data, rules, output, scroll_offset, callback);
       });
     });
   };
 
+
+
   /** add lac_verse and om_verse to the collated data */
   _integrateLacOmReadings = function(data) {
-    var i;
-    if (typeof data.lac_readings !== 'undefined' && data.lac_readings.length > 0) {
-      for (i = 0; i < data.apparatus.length; i += 1) {
+    var special_witnesses, new_lac_witnesses;
+    special_witnesses = [];
+    for (let j = 0; j < data.special_categories.length; j+=1) {
+      for (let i = 0; i < data.apparatus.length; i += 1) {
+        data.apparatus[i].readings.push({
+          'text': [],
+          'type': 'lac_verse',
+          'details': data.special_categories[j].label,
+          'witnesses': data.special_categories[j].witnesses
+        });
+      }
+      special_witnesses.push.apply(special_witnesses, data.special_categories[j].witnesses);
+    }
+    new_lac_witnesses = CL.removeSpecialWitnesses(data.lac_readings, special_witnesses);
+    if (typeof data.lac_readings !== 'undefined' && data.lac_readings.length > 0 && new_lac_witnesses.length > 0) {
+      for (let i = 0; i < data.apparatus.length; i += 1) {
         if (data.lac_readings.indexOf(data.overtext_name) != -1) {
           data.apparatus[i].readings.splice(0, 0, {
             'text': [],
             'type': 'lac_verse',
-            'details': 'lac verse',
-            'witnesses': data.lac_readings
+            'details': CL.project.lac_unit_label,
+            'witnesses': new_lac_witnesses
           });
         } else {
           data.apparatus[i].readings.push({
             'text': [],
             'type': 'lac_verse',
-            'details': 'lac verse',
-            'witnesses': data.lac_readings
+            'details': CL.project.lac_unit_label,
+            'witnesses': new_lac_witnesses
           });
         }
       }
     }
     if (typeof data.om_readings !== 'undefined' && data.om_readings.length > 0) {
-      for (i = 0; i < data.apparatus.length; i += 1) {
+      for (let i = 0; i < data.apparatus.length; i += 1) {
         if (data.om_readings.indexOf(data.overtext_name) != -1) {
           data.apparatus[i].readings.splice(0, 0, {
             'text': [],
             'type': 'om_verse',
-            'details': 'om verse',
+            'details': CL.project.om_unit_label,
             'witnesses': data.om_readings
           });
         } else {
           data.apparatus[i].readings.push({
             'text': [],
             'type': 'om_verse',
-            'details': 'om verse',
+            'details': CL.project.om_unit_label,
             'witnesses': data.om_readings
           });
         }
@@ -563,7 +711,7 @@ RG = (function() {
     return data;
   };
 
-  _doRunCollation = function(collation_data, rules, output, scroll_offset) {
+  _doRunCollation = function(collation_data, rules, output, scroll_offset, callback) {
     var options, setting, result_callback, data_settings,
       algorithm_settings, displaySettings;
     options = {};
@@ -605,22 +753,49 @@ RG = (function() {
       }
     }
     options.algorithm_settings = algorithm_settings;
-    result_callback = function(data) {
-      if (data === null) {
-        alert(CL.context + ' does not collate.');
-        SPN.remove_loading_overlay();
-        location.reload();
-        return;
+
+    if (output === 'add_witnesses') {
+      options.split_single_reading_units = true;
+      result_callback = function(data) {
+        callback(data);
       }
-      CL.data = data;
-      CL.data = _integrateLacOmReadings(CL.data);
-      CL.dataSettings.base_text_siglum = data.overtext_name;
-      showVerseCollation(CL.data, CL.context, document.getElementById('container'));
-      if (scroll_offset !== undefined) {
-        document.getElementById('scroller').scrollLeft = scroll_offset[0];
-        document.getElementById('scroller').scrollTop = scroll_offset[1];
-      }
-    };
+    //TODO: this needs deleting or moving to services
+    // if (output === 'table') {
+    //   if (document.getElementById('book').value !== 'none' &&
+    //     document.getElementById('chapter').value !== 'none' &&
+    //     document.getElementById('verse').value !== 'none') {
+    //
+    //     CL.context = document.getElementById('book').value + 'K' +
+    //       document.getElementById('chapter').value +
+    //       'V' + document.getElementById('verse').value;
+    //
+    //     result_callback = function(data) {
+    //
+    //       _showCollationTable(CL.data, CL.context, document.getElementById('container'));
+    //     };
+    //     options.accept = 'json';
+    //   } else {
+    //     return;
+    //   }
+    //
+    } else {
+      result_callback = function(data) {
+        if (data === null) {
+          alert(CL.context + ' does not collate.');
+          SPN.remove_loading_overlay();
+          location.reload();
+          return;
+        }
+        CL.data = data;
+        CL.data = _integrateLacOmReadings(CL.data);
+        CL.dataSettings.base_text_siglum = data.overtext_name;
+        showVerseCollation(CL.data, CL.context, document.getElementById('container'));
+        if (scroll_offset !== undefined) {
+          document.getElementById('scroller').scrollLeft = scroll_offset[0];
+          document.getElementById('scroller').scrollTop = scroll_offset[1];
+        }
+      };
+    }
     CL.services.doCollation(CL.context, options, result_callback);
   };
 
@@ -856,6 +1031,7 @@ RG = (function() {
         }
         rules.push(rule);
       }
+      console.log(rules)
       return rules;
     }
   };
@@ -898,7 +1074,7 @@ RG = (function() {
       } else { // we are normalising to an existing value
         normalised_text = normalised_form.childNodes[0].textContent;
       }
-      normalised_text = normalised_text.replace(/̣/g, '_');
+      normalised_text = CL.project.prepareNormalisedString(normalised_text);
       //stop the dragged clone being added to the dom
       if (clone.parentNode !== null) {
         clone.parentNode.removeChild(clone);
@@ -908,7 +1084,11 @@ RG = (function() {
       unit = parseInt(unit_data.substring(0, unit_data.indexOf('_r')).replace('variant_unit_', ''), 10);
       reading = parseInt(unit_data.substring(unit_data.indexOf('_r') + 2, unit_data.indexOf('_w')), 10);
       word = parseInt(unit_data.substring(unit_data.indexOf('_w') + 2), 10);
-      witnesses = CL.data.apparatus[unit].readings[reading].witnesses;
+      if (CL.witnessAddingMode !== true) {
+        witnesses = CL.data.apparatus[unit].readings[reading].witnesses;
+      } else {
+        witnesses = CL.data.apparatus[unit].readings[reading].witnesses.filter(x => CL.witnessesAdded.includes(x));
+      }
       original_text = CL.data.apparatus[unit].readings[reading].text[word];
       original_display_text = CL.data.apparatus[unit].readings[reading].text[word]['interface'];
       if (document.getElementById('reg_form') !== null) {
@@ -927,11 +1107,8 @@ RG = (function() {
           data['class'] = 'none';
         }
         CL.services.getUserInfo(function(user) {
-          //FIX: here
-          _rules[word_id] = _createRule(data, user, original_text, normalised_text, unit, reading, word, witnesses)
-          //_rules.push.apply(_rules, _createRule(data, user, original_text, normalised_text, unit, reading, word, witnesses));
+          _rules[word_id] = _createRule(data, user, original_text, normalised_text, unit, reading, word, witnesses);
         });
-
         document.getElementsByTagName('body')[0].removeChild(document.getElementById('reg_form'));
         rd.enableDrag(false, rd.objOld);
         $(original).addClass('regularisation_staged');
@@ -941,8 +1118,13 @@ RG = (function() {
         if (new_unit_data !== '') { //only try this if it is not a user added reading
           new_unit = parseInt(new_unit_data.substring(0, new_unit_data.indexOf('_r')).replace('variant_unit_', ''), 10);
           new_reading = parseInt(new_unit_data.substring(new_unit_data.indexOf('_r') + 2, new_unit_data.indexOf('_w')), 10);
-          //TODO: check this isn't causing problems by not eliminating suffixes.
-          new_witnesses = CL.getReadingWitnesses(CL.data.apparatus[unit].readings[reading]);
+          if (CL.witnessAddingMode !== true) {
+            //TODO: check this isn't causing problems by not eliminating suffixes.
+            new_witnesses = CL.getReadingWitnesses(CL.data.apparatus[unit].readings[reading]);
+          } else {
+            //TODO: check this isn't causing problems by not eliminating suffixes.
+            new_witnesses = CL.getReadingWitnesses(CL.data.apparatus[unit].readings[reading]).filter(x => CL.witnessesAdded.includes(x));
+          }
           if (CL.project.hasOwnProperty('id')) {
             for (i = 0; i < new_witnesses.length; i += 1) {
               suffix = _getSuffix(data['class']);
@@ -955,7 +1137,7 @@ RG = (function() {
         reg_menu = document.createElement('div');
         reg_menu.setAttribute('id', 'reg_form');
         reg_menu.setAttribute('class', 'dragdiv reg_form dialogue_form');
-        reg_menu.innerHTML = html.replace('{unit_data}', unit_data).replace('{original_text}', original_display_text.replace(/_/g, '&#803;')).replace('{normalised_text}', normalised_text.replace(/_/g, '&#803;').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
+        reg_menu.innerHTML = html.replace('{unit_data}', unit_data).replace('{original_text}', CL.project.prepareDisplayString(original_display_text)).replace('{normalised_text}', CL.project.prepareDisplayString(normalised_text).replace(/</g, '&lt;').replace(/>/g, '&gt;'));
         document.getElementsByTagName('body')[0].appendChild(reg_menu);
         reg_rules = CL.getRuleClasses('create_in_RG', true, 'value', ['identifier', 'name', 'RG_default']);
         new_reg_rules = [];
@@ -1004,6 +1186,10 @@ RG = (function() {
     //hardcoded this now as a fail safe against overshooting the bottom of the page, extra tests could be added if you have time.
     //document.getElementById('reg_form').style.top = (rd.td.current.offsetTop + rd.obj.redips.container.offsetParent.offsetTop - document.getElementById('scroller').scrollTop) + 'px';
     document.getElementById('reg_form').style.left = left_pos + 'px';
+
+    if (CL.witnessAddingMode === true) {
+      document.getElementById('rule_creation_warning').innerHTML = 'Rules created will only apply to the witnesses being added.';
+    }
 
     rule_scopes = _getRuleScopes();
     cforms.populateSelect(rule_scopes, document.getElementById('scope'), {'value_key': 'value', 'text_keys': 'label', 'add_select': false});
@@ -1056,25 +1242,35 @@ RG = (function() {
   };
 
   _getSuffix = function(decision_class) {
-    var i, suffix, rule_classes;
+    var i, suffix;
     suffix = '';
-    if (CL.project.hasOwnProperty('ruleClasses') && CL.project.ruleClasses !== undefined) {
-      rule_classes = CL.project.ruleClasses;
-    } else if (CL.services.hasOwnProperty('ruleClasses')) {
-      rule_classes = CL.services.ruleClasses;
-    } else {
-      rule_classes = DEF.ruleClasses;
-    }
-    for (i = 0; i < rule_classes.length; i += 1) {
-      if (rule_classes[i].value === decision_class) {
-        if (rule_classes[i].hasOwnProperty('suffixed_sigla') &&
-            rule_classes[i].suffixed_sigla === true &&
-            rule_classes[i].hasOwnProperty('identifier') &&
-            typeof rule_classes[i].identifier !== 'undefined') {
-          suffix += rule_classes[i].identifier;
+    for (i = 0; i < CL.ruleClasses.length; i += 1) {
+      if (CL.ruleClasses[i].value === decision_class) {
+        if (CL.ruleClasses[i].hasOwnProperty('suffixed_sigla') &&
+            CL.ruleClasses[i].suffixed_sigla === true &&
+            typeof CL.ruleClasses[i].identifier !== 'undefined') {
+          suffix += CL.ruleClasses[i].identifier;
         }
       }
     }
+    //This is what was in master branch but it was improved and corrected in the muya_dev branch
+    // if (CL.project.hasOwnProperty('ruleClasses') && CL.project.ruleClasses !== undefined) {
+    //   rule_classes = CL.project.ruleClasses;
+    // } else if (CL.services.hasOwnProperty('ruleClasses')) {
+    //   rule_classes = CL.services.ruleClasses;
+    // } else {
+    //   rule_classes = DEF.ruleClasses;
+    // }
+    // for (i = 0; i < rule_classes.length; i += 1) {
+    //   if (rule_classes[i].value === decision_class) {
+    //     if (rule_classes[i].hasOwnProperty('suffixed_sigla') &&
+    //         rule_classes[i].suffixed_sigla === true &&
+    //         rule_classes[i].hasOwnProperty('identifier') &&
+    //         typeof rule_classes[i].identifier !== 'undefined') {
+    //       suffix += rule_classes[i].identifier;
+    //     }
+    //   }
+    // }
     return suffix;
   };
 
@@ -1337,7 +1533,6 @@ RG = (function() {
   };
 
 
-  //priv-e
   if (testing) {
     return {
 
@@ -1393,7 +1588,6 @@ RG = (function() {
 
     };
   } else {
-
     return {
 
       showRegularisations: showRegularisations,
@@ -1407,6 +1601,8 @@ RG = (function() {
 
     };
   }
+
+
 
 }());
 
