@@ -10,9 +10,10 @@ import re
 import sys
 import importlib
 from collation.core.regulariser import Regulariser
+from collation.core.settings_applier import SettingsApplier
 
 
-class PostProcessor(Regulariser):
+class PostProcessor(Regulariser, SettingsApplier):
     """Convert alignment table into variant units."""
 
     def __init__(self,
@@ -22,6 +23,7 @@ class PostProcessor(Regulariser):
                  om_readings,
                  lac_readings,
                  hand_id_map,
+                 special_categories,
                  settings,
                  decisions,
                  display_settings_config,
@@ -35,6 +37,7 @@ class PostProcessor(Regulariser):
         self.overtext = overtext
         self.om_readings = om_readings
         self.lac_readings = lac_readings
+        self.special_categories = special_categories
         self.hand_id_map = hand_id_map
         self.settings = settings
         self.decisions = decisions
@@ -50,10 +53,7 @@ class PostProcessor(Regulariser):
             self.local_python_functions = None
         self.split_single_reading_units = split_single_reading_units
         Regulariser.__init__(self, rule_conditions_config, local_python_functions)
-        module_name = self.display_settings_config['python_file']
-        class_name = self.display_settings_config['class_name']
-        MyClass = getattr(importlib.import_module(module_name), class_name)
-        self.apply_settings_instance = MyClass()
+        SettingsApplier.__init__(self, settings, display_settings_config)
 
     ###########################################################
     # this is the starting function
@@ -127,6 +127,7 @@ class PostProcessor(Regulariser):
                     else:
                         variant_unit.append(unit[key])
                 reading_sets.append(variant_unit)
+
         # next line was an experiment to try chunking myself.
         # reading_sets = self.check_adjacent_shared_units(reading_sets)
         return reading_sets
@@ -434,25 +435,8 @@ class PostProcessor(Regulariser):
                 'apparatus': anchored_readings,
                 'om_readings': self.om_readings,
                 'lac_readings': self.lac_readings,
+                'special_categories': self.special_categories,
                 'hand_id_map': self.hand_id_map}
-
-    def apply_settings(self, token):
-        # set up a base string for interface (this may change later with the settings)
-        if 'n' in token:
-            token['interface'] = token['n']
-        elif 'original' in token:
-            token['interface'] = token['original']
-        else:
-            token['interface'] = token['t']
-
-        # display_settings_config is already in execution order
-        for setting in self.display_settings_config['configs']:
-            if setting['id'] in self.settings and setting['apply_when'] is True \
-                    or setting['id'] not in self.settings and setting['apply_when'] is False:
-
-                token = getattr(self.apply_settings_instance, setting['function'])(token)
-        token['interface'] = token['interface'].replace('<', '&lt;').replace('>', '&gt;')
-        return token
 
     def process_witness_tokens(self, witness):
         if not isinstance(witness, list):
