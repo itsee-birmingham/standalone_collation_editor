@@ -2372,18 +2372,18 @@ CL = (function() {
   };
 
   getOrderedAppLines = function() {
-    var key, numbers, i, app_ids;
+    var numbers, app_ids;
     numbers = [];
     app_ids = [];
-    for (key in CL.data) {
+    for (let key in CL.data) {
       if (CL.data.hasOwnProperty(key)) {
         if (key.match(/apparatus\d/g) !== null) {
           numbers.push(parseInt(key.replace('apparatus', '')));
         }
       }
     }
-    numbers.sort();
-    for (i = 0; i < numbers.length; i += 1) {
+    numbers.sort((a, b) => a - b);
+    for (let i = 0; i < numbers.length; i += 1) {
       app_ids.push('apparatus' + numbers[i]);
     }
     return app_ids;
