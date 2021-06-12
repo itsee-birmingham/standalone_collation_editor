@@ -1,5 +1,5 @@
 /*jshint esversion: 6 */
-
+var testing;
 OR = (function() {
   "use strict";
 
@@ -40,7 +40,9 @@ OR = (function() {
       num, temp, event_rows, scroll_offset, overlap_options, new_overlap_options, container,
       undo_button, show_hide_subreadings_button_text;
     //console.log(CL.data);
+    CL.stage = 'ordered';
     addLabels(false);
+
     if (typeof options === 'undefined') {
       options = {};
     }
@@ -120,7 +122,9 @@ OR = (function() {
       show_hide_subreadings_button_text = 'show non-edition subreadings';
     }
     footer_html = [];
-    footer_html.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+    if (CL.project.hasOwnProperty('showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
+      footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+    }
     footer_html.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">' + show_hide_subreadings_button_text + '</button>');
     footer_html.push('<span id="extra_buttons"></span>');
     footer_html.push('<span id="stage_links"></span>');
@@ -137,7 +141,7 @@ OR = (function() {
     CL.addStageLinks();
     SPN.remove_loading_overlay();
     CL.addTriangleFunctions('table');
-    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected': options.highlighted_wit});
+    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected': options.highlighted_wit, 'add_select': true, 'select_label_details': {'label': 'highlight witness', 'value': 'none' }});
     $('#highlighted').on('change', function(event) {
       _highlightWitness(event.target.value);
     });
@@ -190,6 +194,7 @@ OR = (function() {
     if (typeof options === 'undefined') {
       options = {};
     }
+    CL.stage = 'approved';
     //make sure we have a container to put things in
     if (!options.hasOwnProperty('container') || options.container === null) {
       container = document.getElementsByTagName('body')[0];
@@ -232,7 +237,9 @@ OR = (function() {
     CL.expandFillPageClients();
     //sort out footer stuff
     footer_html = [];
-    footer_html.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+    if (CL.project.hasOwnProperty('showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
+      footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+    }
     footer_html.push('<span id="extra_buttons"></span>');
     footer_html.push('<span id="stage_links"></span>');
     footer_html.push('<button class="pure-button right_foot" id="get_apparatus">Get apparatus</button>');
@@ -242,7 +249,7 @@ OR = (function() {
     CL.addStageLinks();
     SPN.remove_loading_overlay();
     CL.addTriangleFunctions('table');
-    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected': options.highlighted_wit});
+    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected': options.highlighted_wit, 'add_select': true, 'select_label_details': {'label': 'highlight witness', 'value': 'none' }});
     $('#highlighted').on('change', function(event) {
       _highlightWitness(event.target.value, 'approved');
     });
@@ -372,7 +379,7 @@ OR = (function() {
   relabelReadings = function(readings, overwrite) {
     var i, j, label;
     for (i = 0; i < readings.length; i += 1) {
-      if (readings[i].hasOwnProperty('type') && readings[i].type === 'lac') {
+      if (readings[i].hasOwnProperty('type') && (readings[i].type === 'lac' || readings[i].type === 'lac_verse')) {
         label = 'zz';
       } else if (readings[i].hasOwnProperty('overlap_status')) {
         for (j = 0; j < CL.overlappedOptions.length; j += 1) {
@@ -441,6 +448,7 @@ OR = (function() {
     }
   };
 
+  //TODO: this also needs to combine shared readings (while preserving a reading - it should be required in most cases but with adding witnesses it might be if an added reading shares that of an existing overlap)
   //Need to work this out from the top line as we can't actually rely on the start and end values in the overlaps
   mergeSharedExtentOverlaps = function() {
     var key, i, m, overlap_lines, overlap_indexes, shared_overlaps, new_key, lead_unit, to_delete;
@@ -509,9 +517,13 @@ OR = (function() {
       delete CL.data[to_delete[i]];
     }
     //this needs to be called at the end once we have deleted any empty overlap lines otherwise it will fill up the empty ones again
-    //it will need to rerun the deletion once it is done so maybe make that a separate function
+    //it reruns the empty line deletion once it is done so maybe make that a separate function?
     _repositionOverlaps();
     _throughNumberApps(2);
+
+    //now check the reading in each of the overlaped units for matching ones and merge if necessary
+
+    //HERE
   };
 
   //
@@ -561,24 +573,22 @@ OR = (function() {
     }
   };
 
+  //For MUYA this needs to accept a regex for details gap * and lac *
+  //optional: can be set in services or project and when moving to OR or approved
   mergeAllLacs = function() {
-    _mergeAllSuppliedEmptyReadings(['lac', 'lac_verse'], {
-      'created': true,
-      'type': 'lac',
-      'details': 'lac',
-      'text': [],
-      'witnesses': []
-    }, true);
+    var typeList, parentTemplate;
+    typeList = ['lac', 'lac_verse'];
+    parentTemplate = {'created': true, 'type': 'lac', 'details': 'lac',
+                      'text': [], 'witnesses': []};
+    _mergeAllSuppliedEmptyReadings(typeList, parentTemplate, true);
   };
 
-  //not currently used but shows how mergeAllLacs and mergeAllOms work
+  //optional: can be set in services or project and when moving to OR or approved
   mergeAllOms = function() {
-    _mergeAllSuppliedEmptyReadings(['om', 'om_verse'], {
-      'created': true,
-      'type': 'om',
-      'text': [],
-      'witnesses': []
-    }, true);
+    var typeList, parentTemplate;
+    typeList = ['om', 'om_verse'];
+    parentTemplate = {'created': true, 'type': 'om', 'text': [], 'witnesses': []};
+    _mergeAllSuppliedEmptyReadings(typeList, parentTemplate, true);
   };
 
   //pub-e
@@ -614,6 +624,12 @@ OR = (function() {
     if (!standoff_problems[0]) {
       extra_results = CL.applyPreStageChecks('approve');
       if (extra_results[0] === true) {
+        if (CL.project.combineAllLacsInApproved === true) {
+					OR.mergeAllLacs();
+				}
+				if (CL.project.combineAllOmsInApproved === true) {
+					OR.mergeAllOms();
+				}
         CL.showSubreadings = false;
         //now do the stuff we need to do
         //make sure all ids are unique (we know there is a problem with overlapping a readings for example)
@@ -1603,16 +1619,16 @@ OR = (function() {
     //we make a generic parent which goes in the position of the first found reading with all the others as a special kind of subreading
     //and we give the generic parent a unique id like all other readings
     _mergeAllSuppliedEmptyReadings = function(type_list, parent_blueprint, always_create_new_parent) {
-      var key, i, j, k, unit, reading, first_hit_index, matched_readings, new_parent, witness, type, parent_id,
+      var unit, reading, first_hit_index, matched_readings, new_parent, witness, type, parent_id,
         rdg_details;
       SR.loseSubreadings();
       SR.findSubreadings();
       matched_readings = {};
-      for (key in CL.data) {
+      for (let key in CL.data) {
         if (key.match(/apparatus\d*/g) !== null) {
-          for (i = 0; i < CL.data[key].length; i += 1) {
+          for (let i = 0; i < CL.data[key].length; i += 1) {
             unit = CL.data[key][i];
-            for (j = 0; j < CL.data[key][i].readings.length; j += 1) {
+            for (let j = 0; j < CL.data[key][i].readings.length; j += 1) {
               reading = CL.data[key][i].readings[j];
               if (reading.text.length === 0 && !reading.hasOwnProperty('overlap_status')) {
                 if (type_list.indexOf(reading.type) != -1) {
@@ -1637,15 +1653,15 @@ OR = (function() {
       }
       //now data is collected
       SR.loseSubreadings();
-      for (key in CL.data) {
+      for (let key in CL.data) {
         if (key.match(/apparatus\d*/g) !== null) {
-          for (i = 0; i < CL.data[key].length; i += 1) {
+          for (let i = 0; i < CL.data[key].length; i += 1) {
             unit = CL.data[key][i];
             if (matched_readings.hasOwnProperty(unit._id)) {
               if ((always_create_new_parent === true &&
                   matched_readings[unit._id].length > 0) ||
-                matched_readings[unit._id].length > 1) {
-                for (j = 0; j < matched_readings[unit._id].length; j += 1) {
+                    matched_readings[unit._id].length > 1) {
+                for (let j = 0; j < matched_readings[unit._id].length; j += 1) {
                   new_parent = JSON.parse(JSON.stringify(parent_blueprint)); //copy our blueprint
                   parent_id = CL.addReadingId(new_parent, unit.start, unit.end);
                   unit.readings.push(new_parent);
@@ -1674,28 +1690,52 @@ OR = (function() {
     };
 
 
-  //priv-e
+  if (testing) {
+    return {
+      //variables
+      undoStack: undoStack,
 
-  return {
-    //variables
-    undoStack: undoStack,
+      //functions
+      showOrderReadings: showOrderReadings,
+      showApprovedVersion: showApprovedVersion,
+      getUnitData: getUnitData,
+      relabelReadings: relabelReadings,
+      addLabels: addLabels,
+      makeStandoffReading: makeStandoffReading,
+      removeSplits: removeSplits,
+      mergeSharedExtentOverlaps: mergeSharedExtentOverlaps,
+      canUnitMoveTo: canUnitMoveTo,
+      addToUndoStack: addToUndoStack,
+      makeWasGapWordsGaps: makeWasGapWordsGaps,
+      mergeAllLacs: mergeAllLacs,
+      mergeAllOms: mergeAllOms,
 
-    //functions
-    showOrderReadings: showOrderReadings,
-    showApprovedVersion: showApprovedVersion,
-    getUnitData: getUnitData,
-    relabelReadings: relabelReadings,
-    addLabels: addLabels,
-    makeStandoffReading: makeStandoffReading,
-    removeSplits: removeSplits,
-    mergeSharedExtentOverlaps: mergeSharedExtentOverlaps,
-    canUnitMoveTo: canUnitMoveTo,
-    addToUndoStack: addToUndoStack,
-    makeWasGapWordsGaps: makeWasGapWordsGaps,
-    mergeAllLacs: mergeAllLacs,
-    mergeAllOms: mergeAllOms,
+      // private for testing
+      _mergeAllSuppliedEmptyReadings: _mergeAllSuppliedEmptyReadings,
 
-  };
+    };
+  } else {
+    return {
+      //variables
+      undoStack: undoStack,
+
+      //functions
+      showOrderReadings: showOrderReadings,
+      showApprovedVersion: showApprovedVersion,
+      getUnitData: getUnitData,
+      relabelReadings: relabelReadings,
+      addLabels: addLabels,
+      makeStandoffReading: makeStandoffReading,
+      removeSplits: removeSplits,
+      mergeSharedExtentOverlaps: mergeSharedExtentOverlaps,
+      canUnitMoveTo: canUnitMoveTo,
+      addToUndoStack: addToUndoStack,
+      makeWasGapWordsGaps: makeWasGapWordsGaps,
+      mergeAllLacs: mergeAllLacs,
+      mergeAllOms: mergeAllOms,
+
+    };
+  }
 }());
 
 // //TODO: I am fairly sure this is never used. Check not needed in version app
