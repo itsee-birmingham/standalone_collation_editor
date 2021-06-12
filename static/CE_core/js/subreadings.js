@@ -1,5 +1,5 @@
 /*jshint esversion: 6 */
-
+var testing;
 SR = (function() {
   "use strict";
 
@@ -774,13 +774,34 @@ SR = (function() {
     delete reading.subreadings;
   };
 
-  //priv-e
+  if (testing) {
 
+    return {
+      findSubreadings: findSubreadings,
+      loseSubreadings: loseSubreadings,
+      //private for testing only
+      _getCorrectStandoffReadingText: _getCorrectStandoffReadingText,
+      _addCombinedGapDataToParent: _addCombinedGapDataToParent,
+      _cleanStandoffMarking: _cleanStandoffMarking,
+      _removeFromMainReading: _removeFromMainReading,
+      _findChildReading: _findChildReading,
+      _isSeparatedReading: _isSeparatedReading,
+      _findParentReading: _findParentReading,
+      _witnessIn: _witnessIn,
+      _makeSubreadings: _makeSubreadings,
+      _addToSubreadings: _addToSubreadings,
+      _addNewSubreading: _addNewSubreading,
+      _stripExtraWitnessDetailsFromTextList: _stripExtraWitnessDetailsFromTextList,
+      _doLoseSubreadings: _doLoseSubreadings,
+      //private variables for testing only
+      _test: _test,
+      _subreadingsAre: _subreadingsAre,
+    };
+  } else {
 
-  return {
-
-    findSubreadings: findSubreadings,
-    loseSubreadings: loseSubreadings,
-
-  };
+    return {
+      findSubreadings: findSubreadings,
+      loseSubreadings: loseSubreadings,
+    };
+  }
 }());
