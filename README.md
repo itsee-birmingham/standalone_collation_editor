@@ -196,7 +196,7 @@ This variable should be an array of strings giving the full url of any additiona
 
 - #### ```extraFooterButtons```
 
-**TODO: check values required for stages**
+**This variable can be overwritten in individual project settings on a stage by stage basis but the services file supports the functions added**
 
 This variable can be used to add your own custom buttons to the footer of the display in the four stages of the collation editor. Each stage is treated separately. The data should be structured as a JSON object with the stage/s to be modified as the top level key/s using the following values: regularised, set, ordered, approved. The value for each key should be an array of objects where each object has the following two keys:
 
@@ -619,7 +619,7 @@ This function populates the links to saved collations in the footer of the page.
 
 - #### ```addExtraFooterFunctions()```
 
-This is required if any extra footer buttons are specified in the services file varabile ```extraFooterButtons```. It must attach onclick listeners to all of the buttons specified in the variable.
+This is required if any extra footer buttons are specified in the services file variable ```extraFooterButtons```. It must attach onclick listeners to all of the buttons specified in the variable.
 
 - #### ```getAdjoiningVerse()```
 
@@ -675,6 +675,8 @@ Configuration
 ---
 
 Much of this is explained above but I will put more of a step by step guide here at some point.
+
+
 
 
 
