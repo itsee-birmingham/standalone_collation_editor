@@ -11,10 +11,8 @@ from collation.core.regulariser import Regulariser
 
 class PreProcessor(Regulariser):
 
-    # last arg just to be compatible with dev branch
     def __init__(self, display_settings_config=None, local_python_functions=None,
                  rule_conditions_config=None, split_single_reading_units=False):
-
         self.display_settings_config = display_settings_config
         self.local_python_functions = local_python_functions
         self.rule_conds_config = rule_conditions_config
@@ -31,6 +29,10 @@ class PreProcessor(Regulariser):
         lac_hands = []
         lac_witnesses = requested_witnesses  # assume everything is lac until we find it
         hand_to_transcript_map = {}
+        if 'special_categories' in data_input:
+            special_categories = data_input['special_categories']
+        else:
+            special_categories = []
         verse = None
         basetext_siglum = None
         # TODO: remove deprecation warning when ready
@@ -39,12 +41,11 @@ class PreProcessor(Regulariser):
         # this means we don't have to use the numerical pk
         # it must match with whatever is used in the services 'get_siglum_map' code
         if 'transcription_id' in data[0]:
-            warnings.warn("The use of 'transcription_id' as a key in 'verse' object is "
-                          "deprecated in favour of 'transcription'. "
-                          "Support will be removed in future releases.", PendingDeprecationWarning)
+            warnings.warn('''The use of 'transcription_id' as a key in 'verse'
+            object is deprecated in favour of 'transcription'. Support will be removed in future releases''',
+                          PendingDeprecationWarning)
         # Add all the witness texts and keep record of witnesses omitting the verse and lacunose witnesses
         for transcription_verse in data:
-
             # TODO: remove legacy support when ready
             if 'transcription_id' in transcription_verse:
                 transcription_verse['transcription'] = transcription_verse['transcription_id']
@@ -93,6 +94,7 @@ class PreProcessor(Regulariser):
                     if len(reading['tokens']) == 0:
                         if 'gap_reading' in reading:
                             lac_hands.append(reading['id'])
+                            self.add_to_special_categories(special_categories, reading)
                             trans_verse[i] = None
                         else:
                             om_witnesses.append(reading['id'])
@@ -100,14 +102,13 @@ class PreProcessor(Regulariser):
                 for reading in reversed(trans_verse):
                     if reading is None:
                         trans_verse.remove(reading)
-            except Exception:
+            except (KeyError, TypeError):
                 om_witnesses.append(transcription_verse['siglum'])
                 if 'transcription_identifier' in transcription_verse:
                     hand_to_transcript_map[transcription_verse['siglum']] = \
-                        transcription_verse['transcription_identifier']
+                            transcription_verse['transcription_identifier']
                 else:
-                    hand_to_transcript_map[transcription_verse['siglum']] = \
-                        transcription_verse['transcription']
+                    hand_to_transcript_map[transcription_verse['siglum']] = transcription_verse['transcription']
             else:
                 collatable_witnesses.extend(trans_verse)
 
@@ -115,6 +116,7 @@ class PreProcessor(Regulariser):
         witnesses['lac'] = list(data_input['lac_witnesses'].keys())
         witnesses['lac'].extend(lac_hands)
         witnesses['om'] = om_witnesses
+        witnesses['special_categories'] = special_categories
 
         # can this all be better so one thing does both WCE and NTVMR??
         # now add in lac witnesses to the mapping
@@ -138,6 +140,18 @@ class PreProcessor(Regulariser):
                      'index': 1
                      }
         return self.regularise(rules, witnesses, verse, settings, collation_settings, project, accept)
+
+    def add_to_special_categories(self, special_categories, reading):
+        added = False
+        for entry in special_categories:
+            if entry['label'] == reading['gap_reading']:
+                entry['witnesses'].append(reading['id'])
+                added = True
+        if not added:
+            special_categories.append({'label': reading['gap_reading'],
+                                       'witnesses': [reading['id']],
+                                       'type': 'lac'})
+        return special_categories
 
     def regularise(self, decisions, witnesses, verse, settings, collation_settings, project, accept):
         """Regularise the witness."""
@@ -217,12 +231,12 @@ class PreProcessor(Regulariser):
             # get overtext details
             overtext_details = self.get_overtext(verse)
             print('collation done', file=sys.stderr)
-            return self.do_post_processing(alignment_table, decisions, overtext_details[0],
-                                           overtext_details[1], witnesses['om'], witnesses['lac'],
-                                           witnesses['hand_id_map'], settings)
+            return self.do_post_processing(alignment_table, decisions, overtext_details[0], overtext_details[1],
+                                           witnesses['om'], witnesses['lac'], witnesses['hand_id_map'],
+                                           witnesses['special_categories'], settings)
 
-    def do_post_processing(self, alignment_table, decisions, overtext_name, overtext,
-                           om_readings, lac_readings, hand_id_map, settings):
+    def do_post_processing(self, alignment_table, decisions, overtext_name, overtext, om_readings,
+                           lac_readings, hand_id_map, special_categories, settings):
 
         pp = PostProcessor(
             alignment_table=alignment_table,
@@ -231,6 +245,7 @@ class PreProcessor(Regulariser):
             om_readings=om_readings,
             lac_readings=lac_readings,
             hand_id_map=hand_id_map,
+            special_categories=special_categories,
             settings=settings,
             decisions=decisions,
             display_settings_config=self.display_settings_config,
