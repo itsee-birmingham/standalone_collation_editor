@@ -1,5 +1,5 @@
 /*jshint esversion: 6 */
-
+var testing;
 SV = (function () {
 	"use strict";
 
@@ -13,12 +13,12 @@ SV = (function () {
 	//public variable declarations
 	let undoStack = [],
 			messagePosLeft = null,
+			undoStackLength = 6,
 			showSharedUnits = false;
 
 
 	//private variable declarations
-	let _undoStackLength = 6,
-			_watchList = [],
+	let _watchList = [],
 			_selectedVariantUnits = [],
 			_messageExpanded = true;
 
@@ -56,7 +56,7 @@ SV = (function () {
   _addToUndoStack,
 	_undo, _removeSplits, _checkTAndNPresence, _checkForStandoffReading, _checkSiglaProblems,
 	_checkIndexesPresent, _checkUniqueWitnesses, _getAllUnitWitnesses, _compareIndexStrings,
-	_compareIndexes, _compareFirstWordIndexes;
+	_compareIndexes, _compareFirstWordIndexes, _setUpSVRemoveWitnessesForm, _highlightAddedWitness;
 
 
 	//*********  public functions *********
@@ -73,8 +73,10 @@ SV = (function () {
 	 *              	highlighted_unit - the unit which needs to be highlighted as an error*/
 	showSetVariants = function (options) {
 		var html, i, unit_button, temp, header, event_rows, num, key, overlaps, app_ids,
-		error_panel_html, row, hands, result, undo_button, footer_html, overlap_options, new_overlap_options;
-		//console.log(CL.data);
+		error_panel_html, row, hands, result, undo_button, footer_html, overlap_options, new_overlap_options,
+		preselected_added_highlight;
+		console.log(CL.data);
+		CL.stage = 'set';
 		if (typeof options === 'undefined') {
 			options = {};
 		}
@@ -86,18 +88,19 @@ SV = (function () {
 		} else {
 			container = document.getElementsByTagName('body')[0];
 		}
-
-		//attach right click menus
-		SimpleContextMenu.setup({'preventDefault' : true, 'preventForms' : false});
-		SimpleContextMenu.attach('unit', function () {return _makeMenu('unit');});
-		SimpleContextMenu.attach('overlap_unit', function () {return _makeMenu('overlap_unit');});
-		SimpleContextMenu.attach('split_unit_a', function () {return _makeMenu('split_unit_a');});
-		SimpleContextMenu.attach('split_unit', function () {return _makeMenu('split_unit');});
-		SimpleContextMenu.attach('overlap_split_unit_a', function () {return _makeMenu('overlap_split_unit_a');});
-		SimpleContextMenu.attach('overlap_split_unit', function () {return _makeMenu('overlap_split_unit');});
-		SimpleContextMenu.attach('split_omlac_unit', function () {return _makeMenu('split_omlac_unit');});
-		SimpleContextMenu.attach('split_duplicate_unit', function () {return _makeMenu('split_duplicate_unit');});
-		SimpleContextMenu.attach('subreading', function () {return _makeMenu('subreading');});
+		if (CL.witnessRemovingMode !== true) {
+			//attach right click menus
+			SimpleContextMenu.setup({'preventDefault' : true, 'preventForms' : false});
+			SimpleContextMenu.attach('unit', function () {return _makeMenu('unit');});
+			SimpleContextMenu.attach('overlap_unit', function () {return _makeMenu('overlap_unit');});
+			SimpleContextMenu.attach('split_unit_a', function () {return _makeMenu('split_unit_a');});
+			SimpleContextMenu.attach('split_unit', function () {return _makeMenu('split_unit');});
+			SimpleContextMenu.attach('overlap_split_unit_a', function () {return _makeMenu('overlap_split_unit_a');});
+			SimpleContextMenu.attach('overlap_split_unit', function () {return _makeMenu('overlap_split_unit');});
+			SimpleContextMenu.attach('split_omlac_unit', function () {return _makeMenu('split_omlac_unit');});
+			SimpleContextMenu.attach('split_duplicate_unit', function () {return _makeMenu('split_duplicate_unit');});
+			SimpleContextMenu.attach('subreading', function () {return _makeMenu('subreading');});
+		}
 
 		//sort out header and main page
 		document.getElementById('header').innerHTML = CL.getHeaderHtml('Set Variants', CL.context);
@@ -110,14 +113,24 @@ SV = (function () {
 		//sort out footer stuff
 		CL.expandFillPageClients();
 		footer_html = [];
-		footer_html.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+		if (CL.project.hasOwnProperty('showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
+      footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
+    }
 		footer_html.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">show subreadings</button>');
-		footer_html.push('<span id="extra_buttons"></span>');
-		footer_html.push('<span id="stage_links"></span>');
-		footer_html.push('<button class="pure-button right_foot" id="move_to_reorder_button">Move to Reorder Variants</button>');
+		if (CL.witnessEditingMode === false) {
+			footer_html.push('<span id="extra_buttons"></span>');
+			footer_html.push('<span id="stage_links"></span>');
+		}
+		if (CL.witnessEditingMode === true) {
+      footer_html.push('<button class="pure-button right_foot" id="return_to_saved_table_button">Return to summary table</button>');
+    } else {
+			footer_html.push('<button class="pure-button right_foot" id="move_to_reorder_button">Move to Reorder Variants</button>');
+		}
 		footer_html.push('<button class="pure-button right_foot" id="save">Save</button>');
-		//footer_html.push('<button class="pure-button right_foot" id="show_hide_shared_units">Show Shared Units</button>');
 		footer_html.push('<select class="right_foot" id="highlighted" name="highlighted"></select>');
+		if (CL.witnessAddingMode === true && CL.witnessesAdded.length > 0) {
+			footer_html.push('<select class="right_foot" id="added_highlight" name="added_highlight"></select>');
+		}
 		footer_html.push('<button class="pure-button right_foot" id="undo_button" style="display:none">undo</button>');
 		$('#footer').addClass('pure-form'); //this does the styling of the select elements in the footer using pure (they cannot be styled individually)
 		document.getElementById('footer').innerHTML = footer_html.join('');
@@ -127,13 +140,24 @@ SV = (function () {
 		//get the data itself
 		container.innerHTML = '<div id="drag"><div id="scroller" class="fillPage"></div><div id="single_witness_reading"></div></div>';
 		document.getElementById('single_witness_reading').style.bottom = document.getElementById('footer').offsetHeight + 'px';
+		if (CL.witnessAddingMode === true) {
+			//this sets this a default so that when all is highlighted this will work - any data specified in options will override it
+			CL.highlightedAdded = JSON.parse(JSON.stringify(CL.witnessesAdded));
+		}
 		showSetVariantsData(options);
 
 		//add functions and populate dropdowns etc.
 		CL.addSubreadingEvents('set_variants');
 
-		cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected': options.highlighted_wit});
-
+		cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected': options.highlighted_wit, 'add_select': true, 'select_label_details': {'label': 'highlight witness', 'value': 'none' }});
+		if (CL.witnessAddingMode === true && CL.witnessesAdded.length > 0) {
+			if (options.highlighted_added_wits.length === 1) {
+				preselected_added_highlight = options.highlighted_added_wits[0];
+			} else {
+				preselected_added_highlight = 'all';
+			}
+			cforms.populateSelect(CL.sortWitnesses(CL.witnessesAdded), document.getElementById('added_highlight'), {'selected': preselected_added_highlight, 'add_select': true, 'select_label_details': {'label': 'highlight all added witnesses', 'value': 'all'}})
+		}
 		//TODO: this is no longer needed because we show all units all of the time but might be worth keeping as a setting
 		// if (document.getElementById('show_hide_shared_units')) {
 		// 	$('#show_hide_shared_units').on('click', function (event) {
@@ -160,7 +184,15 @@ SV = (function () {
 			CL.saveCollation('set');
 		});
 
+		//TODO: this code is repeated in RG - put in function?
+		$('#return_to_saved_table_button').on('click', function() {
+			CL.returnToSummaryTable();
+    });
+
 		$('#highlighted').on('change', function (event) {_highlightWitness(event.target.value);});
+		if (document.getElementById('added_highlight')) {
+			$('#added_highlight').on('change', function (event) {_highlightAddedWitness(event.target.value)});
+		}
 		if (document.getElementById('undo_button')) {
 			$('#undo_button').on('click', function (event) {
 				SPN.show_loading_overlay();
@@ -171,7 +203,9 @@ SV = (function () {
 	};
 
 	showSetVariantsData = function (options) {
-		var temp, header, html, i, app_ids, num, overlaps, overlap_options, new_overlap_options, error_panel_html, event_rows, row;
+		var temp, header, html, i, app_ids, num, overlaps, overlap_options,
+		new_overlap_options, error_panel_html, event_rows, row, wits, remove_wits_form,
+		removeFunction;
 		//sort out options and get layout
 		if (typeof options === 'undefined') {
 			options = {};
@@ -179,7 +213,48 @@ SV = (function () {
 		if (!options.hasOwnProperty('highlighted_wit') && CL.highlighted !== 'none') {
 			options.highlighted_wit = CL.highlighted;
 		}
+		if (CL.witnessAddingMode === true && !options.hasOwnProperty('highlighted_added_wits')) {
+      options.highlighted_added_wits = CL.highlightedAdded;
+    }
 		options.sort = true;
+		//remove the witness removal window if shown
+		if (document.getElementById('remove_witnesses_div')) {
+      document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
+    }
+		if (CL.witnessEditingMode === true) {
+      wits = CL.checkWitnessesAgainstProject(CL.dataSettings.witness_list, CL.project.witnesses);
+      if (wits[0] === false) {
+        if ((wits[1] === 'removed' || wits[1] === 'both') && CL.witnessRemovingMode === true) {
+          $.get(staticUrl + 'CE_core/html_fragments/remove_witnesses_form.html', function(html) {
+            if (!document.getElementById('remove_witnesses_div')) {
+              remove_wits_form = document.createElement('div');
+            } else {
+              remove_wits_form = document.getElementById('remove_witnesses_div');
+            }
+            remove_wits_form.setAttribute('id', 'remove_witnesses_div');
+            remove_wits_form.setAttribute('class', 'dragdiv remove_witnesses_div dialogue_form');
+            remove_wits_form.innerHTML = html;
+            document.getElementsByTagName('body')[0].appendChild(remove_wits_form);
+						removeFunction = function () {
+					      var data, handsToRemove;
+					      handsToRemove = [];
+					      data = cforms.serialiseForm('remove_witnesses_form');
+					      for (let key in data) {
+					        if (data.hasOwnProperty(key) && data[key] === true) {
+					          handsToRemove.push(key);
+					        }
+					      }
+								prepareForOperation();
+					      CL.removeWitnesses(handsToRemove, 'set');
+								//clear undo stack so you can't go back to a point with the witnesses still present.
+								SV.undoStack = [];
+								unprepareForOperation();
+					    };
+						CL.setUpRemoveWitnessesForm(wits[2], CL.data, 'set', removeFunction);
+          }, 'text');
+        }
+      }
+    }
 
 		prepareForOperation();
 		CL.lacOmFix(); //also does extra gaps
@@ -194,6 +269,9 @@ SV = (function () {
 		if (options.hasOwnProperty('highlighted_wit')) {
 			overlap_options.highlighted_wit = options.highlighted_wit;
 		}
+		if (options.hasOwnProperty('highlighted_added_wits')) {
+      overlap_options.highlighted_added_wits = options.highlighted_added_wits;
+    }
 		if (options.hasOwnProperty('highlighted_unit')) {
 			overlap_options.highlighted_unit = options.highlighted_unit;
 		}
@@ -215,8 +293,10 @@ SV = (function () {
 			CL.addHoverEvents(row);
 		}
 		SPN.remove_loading_overlay();
-		//initialise DnD
-		_redipsInitSV(CL.data.apparatus.length);
+		if (CL.witnessRemovingMode !== true) {
+			//initialise DnD
+			_redipsInitSV(CL.data.apparatus.length);
+		}
 
 		if (SV.undoStack.length > 0) {
 			document.getElementById("undo_button").style.display = 'inline';
@@ -242,6 +322,36 @@ SV = (function () {
 		}
 		CL.expandFillPageClients(); //this has to be at the end so the message panel is in the right place
 	};
+
+	_setUpSVRemoveWitnessesForm = function(wits, data) {
+    var html;
+		document.getElementById('remove_witnesses_div').style.left = document.getElementById('scroller').offsetWidth - document.getElementById('remove_witnesses_div').offsetWidth - 15 + 'px';
+    html = [];
+    for (let i=0; i<wits.length; i+=1) {
+      for (let key in data.hand_id_map) {
+        if ( data.hand_id_map.hasOwnProperty(key) && data.hand_id_map[key] === wits[i]) {
+          html.push('<input class="boolean" type="checkbox" id="' + key + '" name="' + key + '"/><label>' + key + '</label><br/>');
+        }
+      }
+    }
+    document.getElementById('witness_checkboxes').innerHTML = html.join('');
+    DND.InitDragDrop('remove_witnesses_div', true, true);
+    $('#remove_selected_button').on('click', function () {
+      var data, handsToRemove;
+      handsToRemove = [];
+      data = cforms.serialiseForm('remove_witnesses_form');
+      for (let key in data) {
+        if (data.hasOwnProperty(key) && data[key] === true) {
+          handsToRemove.push(key);
+        }
+      }
+			prepareForOperation();
+      CL.removeWitnesses(handsToRemove, 'set');
+			//clear undo stack so you can't go back to a point with the witnesses still present.
+			SV.undoStack = [];
+			unprepareForOperation();
+    });
+  };
 
 	calculateUnitLengths = function (app_id, options) {
 		var i, j, app, top_line, id, start, first_hit, gap_before, last_end, length, gap_counts, highest_gap, gap_after,
@@ -349,19 +459,23 @@ SV = (function () {
 	 * 		gap_unit - boolean - is this a unit which only contains lac/om readings
 	 * 		col_length - int - the expected column width based on other table rows
 	 * 		highlighted_wit - the witness to highlight
-	 * 		highlighted_unit - the unit to highlight
+	 * 		highlighted_added_wits - the witnesses to highlight of those that have been added CL.witnessAddingMode only
+	 * 		highlighted_unit - the unit to highlight (used for showing which units have errors I think)
 	 * 		created - boolean (is this a specially created gap element)
 	 * 		overlapping_ids - a list of ids for any overlapping readings realted to this top line reading
 	 * 		td_id - the id for the cell (used in overlap rows to allow readings to be moved between rows))*/
 	getUnitData = function (data, id, start, end, options) {
 		var i, j, html, decisions, rows, cells, row_list, temp, events, colspan, row_id, text, split_class,
-		hand, highlighted, SV_rules, key, label_suffix, reading_suffix, alpha_id, reading_label;
+		highlighted_hand, highlighted_unit, highlighted_classes, SV_rules, key, label_suffix, reading_suffix, alpha_id, reading_label;
 		html = [];
 		row_list = [];
+		if (typeof options === 'undefined') {
+      options = {};
+    }
 		if (options.hasOwnProperty('highlighted_wit')) {
-			hand = options.highlighted_wit.split('|')[1];
+			highlighted_hand = options.highlighted_wit.split('|')[1];
 		} else {
-			hand = null;
+			highlighted_hand = null;
 		}
 		if (options.hasOwnProperty('col_length')) {
 			colspan = options.col_length;
@@ -380,13 +494,15 @@ SV = (function () {
 		} else {
 			html.push('<td class="start_' + start + '" headers="NA_' + start + '" colspan="' + colspan + '">');
 		}
+
+		//is the unit highlighted? used for showing errors
+		if (options.hasOwnProperty('highlighted_unit') && parseInt(id) === options.highlighted_unit[1]) {
+			highlighted_unit = ' highlighted_unit';
+		} else {
+			highlighted_unit = '';
+		}
+
 		for (i = 0; i < data.length; i += 1) {
-			//is it highlighted?
-			if (options.hasOwnProperty('highlighted_unit') && parseInt(id) === options.highlighted_unit[1]) {
-				highlighted = ' highlighted_unit';
-			} else {
-				highlighted = '';
-			}
 			//what is the reading text?
 			text = CL.extractDisplayText(data[i], i, data.length, options.unit_id, options.app_id);
 
@@ -399,6 +515,16 @@ SV = (function () {
 			//what is the row id? (and add it to the list for adding events)
 			row_id = 'variant_unit_' + id + '_row_' + i;
 			row_list.push(row_id);
+
+			//Work out what reading highlighting classes we need
+			highlighted_classes = [];
+			if (data[i].witnesses.indexOf(highlighted_hand) != -1) {
+				//this is the regular highlighting of any selected witness
+				highlighted_classes.push('highlighted');
+			}
+			if (options.hasOwnProperty('highlighted_added_wits') && data[i].witnesses.filter(x => options.highlighted_added_wits.includes(x)).length > 0) {
+				highlighted_classes.push('added_highlighted');
+			}
 			if (options.hasOwnProperty('split') && options.split === true) {
 				if (data[i].hasOwnProperty('overlap_status')) {
 					html.push('<div id="' + 'drag_unit_' + id + '_reading_' + i + '" class="drag split_' + data[i].overlap_status + '_unit">');
@@ -420,13 +546,9 @@ SV = (function () {
 				}
 				html.push('<ul class="variant_unit" id="variant_unit_' + id + '_reading_' + i + '">');
 
-				if (data[i].witnesses.indexOf(hand) != -1) {
-					html.push('<li id="' + row_id + '" class="highlighted">');
-				} else {
-					html.push('<li id="' + row_id + '" >');
-				}
+				html.push('<li id="' + row_id + '" class="' + highlighted_classes.join(' ') + '">');
 				html.push('<div class="spanlike">' + reading_label + ' ' + text + reading_suffix + '  </div>');
-				temp = _showSubreadings(data[i], id, i, hand);
+				temp = _showSubreadings(data[i], id, i, highlighted_hand);
 				html.push.apply(html, temp[0]);
 				row_list.push.apply(row_list, temp[1]);
 				html.push('</li>');
@@ -435,34 +557,23 @@ SV = (function () {
 			} else {
 				if (i === 0) {
 					if (options.hasOwnProperty('overlap') && options.overlap === true) {
-						html.push('<div id="' + 'drag_unit_' + id + '" class="drag overlap_unit' + highlighted + '">');
+						html.push('<div id="' + 'drag_unit_' + id + '" class="drag overlap_unit' + highlighted_unit + '">');
 					} else if (options.hasOwnProperty('gap_unit') && options.gap_unit === true) {
-						html.push('<div id="' + 'drag_unit_' + id + '" class="drag gap_unit' + highlighted + '">');
+						html.push('<div id="' + 'drag_unit_' + id + '" class="drag gap_unit' + highlighted_unit + '">');
 					} else {
-						html.push('<div id="' + 'drag_unit_' + id + '" class="drag unit' + highlighted + '">');
+						html.push('<div id="' + 'drag_unit_' + id + '" class="drag unit' + highlighted_unit + '">');
 					}
 					if (data.length > 1) {
-						//debug version
-						//html.push('<ul class="variant_unit" id="variant_unit_' + id + '"><span>' + id + '</span><span id="toggle_variant_' + id + '" class="triangle">&#9660;</span><br/>');
-						//live version
 						html.push('<ul class="variant_unit" id="variant_unit_' + id + '"><span id="toggle_variant_' + id + '" class="triangle">&#9660;</span><br/>');
 					} else {
 						html.push('<ul class="variant_unit" id="variant_unit_' + id + '"><br/>');
 					}
-					if (data[i].witnesses.indexOf(hand) != -1) {
-						html.push('<li id="' + row_id + '" class="top highlighted">');
-					} else {
-						html.push('<li id="' + row_id + '" class="top">');
-					}
+					html.push('<li id="' + row_id + '" class="top ' + highlighted_classes.join(' ') + '">');
 				} else {
-					if (data[i].witnesses.indexOf(hand) != -1) {
-						html.push('<li id="' + row_id + '" class="highlighted">');
-					} else {
-						html.push('<li id="' + row_id + '" >');
-					}
+					html.push('<li id="' + row_id + '" class="' + highlighted_classes.join(' ') + '">');
 				}
 				html.push('<div class="spanlike">' + reading_label  + ' ' + text + reading_suffix + '  </div>');
-				temp = _showSubreadings(data[i], id, i, hand);
+				temp = _showSubreadings(data[i], id, i, highlighted_hand);
 				html.push.apply(html, temp[0]);
 				row_list.push.apply(row_list, temp[1]);
 				html.push('</li>');
@@ -598,7 +709,6 @@ SV = (function () {
 		var i, j, k, text, unit, reading, reading_list, index, witness, current, standoff_record, is_standoff;
 		reading_list = [];
 		unit = CL.data[app_id][unit_num];
-
 		_removeSeparatedWitnessData(app_id, unit._id);
 
 		for (i = 0; i < unit.readings.length; i += 1) {
@@ -614,6 +724,9 @@ SV = (function () {
 				} else {
 					text = text + '_OLSTS_' + reading.overlap_status; //the capital letters are there to help ensure no clash with any real words
 				}
+			}
+			if (reading.hasOwnProperty('type') && reading.type === 'lac_verse') {
+				text = text + '_lac_verse';
 			}
 			//find out if this is a standoff reading
 			//at this point all witnesses to the reading should be standoff if it is a standoff reading made into a main reading so just check first witness (and keep fingers crossed!)
@@ -1002,17 +1115,37 @@ SV = (function () {
 		});
 	};
 
-	/** highlight a witness, called from select box in page footer*/
+	/** highlight a witness, called from select box in page footer */
 	_highlightWitness = function (witness) {
 		var scroll_offset;
 		scroll_offset = [document.getElementById('scroller').scrollLeft,
 										 document.getElementById('scroller').scrollTop];
 		CL.highlighted = witness;
-		showSetVariantsData({'highlighted_wit': witness});
-		CL.getHighlightedText(witness);
+		showSetVariantsData({'highlighted_wit': CL.highlighted});
+		CL.getHighlightedText(CL.highlighted);
 		document.getElementById('scroller').scrollLeft = scroll_offset[0];
 		document.getElementById('scroller').scrollTop = scroll_offset[1];
 	};
+
+	/** highlight a witness that has been added or highlight all added witnesses with 'all' (only in CL.witnessAddingMode), called from select box in page footer */
+	_highlightAddedWitness = function (witness) {
+		var scroll_offset, witnesses;
+		scroll_offset = [document.getElementById('scroller').scrollLeft,
+										 document.getElementById('scroller').scrollTop];
+
+		if (witness === 'all') {
+			witnesses = CL.witnessesAdded;
+		} else {
+			witnesses = [witness];
+		}
+		CL.highlightedAdded = witnesses;
+		showSetVariantsData({'highlighted_added_wits': witnesses});
+
+		document.getElementById('scroller').scrollLeft = scroll_offset[0];
+		document.getElementById('scroller').scrollTop = scroll_offset[1];
+	};
+
+
 
 	/** the code for displaying subreadings present in the object model */
 	_showSubreadings = function (reading, id, i, hand) {
@@ -1627,14 +1760,18 @@ SV = (function () {
 		return true;
 	};
 
-	_neighboursShareOverlaps = function (index_point) {
-		var i, before, after;
-		for (i = 0; i < CL.data.apparatus.length; i += 1) {
-			if (CL.data.apparatus[i].end === index_point - 1) {
-				before = CL.data.apparatus[i];
+//TODO: check that this is good enough for what you use it for. It actually requires all overlaps to be shared not just some
+	_neighboursShareOverlaps = function (index_point, data) {
+		var before, after;
+		if (data === undefined) {
+			data = CL.data;
+		}
+		for (let i=0; i<data.apparatus.length; i+=1) {
+			if (data.apparatus[i].end === index_point-1) {
+				before = data.apparatus[i];
 			}
-			if (CL.data.apparatus[i].start === index_point + 1) {
-				after = CL.data.apparatus[i];
+			if (data.apparatus[i].start === index_point+1) {
+				after = data.apparatus[i];
 			}
 		}
 		if (!after || !before) {
@@ -1698,7 +1835,7 @@ SV = (function () {
 					witnesses.splice(witnesses.indexOf(reading.witnesses[i]), 1);
 				}
 				if (CL.data.lac_readings.length > 0) {
-					readings.push({'text' : [], 'type' : 'lac_verse', 'details' : 'lac verse', 'witnesses' : CL.data.lac_readings});
+					readings.push({'text' : [], 'type' : 'lac_verse', 'details' : CL.project.lac_unit_label, 'witnesses' : JSON.parse(JSON.stringify(CL.data.lac_readings))});
 					for (i = 0; i < CL.data.lac_readings.length; i += 1) {
 						witnesses.splice(witnesses.indexOf(CL.data.lac_readings[i]), 1);
 					}
@@ -1706,7 +1843,7 @@ SV = (function () {
 				if (CL.data.om_readings.length > 0) {
 					readings.push({'text' : [],
 						'type' : 'om_verse',
-						'details' : 'om verse',
+						'details' : CL.project.om_unit_label,
 						'witnesses' : JSON.parse(JSON.stringify(CL.data.om_readings))});
 					for (i = 0; i < CL.data.om_readings.length; i += 1) {
 						witnesses.splice(witnesses.indexOf(CL.data.om_readings[i]), 1);
@@ -2976,7 +3113,7 @@ SV = (function () {
 	/** split unit stuff*/
 	_doSplitUnit = function (unit, app_id, index) {
 		var i, j, text, apps, witnesses, witnesses_copy, overlap_witnesses, ol_witnesses_copy, words, key, words_dict, scroll_offset, rdg, add,
-		split_adds, newunit, om_readings_copy, lac_readings_copy, new_reading;
+		split_adds, newunit, om_readings_copy, lac_readings_copy, new_reading, special_category_witnesses;
 		scroll_offset = [document.getElementById('scroller').scrollLeft,
 		                 document.getElementById('scroller').scrollTop];
 		_addToUndoStack(CL.data);
@@ -3139,13 +3276,13 @@ SV = (function () {
 								}
 							}
 							if (add.length > 0) {
-								newunit.readings.push({'witnesses': add, 'text' : [], 'overlap_status': key, 'type': 'om_verse', 'details': 'om verse'});
+								newunit.readings.push({'witnesses': add, 'text' : [], 'overlap_status': key, 'type': 'om_verse', 'details': CL.project.om_unit_label});
 							}
 						}
 					}
 				}
 				if (om_readings_copy.length > 0) {
-					newunit.readings.push({'witnesses': om_readings_copy, 'text': [], 'type': 'om_verse', 'details': 'om verse'});
+					newunit.readings.push({'witnesses': om_readings_copy, 'text': [], 'type': 'om_verse', 'details': CL.project.om_unit_label});
 				}
 			}
 			if (CL.data.hasOwnProperty('lac_readings') && CL.data.lac_readings.length > 0) {
@@ -3161,13 +3298,29 @@ SV = (function () {
 								}
 							}
 							if (add.length > 0) {
-								newunit.readings.push({'witnesses': add, 'text' : [], 'overlap_status': key, 'type': 'lac_verse', 'details': 'lac verse'});
+								newunit.readings.push({'witnesses': add, 'text' : [], 'overlap_status': key, 'type': 'lac_verse', 'details': CL.project.lac_unit_label});
 							}
 						}
 					}
 				}
 				if (lac_readings_copy.length > 0) {
-					newunit.readings.push({'witnesses': lac_readings_copy, 'text': [], 'type': 'lac_verse', 'details': 'lac verse'});
+					if (CL.data.hasOwnProperty('special_categories')) {
+						for (let i=0; i<CL.data.special_categories.length; i+=1) {
+							special_category_witnesses = [];
+							for (let j=0; j<CL.data.special_categories[i].witnesses.length; j+=1) {
+								if (lac_readings_copy.indexOf(CL.data.special_categories[i].witnesses[j]) >= -1) {
+									special_category_witnesses.push(CL.data.special_categories[i].witnesses[j]);
+									lac_readings_copy.splice(lac_readings_copy.indexOf(CL.data.special_categories[i].witnesses[j]), 1);
+								}
+							}
+							newunit.readings.push({'witnesses': special_category_witnesses, 'text': [], 'type': 'lac_verse', 'details': CL.data.special_categories[i].label});
+						}
+						if (lac_readings_copy.length > 0) {
+							newunit.readings.push({'witnesses': lac_readings_copy, 'text': [], 'type': 'lac_verse', 'details': CL.project.lac_unit_label});
+						}
+					} else {
+						newunit.readings.push({'witnesses': lac_readings_copy, 'text': [], 'type': 'lac_verse', 'details': CL.project.lac_unit_label});
+					}
 				}
 			}
 			CL.addUnitId(newunit);
@@ -3998,6 +4151,7 @@ SV = (function () {
 		document.getElementById('scroller').scrollTop = scroll_offset[1];
 	};
 
+	//TODO: check this is always between prepare and unprepare as this is needed for unsplitUnitWitnesses
 	_removeReadingFlag = function (reading_details) {
 		var scroll_offset;
 		scroll_offset = [document.getElementById('scroller').scrollLeft,
@@ -4296,13 +4450,14 @@ SV = (function () {
 
 	/** next two functions allow undo operation. */
 
-	/** Length of undo stack is determined by _undoStackLength variable.
+	/** Length of undo stack is determined by SV.undoStackLength variable.
+	 * The default can be overwritten by the services (but not by projects)
 	 * Not all operations lead to a new entry on the stack only those that really
 	 * change the object so split readings and recombine readings for example
 	 * don't get added to the stack. Functions that are considered important enough to
 	 * be undone call _addToUndoStack before making the object changes.*/
 	_addToUndoStack = function (data) {
-		if (SV.undoStack.length === _undoStackLength) {
+		if (SV.undoStack.length === SV.undoStackLength) {
 			SV.undoStack.shift();
 		}
 		SV.undoStack.push(JSON.stringify(data));
@@ -4328,17 +4483,18 @@ SV = (function () {
 	};
 
 	_removeSplits = function () {
-		var i, key;
-		for (key in CL.data) {
-			if (CL.data.hasOwnProperty(key)) {
-				for (i = 0; i < CL.data[key].length; i +=1 ) {
+		for (let key in CL.data) {
+			if (CL.data.hasOwnProperty(key) && key.indexOf('apparatus') !== -1) {
+				for (let i=0; i<CL.data[key].length; i+=1 ) {
 					if (CL.data[key][i].hasOwnProperty('split_readings')) {
 						delete CL.data[key][i].split_readings;
-						unsplitUnitWitnesses(i, 'apparatus');
+						//this is only called if they are split at the time this function is called
+						unsplitUnitWitnesses(i, key);
 					}
 				}
 			}
 		}
+
 	};
 
 	_checkTAndNPresence = function () {
@@ -4572,34 +4728,174 @@ SV = (function () {
 	};
 
 	//priv-e
+	if (testing) {
+		return {
+			undoStack: undoStack,
+			messagePosLeft: messagePosLeft,
+			showSharedUnits: showSharedUnits,
+
+			showSetVariantsData: showSetVariantsData,
+			showSetVariants: showSetVariants,
+			calculateUnitLengths: calculateUnitLengths,
+			getUnitData: getUnitData,
+			getSpacerUnitData: getSpacerUnitData,
+			getEmptySpacerCell: getEmptySpacerCell,
+			reindexUnit: reindexUnit,
+			checkCombinedGapFlags: checkCombinedGapFlags,
+			doSplitReadingWitnesses: doSplitReadingWitnesses,
+			unsplitUnitWitnesses: unsplitUnitWitnesses,
+			splitReadingWitnesses: splitReadingWitnesses,
+			prepareForOperation: prepareForOperation,
+			unprepareForOperation: unprepareForOperation,
+			makeStandoffReading: makeStandoffReading,
+			checkIds: checkIds,
+			checkBugStatus: checkBugStatus,
+			checkStandoffReadingProblems: checkStandoffReadingProblems,
+			areAllUnitsComplete: areAllUnitsComplete,
+			undoStackLength: undoStackLength,
+
+			//TODO: properly make this public!
+			_combineReadings: _combineReadings,
+			_compareFirstWordIndexes: _compareFirstWordIndexes,
+
+			//private variables
+			_watchList: _watchList,
+			_selectedVariantUnits: _selectedVariantUnits,
+			_messageExpanded: _messageExpanded,
+
+			//private functions
+			_moveToReorder: _moveToReorder,
+			_setupMessage: _setupMessage,
+			_highlightWitness: _highlightWitness,
+			_showSubreadings: _showSubreadings,
+			_redipsInitSV: _redipsInitSV,
+			_reindexMovedReading: _reindexMovedReading,
+			_indexLessThan: _indexLessThan,
+			_indexLessThanOrEqualTo: _indexLessThanOrEqualTo,
+			_incrementSubIndex: _incrementSubIndex,
+			_decrementSubIndex: _decrementSubIndex,
+			_incrementMainIndex: _incrementMainIndex,
+			_decrementMainIndex: _decrementMainIndex,
+			_reindexReadings: _reindexReadings,
+			_checkAndFixIndexOrder: _checkAndFixIndexOrder,
+			_checkAndFixReadingIndexes: _checkAndFixReadingIndexes,
+			_splitReadings: _splitReadings,
+			_unsplitReadings: _unsplitReadings,
+			_removeWitnessFromTokens: _removeWitnessFromTokens,
+			_removeWitnessFromReading: _removeWitnessFromReading,
+			_removeSeparatedWitnessData: _removeSeparatedWitnessData,
+			_getOverlappedWitnessesForUnit: _getOverlappedWitnessesForUnit,
+			_separateOverlapWitnesses: _separateOverlapWitnesses,
+			_doMoveWholeUnit: _doMoveWholeUnit,
+			_targetHasOverlapConflict: _targetHasOverlapConflict,
+			_sourceHasOverlapConflict: _sourceHasOverlapConflict,
+			_allOverlapsMatch: _allOverlapsMatch,
+			_neighboursShareOverlaps: _neighboursShareOverlaps,
+			_doMoveSingleReading: _doMoveSingleReading,
+			_unitAtLocation: _unitAtLocation,
+			_getOverlapDetailsForGap: _getOverlapDetailsForGap,
+			_getOverlappedWitnessesForGap: _getOverlappedWitnessesForGap,
+			_moveUnit: _moveUnit,
+			_checkWitnessEquality: _checkWitnessEquality,
+			_getLowestIndex: _getLowestIndex,
+			_doCombineUnits: _doCombineUnits,
+			_checkOverlapBoundaries: _checkOverlapBoundaries,
+			_checkSpecialOverlapStatusAgreement: _checkSpecialOverlapStatusAgreement,
+			_checkOverlapStatusAgreement: _checkOverlapStatusAgreement,
+			_getObjectKeys: _getObjectKeys,
+			_getGapDetails: _getGapDetails,
+			_isSubsetOf: _isSubsetOf,
+			_specialCombineReadings: _specialCombineReadings,
+			_doSpecialCombineUnits: _doSpecialCombineUnits,
+			_combineUnits: _combineUnits,
+			_combineApparatusIds: _combineApparatusIds,
+			_findApparatusPositionsByOverlapId: _findApparatusPositionsByOverlapId,
+			_moveReading: _moveReading,
+			_areAdjacent: _areAdjacent,
+			_neighboursShareAllOverlaps: _neighboursShareAllOverlaps,
+			_getOverlappedIds: _getOverlappedIds,
+			_getReplacementOmReading: _getReplacementOmReading,
+			_fixIndexNumbers: _fixIndexNumbers,
+			_orderUnitText: _orderUnitText,
+			_combineReadingText: _combineReadingText,
+			_addTypeAndDetails: _addTypeAndDetails,
+			_combineWords: _combineWords,
+			_separateIndividualOverlapWitnesses: _separateIndividualOverlapWitnesses,
+			_doSplitUnit: _doSplitUnit,
+			_splitUnit: _splitUnit,
+			_tidyUnits: _tidyUnits,
+			_checkUnitUniqueness: _checkUnitUniqueness,
+			_getPosInUnitSet: _getPosInUnitSet,
+			_overlapReading: _overlapReading,
+			_makeOverlappingReading: _makeOverlappingReading,
+			_moveOverlapping: _moveOverlapping,
+			_mergeOverlaps: _mergeOverlaps,
+			_checkAllWitnessesIntegrity: _checkAllWitnessesIntegrity,
+			_checkWitnessIntegrity: _checkWitnessIntegrity,
+			_getFirstIndexForWitnesses: _getFirstIndexForWitnesses,
+			_compareWitnessQueue: _compareWitnessQueue,
+			_checkWordOrderIntegrity: _checkWordOrderIntegrity,
+			_checkUnitIntegrity: _checkUnitIntegrity,
+			_removeOffsetSubreadings: _removeOffsetSubreadings,
+			_hasStandoffSubreading: _hasStandoffSubreading,
+			_makeMainReading: _makeMainReading,
+			_addReadingFlag: _addReadingFlag,
+			_removeReadingFlag: _removeReadingFlag,
+			_subreadingIdSort: _subreadingIdSort,
+			_makeMenu: _makeMenu,
+			_addContextMenuHandlers: _addContextMenuHandlers,
+			_addOverlappedEvent: _addOverlappedEvent,
+			_addEvent: _addEvent,
+			_markReading: _markReading,
+		  _addToUndoStack: _addToUndoStack,
+			_undo: _undo,
+			_removeSplits: _removeSplits,
+			_checkTAndNPresence: _checkTAndNPresence,
+			_checkForStandoffReading: _checkForStandoffReading,
+			_checkSiglaProblems: _checkSiglaProblems,
+			_checkIndexesPresent: _checkIndexesPresent,
+			_checkUniqueWitnesses: _checkUniqueWitnesses,
+			_getAllUnitWitnesses: _getAllUnitWitnesses,
+			_compareIndexStrings: _compareIndexStrings,
+			_compareIndexes: _compareIndexes,
+			_setUpSVRemoveWitnessesForm: _setUpSVRemoveWitnessesForm,
+			_highlightAddedWitness: _highlightAddedWitness,
+
+		};
+	} else {
+		return {
+
+			undoStack: undoStack,
+			messagePosLeft: messagePosLeft,
+			showSharedUnits: showSharedUnits,
+
+			showSetVariantsData: showSetVariantsData,
+			showSetVariants: showSetVariants,
+			calculateUnitLengths: calculateUnitLengths,
+			getUnitData: getUnitData,
+			getSpacerUnitData: getSpacerUnitData,
+			getEmptySpacerCell: getEmptySpacerCell,
+			reindexUnit: reindexUnit,
+			checkCombinedGapFlags: checkCombinedGapFlags,
+			doSplitReadingWitnesses: doSplitReadingWitnesses,
+			unsplitUnitWitnesses: unsplitUnitWitnesses,
+			splitReadingWitnesses: splitReadingWitnesses,
+			prepareForOperation: prepareForOperation,
+			unprepareForOperation: unprepareForOperation,
+			makeStandoffReading: makeStandoffReading,
+			checkIds: checkIds,
+			checkBugStatus: checkBugStatus,
+			checkStandoffReadingProblems: checkStandoffReadingProblems,
+			areAllUnitsComplete: areAllUnitsComplete,
+			undoStackLength: undoStackLength,
+
+			//TODO: properly make this public!
+			_combineReadings: _combineReadings,
+			_compareFirstWordIndexes: _compareFirstWordIndexes,
 
 
-	return {
-
-		undoStack: undoStack,
-		messagePosLeft: messagePosLeft,
-		showSharedUnits: showSharedUnits,
-
-		showSetVariantsData: showSetVariantsData,
-		showSetVariants: showSetVariants,
-		calculateUnitLengths: calculateUnitLengths,
-		getUnitData: getUnitData,
-		getSpacerUnitData: getSpacerUnitData,
-		getEmptySpacerCell: getEmptySpacerCell,
-		reindexUnit: reindexUnit,
-		checkCombinedGapFlags: checkCombinedGapFlags,
-		doSplitReadingWitnesses: doSplitReadingWitnesses,
-		unsplitUnitWitnesses: unsplitUnitWitnesses,
-		splitReadingWitnesses: splitReadingWitnesses,
-		prepareForOperation: prepareForOperation,
-		unprepareForOperation: unprepareForOperation,
-		makeStandoffReading: makeStandoffReading,
-		checkIds: checkIds,
-		checkBugStatus: checkBugStatus,
-		checkStandoffReadingProblems: checkStandoffReadingProblems,
-		areAllUnitsComplete: areAllUnitsComplete,
-
-	};
+		};
+	}
 }());
 
 // //TODO: no longer needed should be deleted plus all calls to it
