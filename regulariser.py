@@ -29,14 +29,14 @@ class Regulariser(object):
         token_matches = token['rule_match']
         for condition in self.rule_conditions_config['configs']:
             if 'conditions' in decision and decision['conditions'] is not None:
-                if (condition['id'] in decision['conditions'].keys()
-                        and decision['conditions'][condition['id']] is True
-                        and condition['apply_when'] is True) \
-                        or \
-                        ((condition['id'] not in decision['conditions'].keys()
-                         or (condition['id'] in decision['conditions'].keys()
-                         and decision['conditions'][condition['id']] is False))
-                         and condition['apply_when'] is False):
+                if ((condition['id'] in decision['conditions'].keys()
+                    and decision['conditions'][condition['id']] is True
+                    and condition['apply_when'] is True)
+                    or
+                    ((condition['id'] not in decision['conditions'].keys()
+                        or (condition['id'] in decision['conditions'].keys()
+                            and decision['conditions'][condition['id']] is False))
+                        and condition['apply_when'] is False)):
                     if condition['type'] == 'boolean':
                         result = getattr(self.instance, condition['function'])(token, decision)
                         if result is False:
@@ -59,19 +59,20 @@ class Regulariser(object):
                 print('deprecated - use \'id\' for rules not \'_id\'', file=sys.stderr)
                 decision['id'] = decision['_id']
 
-            if decision['scope'] == u'always' \
-                or decision['scope'] == u'verse' \
+            if (decision['scope'] == u'always'
+                or decision['scope'] == u'verse'
                 or (decision['scope'] == u'manuscript'
-                    and token['reading'] == decision['context']['witness']) \
+                    and token['reading'] == decision['context']['witness'])
                 or (decision['scope'] == u'once'
                     and (token['index'] == str(decision['context']['word'])
-                    and token['reading'] == decision['context']['witness'])):
+                    and token['reading'] == decision['context']['witness']))):
                 decision_matches.append(decision)
         # order by time last modified or created for newer data
         # TODO: perhaps always better to do created time otherwise adding exception
         # to a global rule will change the order for all verses
         if len(decision_matches) > 1:
-            decision_matches.sort(key=lambda x: x['_meta']['_last_modified_time'] if '_meta' in x else x['created_time'])
+            decision_matches.sort(key=lambda x: x['_meta']['_last_modified_time']
+                                  if '_meta' in x else x['created_time'])
 
         classes = []
         last_match = None
