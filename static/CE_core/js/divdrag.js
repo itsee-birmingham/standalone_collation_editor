@@ -116,8 +116,12 @@ var DND = (function () {
         OnMouseUp: function (e) {
             if (DND._dragElement !== null) {
                 DND._dragElement.style.zIndex = DND._oldZIndex;
-                SV.messagePosLeft = DND._dragElement.style.left;
-                SV._message_pos_top = DND._dragElement.style.top;
+                try {
+                  SV.messagePosLeft = DND._dragElement.style.left;
+                  SV._message_pos_top = DND._dragElement.style.top;
+                } catch {
+                  
+                }
              // we're done with these events until the next OnMouseDown
                 document.onmousemove = null;
                 document.onselectstart = null;
