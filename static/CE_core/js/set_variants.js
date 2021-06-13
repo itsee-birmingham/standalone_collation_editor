@@ -2213,8 +2213,8 @@ SV = (function () {
 					}
 				}
 			}
-			unprepareForOperation();
 			unsplitUnitWitnesses(index, 'apparatus'); //just in case
+			unprepareForOperation();
 			if (app_id !== 'apparatus') {
 				//then check that all witness words in the unit are only 2 apart
 				problems = _checkUnitIntegrity(app_id, index);
