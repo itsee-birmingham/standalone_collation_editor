@@ -67,7 +67,7 @@ CL = (function() {
   makeStandoffReading, doMakeStandoffReading, makeMainReading, getOrderedAppLines,
   loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses,
   calculatePosition, removeWitness, checkWitnessesAgainstProject, setUpRemoveWitnessesForm,
-  removeWitnesses, loadSavedCollation, returnToSummaryTable, prepareAdditionalCollation,
+  removeWitnesses, returnToSummaryTable, prepareAdditionalCollation,
   removeSpecialWitnesses;
 
   //private function declarations
@@ -88,7 +88,7 @@ CL = (function() {
    _getMousePosition, _displayWitnessesHover, _getWitnessesForReading,
    _findStandoffWitness, _getPreStageChecks, _makeRegDecisionsStandoff,
    _contextInputOnload, _removeWitnessFromUnit, _findSaved, _addToSavedCollation,
-   _displaySavedCollation, _mergeCollationObjects,
+   _displaySavedCollation, _mergeCollationObjects, _loadSavedCollation,
    _getUnitsByStartIndex, _mergeNewLacOmVerseReadings, _mergeNewReading,
    _getReadingHistory, _getNextTargetRuleInfo, _removeAppliedRules,
    _getHistoricalReading, _doMakeRegDecisionsStandoff, _extractAllTValuesForRGAppliedRules,
@@ -3481,7 +3481,7 @@ CL = (function() {
       CL.witnessEditingMode = false;
       CL.witnessAddingMode = false;
       CL.witnessRemovingMode = false;
-      loadSavedCollation();
+      _loadSavedCollation();
     });
     $('#load_saved_add_button').on('click', function(event) {
       CL.witnessEditingMode = true;
@@ -3493,7 +3493,7 @@ CL = (function() {
       CL.witnessEditingMode = true;
       CL.witnessAddingMode = false;
       CL.witnessRemovingMode = true;
-      loadSavedCollation();
+      _loadSavedCollation();
     });
   };
 
@@ -3877,7 +3877,7 @@ CL = (function() {
     return units;
   };
 
-  loadSavedCollation = function(id) {
+  _loadSavedCollation = function(id) {
     var i, value, bk, data, coll_id, temp, witnessStatus;
     CL.isDirty = false;
     SPN.show_loading_overlay();
@@ -4830,7 +4830,7 @@ CL = (function() {
 
   _addNavEvent = function(elemId, collId) {
     $('#' + elemId).on('click', function() {
-      loadSavedCollation(collId);
+      _loadSavedCollation(collId);
     });
   };
 
@@ -5708,7 +5708,7 @@ CL = (function() {
       setUpRemoveWitnessesForm: setUpRemoveWitnessesForm,
       removeWitnesses: removeWitnesses,
       checkWitnessesAgainstProject: checkWitnessesAgainstProject,
-      loadSavedCollation: loadSavedCollation,
+
       returnToSummaryTable: returnToSummaryTable,
       prepareAdditionalCollation: prepareAdditionalCollation,
       removeSpecialWitnesses: removeSpecialWitnesses,
@@ -5731,6 +5731,7 @@ CL = (function() {
        _setRuleConditions: _setRuleConditions,
        _setOverlappedOptions: _setOverlappedOptions,
        _includeJavascript: _includeJavascript,
+       _loadSavedCollation: _loadSavedCollation,
        _prepareCollation: _prepareCollation,
        _getContextFromInputForm: _getContextFromInputForm,
        _getWitnessesFromInputForm: _getWitnessesFromInputForm,
@@ -5924,7 +5925,6 @@ CL = (function() {
       setUpRemoveWitnessesForm: setUpRemoveWitnessesForm,
       removeWitnesses: removeWitnesses,
       checkWitnessesAgainstProject: checkWitnessesAgainstProject,
-      loadSavedCollation: loadSavedCollation,
       returnToSummaryTable: returnToSummaryTable,
       prepareAdditionalCollation: prepareAdditionalCollation,
       removeSpecialWitnesses: removeSpecialWitnesses,
