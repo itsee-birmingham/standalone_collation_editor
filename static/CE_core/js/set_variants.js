@@ -1034,18 +1034,26 @@ SV = (function () {
 				OR.removeSplits(); //ensure all the units are unsplit (readings wise) - still needed
 				OR.mergeSharedExtentOverlaps(); //do this before adding labels so the labels are correct))
 				OR.makeWasGapWordsGaps();
-				//merge lacs into a single unit
+				//merge lacs into a single unit if in settings (default is also true to protect existing projects)
 				//we used to do this with OM as well but om verse should never be merged with OM so I don't run it anymore as there
 				//should be no more that one OM and om verse in any given unit.
-				//TODO: this one should perhaps be configurable
-				//could just be a flag for this and oms
-				OR.mergeAllLacs();
+				if (CL.project.combineAllLacsInOR === true) {
+					OR.mergeAllLacs();
+				}
+				if (CL.project.combineAllOmsInOR === true) {
+					OR.mergeAllOms();
+				}
+
 				OR.addLabels(true); //this adds the reading labels to the datastructure itself - still required so they can be edited
 				//log that we have moved to OR in the event_list
 				if (CL.data.hasOwnProperty('event_list')) {
 					CL.data.event_list.push('moved to order readings');
 				}
 				SR.findSubreadings({'rule_classes': CL.getRuleClasses('subreading', true, 'value', ['identifier', 'subreading'])}); //only show the subreadings when there class is labelled as subreading in the project)))
+				//remove the remove witnesses menu if it is still hanging about
+				if (document.getElementById('remove_witnesses_div')) {
+					document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
+				}
 				OR.showOrderReadings({'container': container});
 			} else {
 				if (CL.showSubreadings === true) {
