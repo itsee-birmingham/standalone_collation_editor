@@ -63,7 +63,7 @@ CL = (function() {
   addStageLinks, addExtraFooterButtons, makeVerseLinks, getUnitAppReading, setList,
   getActiveUnitWitnesses, getExporterSettings, saveCollation, sortWitnesses,
   getSpecifiedAncestor, hideTooltip, addHoverEvents, markReading, showSplitWitnessMenu,
-  markStandoffReading, findUnitPosById, findReadingById, applyPreStageChecks,
+  markStandoffReading, findUnitPosById, findReadingPosById, findReadingById, applyPreStageChecks,
   makeStandoffReading, doMakeStandoffReading, makeMainReading, getOrderedAppLines,
   loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses,
   calculatePosition, removeWitness, checkWitnessesAgainstProject, setUpRemoveWitnessesForm,
@@ -86,7 +86,7 @@ CL = (function() {
    _applySettings, _getApprovalSettings, _compareReadings,
    _disableEventPropagation, _showCollationSettings, _checkWitnesses, _getScrollPosition,
    _getMousePosition, _displayWitnessesHover, _getWitnessesForReading,
-   _findStandoffWitness, _findReadingPosById, _getPreStageChecks, _makeRegDecisionsStandoff,
+   _findStandoffWitness, _getPreStageChecks, _makeRegDecisionsStandoff,
    _contextInputOnload, _removeWitnessFromUnit, _findSaved, _addToSavedCollation,
    _displaySavedCollation, _mergeCollationObjects,
    _getUnitsByStartIndex, _mergeNewLacOmVerseReadings, _mergeNewReading,
@@ -750,11 +750,19 @@ CL = (function() {
           } else {
             id_string = String(j);
           }
-          unit_data_options = {
-            'overlap': true,
-            'col_length': options.overlap_details[unit._id].col_length,
-            'unit_id': unit._id
-          };
+          // TODO: check that getUnitDataOptions is a real option
+          if (options.hasOwnProperty('getUnitDataOptions')) {
+            unit_data_options = options.getUnitDataOptions;
+            unit_data_options.overlap = true;
+            unit_data_options.col_length = options.overlap_details[unit._id].col_length;
+            unit_data_options.unit_id = unit._id;
+          } else {
+            unit_data_options = {
+              'overlap': true,
+              'col_length': options.overlap_details[unit._id].col_length,
+              'unit_id': unit._id
+            };
+          }
           if (app > 1) {
             unit_data_options.app_id = 'apparatus' + app;
           } else {
@@ -789,8 +797,8 @@ CL = (function() {
             spacer_rows.push(SV.getSpacerUnitData(id_string, unit.start, unit.end));
           } else if (format === 'reorder') {
             unit_data = OR.getUnitData(unit.readings, id_string, format, unit.start, unit.end, unit_data_options);
-          } else if (format === 'version' || format === 'version_additions' || format === 'other_version_additions') {
-            unit_data = VER.get_unit_data(unit.readings, id_string, format, unit.start, unit.end, unit_data_options);
+          // } else if (format === 'version' || format === 'version_additions' || format === 'other_version_additions') {
+          //   unit_data = VER.get_unit_data(unit.readings, id_string, format, unit.start, unit.end, unit_data_options);
           } else {
             unit_data = _getUnitData(unit.readings, id_string, format, unit.start, unit.end, unit_data_options);
           }
@@ -1055,11 +1063,15 @@ CL = (function() {
           } else {
             id_string = String(j);
           }
-          //why am I recreating the options here and not reusing - any not required will just be ignored if the getUnitData function doesn't know about them
-          //some might need adding but most seem to be the same
-          unit_data_options = {
-            'unit_id': unit._id
-          };
+          //TODO: check this option is used - another further up
+          if (options.hasOwnProperty('getUnitDataOptions')) {
+            unit_data_options = options.getUnitDataOptions;
+            unit_data_options.unit_id = unit._id;
+          } else {
+            unit_data_options = {
+              'unit_id': unit._id
+            };
+          }
           if (app > 1) {
             unit_data_options.app_id = 'apparatus' + app;
           } else {
@@ -2068,10 +2080,7 @@ CL = (function() {
     //			console.log('RESULT OF _LOSE_SUBREADINGS BELOW')
     //			console.log(JSON.parse(JSON.stringify(CL.data)))
     //now check that we don't have any shared readings (need to prepare and unprepare for this)
-    SV.prepareForOperation({
-      'app_id': apparatus,
-      'unit_id': unit._id
-    });
+    SV.prepareForOperation();
     //			console.log('now we have prepared')
     //			console.log(JSON.parse(JSON.stringify(CL.data)))
     SV.unsplitUnitWitnesses(reading_details.unit_pos, 'apparatus');
@@ -2197,7 +2206,7 @@ CL = (function() {
     if (typeof options === 'undefined') {
       options = {};
     }
-    parent_pos = _findReadingPosById(unit, parent._id);
+    parent_pos = findReadingPosById(unit, parent._id);
     subreading = parent.subreadings[subtype][subreading_pos];
 
     if (typeof options.witnesses !== 'undefined') {
@@ -3129,6 +3138,7 @@ CL = (function() {
     if (context && CL.dataSettings.base_text !== 'none') {
       CL.context = context;
       CL.dataSettings.witness_list = _getWitnessesFromInputForm();
+      CL.debug = _getDebugSetting();
       RG.getCollationData(output, 0);
     }
   };
@@ -3186,6 +3196,13 @@ CL = (function() {
         return witnessList;
       }
     }
+  };
+
+  _getDebugSetting = function () {
+    if (CL.services.hasOwnProperty('getDebugSetting')) {
+      return CL.services.getDebugSetting();
+    }
+    return false;
   };
 
   _showSavedVersions = function(data, projectWitnesses, context) {
@@ -5269,7 +5286,7 @@ CL = (function() {
     return null;
   };
 
-  _findReadingPosById = function(unit, id) {
+  findReadingPosById = function(unit, id) {
     var i;
     for (i = 0; i < unit.readings.length; i += 1) {
       if (unit.readings[i].hasOwnProperty('_id') && unit.readings[i]._id === id) {
@@ -5370,10 +5387,7 @@ CL = (function() {
           standoff_reading.combined_gap_before_details = reading.text[0].combined_gap_before_details;
         }
       }
-
       CL.data.marked_readings[standoff_reading.value].push(standoff_reading);
-
-
   };
 
   _doMakeRegDecisionsStandoff = function(base_reading_data, standoff_reading, rule_details, subreading_types, type, apparatus, unit, reading, parent, subreading, witness) {
@@ -5698,6 +5712,7 @@ CL = (function() {
       returnToSummaryTable: returnToSummaryTable,
       prepareAdditionalCollation: prepareAdditionalCollation,
       removeSpecialWitnesses: removeSpecialWitnesses,
+      findReadingPosById: findReadingPosById,
 
       //deprecated function mapping for calls from older services
       set_service_provider: setServiceProvider,
@@ -5765,7 +5780,6 @@ CL = (function() {
        _displayWitnessesHover: _displayWitnessesHover,
        _getWitnessesForReading: _getWitnessesForReading,
        _findStandoffWitness: _findStandoffWitness,
-       _findReadingPosById: _findReadingPosById,
        _getPreStageChecks: _getPreStageChecks,
        _makeRegDecisionsStandoff: _makeRegDecisionsStandoff,
        _contextInputOnload: _contextInputOnload,
@@ -5847,7 +5861,7 @@ CL = (function() {
       savedAlgorithmSettings: savedAlgorithmSettings,
       savedDataSettings: savedDataSettings,
       existingCollation: existingCollation,
-
+      findReadingPosById: findReadingPosById,
       setServiceProvider: setServiceProvider,
       expandFillPageClients: expandFillPageClients,
       getHeaderHtml: getHeaderHtml,
