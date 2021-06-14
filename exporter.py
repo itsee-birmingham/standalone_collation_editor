@@ -143,7 +143,7 @@ class Exporter(object):
                      consolidate_om_verse=True, consolidate_lac_verse=True,
                      include_lemma_when_no_variants=False
                      ):
-        context entry['context']
+        context = entry['context']
         basetext_siglum = entry['structure']['overtext'][0]['id']
 
         apparatus = entry['structure']['apparatus'][:]
