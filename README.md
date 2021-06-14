@@ -739,3 +739,17 @@ The inclusion of the editor and initialisation of the editor has changed. Please
 
 - collation unit model
   - data for collation should use 'transcription' rather than 'transcription_id'
+
+
+Upgrading to collation_editor_core 2.x from collation_editor_core 1.x
+---
+
+The 2.x release of the collation editor core code is mostly backwards compatible with 1.x.
+
+There are, however, some additions required to the services file and the settings and some of the deprecated features from 1.x have been removed as planned.
+
+New features are also introduced in this release including the ability to add and remove witnesses from existing collations as the first two stages.
+
+In 1.1.0 the way regularisation rules are applied was significantly altered because in some circumstances rules were not being
+applied as intended. The older way of applying regularisation rules is preserved in XXX. Any projects which started regularising in a version
+of the collation editor code prior to release 1.1.0 
