@@ -141,9 +141,9 @@ class Exporter(object):
     def get_unit_xml(self, entry, ignore_basetext, negative_apparatus=False,
                      overlap_status_to_ignore=['overlapped', 'deleted'],
                      consolidate_om_verse=True, consolidate_lac_verse=True,
-                     include_lemma_when_no_variants=False, context_prefix=''
+                     include_lemma_when_no_variants=False
                      ):
-        context = '{}{}'.format(context_prefix, entry['context'])
+        context entry['context']
         basetext_siglum = entry['structure']['overtext'][0]['id']
 
         apparatus = entry['structure']['apparatus'][:]
