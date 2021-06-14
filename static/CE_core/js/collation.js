@@ -73,7 +73,7 @@ CL = (function() {
   //private function declarations
   let _initialiseEditor, _initialiseProject, _setProjectConfig, _setDisplaySettings,
    _setLocalPythonFunctions, _setRuleClasses, _setRuleConditions, _setOverlappedOptions,
-   _includeJavascript, _prepareCollation, _getContextFromInputForm,
+   _includeJavascript, _prepareCollation, _getContextFromInputForm, _getDebugSetting,
    _getWitnessesFromInputForm, _showSavedVersions, _getSavedRadio, _makeSavedCollationTable,
    _loadSavedCollation, _getSubreadingWitnessData, _findStandoffRegularisationText,
    _collapseUnit, _expandUnit, _expandAll, _collapseAll, _getEmptyCell, _mergeDicts,
