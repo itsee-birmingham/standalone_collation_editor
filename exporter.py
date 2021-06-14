@@ -24,8 +24,7 @@ class Exporter(object):
         if len(reading['text']) > 0:
             if 'text_string' in reading:
                 return [reading['text_string'].replace('&lt;', '<').replace('&gt;', '>')]
-            # TODO: should not be hard coded if required at all needs to go in NT specific stuff
-            return [' '.join(i['interface'].replace('_', u'\u0323') for i in reading['text'])]
+            return [' '.join(i['interface'] for i in reading['text'])]
         else:
             if 'overlap_status' in reading.keys() and (reading['overlap_status'] in ['overlapped', 'deleted']):
                 text = ['', reading['overlap_status']]
