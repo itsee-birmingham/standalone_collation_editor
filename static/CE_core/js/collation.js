@@ -91,7 +91,7 @@ CL = (function() {
    _displaySavedCollation, _mergeCollationObjects,
    _getUnitsByStartIndex, _mergeNewLacOmVerseReadings, _mergeNewReading,
    _getReadingHistory, _getNextTargetRuleInfo, _removeAppliedRules,
-   _getHistoricalReading, _doMakeRegDecisionsStandoff, _extractAllTValuesForRGAppliedRules,
+   _getHistoricalReading, _extractAllTValuesForRGAppliedRules,
    _makeStandoffReading2;
 
 
@@ -5732,7 +5732,6 @@ CL = (function() {
        _getNextTargetRuleInfo: _getNextTargetRuleInfo,
        _removeAppliedRules: _removeAppliedRules,
        _getHistoricalReading: _getHistoricalReading,
-       _doMakeRegDecisionsStandoff: _doMakeRegDecisionsStandoff,
        _extractAllTValuesForRGAppliedRules: _extractAllTValuesForRGAppliedRules,
        _makeStandoffReading2: _makeStandoffReading2,
        //private variables for testing only
