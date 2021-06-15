@@ -573,7 +573,6 @@ OR = (function() {
     }
   };
 
-  //For MUYA this needs to accept a regex for details gap * and lac *
   //optional: can be set in services or project and when moving to OR or approved
   mergeAllLacs = function() {
     var typeList, parentTemplate;
