@@ -1843,7 +1843,7 @@ SV = (function () {
 					witnesses.splice(witnesses.indexOf(reading.witnesses[i]), 1);
 				}
 				if (CL.data.lac_readings.length > 0) {
-					readings.push({'text' : [], 'type' : 'lac_verse', 'details' : CL.project.lac_unit_label, 'witnesses' : JSON.parse(JSON.stringify(CL.data.lac_readings))});
+					readings.push({'text' : [], 'type' : 'lac_verse', 'details' : CL.project.lacUnitLabel, 'witnesses' : JSON.parse(JSON.stringify(CL.data.lac_readings))});
 					for (i = 0; i < CL.data.lac_readings.length; i += 1) {
 						witnesses.splice(witnesses.indexOf(CL.data.lac_readings[i]), 1);
 					}
@@ -1851,7 +1851,7 @@ SV = (function () {
 				if (CL.data.om_readings.length > 0) {
 					readings.push({'text' : [],
 						'type' : 'om_verse',
-						'details' : CL.project.om_unit_label,
+						'details' : CL.project.omUnitLabel,
 						'witnesses' : JSON.parse(JSON.stringify(CL.data.om_readings))});
 					for (i = 0; i < CL.data.om_readings.length; i += 1) {
 						witnesses.splice(witnesses.indexOf(CL.data.om_readings[i]), 1);
@@ -3284,13 +3284,13 @@ SV = (function () {
 								}
 							}
 							if (add.length > 0) {
-								newunit.readings.push({'witnesses': add, 'text' : [], 'overlap_status': key, 'type': 'om_verse', 'details': CL.project.om_unit_label});
+								newunit.readings.push({'witnesses': add, 'text' : [], 'overlap_status': key, 'type': 'om_verse', 'details': CL.project.omUnitLabel});
 							}
 						}
 					}
 				}
 				if (om_readings_copy.length > 0) {
-					newunit.readings.push({'witnesses': om_readings_copy, 'text': [], 'type': 'om_verse', 'details': CL.project.om_unit_label});
+					newunit.readings.push({'witnesses': om_readings_copy, 'text': [], 'type': 'om_verse', 'details': CL.project.omUnitLabel});
 				}
 			}
 			if (CL.data.hasOwnProperty('lac_readings') && CL.data.lac_readings.length > 0) {
@@ -3306,7 +3306,7 @@ SV = (function () {
 								}
 							}
 							if (add.length > 0) {
-								newunit.readings.push({'witnesses': add, 'text' : [], 'overlap_status': key, 'type': 'lac_verse', 'details': CL.project.lac_unit_label});
+								newunit.readings.push({'witnesses': add, 'text' : [], 'overlap_status': key, 'type': 'lac_verse', 'details': CL.project.lacUnitLabel});
 							}
 						}
 					}
@@ -3324,10 +3324,10 @@ SV = (function () {
 							newunit.readings.push({'witnesses': special_category_witnesses, 'text': [], 'type': 'lac_verse', 'details': CL.data.special_categories[i].label});
 						}
 						if (lac_readings_copy.length > 0) {
-							newunit.readings.push({'witnesses': lac_readings_copy, 'text': [], 'type': 'lac_verse', 'details': CL.project.lac_unit_label});
+							newunit.readings.push({'witnesses': lac_readings_copy, 'text': [], 'type': 'lac_verse', 'details': CL.project.lacUnitLabel});
 						}
 					} else {
-						newunit.readings.push({'witnesses': lac_readings_copy, 'text': [], 'type': 'lac_verse', 'details': CL.project.lac_unit_label});
+						newunit.readings.push({'witnesses': lac_readings_copy, 'text': [], 'type': 'lac_verse', 'details': CL.project.lacUnitLabel});
 					}
 				}
 			}

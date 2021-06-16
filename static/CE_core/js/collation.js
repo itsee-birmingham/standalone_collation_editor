@@ -32,9 +32,10 @@ CL = (function() {
       debug = false,
       stage = null,
       data = {},
-      isDirty = false, //this is currently only used for witnessEditingMode but could be expanded maybe on a project setting
-      //It also only works for modifications to witnesses (adding/removing) not any other action while in edit mode.
-      //That should perhaps be changed for adding as more editing is allowed (when removing all you can do is remove so the dirty flag is fine)
+      isDirty = false, // this is currently only used for witnessEditingMode but could be expanded maybe on a
+      // project setting. It also only works for modifications to witnesses (adding/removing) not any other action
+      // while in edit mode. That should perhaps be changed for adding as more editing is allowed (when removing all
+      // you can do is remove so the dirty flag is fine)
       witnessEditingMode = false,
       witnessAddingMode = false,
       witnessRemovingMode = false,
@@ -43,7 +44,6 @@ CL = (function() {
       savedAlgorithmSettings = null,
       savedDataSettings = null,
       existingCollation = null;
-
 
   //private variable declarations
   let _contextInput = null,
@@ -92,7 +92,7 @@ CL = (function() {
    _getUnitsByStartIndex, _mergeNewLacOmVerseReadings, _mergeNewReading,
    _getReadingHistory, _getNextTargetRuleInfo, _removeAppliedRules,
    _getHistoricalReading, _extractAllTValuesForRGAppliedRules,
-   _makeStandoffReading2;
+   _makeStandoffReading2, _extractWordsForHeader;
 
 
   //*********  public functions *********
@@ -530,19 +530,17 @@ CL = (function() {
   };
 
   //TODO: sort out this mess of what is called what and snake vs camel for regularisation_classes and ruleClasses and rule_classes!!!!
-  //TODO: is this the most efficient way to do this?
-  //rule_classes could at least be set once in project config even if we have to cycle through them every time here
   getRuleClasses = function(test_key, test_value, key, data) {
-    var i, j, classes, list, rule_classes;
+    var classes, list, rule_classes;
     classes = {};
     rule_classes = CL.ruleClasses;
-    for (i = 0; i < rule_classes.length; i += 1) {
+    for (let i = 0; i < rule_classes.length; i += 1) {
       if (rule_classes[i][test_key] === test_value || typeof test_key === 'undefined') {
         if ($.type(data) === 'string') {
           classes[rule_classes[i][key]] = rule_classes[i][data];
         } else {
           list = [];
-          for (j = 0; j < data.length; j += 1) {
+          for (let j = 0; j < data.length; j += 1) {
             list.push(rule_classes[i][data[j]]);
           }
           classes[rule_classes[i][key]] = list;
@@ -552,20 +550,19 @@ CL = (function() {
     return classes;
   };
 
-  //TODO: see if you really need to return j and then remove if you can
-  getCollationHeader = function(data, col_spans, number_spaces) {
-    var html, word, words, cols, i, j, colspan;
-    html = [];
-    // words is a list of lists now with the first being the word and the second being the class to add
-    words = [];
-    //TODO: add in project based option
-    if (CL.services.hasOwnProperty('extractWordsForHeader') ) {
+  _extractWordsForHeader = function (data) {
+    let words, word;
+    // words is a list of lists with the first being the word and the second being the class to add if any or a an empty string
+    if (CL.project.hasOwnProperty('extractWordsForHeader')) {
+      words = CL.project.extractWordsForHeader(data);
+    } else if (CL.services.hasOwnProperty('extractWordsForHeader')) {
       words = CL.services.extractWordsForHeader(data);
     } else {
       //hardcoded default
       //extract all the words from the data you get back
+      words = [];
       if ($.isArray(data.overtext)) {
-        for (i = 0; i < data.overtext[0].tokens.length; i += 1) {
+        for (let i = 0; i < data.overtext[0].tokens.length; i += 1) {
           word = [];
           if (data.overtext[0].tokens[i].hasOwnProperty('pc_before')) {
             word.push(data.overtext[0].tokens[i].pc_before);
@@ -582,6 +579,13 @@ CL = (function() {
         }
       }
     }
+    return words;
+  };
+
+  getCollationHeader = function(data, col_spans, number_spaces) {
+    var html, words, cols, j, colspan;
+    html = [];
+    words = _extractWordsForHeader(data);
 
     //columns is based on number of words*2 (to include spaces) + 1 (to add space at the end)
     cols = (words.length * 2) + 1;
@@ -593,7 +597,7 @@ CL = (function() {
       //words are just in a list so index from 0 (j will go up slower than i)
       j = 0;
       //we don't want 0 based indexing so start i at 1
-      for (i = 1; i <= cols; i += 1) {
+      for (let i = 1; i <= cols; i += 1) {
         if (col_spans.hasOwnProperty(i)) {
           colspan = col_spans[i];
         } else {
@@ -611,7 +615,7 @@ CL = (function() {
 
       html.push('<tr id="number_row" class="number_row"><td></td>');
       j = 1;
-      for (i = 1; i <= cols; i += 1) {
+      for (let i = 1; i <= cols; i += 1) {
         if (col_spans.hasOwnProperty(i)) {
           colspan = col_spans[i];
         } else {
@@ -669,6 +673,8 @@ CL = (function() {
    * 			highlighted_unit - a unit to mark as having an error
    * 			column_lengths - dictionary detailing widths of columns in top apparatus
    * 			overlap_details - a dictionary keyed by id of overlapping reading giving column width for that unit
+   *      getUnitDataFunction - a function to be used for getUnitData when the hard coded ones are not good enough
+   *      getUnitDataOptions - this allows options to be passed into the getUnitData function
    * */
   getOverlapLayout = function(apparatus, app, format, overtext_length, options) {
     var j, i, k, id, rows, unit, row_list, extra_rows, events,
@@ -689,7 +695,9 @@ CL = (function() {
     }
     rows.push('<tr><td></td>'); //the extra ones for navigation arrows
     //only care about highlighted unit if we are in the right apparatus
-    if (options.hasOwnProperty('highlighted_unit') && options.highlighted_unit !== undefined && options.highlighted_unit[0] !== 'apparatus' + app) {
+    if (options.hasOwnProperty('highlighted_unit') &&
+          options.highlighted_unit !== undefined &&
+          options.highlighted_unit[0] !== 'apparatus' + app) {
       delete options.highlighted_unit;
     }
     while (i <= overtext_length) {
@@ -750,7 +758,6 @@ CL = (function() {
           } else {
             id_string = String(j);
           }
-          // TODO: check that getUnitDataOptions is a real option
           if (options.hasOwnProperty('getUnitDataOptions')) {
             unit_data_options = options.getUnitDataOptions;
             unit_data_options.overlap = true;
@@ -797,8 +804,6 @@ CL = (function() {
             spacer_rows.push(SV.getSpacerUnitData(id_string, unit.start, unit.end));
           } else if (format === 'reorder') {
             unit_data = OR.getUnitData(unit.readings, id_string, format, unit.start, unit.end, unit_data_options);
-          // } else if (format === 'version' || format === 'version_additions' || format === 'other_version_additions') {
-          //   unit_data = VER.get_unit_data(unit.readings, id_string, format, unit.start, unit.end, unit_data_options);
           } else {
             unit_data = _getUnitData(unit.readings, id_string, format, unit.start, unit.end, unit_data_options);
           }
@@ -1006,7 +1011,9 @@ CL = (function() {
    * 			sort - boolean - do the readings need sorting (default = false)
    * 			highlighted_wit - the witness to highlight
    * 			highlighted_version - a versional witness to highlight (version editor only)
-   * 			highlighted_unit - a unit to mark as having an error*/
+   * 			highlighted_unit - a unit to mark as having an error
+   *      getUnitDataFunction - a function to be used for getUnitData when the hard coded ones are not good enough
+   *      getUnitDataOptions - this allows options to be passed into the getUnitData function*/
   getUnitLayout = function(apparatus, app, format, options) {
     var j, i, k, rows, unit, col_len_dict, row_list, extra_rows, new_row, unit_data_options,
       previous_index, id_string, events, unit_data, unit_index, split, spacer_rows, key;
@@ -1026,7 +1033,7 @@ CL = (function() {
       spacer_rows.push('<tr><td></td>');
     }
     rows.push('<tr><td></td>');
-    //only care about highlighted unit if we are in the right apparatus
+    // only care about highlighted unit if we are in the right apparatus
     if (options.hasOwnProperty('highlighted_unit') &&
       options.highlighted_unit !== undefined &&
       options.highlighted_unit[0] !== 'apparatus' + app) {
@@ -1036,16 +1043,16 @@ CL = (function() {
       unit = apparatus[j];
 
       unit_index = unit.start;
-      if (i < unit_index) { //we don't have a variant for this word
+      if (i < unit_index) {  // we don't have a variant for this word
         rows.push(_getEmptyCell(format));
         if (format === 'set_variants') {
           spacer_rows.push(SV.getEmptySpacerCell());
         }
         i += 1;
-      } else if (i === unit_index) { //we do have a variant for this word
+      } else if (i === unit_index) {  // we do have a variant for this word
         if (unit.readings.length > 1 ||
-          //this is now set to always show units regardless of whether they have variation
-          //the unused logic is left in incase we want to revert to the old way sometime
+          // this is now set to always show units regardless of whether they have variation
+          // the unused logic is left in incase we want to revert to the old way sometime
           (format === 'set_variants' && SV.showSharedUnits === true) ||
           (format === 'regularise') ||
           (format === 'reorder') ||
@@ -1063,7 +1070,6 @@ CL = (function() {
           } else {
             id_string = String(j);
           }
-          //TODO: check this option is used - another further up
           if (options.hasOwnProperty('getUnitDataOptions')) {
             unit_data_options = options.getUnitDataOptions;
             unit_data_options.unit_id = unit._id;
@@ -1107,7 +1113,6 @@ CL = (function() {
             unit_data_options.gap_unit = true;
           }
 
-
           if (options.hasOwnProperty('getUnitDataFunction')) {
             unit_data_options.format = format;
             unit_data = options.getUnitDataFunction(unit.readings, id_string, unit.start, unit.end, unit_data_options);
@@ -1118,8 +1123,6 @@ CL = (function() {
             spacer_rows.push(SV.getSpacerUnitData(id_string, unit.start, unit.end));
           } else if (format === 'reorder') {
             unit_data = OR.getUnitData(unit.readings, id_string, format, unit.start, unit.end, unit_data_options);
-          } else if (format === 'version') {
-            unit_data = VER.get_unit_data(unit.readings, id_string, format, unit.start, unit.end, unit_data_options);
           } else {
             unit_data = OR.getUnitData(unit.readings, id_string, format, unit.start, unit.end, unit_data_options);
           }
@@ -1201,53 +1204,52 @@ CL = (function() {
   };
 
   getHighlightedText = function(witness) {
-    var i, j, k, temp, transcription_id, hand, text, display_hand, verse, is_private;
+    var temp, transcription_id, hand, text, unit;
     temp = witness.split('|');
     transcription_id = temp[0];
     hand = temp[1];
     text = [];
-    display_hand = hand;
-    //TODO: hand and display_hand can be rationalised now we have got rid of _private from sigla
-    document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + display_hand + ':</b><img id="loadingbar" src="' + staticUrl + 'CE_core/images/loadingbar.gif"/></span>';
-    CL.services.getVerseData(CL.context, [transcription_id], function(response) {
+
+    document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + hand + ':</b><img id="loadingbar" src="' + staticUrl + 'CE_core/images/loadingbar.gif"/></span>';
+    CL.services.getCollationData(CL.context, [transcription_id], function(response) {
       var transcriptions;
       transcriptions = response.results;
       if (transcriptions.length > 0) {
-        for (i = 0; i < transcriptions.length; i += 1) {
-          verse = transcriptions[i];
-          if (verse.hasOwnProperty('witnesses') && verse.witnesses !== null) {
-            for (j = 0; j < verse.witnesses.length; j += 1) {
-              if (verse.witnesses[j].id === hand) {
-                for (k = 0; k < verse.witnesses[j].tokens.length; k += 1) {
-                  if (verse.witnesses[j].tokens[k].hasOwnProperty('gap_before')) {
-                    text.push('&lt;' + verse.witnesses[j].tokens[k].gap_before_details + '&gt;');
+        for (let i = 0; i < transcriptions.length; i += 1) {
+          unit = transcriptions[i];
+          if (unit.hasOwnProperty('witnesses') && unit.witnesses !== null) {
+            for (let j = 0; j < unit.witnesses.length; j += 1) {
+              if (unit.witnesses[j].id === hand) {
+                for (let k = 0; k < unit.witnesses[j].tokens.length; k += 1) {
+                  if (unit.witnesses[j].tokens[k].hasOwnProperty('gap_before')) {
+                    text.push('&lt;' + unit.witnesses[j].tokens[k].gap_before_details + '&gt;');
                   }
-                  if (verse.witnesses[j].tokens[k].hasOwnProperty('expanded')) {
-                    text.push(verse.witnesses[j].tokens[k].expanded);
-                  } else if (verse.witnesses[j].tokens[k].hasOwnProperty('original')) {
-                    text.push(verse.witnesses[j].tokens[k].original);
+                  if (unit.witnesses[j].tokens[k].hasOwnProperty('expanded')) {
+                    text.push(unit.witnesses[j].tokens[k].expanded);
+                  } else if (unit.witnesses[j].tokens[k].hasOwnProperty('original')) {
+                    text.push(unit.witnesses[j].tokens[k].original);
                   } else {
-                    text.push(verse.witnesses[j].tokens[k].t);
+                    text.push(unit.witnesses[j].tokens[k].t);
                   }
-                  if (verse.witnesses[j].tokens[k].hasOwnProperty('gap_after')) {
-                    text.push('&lt;' + verse.witnesses[j].tokens[k].gap_details + '&gt;');
+                  if (unit.witnesses[j].tokens[k].hasOwnProperty('gap_after')) {
+                    text.push('&lt;' + unit.witnesses[j].tokens[k].gap_details + '&gt;');
                   }
                 }
-                document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + display_hand + ':</b> ' + CL.project.prepareDisplayString(text.join(' ')) + '</span>';
+                document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + hand + ':</b> ' + CL.project.prepareDisplayString(text.join(' ')) + '</span>';
                 break;
               }
             }
           } else {
-            //om verse
-            document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + display_hand + ':</b> no text</span>';
+            //om unit
+            document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + hand + ':</b> no text</span>';
           }
         }
       } else {
         if (transcription_id === 'none') {
           document.getElementById('single_witness_reading').innerHTML = '';
         } else {
-          //lac verse
-          document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + display_hand + ':</b> no text</span>';
+          //lac unit
+          document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + hand + ':</b> no text</span>';
         }
       }
     });
@@ -1542,9 +1544,9 @@ CL = (function() {
   /** turn a list into another list which only contains unique items */
   //TODO: can this be done by casting?
   setList = function(list) {
-    var i, set;
+    var set;
     set = [];
-    for (i = 0; i < list.length; i += 1) {
+    for (let i = 0; i < list.length; i += 1) {
       if (set.indexOf(list[i]) === -1) {
         set.push(list[i]);
       }
@@ -1640,7 +1642,6 @@ CL = (function() {
   };
 
   sortWitnesses = function(witnesses) {
-    //TODO: this should look for project_witnessSort or use the key witnessSort in CL.project
     if (CL.project.hasOwnProperty('witnessSort')) {
       //use a project function if there is one
       CL.run_function(CL.project.witnessSort, [witnesses]);
@@ -1718,14 +1719,15 @@ CL = (function() {
     witness_html.push('</span>');
     if (witnesses.length > 1 && (!details.hasOwnProperty('witness_select') || details.witness_select !== false)) {
       witness_html.push('<div id="wit_scroller"><input type="checkbox" id="wit_select_all">Select All</input><br/>');
-      for (i = 0; i < witnesses.length; i += 1) {
+      for (let i = 0; i < witnesses.length; i += 1) {
         if (witnesses[i] !== CL.dataSettings.base_text_siglum) {
-          witness_html.push('<input type="checkbox" id="' + witnesses[i] + '" name="' + witnesses[i] + '" value="' + witnesses[i] + '">' + witnesses[i] + '</input><br/>');
+          witness_html.push('<input type="checkbox" id="' + witnesses[i] + '" name="' + witnesses[i] + '" value="' +
+                            witnesses[i] + '">' + witnesses[i] + '</input><br/>');
         }
       }
       witness_html.push('</div>');
     } else {
-      for (i = 0; i < witnesses.length; i += 1) {
+      for (let i = 0; i < witnesses.length; i += 1) {
         witness_html.push('<input type="hidden" name="' + witnesses[i] + '" value="true"/><br/>');
       }
       //witness_html.push('<br/><br/>');
@@ -1905,8 +1907,6 @@ CL = (function() {
         } else if (format === 'order_readings') {
           OR.makeStandoffReading(type, reading_details, data.parent_reading);
         }
-
-
         document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
       }
     });
@@ -1927,8 +1927,7 @@ CL = (function() {
   };
 
   findReadingById = function(unit, id) {
-    var i;
-    for (i = 0; i < unit.readings.length; i += 1) {
+    for (let i = 0; i < unit.readings.length; i += 1) {
       if (unit.readings[i].hasOwnProperty('_id') && unit.readings[i]._id === id) {
         return unit.readings[i];
       }
@@ -1937,9 +1936,9 @@ CL = (function() {
   };
 
   applyPreStageChecks = function(stage) {
-    var preStageChecks, i, result;
+    var preStageChecks, result;
     preStageChecks = _getPreStageChecks(stage);
-    for (i = 0; i < preStageChecks.length; i += 1) {
+    for (let i = 0; i < preStageChecks.length; i += 1) {
       result = CL.run_function(preStageChecks[i]['function']);
       if (result !== preStageChecks[i].pass_condition) {
         return [false, preStageChecks[i].fail_message];
@@ -1982,8 +1981,8 @@ CL = (function() {
   };
 
   makeStandoffReading = function(type, reading_details, parent_id) {
-    var apparatus, unit, reading, fosilised_reading, parent, key, i, j, k, ids,
-    tValuesForSettings, new_reading, witness, options, displaySettings, resultCallback;
+    var apparatus, unit, parent, reading, fosilised_reading, tValuesForSettings, options, displaySettings,
+        resultCallback;
     apparatus = reading_details.app_id;
     unit = findUnitById(apparatus, reading_details.unit_id);
     parent = findReadingById(unit, parent_id);
@@ -2021,13 +2020,15 @@ CL = (function() {
     CL.services.applySettings(tValuesForSettings, options, resultCallback);
   };
 
-  _makeStandoffReading2 = function (reading, fosilised_reading, parent, baseReadingsWithSettingsApplied, type, unit, apparatus, reading_details) {
+  _makeStandoffReading2 = function (reading, fosilised_reading, parent, baseReadingsWithSettingsApplied, type, unit,
+                                    apparatus, reading_details) {
     var k, ids, new_reading, witness;
     //do any existing subreadings
     if (reading.hasOwnProperty('subreadings')) {
-      //now here is the tricky bit - if this subreading is a subreading because of work done in the regulariser we need to
-      //preserve those decisions in the reading_history of the standoff subreading we are about to create.
-      //To do this we need to pretend these are already standoff marked readings and add the data to the standoff marked readings datastructure
+      // now here is the tricky bit - if this subreading is a subreading because of work done in the regulariser we
+      // need to preserve those decisions in the reading_history of the standoff subreading we are about to create.
+      // To do this we need to pretend these are already standoff marked readings and add the data to the standoff
+      // marked readings datastructure
       for (let key in reading.subreadings) {
         if (reading.subreadings.hasOwnProperty(key)) {
           for (let i = reading.subreadings[key].length - 1; i >= 0; i -= 1) {
@@ -2277,6 +2278,7 @@ CL = (function() {
         }
         removeNullItems(new_reading.text[i].reading);
       }
+      //TODO
       //note that the information is stored in different places depending on whether this is a standoff subreading or one created in the regulariser (this is not
       //especially sensible but it is how it is at present and working with it is easier and less dangerous than trying to change it!) In version 2 I would fix this!
       if (parent.text.length > 0 && parent.text[0].hasOwnProperty('combined_gap_before') && parent.text[0].combined_gap_before.indexOf(witnesses[j]) !== -1) {
@@ -2649,7 +2651,7 @@ CL = (function() {
     details = [];
     for (let key in CL.data.hand_id_map) {
       if (CL.data.hand_id_map.hasOwnProperty(key)) {
-        details.push({'hand': key.replace('_private', ' (private)'), 'document': CL.data.hand_id_map[key]+ '|' + key});
+        details.push({'hand': key, 'document': CL.data.hand_id_map[key]+ '|' + key});
       }
     }
     details = sortWitnesses(details);
@@ -2878,7 +2880,6 @@ CL = (function() {
     //end deprecation
 
 
-
     CL.project.witnesses = project.witnesses;
     if (project.hasOwnProperty('book_name')) {
       CL.project.book_name = project.book_name;
@@ -2901,6 +2902,10 @@ CL = (function() {
     if (project.hasOwnProperty('useVForSupplied')) {
       CL.project.useVForSupplied = project.useVForSupplied;
     }
+    if (project.hasOwnProperty('extractWordsForHeader')) {
+      CL.project.extractWordsForHeader = project.extractWordsForHeader;
+    }
+
 
     // TODO: check this works as I added the first two assignments since testing
     if (project.hasOwnProperty('prepareDisplayString')) {
@@ -2975,28 +2980,25 @@ CL = (function() {
     }
 
 
-    if (project.hasOwnProperty('lac_unit_label')) {
-      CL.project.lac_unit_label = project.lac_unit_label;
-    } else if (CL.services.hasOwnProperty('lac_unit_label')) {
-      CL.project.lac_unit_label = CL.services.lac_unit_label;
+    if (project.hasOwnProperty('lacUnitLabel')) {
+      CL.project.lacUnitLabel = project.lacUnitLabel;
+    } else if (CL.services.hasOwnProperty('lacUnitLabel')) {
+      CL.project.lacUnitLabel = CL.services.lacUnitLabel;
     } else {
-      //default is lac verse for now to protect existing projects
-      CL.project.lac_unit_label = CL.project.lac_unit_label;
+      CL.project.lacUnitLabel = 'lac unit';
+    }
+
+    if (project.hasOwnProperty('omUnitLabel')) {
+      CL.project.omUnitLabel = project.omUnitLabel;
+    } else if (CL.services.hasOwnProperty('omUnitLabel')) {
+      CL.project.omUnitLabel = CL.services.omUnitLabel;
+    } else {
+      CL.project.omUnitLabel = 'om unit';
     }
 
     if (CL.services.hasOwnProperty('undoStackLength')) {
       SV.undoStackLength = CL.services.undoStackLength;
     } //default in SV
-
-    if (project.hasOwnProperty('om_unit_label')) {
-      CL.project.om_unit_label = project.om_unit_label;
-    } else if (CL.services.hasOwnProperty('om_unit_label')) {
-      CL.project.om_unit_label = CL.services.om_unit_label;
-    } else {
-      //default is om verse for now to protect existing projects
-      CL.project.om_unit_label = CL.project.om_unit_label;
-    }
-
 
 
     //settings for witness changes
@@ -3704,7 +3706,7 @@ CL = (function() {
               existingWitnesses.push.apply(existingWitnesses, mainCollation.structure.apparatus[0].readings[i].witnesses);
             }
             if (mainCollation.structure.lac_readings.length > 0) {
-              newUnit.readings.push({'text' : [], 'type' : 'lac_verse', 'details' : CL.project.lac_unit_label, 'witnesses' : JSON.parse(JSON.stringify(mainCollation.structure.lac_readings))});
+              newUnit.readings.push({'text' : [], 'type' : 'lac_verse', 'details' : CL.project.lacUnitLabel, 'witnesses' : JSON.parse(JSON.stringify(mainCollation.structure.lac_readings))});
               for (let i=0; i<mainCollation.structure.lac_readings.length; i+=1) {
                 if (existingWitnesses.indexOf(mainCollation.structure.lac_readings[i]) !== -1) {
                   existingWitnesses.splice(existingWitnesses.indexOf(mainCollation.structure.lac_readings[i]), 1);
@@ -3712,7 +3714,7 @@ CL = (function() {
               }
             }
             if (mainCollation.structure.om_readings.length > 0) {
-              newUnit.readings.push({'text' : [], 'type' : 'om_verse', 'details' : CL.project.om_unit_label, 'witnesses' : JSON.parse(JSON.stringify(mainCollation.structure.om_readings))});
+              newUnit.readings.push({'text' : [], 'type' : 'om_verse', 'details' : CL.project.omUnitLabel, 'witnesses' : JSON.parse(JSON.stringify(mainCollation.structure.om_readings))});
               for (let i=0; i<mainCollation.structure.om_readings.length; i+=1) {
                 if (existingWitnesses.indexOf(mainCollation.structure.om_readings[i]) !== -1) {
                   existingWitnesses.splice(existingWitnesses.indexOf(mainCollation.structure.om_readings[i]), 1);
@@ -3740,7 +3742,9 @@ CL = (function() {
               } else {
                 //TODO: address comment below
                 //something has probably gone wrong but we could just add an om reading!
-                //We should probably quit in the same as the reverse situation above because it means something is wrong in the basetext which should always be om and should always be in the unit being changed
+                //We should probably quit in the same as the reverse situation above because it means
+                //something is wrong in the basetext which should always be om and should always be in the unit being
+                // changed
                 newUnit.readings.push({'text' : [],
                   'witnesses' : existingWitnesses});
               }
@@ -3993,7 +3997,7 @@ CL = (function() {
   };
 
   _expandUnit = function(id, format) {
-    var table, rows, i, span, idno, list, items;
+    var idno, span;
     idno = id.replace('toggle_variant_', '');
     if (format === 'table') {
       $('#variant_unit_' + idno).find('TR').removeClass('hidden');
@@ -4247,7 +4251,7 @@ CL = (function() {
             }
             return [false];
           }
-          //this should never happen and means the data needs osme serious work but keeping to keep collaborators happy
+          //this should never happen and means the data needs some serious work but keeping to keep collaborators happy
           if (!reading.text[reading.text.length - 1].hasOwnProperty(witness)) {
             console.log('**** Problem witness: ' + witness);
             return[false];
@@ -4577,9 +4581,8 @@ CL = (function() {
     return details;
   };
 
-  // TODO: this needs to separate special_categories from lac/om wits TODO: is this done now?
   _addExtraGapReadings = function(adjacent_unit, all_witnesses, new_unit, inclusive_overlaps) {
-    var lac_wits, om_wits, other_wits, key, ol_unit, i, j, k, new_rdg, special_witnesses;
+    var lac_wits, om_wits, other_wits, ol_unit, new_rdg, special_witnesses;
     //the rest of this section is really just adding the readings (and witnesses) to this unit
     lac_wits = JSON.parse(JSON.stringify(CL.data.lac_readings));
     om_wits = JSON.parse(JSON.stringify(CL.data.om_readings));
@@ -4588,27 +4591,27 @@ CL = (function() {
     //ALL overlap indexes need adding to this one
     if (adjacent_unit.hasOwnProperty('overlap_units') &&
       overlapHasEmptyReading(adjacent_unit.overlap_units)) {
-      for (key in adjacent_unit.overlap_units) {
+      for (let key in adjacent_unit.overlap_units) {
         if (adjacent_unit.overlap_units.hasOwnProperty(key) &&
           (typeof inclusive_overlaps === 'undefined' ||
             typeof inclusive_overlaps !== 'undefined' &&
             inclusive_overlaps.indexOf(key) !== -1)
         ) {
           ol_unit = findOverlapUnitById(key);
-          for (j = 1; j < ol_unit.readings.length; j += 1) {
+          for (let j=1; j<ol_unit.readings.length; j+=1) {
             new_rdg = JSON.parse(JSON.stringify(_getNewGapRdgDetails(adjacent_unit, ol_unit.readings[j])));
             new_rdg.text = [];
             //remove these readings from the ones we collected earlier (because these ones need separating)
-            for (k = 0; k < new_rdg.witnesses.length; k += 1) {
+            for (let k=0; k<new_rdg.witnesses.length; k+=1) {
               if (lac_wits.indexOf(new_rdg.witnesses[k]) !== -1) {
                 lac_wits.splice(lac_wits.indexOf(new_rdg.witnesses[k]), 1);
                 new_rdg.type = 'lac_verse';
-                new_rdg.details = CL.project.lac_unit_label;
+                new_rdg.details = CL.project.lacUnitLabel;
               }
               if (om_wits.indexOf(new_rdg.witnesses[k]) !== -1) {
                 om_wits.splice(om_wits.indexOf(new_rdg.witnesses[k]), 1);
                 new_rdg.type = 'om_verse';
-                new_rdg.details = CL.project.om_unit_label;
+                new_rdg.details = CL.project.omUnitLabel;
               }
               if (other_wits.indexOf(new_rdg.witnesses[k]) !== -1) {
                 other_wits.splice(other_wits.indexOf(new_rdg.witnesses[k]), 1);
@@ -4621,13 +4624,12 @@ CL = (function() {
       //now add the relevant overlap_units key to the new unit
       if (typeof inclusive_overlaps !== 'undefined') {
         new_unit.overlap_units = {};
-        for (i = 0; i < inclusive_overlaps.length; i += 1) {
+        for (let i=0; i<inclusive_overlaps.length; i+=1) {
           new_unit.overlap_units[inclusive_overlaps[i]] = adjacent_unit.overlap_units[inclusive_overlaps[i]];
         }
       } else {
         new_unit.overlap_units = adjacent_unit.overlap_units;
       }
-
     }
     //add all remaining witnesses (lac_om_fix will sort them out later)
     if (other_wits.length > 0) {
@@ -4637,8 +4639,8 @@ CL = (function() {
       });
     }
     special_witnesses = [];
-    for (let j = 0; j < CL.data.special_categories.length; j+=1) {
-      for (let i = 0; i < CL.data.apparatus.length; i += 1) {
+    for (let j=0; j<CL.data.special_categories.length; j+=1) {
+      for (let i=0; i<CL.data.apparatus.length; i+=1) {
         new_unit.readings.push({
           'text': [],
           'type': 'lac_verse',
@@ -4655,7 +4657,7 @@ CL = (function() {
         'witnesses': lac_wits,
         'text': [],
         'type': 'lac_verse',
-        'details': CL.project.lac_unit_label
+        'details': CL.project.lacUnitLabel
       });
     }
     if (om_wits.length > 0) {
@@ -4663,7 +4665,7 @@ CL = (function() {
         'witnesses': om_wits,
         'text': [],
         'type': 'om_verse',
-        'details': CL.project.om_unit_label
+        'details': CL.project.omUnitLabel
       });
     }
     addUnitId(new_unit, 'apparatus');
@@ -4682,9 +4684,8 @@ CL = (function() {
   };
 
   _extraGapIsWithinAnOverlap = function(current) {
-    var key;
     if (current + 1 < CL.data.apparatus.length && CL.data.apparatus[current + 1].hasOwnProperty('overlap_units')) {
-      for (key in CL.data.apparatus[current].overlap_units) {
+      for (let key in CL.data.apparatus[current].overlap_units) {
         if (CL.data.apparatus[current].overlap_units.hasOwnProperty(key) &&
           CL.data.apparatus[current + 1].overlap_units.hasOwnProperty(key)) {
           return true;
@@ -4695,10 +4696,10 @@ CL = (function() {
   };
 
   _getInclusiveOverlapReadings = function(current) {
-    var inclusive_overlaps, key;
+    var inclusive_overlaps;
     inclusive_overlaps = [];
     if (current + 1 < CL.data.apparatus.length && CL.data.apparatus[current + 1].hasOwnProperty('overlap_units')) {
-      for (key in CL.data.apparatus[current].overlap_units) {
+      for (let key in CL.data.apparatus[current].overlap_units) {
         if (CL.data.apparatus[current].overlap_units.hasOwnProperty(key) &&
           CL.data.apparatus[current + 1].overlap_units.hasOwnProperty(key)) {
           inclusive_overlaps.push(key);
@@ -4806,8 +4807,8 @@ CL = (function() {
   };
 
   _addLacReading = function(extra_readings, witness, gap_details, overlap_status) {
-    var i, extra_reading, key;
-    for (i = 0; i < extra_readings.length; i += 1) {
+    var extra_reading;
+    for (let i=0; i<extra_readings.length; i+=1) {
       if (extra_readings[i].details === gap_details &&
         ((typeof overlap_status === 'undefined' && !extra_readings[i].hasOwnProperty('overlap_status')) ||
           (typeof overlap_status !== 'undefined' && extra_readings[i].overlap_status === overlap_status))) {
@@ -4835,7 +4836,7 @@ CL = (function() {
   };
 
   _findLatestStageVerse = function(verse) {
-    var i, j, levels, found, latest, approved;
+    var levels, found, latest, approved;
     SPN.show_loading_overlay();
     CL.context = verse;
     CL.services.getUserInfo(function(user) {
@@ -4843,8 +4844,8 @@ CL = (function() {
         CL.services.getSavedCollations(verse, user.id, function(collations) {
           //now we need to do another call to get any project (not necessarily owned by this user) approved versions
           CL.services.getSavedCollations(verse, undefined, function(approved_ones) {
-            //because this will get more than just approved versions we need to check status and only use the approved one
-            for (i = 0; i < approved_ones.length; i += 1) {
+            //because this will get more than just approved versions check status and only use the approved one
+            for (let i=0; i<approved_ones.length; i+=1) {
               if (approved_ones[i].status == 'approved') {
                 collations.push(approved_ones[i]);
               }
@@ -4852,9 +4853,9 @@ CL = (function() {
             levels = ['approved', 'ordered', 'set', 'regularised'];
             approved = false;
             latest = null;
-            for (i = 0; i < levels.length; i += 1) {
+            for (let i=0; i<levels.length; i+=1) {
               found = false;
-              for (j = 0; j < collations.length; j += 1) {
+              for (let j=0; j<collations.length; j+=1) {
                 if (collations[j].status === levels[i]) {
                   latest = collations[j];
                   found = true;
@@ -4885,11 +4886,10 @@ CL = (function() {
   };
 
   _loadLatestStageVerse = function(latest, approved) {
-    var key;
     SV.undoStack = [];
     OR.undoStack = [];
     if (latest === null) {
-      for (key in _defaultDisplaySettings) {
+      for (let key in _defaultDisplaySettings) {
         if (_defaultDisplaySettings.hasOwnProperty(key)) {
           CL.displaySettings[key] = _defaultDisplaySettings[key];
         }
@@ -4944,8 +4944,8 @@ CL = (function() {
   _removeOverlappedReadings = function() {
     var apparatus, i, j;
     apparatus = CL.data.apparatus;
-    for (i = 0; i < apparatus.length; i += 1) {
-      for (j = 0; j < apparatus[i].readings.length; j += 1) {
+    for (let i=0; i<apparatus.length; i+=1) {
+      for (let j=0; j<apparatus[i].readings.length; j+=1) {
         if (apparatus[i].readings[j].hasOwnProperty('overlap')) {
           apparatus[i].readings[j] = 'None';
         }
@@ -4955,36 +4955,6 @@ CL = (function() {
       }
     }
     CL.data.apparatus = apparatus;
-  };
-
-  /** apply the current display settings to the given token */
-  _applySettings = function(word) {
-    if (CL.displaySettings.view_capitalisation === false) {
-      word = word.toLowerCase();
-    }
-    if (CL.displaySettings.view_diaeresis === false) {
-      word = word.replace(/ϊ/g, 'ι');
-      word = word.replace(/ϊ/g, 'ι');
-      word = word.replace(/ϋ/g, 'υ');
-      word = word.replace(/ϋ/g, 'υ');
-    }
-    if (CL.displaySettings.view_apostrophes === false) {
-      word = word.replace(/’/g, '');
-      word = word.replace(/\'/g, '');
-    }
-    if (CL.displaySettings.view_unclear === false) {
-      word = word.replace(/&#803;/g, '');
-    }
-    if (CL.displaySettings.view_supplied === false) {
-      word = word.replace(/\[([^0-9]*?)\]/g, '$1');
-    }
-    //TODO: this needs to be converted into js if we want punctuation to show up in subreadings
-    //			if 'view_punctuation' in self.settings:
-    //			if 'pc_before' in token:
-    //			word = '%s%s' % (token['pc_before'], word)
-    //			if 'pc_after' in token:
-    //			word = '%s%s' % (word, token['pc_after'])
-    return word;
   };
 
   _getApprovalSettings = function() {
@@ -5138,11 +5108,11 @@ CL = (function() {
 
   /** checks to see if controlling checkbox is checked/unchecked and then check/uncheck children */
   _checkWitnesses = function(id) {
-    var parent_div, elements, checked, i;
+    var parent_div, elements, checked;
     parent_div = document.getElementById(id).parentNode;
     checked = document.getElementById(id).checked;
     elements = parent_div.childNodes;
-    for (i = 0; i < elements.length; i += 1) {
+    for (let i=0; i<elements.length; i+=1) {
       if (elements[i].tagName === 'INPUT') {
         if (checked === true) {
           elements[i].checked = true;
@@ -5261,13 +5231,13 @@ CL = (function() {
    * if it does return the reading
    * if it does not return null */
   _findStandoffWitness = function(witness, start, end, first_word_index) {
-    var key, i, entry;
-    for (key in CL.data.marked_readings) {
+    var entry;
+    for (let key in CL.data.marked_readings) {
       if (CL.data.marked_readings.hasOwnProperty(key)) {
-        for (i = CL.data.marked_readings[key].length - 1; i >= 0; i -= 1) {
+        for (let i = CL.data.marked_readings[key].length - 1; i >= 0; i -= 1) {
           if (CL.data.marked_readings[key][i].witness === witness &&
-            CL.data.marked_readings[key][i].start === start &&
-            CL.data.marked_readings[key][i].end === end) {
+                CL.data.marked_readings[key][i].start === start &&
+                CL.data.marked_readings[key][i].end === end) {
             if (CL.data.marked_readings[key][i].hasOwnProperty('first_word_index')) {
               if (CL.data.marked_readings[key][i].first_word_index === first_word_index) {
                 entry = JSON.parse(JSON.stringify(CL.data.marked_readings[key][i]));
@@ -5287,8 +5257,7 @@ CL = (function() {
   };
 
   findReadingPosById = function(unit, id) {
-    var i;
-    for (i = 0; i < unit.readings.length; i += 1) {
+    for (let i=0; i<unit.readings.length; i+=1) {
       if (unit.readings[i].hasOwnProperty('_id') && unit.readings[i]._id === id) {
         return i;
       }
@@ -5433,12 +5402,12 @@ CL = (function() {
   };
 
   _getNextTargetRuleInfo = function(classes, subreading_types) {
-    var rule_type, positions, lowest_position, i, j;
+    var rule_type, positions, lowest_position;
     positions = [];
     lowest_position = 1000000000;
-    for (i = 0; i < classes.length; i += 1) {
+    for (let i = 0; i < classes.length; i += 1) {
       positions[i] = null;
-      for (j = 0; j < classes[i].length; j += 1) {
+      for (let j = 0; j < classes[i].length; j += 1) {
         if (classes[i][j] && positions[i] === null) {
           positions[i] = j;
           if (j < lowest_position) {
@@ -5449,13 +5418,13 @@ CL = (function() {
     }
     //put a rule type in to start off with so we always have one - overwrite if needed in the loop
     rule_type = classes[0][lowest_position];
-    for (i = 1; i < classes.length; i += 1) {
+    for (let i = 1; i < classes.length; i += 1) {
       if (classes[i][lowest_position] !== null && typeof classes[i][lowest_position] !== 'undefined' && (typeof rule_type === 'undefined' || rule_type === null || subreading_types.indexOf(rule_type) !== -1)) {
         rule_type = classes[i][lowest_position];
       }
     }
     if (subreading_types.indexOf(rule_type) !== -1) {
-      for (i = 0; i < positions.length; i += 1) {
+      for (let i = 0; i < positions.length; i += 1) {
         if (classes[i][positions[i]] !== null && typeof classes[i][positions[i]] !== 'undefined' && subreading_types.indexOf(classes[i][positions[i]]) === -1) {
           rule_type = classes[i][positions[i]];
           break;

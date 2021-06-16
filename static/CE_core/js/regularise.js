@@ -54,7 +54,7 @@ RG = (function() {
 
   getCollationData = function(output, scroll_offset, callback) {
     CL.container = document.getElementById('container');
-    CL.services.getVerseData(CL.context, CL.dataSettings.witness_list, function(collation_data) {
+    CL.services.getCollationData(CL.context, CL.dataSettings.witness_list, function(collation_data) {
       _calculateLacWits(collation_data, function(lac_witness_list) {
         CL.services.getSiglumMap(lac_witness_list, function(lac_witnesses) {
           CL.collateData = {
@@ -555,6 +555,7 @@ RG = (function() {
   _calculateLacWits = function(collation_data, result_callback) {
     var i, transcription_id, lac_transcriptions;
     lac_transcriptions = JSON.parse(JSON.stringify(CL.dataSettings.witness_list));
+    console.log(collation_data)
     if (collation_data.results[0].hasOwnProperty('transcription_id')) {
       console.warn('The use of \'transcription_id\' is deprecated. \'transcription\' should be used instead.');
     }
@@ -676,14 +677,14 @@ RG = (function() {
           data.apparatus[i].readings.splice(0, 0, {
             'text': [],
             'type': 'lac_verse',
-            'details': CL.project.lac_unit_label,
+            'details': CL.project.lacUnitLabel,
             'witnesses': new_lac_witnesses
           });
         } else {
           data.apparatus[i].readings.push({
             'text': [],
             'type': 'lac_verse',
-            'details': CL.project.lac_unit_label,
+            'details': CL.project.lacUnitLabel,
             'witnesses': new_lac_witnesses
           });
         }
@@ -695,14 +696,14 @@ RG = (function() {
           data.apparatus[i].readings.splice(0, 0, {
             'text': [],
             'type': 'om_verse',
-            'details': CL.project.om_unit_label,
+            'details': CL.project.omUnitLabel,
             'witnesses': data.om_readings
           });
         } else {
           data.apparatus[i].readings.push({
             'text': [],
             'type': 'om_verse',
-            'details': CL.project.om_unit_label,
+            'details': CL.project.omUnitLabel,
             'witnesses': data.om_readings
           });
         }
