@@ -766,3 +766,7 @@ Changes required to the services file.
 * rules specified in project settings should use the key ruleClasses not regularisation_classes (this bring it in line with the services equivalent - both have been supported previously)
 
 * ensure that somewhere it is recorded how to specify functions such as sortWitnesses, prepareDisplay String etc in project settings (code for this has changed so essential it is done correctly now) include how to do it in services somewhere for good measure (might already be done)
+
+Optional changes to the services file.
+
+* extractWordsForHeader - also available in the project settings. This is used to extract the words for the header. This function was originally added so that special classes can be added to the words in the header of the collation editor if necessary and also to display additional uncollated text (ritual directions for MUYA for example) if required. The function will be given the list of tokens from the basetext of the data. It should return a list of words where each word is an array with two items, the first is the string representing the word (with any punctuation added into the string) and the second an optional class to be added to the word in the basetext which appears above the row of numbers. This can then be styled with css is required. If no class is required then the default can be used unless the word itself needs further manipulation. If you need to manipulate the word but do not need a class the second argument should be an empty string.

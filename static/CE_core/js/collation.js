@@ -529,21 +529,21 @@ CL = (function() {
     return null;
   };
 
-  //TODO: sort out this mess of what is called what and snake vs camel for regularisation_classes and ruleClasses and rule_classes!!!!
-  getRuleClasses = function(test_key, test_value, key, data) {
-    var classes, list, rule_classes;
+
+  getRuleClasses = function(testKey, testValue, key, data) {
+    var classes, list, ruleClasses;
     classes = {};
-    rule_classes = CL.ruleClasses;
-    for (let i = 0; i < rule_classes.length; i += 1) {
-      if (rule_classes[i][test_key] === test_value || typeof test_key === 'undefined') {
+    ruleClasses = CL.ruleClasses;
+    for (let i = 0; i < ruleClasses.length; i += 1) {
+      if (ruleClasses[i][test_key] === testValue || typeof testKey === 'undefined') {
         if ($.type(data) === 'string') {
-          classes[rule_classes[i][key]] = rule_classes[i][data];
+          classes[ruleClasses[i][key]] = ruleClasses[i][data];
         } else {
           list = [];
           for (let j = 0; j < data.length; j += 1) {
-            list.push(rule_classes[i][data[j]]);
+            list.push(ruleClasses[i][data[j]]);
           }
-          classes[rule_classes[i][key]] = list;
+          classes[ruleClasses[i][key]] = list;
         }
       }
     }
@@ -552,16 +552,15 @@ CL = (function() {
 
   _extractWordsForHeader = function (data) {
     let words, word;
-    // words is a list of lists with the first being the word and the second being the class to add if any or a an empty string
-    if (CL.project.hasOwnProperty('extractWordsForHeader')) {
-      words = CL.project.extractWordsForHeader(data);
-    } else if (CL.services.hasOwnProperty('extractWordsForHeader')) {
-      words = CL.services.extractWordsForHeader(data);
-    } else {
-      //hardcoded default
-      //extract all the words from the data you get back
-      words = [];
-      if ($.isArray(data.overtext)) {
+    if ($.isArray(data.overtext)) {
+      // words is a list of lists with the first being the word and the second being the class to add if any or a an empty string
+      if (CL.project.hasOwnProperty('extractWordsForHeader')) {
+        words = CL.project.extractWordsForHeader(data.overtext[0].tokens);
+      } else if (CL.services.hasOwnProperty('extractWordsForHeader')) {
+        words = CL.services.extractWordsForHeader(data.overtext[0].tokens);
+      } else {
+        //hardcoded default
+        words = [];
         for (let i = 0; i < data.overtext[0].tokens.length; i += 1) {
           word = [];
           if (data.overtext[0].tokens[i].hasOwnProperty('pc_before')) {
@@ -1992,11 +1991,6 @@ CL = (function() {
     }); //we need this to see if we have any!
     reading = findReadingById(unit, reading_details.reading_id);
     fosilised_reading = JSON.parse(JSON.stringify(reading));
-
-    //TODO: here we need to apply the settings to all the t strings in the
-    //subreadings and sort them into some kind of lookup table
-    //for use later so that the service call is not embedded in the loop
-    //rest of this function must not continue until data is returned
     tValuesForSettings = _extractAllTValuesForRGAppliedRules(reading, unit, apparatus);
     options = {};
     displaySettings = {};
@@ -2009,6 +2003,7 @@ CL = (function() {
     }
     options.display_settings = displaySettings;
     options.display_settings_config = CL.displaySettingsDetails;
+
     resultCallback = function(data) {
       var baseReadingsWithSettingsApplied;
       baseReadingsWithSettingsApplied = {};
@@ -2902,8 +2897,8 @@ CL = (function() {
     if (project.hasOwnProperty('useVForSupplied')) {
       CL.project.useVForSupplied = project.useVForSupplied;
     }
-    if (project.hasOwnProperty('extractWordsForHeader')) {
-      CL.project.extractWordsForHeader = project.extractWordsForHeader;
+    if (project.hasOwnProperty('extractWordsForHeader') && typeof project.extractWordsForHeader === 'string') {
+      CL.project.extractWordsForHeader = _getFunctionFromString(project.extractWordsForHeader);
     }
 
     if (project.hasOwnProperty('prepareDisplayString') && typeof project.prepareDisplayString === 'string') {
@@ -3156,7 +3151,6 @@ CL = (function() {
     }
 
   };
-
 
   _getContextFromInputForm = function() {
     var context;
