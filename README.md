@@ -752,7 +752,7 @@ New features are also introduced in this release including the ability to add an
 
 In 1.1.0 the way regularisation rules are applied was significantly altered because in some circumstances rules were not being
 applied as intended. The older way of applying regularisation rules is preserved in XXX. Any projects which started regularising in a version
-of the collation editor code prior to release 1.1.0
+of the collation editor code prior to release 1.1.0 should use the legacy system. explain the difference and what might happen. both can be run in parallel.
 
 Changes required to the services file.
 
@@ -762,3 +762,7 @@ Changes required to the services file.
 * variables lacUnitLabel and omUnitLabel should be provided in the services file to maintain current behaviour of 'lac verse' and 'om verse' the defaults have changed to 'lac unit' and 'om unit' to remove biblical verse assumption. The services choices can also be overridden in individual project settings if required.
 * To maintain past behaviour prepareNormalisedString and prepareDisplayString must be provided, this is to remove a hard coded weird switch from the early Greek implementations. To maintain existing behaviour the prepareNormalisedString must replace an underdot with an underscore and prepareDisplayString the reverse - see Django implementation for more detail to add here. Very few if any projects will need this it depends how data was prepared for NT stuff. Explain how this works and where it is called so people know how to use it if they choose.
 * To maintain past behaviour showCollapseAllUnitsButton: true  determines whether to show the collapse all button. Default is now false so to keep previous behaviour changes are required. This can also be overridden in project settings.
+
+* rules specified in project settings should use the key ruleClasses not regularisation_classes (this bring it in line with the services equivalent - both have been supported previously)
+
+* ensure that somewhere it is recorded how to specify functions such as sortWitnesses, prepareDisplay String etc in project settings (code for this has changed so essential it is done correctly now) include how to do it in services somewhere for good measure (might already be done)

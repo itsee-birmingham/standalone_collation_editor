@@ -68,7 +68,7 @@ CL = (function() {
   loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses,
   calculatePosition, removeWitness, checkWitnessesAgainstProject, setUpRemoveWitnessesForm,
   removeWitnesses, returnToSummaryTable, prepareAdditionalCollation,
-  removeSpecialWitnesses;
+  removeSpecialWitnesses, runFunction;
 
   //private function declarations
   let _initialiseEditor, _initialiseProject, _setProjectConfig, _setDisplaySettings,
@@ -92,7 +92,7 @@ CL = (function() {
    _getUnitsByStartIndex, _mergeNewLacOmVerseReadings, _mergeNewReading,
    _getReadingHistory, _getNextTargetRuleInfo, _removeAppliedRules,
    _getHistoricalReading, _extractAllTValuesForRGAppliedRules,
-   _makeStandoffReading2, _extractWordsForHeader;
+   _makeStandoffReading2, _extractWordsForHeader, _getFunctionFromString;
 
 
   //*********  public functions *********
@@ -1644,10 +1644,10 @@ CL = (function() {
   sortWitnesses = function(witnesses) {
     if (CL.project.hasOwnProperty('witnessSort')) {
       //use a project function if there is one
-      CL.run_function(CL.project.witnessSort, [witnesses]);
+      runFunction(CL.project.witnessSort, [witnesses]);
     } else if (CL.services && CL.services.hasOwnProperty('witnessSort')) {
       //or use the default for the services if there is one
-      CL.run_function(CL.services.witnessSort, [witnesses]);
+      runFunction(CL.services.witnessSort, [witnesses]);
     } else {
       //or just use regular sort
       witnesses.sort();
@@ -1939,7 +1939,7 @@ CL = (function() {
     var preStageChecks, result;
     preStageChecks = _getPreStageChecks(stage);
     for (let i = 0; i < preStageChecks.length; i += 1) {
-      result = CL.run_function(preStageChecks[i]['function']);
+      result = runFunction(preStageChecks[i]['function']);
       if (result !== preStageChecks[i].pass_condition) {
         return [false, preStageChecks[i].fail_message];
       }
@@ -2585,7 +2585,7 @@ CL = (function() {
       CL.container.innerHTML = html;
       document.getElementById('project_name').innerHTML = CL.project.name;
       if (_contextInput && _contextInput.hasOwnProperty('onload_function')) {
-        CL.run_function(_contextInput.onload_function, [CL.project]);
+        runFunction(_contextInput.onload_function, [CL.project]);
       } else {
         //run the default function to populate hideen form elements
         _contextInputOnload(project);
@@ -2906,10 +2906,8 @@ CL = (function() {
       CL.project.extractWordsForHeader = project.extractWordsForHeader;
     }
 
-
-    // TODO: check this works as I added the first two assignments since testing
-    if (project.hasOwnProperty('prepareDisplayString')) {
-      CL.project.prepareDisplayString = project.prepareDisplayString;
+    if (project.hasOwnProperty('prepareDisplayString') && typeof project.prepareDisplayString === 'string') {
+      CL.project.prepareDisplayString = _getFunctionFromString(project.prepareDisplayString);
     } else if (CL.services.hasOwnProperty('prepareDisplayString')) {
       CL.project.prepareDisplayString = CL.services.prepareDisplayString;
     } else {
@@ -2918,9 +2916,8 @@ CL = (function() {
       };
     }
 
-    // TODO: check this works as I added the first two assignments since testing
-    if (project.hasOwnProperty('prepareNormalisedString')) {
-      CL.project.prepareNormalisedString = project.prepareNormalisedString;
+    if (project.hasOwnProperty('prepareNormalisedString') && typeof project.prepareNormalisedString === 'string') {
+      CL.project.prepareNormalisedString = _getFunctionFromString(project.prepareNormalisedString);
     } else if (CL.services.hasOwnProperty('prepareNormalisedString')) {
       CL.project.prepareNormalisedString = CL.services.prepareNormalisedString;
     } else {
@@ -3034,9 +3031,6 @@ CL = (function() {
   _setRuleClasses = function(project) {
     if (project.hasOwnProperty('ruleClasses') && project.ruleClasses !== undefined) {
       CL.ruleClasses = project.ruleClasses;
-    } else if (project.hasOwnProperty('regularisation_classes') && project.regularisation_classes !== undefined) {
-      //a temporary thing while we sort out names of settings!!
-      CL.ruleClasses = project.regularisation_classes;
     } else if (CL.services && CL.services.hasOwnProperty('ruleClasses')) {
       CL.ruleClasses = CL.services.ruleClasses;
     } else {
@@ -3167,7 +3161,7 @@ CL = (function() {
   _getContextFromInputForm = function() {
     var context;
     if (_contextInput && _contextInput.hasOwnProperty('result_provider')) {
-      context = CL.run_function(_contextInput.result_provider);
+      context = runFunction(_contextInput.result_provider);
     } else {
       context = document.getElementById('context').value;
     }
@@ -5488,38 +5482,33 @@ CL = (function() {
     return new_reading.join(' ');
   };
 
+  _getFunctionFromString =  function(functionString) {
+    var scope, scopeList;
+    scope = window;
+    scopeList = functionString.split('.');
+    for (let i = 0; i < scopeList.length - 1; i += 1) {
+      scope = scope[scopeList[i]];
+      if (scope == undefined) return;
+    }
+    return scope[scopeList[scopeList.length - 1]];
+  };
+
+  runFunction = function(functionRef, args) {
+    var fn;
+    if (typeof args === 'undefined') {
+      args = [];
+    }
+    if (typeof functionRef === 'string') {
+      fn = _getFunctionFromString(functionRef);
+      return fn(args);
+    } else {
+      return functionRef.apply(this, args);
+    }
+  };
 
 
-
-//priv-e
-
-
-//OLD STYLE FROM HERE
   if (testing) {
     return {
-
-      //This needs to go because of eval
-      run_function: function(function_ref, args) {
-        var fn;
-        if (typeof args === 'undefined') {
-          args = [];
-        }
-        if (typeof function_ref === 'string') {
-          // console.warn('This feature will be deprecated soon. All js functions should be specified in a file and referenced in projects and services only');
-          // console.log(function_ref)
-          if (function_ref.indexOf('(') === -1 && function_ref.indexOf('{') === -1) {
-
-            fn = eval(function_ref);
-            return fn.apply(this, args);
-          } else {
-            alert('there may be a security problem on this page');
-          }
-        } else {
-          // console.log('running the else condition in run_function with ')
-          // console.log(function_ref)
-          return function_ref.apply(this, args);
-        }
-      },
 
       services: services,
       container: container,
@@ -5618,6 +5607,7 @@ CL = (function() {
       prepareAdditionalCollation: prepareAdditionalCollation,
       removeSpecialWitnesses: removeSpecialWitnesses,
       findReadingPosById: findReadingPosById,
+      runFunction: runFunction,
 
       //deprecated function mapping for calls from older services
       set_service_provider: setServiceProvider,
@@ -5703,6 +5693,7 @@ CL = (function() {
        _getHistoricalReading: _getHistoricalReading,
        _extractAllTValuesForRGAppliedRules: _extractAllTValuesForRGAppliedRules,
        _makeStandoffReading2: _makeStandoffReading2,
+       _getFunctionFromString: _getFunctionFromString,
        //private variables for testing only
        _contextInput: _contextInput,
        _defaultDisplaySettings: _defaultDisplaySettings,
@@ -5713,29 +5704,6 @@ CL = (function() {
   } else {
 
     return {
-
-      //This needs to go because of eval
-      run_function: function(function_ref, args) {
-        var fn;
-        if (typeof args === 'undefined') {
-          args = [];
-        }
-        if (typeof function_ref === 'string') {
-          // console.warn('This feature will be deprecated soon. All js functions should be specified in a file and referenced in projects and services only');
-          // console.log(function_ref)
-          if (function_ref.indexOf('(') === -1 && function_ref.indexOf('{') === -1) {
-
-            fn = eval(function_ref);
-            return fn.apply(this, args);
-          } else {
-            alert('there may be a security problem on this page');
-          }
-        } else {
-          // console.log('running the else condition in run_function with ')
-          // console.log(function_ref)
-          return function_ref.apply(this, args);
-        }
-      },
 
       services: services,
       container: container,
@@ -5832,6 +5800,7 @@ CL = (function() {
       returnToSummaryTable: returnToSummaryTable,
       prepareAdditionalCollation: prepareAdditionalCollation,
       removeSpecialWitnesses: removeSpecialWitnesses,
+      runFunction: runFunction,
 
       //deprecated function mapping for calls from older services
       set_service_provider: setServiceProvider,

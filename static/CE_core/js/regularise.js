@@ -659,16 +659,18 @@ RG = (function() {
   _integrateLacOmReadings = function(data) {
     var special_witnesses, new_lac_witnesses;
     special_witnesses = [];
-    for (let j = 0; j < data.special_categories.length; j+=1) {
-      for (let i = 0; i < data.apparatus.length; i += 1) {
-        data.apparatus[i].readings.push({
-          'text': [],
-          'type': 'lac_verse',
-          'details': data.special_categories[j].label,
-          'witnesses': data.special_categories[j].witnesses
-        });
+    if (data.hasOwnProperty('special_categories')) {
+      for (let j = 0; j < data.special_categories.length; j+=1) {
+        for (let i = 0; i < data.apparatus.length; i += 1) {
+          data.apparatus[i].readings.push({
+            'text': [],
+            'type': 'lac_verse',
+            'details': data.special_categories[j].label,
+            'witnesses': data.special_categories[j].witnesses
+          });
+        }
+        special_witnesses.push.apply(special_witnesses, data.special_categories[j].witnesses);
       }
-      special_witnesses.push.apply(special_witnesses, data.special_categories[j].witnesses);
     }
     new_lac_witnesses = CL.removeSpecialWitnesses(data.lac_readings, special_witnesses);
     if (typeof data.lac_readings !== 'undefined' && data.lac_readings.length > 0 && new_lac_witnesses.length > 0) {
