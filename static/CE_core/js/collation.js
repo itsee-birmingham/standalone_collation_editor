@@ -529,7 +529,6 @@ CL = (function() {
     return null;
   };
 
-
   getRuleClasses = function(testKey, testValue, key, data) {
     var classes, list, ruleClasses;
     classes = {};
@@ -2941,8 +2940,8 @@ CL = (function() {
     } else if (CL.services.hasOwnProperty('combineAllLacsInOR')) {
       CL.project.combineAllLacsInOR = CL.services.combineAllLacsInOR;
     } else {
-      //default is true to prtect existing projects as this was hard coded in
-      CL.project.combineAllLacsInOR = true;
+      //default is false
+      CL.project.combineAllLacsInOR = false;
     }
     //combine all oms
     if (project.hasOwnProperty('combineAllOmsInOR')) {
@@ -2993,7 +2992,7 @@ CL = (function() {
 
     if (CL.services.hasOwnProperty('undoStackLength')) {
       SV.undoStackLength = CL.services.undoStackLength;
-    } //default in SV
+    } //default in SV cannot be overriden in projects due to potential memory issues
 
 
     //settings for witness changes
@@ -3508,6 +3507,7 @@ CL = (function() {
           witsToAdd = temp[3];
           if (temp[3].length === 0) {
             alert('No witnesses were found to add'); //should never happen but just in case - TODO: it should then reload the table
+            //HERE NOW
             return;
           }
           CL.existingCollation = collation;
@@ -5807,234 +5807,3 @@ CL = (function() {
     };
   }
 }());
-
-
-
-    // set_project_cookie: function(project_id) {
-    //   document.cookie = 'project=' + project_id + 'path=/collation/';
-    // },
-    //
-    // get_project_cookie: function() {
-    //   var cookie_pairs, pair, i, name;
-    //   cookie_pairs = document.cookie.split(';');
-    //   name = 'project=';
-    //   for (i = 0; i < cookie_pairs.length; i += 1) {
-    //     pair = cookie_pairs[i].trim();
-    //     if (pair.indexOf(name) === 0) {
-    //       return pair.substring(name.length, pair.length);
-    //     }
-    //   }
-    //   return '';
-    // },
-    //
-    // delete_project_cookie: function() {
-    //   document.cookie = "project=; path=/collation/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    // },
-
-
-
-    // //TODO: we may not need all of this data
-    // //at the moment I am just keeping everything we have in the collation object
-    // //but this can probably be thinned out when I know what we need
-    // export_to_apparatusEditor: function() {
-    //   var main_app, data, i, key, apparatus;
-    //   CL.services.getUserInfo(function(user) {
-    //     if (user) {
-    //       console.log('exporting to apparatus editor');
-    //       main_app = {
-    //         '_model': 'main_apparatus',
-    //         'structure': CL.data,
-    //         'status': status,
-    //         'context': CL.get_context_dict(),
-    //         'user': user.id,
-    //         'data_settings': CL.dataSettings,
-    //         'algorithm_settings': CL.algorithmSettings,
-    //         'display_settings': CL.displaySettings
-    //       };
-    //       if (CL.project.hasOwnProperty('id')) {
-    //         main_app.project = CL.project.id;
-    //         main_app._id = CL.context + '_' + CL.project.id;
-    //       } else {
-    //         // should never happen but just in case stick in the user id.
-    //         main_app._id += '_' + user.id;
-    //       }
-    //
-    //       //TODO: Important! make an error message that checks if any versions have been added
-    //       //and if they have then don't allow
-    //
-    //       var confirm_message = "This project already has an version of this verse in the main apparatus.\nAre you sure you want to overwrite the currently saved version with this one?\nOverwriting may mean versional data needs to be checked and edited in the apparatus editor.";
-    //       var success_message = "Approved successful";
-    //       CL.services.saveCollation(CL.context, main_app, confirm_message, true, function(saved_successful) {
-    //         document.getElementById('message_panel').innerHTML = saved_successful ? success_message : '';
-    //       });
-    //     }
-    //   });
-    // },
-    //
-    // //only used in Magpy specific stuff - move somewhere else
-    // get_context_dict: function(witness, verse) {
-    //   var context;
-    //   if (typeof verse === 'undefined') {
-    //     verse = CL.context;
-    //   }
-    //   context = {
-    //     'book': parseInt(verse.substring(verse.indexOf('B') + 1, verse.indexOf('K')), 10),
-    //     'chapter': parseInt(verse.substring(verse.indexOf('K') + 1, verse.indexOf('V')), 10),
-    //     'verse': parseInt(verse.substring(verse.indexOf('V') + 1), 10)
-    //   };
-    //   if (typeof witness !== 'undefined') {
-    //     context.witness = witness;
-    //   }
-    //   return context;
-    // },
-
-
-        // delete_reading_by_id: function(unit, reading_id) {
-        //   var i;
-        //   for (i = 0; i < unit.readings.length; i += 1) {
-        //     if (unit.readings[i]._id === reading_id) {
-        //       unit.readings[i] = null;
-        //     }
-        //   }
-        //   removeNullItems(unit.readings);
-        // },
-
-        //if all of the provided overlap_unit ids have empty readings
-        // overlaps_are_all_empty_readings: function(overlap_units) {
-        //   var i, ol_unit;
-        //   for (i = 0; i < overlap_units.length; i += 1) {
-        //     ol_unit = findOverlapUnitById(overlap_units[i]);
-        //     if (ol_unit.readings[1].text.length > 0) {
-        //       return false;
-        //     }
-        //   }
-        //   return true;
-        // },
-
-        // /** prepare the token for collate */
-        // prepare_t: function(data) {
-        //   data = data.replace(/ϊ/g, 'ι');
-        //   data = data.replace(/ϊ/g, 'ι');
-        //   data = data.replace(/ϋ/g, 'υ');
-        //   data = data.replace(/ϋ/g, 'υ');
-        //   data = data.replace(/\[/g, '').replace(/\]/g, '').replace(/_/g, '').replace(/〚/g, '').replace(/〛/g, '');
-        //   data = CL.lower_greek(data);
-        //   //TODO: need full list of punctuation to also strip!
-        //   return data;
-        // },
-
-        // /** special lower case method for Greek to deal with sigmas properly*/
-        // lower_greek: function(data) {
-        //   console.error('lower_greek should be in settings');
-        //   var chars, i, newchars, lower;
-        //   newchars = [];
-        //   chars = data.split('');
-        //   if (chars.length > 0) {
-        //     for (i = 0; i < chars.length; i += 1) {
-        //       lower = chars[i].toLowerCase();
-        //       if (i === chars.length - 1 && lower === 'σ') {
-        //         newchars.push('ς');
-        //       } else {
-        //         newchars.push(lower);
-        //       }
-        //     }
-        //     return newchars.join('');
-        //   }
-        //   return data;
-        // },
-
-        // check_login_status: function(output) {
-        //   var criteria;
-        //   SPN.show_loading_overlay();
-        //   expandFillPageClients();
-        //   $(window).resize(function() {
-        //     expandFillPageClients();
-        //   });
-        //   CL.services.showLoginStatus(function() {
-        //     if (typeof output !== 'undefined') {
-        //       _displayMode = output;
-        //     }
-        //     CL.container = document.getElementById('container');
-        //     CL.services.getUserInfo(function(user) { // success
-        //       if (user) {
-        //         criteria = {
-        //           'editors': {
-        //             '$in': [user.id]
-        //           }
-        //         };
-        //         //we are using the ITSEE interface
-        //         //so display the correct menu for the circumstances
-        //         MENU.choose_menu_to_display(user, criteria, 'collation');
-        //       } else { // failure
-        //         CL.container.innerHTML = '<p>Please login using the link in the top right corner to use the editing interface</p>';
-        //         SPN.remove_loading_overlay();
-        //       }
-        //     });
-        //   });
-        // },
-
-        // cbgm_export: function() {
-        //   COLLATE.exporter(CL.context);
-        // },
-
-        // show_header_row: function(ref) {
-        //   document.getElementById('header_row').innerHTML = ref;
-        // },
-
-        // list_content_matches: function(list1, list2) {
-        //   var i;
-        //   if (list1.length !== list2.length) {
-        //     return false;
-        //   }
-        //   for (i = 0; i < list1.length; i += 1) {
-        //     if (list2.indexOf(list1[i]) === -1) {
-        //       return false;
-        //     }
-        //   }
-        //   return true;
-        // },
-
-        /** check to see if parent needs to be unchecked/checked */
-        //TODO: this is actually used for selecting witnesses from the menu of all availble transcriptions
-        // check_witness_lead: function(id) {
-        //   var parent_div, elements, all_checked, i, summary_box;
-        //   if (document.getElementById(id).checked === false) {
-        //     document.getElementById(id).parentNode.childNodes[0].checked = false;
-        //   } else {
-        //     parent_div = document.getElementById(id).parentNode;
-        //     elements = parent_div.childNodes;
-        //     all_checked = true;
-        //     for (i = 0; i < elements.length; i += 1) {
-        //       if (elements[i].tagName === 'INPUT') {
-        //         if (elements[i].id.search('Every_') !== -1) {
-        //           summary_box = elements[i];
-        //         } else {
-        //           if (elements[i].checked === false) {
-        //             all_checked = false;
-        //             break;
-        //           }
-        //         }
-        //       }
-        //     }
-        //     if (all_checked === true) {
-        //       summary_box.checked = true;
-        //     }
-        //   }
-        // },
-
-
-
-
-
-
-
-
-            // processesHandId = function(hand) {
-            //   var display_hand;
-            //   if (CL._remove_private_for.indexOf(hand.replace('_private', ' (private)')) !== -1) {
-            //     display_hand = hand.replace('_private', '');
-            //   } else {
-            //     display_hand = hand.replace('_private', ' (private)');
-            //   }
-            //   return display_hand;
-            // };

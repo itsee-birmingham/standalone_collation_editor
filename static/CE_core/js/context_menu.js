@@ -42,7 +42,7 @@ var SimpleContextMenu = {
     },
 
     detach_all: function () {
-	SimpleContextMenu._menus = new Array;
+	     SimpleContextMenu._menus = new Array;
     },
 
     // public method. Attaches context menus to specific class names

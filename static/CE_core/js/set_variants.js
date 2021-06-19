@@ -97,9 +97,10 @@ SV = (function () {
 			SimpleContextMenu.attach('split_unit', function () {return _makeMenu('split_unit');});
 			SimpleContextMenu.attach('overlap_split_unit_a', function () {return _makeMenu('overlap_split_unit_a');});
 			SimpleContextMenu.attach('overlap_split_unit', function () {return _makeMenu('overlap_split_unit');});
+			SimpleContextMenu.attach('subreading', function () {return _makeMenu('subreading');});
+			//I don't think the next two menus are ever used and I don't know what they ever did!
 			SimpleContextMenu.attach('split_omlac_unit', function () {return _makeMenu('split_omlac_unit');});
 			SimpleContextMenu.attach('split_duplicate_unit', function () {return _makeMenu('split_duplicate_unit');});
-			SimpleContextMenu.attach('subreading', function () {return _makeMenu('subreading');});
 		}
 
 		//sort out header and main page
@@ -1773,7 +1774,6 @@ SV = (function () {
 		return true;
 	};
 
-//TODO: check that this is good enough for what you use it for. It actually requires all overlaps to be shared not just some
 	_neighboursShareOverlaps = function (index_point, data) {
 		var before, after;
 		if (data === undefined) {
@@ -1837,10 +1837,7 @@ SV = (function () {
 				//get the unit you moved the word from
 				readings = [];
 				readings.push(reading);
-				//if unit2 has overlap_units key then copy this to new unit
-				//TODO: this should not happen if it is not in the overlap unit anymore
-				//only add this if the target_gap is part of the overlapping unit
-
+				//if unit2 has overlap_units key then copy this to new unit if it is still within the overlap
 				if (unit2.hasOwnProperty('overlap_units') && _neighboursShareOverlaps(target_location)) {
 					newunit.overlap_units = unit2.overlap_units;
 				}
@@ -4164,7 +4161,7 @@ SV = (function () {
 		document.getElementById('scroller').scrollTop = scroll_offset[1];
 	};
 
-	//TODO: check this is always between prepare and unprepare as this is needed for unsplitUnitWitnesses
+	// needs to be in prepare/unprepare sandwich because of unsplitUnitWitnesses
 	_removeReadingFlag = function (reading_details) {
 		var scroll_offset;
 		scroll_offset = [document.getElementById('scroller').scrollLeft,
@@ -4215,6 +4212,7 @@ SV = (function () {
 		} else if (menu_name === 'subreading') {
 			document.getElementById('context_menu').innerHTML = '<li id="make_main_reading"><span>Make main reading</span></li>';
 		} else if (menu_name === 'split_duplicate_unit') {
+			// I don't think this is ever user I have no idea what it did
 			menu = ['<li id="treat_as_main"><span>Make main reading</span></li>'];
 			for (i = 0; i < CL.overlappedOptions.length; i += 1) {
 				menu.push('<li id="' + CL.overlappedOptions[i].id + '"><span>' + CL.overlappedOptions[i].label + '</span></li>');
@@ -4343,7 +4341,10 @@ SV = (function () {
 				element = SimpleContextMenu._target_element;
 				div = CL.getSpecifiedAncestor(element, 'DIV', function (e) { if ($(e).hasClass('spanlike')) {return false;} return true;});
 				reading_details = CL.getUnitAppReading(div.id);
+				console.log(reading_details);
+				prepareForOperation();
 				_removeReadingFlag(reading_details);
+				unprepareForOperation();
 			});
 			$('#treat_as_main').on('mouseover.tam_mo', function(event) {CL.hideTooltip();});
 		}
