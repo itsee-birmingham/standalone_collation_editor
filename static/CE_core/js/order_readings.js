@@ -410,26 +410,31 @@ OR = (function() {
     }
   };
 
-  makeStandoffReading = function(type, reading_details, parent_reading) {
-    var scroll_offset, apparatus, unit;
+  makeStandoffReading = function(type, reading_details, parent_reading, outerCallback) {
+    var scroll_offset, apparatus, unit, callback;
     scroll_offset = [document.getElementById('scroller').scrollLeft,
       document.getElementById('scroller').scrollTop
     ];
     addToUndoStack(CL.data);
     apparatus = reading_details.app_id;
     unit = CL.findUnitById(apparatus, reading_details.unit_id);
-    CL.makeStandoffReading(type, reading_details, parent_reading);
-    relabelReadings(unit.readings, true);
-    if (CL.showSubreadings === false) { //make sure we are still showing the edition subreadings
-      SR.findSubreadings({
-        'rule_classes': CL.getRuleClasses('subreading', true, 'value', ['identifier', 'subreading'])
+    callback = function () {
+      relabelReadings(unit.readings, true);
+      if (CL.showSubreadings === false) { //make sure we are still showing the edition subreadings
+        SR.findSubreadings({
+          'rule_classes': CL.getRuleClasses('subreading', true, 'value', ['identifier', 'subreading'])
+        });
+      }
+      showOrderReadings({
+        'container': CL.container
       });
-    }
-    showOrderReadings({
-      'container': CL.container
-    });
-    document.getElementById('scroller').scrollLeft = scroll_offset[0];
-    document.getElementById('scroller').scrollTop = scroll_offset[1];
+      document.getElementById('scroller').scrollLeft = scroll_offset[0];
+      document.getElementById('scroller').scrollTop = scroll_offset[1];
+      if (outerCallback !== undefined) {
+        outerCallback();
+      }
+    };
+    CL.makeStandoffReading(type, reading_details, parent_reading, callback);
   };
 
   removeSplits = function() {

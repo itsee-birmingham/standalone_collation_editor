@@ -535,7 +535,7 @@ CL = (function() {
     classes = {};
     ruleClasses = CL.ruleClasses;
     for (let i = 0; i < ruleClasses.length; i += 1) {
-      if (ruleClasses[i][test_key] === testValue || typeof testKey === 'undefined') {
+      if (ruleClasses[i][testKey] === testValue || typeof testKey === 'undefined') {
         if ($.type(data) === 'string') {
           classes[ruleClasses[i][key]] = ruleClasses[i][data];
         } else {
@@ -1777,7 +1777,7 @@ CL = (function() {
 
   //mark readings using standoff model
   markStandoffReading = function(type, name, reading_details, format, menu_pos) {
-    var i, reading, parents, unit, new_reading_id, subreading_classes, total_reading_witnesses;
+    var i, reading, parents, unit, new_reading_id, subreading_classes, total_reading_witnesses, callback;
     reading = CL.data[reading_details.app_id][reading_details.unit_pos].readings[reading_details.reading_pos];
     total_reading_witnesses = reading.witnesses.length;
     //show the menu to identify the parent reading and split the witnesses if necessary
@@ -1854,7 +1854,7 @@ CL = (function() {
     });
     //Add event handler to do the job
     $('#select_button').on('click', function(event) {
-      var extra_details, data, witness_list, key, unit;
+      var extra_details, data, witness_list, key, uni, callbackt;
       data = cforms.serialiseForm('select_wit_form');
       if (data.parent_reading !== 'none') {
         witness_list = [];
@@ -1901,12 +1901,12 @@ CL = (function() {
             'reading_id': reading_details.reading_id
           });
         }
+        callback = function(){  document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));};
         if (format === 'set_variants') {
-          SV.makeStandoffReading(type, reading_details, data.parent_reading, extra_details);
+          SV.makeStandoffReading(type, reading_details, data.parent_reading, callback);
         } else if (format === 'order_readings') {
-          OR.makeStandoffReading(type, reading_details, data.parent_reading);
+          OR.makeStandoffReading(type, reading_details, data.parent_readingm, callback);
         }
-        document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
       }
     });
   };
@@ -1979,7 +1979,7 @@ CL = (function() {
     return structuredTokens;
   };
 
-  makeStandoffReading = function(type, reading_details, parent_id) {
+  makeStandoffReading = function(type, reading_details, parent_id, outerCallback) {
     var apparatus, unit, parent, reading, fosilised_reading, tValuesForSettings, options, displaySettings,
         resultCallback;
     apparatus = reading_details.app_id;
@@ -2011,6 +2011,9 @@ CL = (function() {
         baseReadingsWithSettingsApplied[data.tokens[i].t] = data.tokens[i]['interface'];
       }
       _makeStandoffReading2(reading, fosilised_reading, parent, baseReadingsWithSettingsApplied, type, unit, apparatus, reading_details);
+      if (outerCallback !== undefined) {
+        outerCallback();
+      }
     };
     CL.services.applySettings(tValuesForSettings, options, resultCallback);
   };

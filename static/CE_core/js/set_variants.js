@@ -858,16 +858,21 @@ SV = (function () {
 		}
 	};
 
-	makeStandoffReading = function (type, reading_details, parent_reading) {
-		var scroll_offset;
+	makeStandoffReading = function (type, reading_details, parent_reading, outerCallback) {
+		var scroll_offset, callback;
 		scroll_offset = [document.getElementById('scroller').scrollLeft,
 		                 document.getElementById('scroller').scrollTop];
 		_addToUndoStack(CL.data);
-		CL.makeStandoffReading(type, reading_details, parent_reading);
-		checkBugStatus('make offset reading', 'of type ' + type + ' in apparatus unit ' + reading_details.unit_pos + ' of reading ' + reading_details.reading_pos + ' as a subreading of ' + parent_reading + '.');
-		showSetVariantsData();
-		document.getElementById('scroller').scrollLeft = scroll_offset[0];
-		document.getElementById('scroller').scrollTop = scroll_offset[1];
+		callback = function () {
+			checkBugStatus('make offset reading', 'of type ' + type + ' in apparatus unit ' + reading_details.unit_pos + ' of reading ' + reading_details.reading_pos + ' as a subreading of ' + parent_reading + '.');
+			showSetVariantsData();
+			document.getElementById('scroller').scrollLeft = scroll_offset[0];
+			document.getElementById('scroller').scrollTop = scroll_offset[1];
+			if (outerCallback !== undefined) {
+        outerCallback();
+      }
+		};
+		CL.makeStandoffReading(type, reading_details, parent_reading, callback);
 	};
 
 	checkIds = function () {
