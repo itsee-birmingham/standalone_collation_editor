@@ -3567,6 +3567,7 @@ CL = (function() {
             CL.data = data; //temporary assignment to allow all the cleaning functions to work
             lacOmFix();
             data = JSON.parse(JSON.stringify(CL.data)); //copy so we can change CL.data without screwing this up
+            console.log(JSON.parse(JSON.stringify(data)))
             if (CL.context === existing_collation.context) { //assume CL.context agrees with the new data since it was used to fetch it
 
               if (data.overtext_name === existing_collation.structure.overtext_name) { //check we have basetext agreement
@@ -3646,7 +3647,7 @@ CL = (function() {
     //make reading for any combined or shared units and check against existing readings
     index = 1; //this refers to the position indicated by numbers under the basetext
     while (index<=(newData.overtext[0].tokens.length*2)+1) {
-
+      console.log(index);
       //if new data has one then
       newUnits = _getUnitsByStartIndex(index, newData.apparatus);
       existingUnits = _getUnitsByStartIndex(index, mainCollation.structure.apparatus);
@@ -3656,6 +3657,8 @@ CL = (function() {
       for (let z=0; z<Math.max(newUnits.length, existingUnits.length); z+=1) {
         newUnit = z<newUnits.length ? newUnits[z] : null; //_getUnitByStartIndex(index, newData.apparatus);
         existingUnit = z<existingUnits.length ? existingUnits[z] : null;//_getUnitByStartIndex(index, mainCollation.structure.apparatus);
+        console.log(newUnit);
+        console.log(existingUnit);
         if (existingUnit !== null && (newData.lac_readings.length > 0 || newData.om_readings.length > 0)) {
           _mergeNewLacOmVerseReadings(existingUnit, newData);
         }
@@ -3682,7 +3685,7 @@ CL = (function() {
                   }
                 }
               }
-              index += 1;
+              index = existingUnit.end + 1;
             } else {
               alert('the new witnesses cannot be added due to a problem with a conflict of basetexts (error CL:3623)');
               //TODO: more sensible message and reload summary page here or get
@@ -3765,9 +3768,11 @@ CL = (function() {
                 }
               }
             }
-            index += 1;
+            index = newUnit.end + 1;
           } else {
             if (newUnit.end == existingUnit.end) {
+              console.log(CL.witnessesAdded)
+              //HERE in this condition you must add om for any missing witnesses
               //console.log('we agree on start and end so just merge')
               for (let j=0; j<newUnit.readings.length; j+=1) {
                 matchingReadingFound = false;
