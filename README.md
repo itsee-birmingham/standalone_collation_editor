@@ -786,3 +786,7 @@ combineAllLacsInOR should be set to true in the services file.
 Other things to be aware of
 
 * In all stages of the editor the select box for highlighting a witness will say 'highlight witness' rather than 'select' as was the case in 1.x There is no way to change this as it is seen as a positive change but your users might need to be aware and any screen shots in documentation may need updating.
+
+Changes required to collation service
+
+collation service in views.py (for me) can support an optional parameter 'debug' it must be optional if it is used as the add witness function does not use debug mode.
