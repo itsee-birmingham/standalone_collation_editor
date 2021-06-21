@@ -2498,11 +2498,13 @@ CL = (function() {
     SPN.remove_loading_overlay();
   };
 
-  returnToSummaryTable = function () {
+  returnToSummaryTable = function (callback) {
     var ok;
     //save warning
     if (CL.isDirty) {
-      ok = confirm('Changes have been made to the witnesses since this collation was last saved.\nThese changes will be lost if you return to the summary table.\n\nAre you sure you want to return to the summary table?');
+      ok = confirm('Changes have been made to the witnesses since this collation was last saved.' +
+                   '\nThese changes will be lost if you return to the summary table.\n\nAre you sure ' +
+                   'you want to return to the summary table?');
     } else {
       ok = true;
     }
@@ -2511,6 +2513,9 @@ CL = (function() {
       //remove the witness removal window if shown
       if (document.getElementById('remove_witnesses_div')) {
         document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
+      }
+      if (callback !== undefined) {
+        callback();
       }
       document.getElementById('container').innerHTML = '<div id="saved_collations_div"></div>';
       _findSaved(CL.context);
@@ -2535,7 +2540,8 @@ CL = (function() {
             if (key === 'apparatus') { //this is a main apparatus unit so delete if only om and lac readings remain
               genuineReadingFound = false;
               for (let j=0; j<CL.data[key][i].readings.length; j+=1) {
-                if (CL.data[key][i].readings[j].text.length > 0 || CL.data[key][i].readings[j].hasOwnProperty('SR_text')) {
+                if (CL.data[key][i].readings[j].text.length > 0 ||
+                    CL.data[key][i].readings[j].hasOwnProperty('SR_text')) {
                   genuineReadingFound = true;
                 }
               }

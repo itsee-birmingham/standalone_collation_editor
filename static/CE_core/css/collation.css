@@ -382,6 +382,13 @@ tr.added_highlighted > td > div {
   font-weight: bold;
 }
 
+tr.added_highlighted > td > div.regularisation_staged {
+	color: peru;
+  font-weight: bold;
+}
+
+
+
 
 
 td > div.spanlike {

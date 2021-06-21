@@ -60,6 +60,8 @@ class PostProcessor(Regulariser, SettingsApplier):
     def produce_variant_units(self):
         """Produce variant units for display and editing."""
         variant_readings = self.create_readings_sets()
+        if self.split_single_reading_units is True:
+            print(variant_readings)
         return self.format_output(self.anchor_readings(variant_readings))
 
     def create_extra_reading(self, text_list, witness):
@@ -108,6 +110,10 @@ class PostProcessor(Regulariser, SettingsApplier):
             for i, witness in enumerate(unit):
                 witness = self.process_witness_tokens(witness)
                 reading = ' '.join([self.get_token_text(token) for token in witness])
+                # empty string not a valid key in python dict so change to underscore
+                # this is only used internally in this class and does not get passed out to js
+                if reading == '':
+                    reading = '_'
 
                 if reading in readings.keys():
                     readings[reading]['witnesses'].append(self.alignment_table['witnesses'][i])
@@ -227,8 +233,8 @@ class PostProcessor(Regulariser, SettingsApplier):
         token_matches = []
         base_text = None
         # if we have at least two actual readings (not including empty readings)
-        if len(readings.keys()) > 1 and ('' not in readings.keys()) or \
-           len(readings.keys()) > 2 and ('' in readings.keys()):
+        if len(readings.keys()) > 1 and ('_' not in readings.keys()) or \
+           len(readings.keys()) > 2 and ('_' in readings.keys()):
             matrix = []  # a token matrix one row per reading one column per token
             readings_list = []  # the full reading data in same order as matrix
             for reading in readings.keys():
@@ -245,7 +251,7 @@ class PostProcessor(Regulariser, SettingsApplier):
                 if row is not None:
                     highest = max(len(row), highest)
                     # I don't know what is expected here - it used to test for 'None'. It might not be needed at all
-                    if row[0] != '' and row[0] is not None:
+                    if row[0] != '_' and row[0] is not None:
                         lowest = min(len(row), lowest)
             if highest > 1:  # if at least one reading has more than one word
                 lengths = []
@@ -269,7 +275,7 @@ class PostProcessor(Regulariser, SettingsApplier):
             # so just return existing readings except when the setting tells us to
             # In particular this is always True when we are combining new witnesses
             # into existing collations when we always want the new reading in smallest chunks possible
-            if (len([x for x in readings.keys() if x != '']) == 1
+            if (len([x for x in readings.keys() if x != '_']) == 1
                     and self.split_single_reading_units is True):
                 for key in readings:
                     if len(key.split(' ')) == len(readings[key]['text']):

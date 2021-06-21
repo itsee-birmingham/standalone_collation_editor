@@ -114,7 +114,8 @@ RG = (function() {
       if (data[i].witnesses.indexOf(highlighted_hand) != -1) {
         classes.push('highlighted');
       }
-      if (options.hasOwnProperty('highlighted_added_wits') && data[i].witnesses.filter(x => options.highlighted_added_wits.includes(x)).length > 0) {
+      if (options.hasOwnProperty('highlighted_added_wits') &&
+          data[i].witnesses.filter(x => options.highlighted_added_wits.includes(x)).length > 0) {
 				classes.push('added_highlighted');
 			}
       cells.push('<tr id="' + row_id + '" class="' + classes.join(' ') + '">');
@@ -138,8 +139,11 @@ RG = (function() {
           div_class_string = '';
 
           class_list = [];
-          //if we are in witnessAdding mode only allow regularisation of readings that have added witnesses (the rules will only be made with the added ones not the full set)
-          if (i > 0 && (CL.witnessAddingMode === false || (CL.witnessAddingMode === true && data[i].witnesses.filter(x => CL.witnessesAdded.includes(x)).length > 0))) {
+          // if we are in witnessAdding mode only allow regularisation of readings that have added witnesses
+          // (the rules will only be made with the added ones not the full set)
+          if (i > 0 && (CL.witnessAddingMode === false ||
+                (CL.witnessAddingMode === true &&
+                    data[i].witnesses.filter(x => CL.witnessesAdded.includes(x)).length > 0))) {
             class_list = ['drag', 'clone', 'reg_word'];
           }
 
@@ -161,20 +165,27 @@ RG = (function() {
           }
           if (RG.showRegularisations) {
             id_dict = {};
+            // TODO: check this covers globals
+            // TODO: if we need to see regularisations for other witnesses then add another id dict here
+            // and use different classes when exporting so they cannot be deleted. Will need to think about global
+            // behaviour as global exceptions should not really be changed in this mode as they will affect all
+            // witnesses
             for (k = 0; k < data[i].witnesses.length; k += 1) {
               witness = data[i].witnesses[k];
-              if (data[i].text[j].hasOwnProperty(witness) && data[i].text[j][witness].hasOwnProperty('decision_details')) {
-                for (l = 0; l < data[i].text[j][witness].decision_details.length; l += 1) {
-                  if (id_dict.hasOwnProperty(data[i].text[j][witness].decision_details[l].id)) {
-                    id_dict[data[i].text[j][witness].decision_details[l].id].witnesses.push(witness);
-                  } else {
-                    id_dict[data[i].text[j][witness].decision_details[l].id] = {
-                      'scope': data[i].text[j][witness].decision_details[l].scope,
-                      't': data[i].text[j][witness].decision_details[l].t.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
-                      'n': data[i].text[j][witness].decision_details[l].n.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
-                      'class': data[i].text[j][witness].decision_details[l].class.replace(/[^a-zA-Z]'/g, '_'),
-                      'witnesses': [witness]
-                    };
+              if (CL.witnessAddingMode === false || CL.witnessesAdded.indexOf(witness) !== -1) {
+                if (data[i].text[j].hasOwnProperty(witness) && data[i].text[j][witness].hasOwnProperty('decision_details')) {
+                  for (l = 0; l < data[i].text[j][witness].decision_details.length; l += 1) {
+                    if (id_dict.hasOwnProperty(data[i].text[j][witness].decision_details[l].id)) {
+                      id_dict[data[i].text[j][witness].decision_details[l].id].witnesses.push(witness);
+                    } else {
+                      id_dict[data[i].text[j][witness].decision_details[l].id] = {
+                        'scope': data[i].text[j][witness].decision_details[l].scope,
+                        't': data[i].text[j][witness].decision_details[l].t.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
+                        'n': data[i].text[j][witness].decision_details[l].n.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
+                        'class': data[i].text[j][witness].decision_details[l].class.replace(/[^a-zA-Z]'/g, '_'),
+                        'witnesses': [witness]
+                      };
+                    }
                   }
                 }
               }
@@ -245,10 +256,7 @@ RG = (function() {
     html.push('<td class="start_' + start + '" colspan="' + (end - start + 1) + '"><div class="drag_div" id="drag' + id + '">');
     html.push('<table class="variant_unit" id="variant_unit_' + id + '">');
     html.push(rows.join('').replace(/MX_LN/g, String(max_length + 1)));
-    //html.push(utils.TEMPLATE.replace_all(rows.join(''), 'MX_LN', String(max_length + 1)));
-    if (CL.witnessEditingMode === false) {
-      html.push('<tr><td class="mark" colspan="' + (max_length + 1) + '"><span id="add_reading_' + id + '">+</span></td></tr>');
-    }
+    html.push('<tr><td class="mark" colspan="' + (max_length + 1) + '"><span id="add_reading_' + id + '">+</span></td></tr>');
     html.push('</table>');
     html.push('</div></td>');
     return [html, row_list, events];
@@ -480,9 +488,14 @@ RG = (function() {
   };
 
   _addFooterFunctions = function () {
-    //TODO: this code is repeated in SV - put in function?
     $('#return_to_saved_table_button').on('click', function() {
-      	CL.returnToSummaryTable();
+        let callback;
+        callback = function () {
+          _rules = {};
+          _forDeletion = [];
+          _forGlobalExceptions = [];
+        };
+      	CL.returnToSummaryTable(callback);
     });
     $('#go_to_sv_button').on('click',
       function(event) {
