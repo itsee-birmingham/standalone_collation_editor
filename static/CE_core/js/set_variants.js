@@ -159,23 +159,6 @@ SV = (function () {
 			}
 			cforms.populateSelect(CL.sortWitnesses(CL.witnessesAdded), document.getElementById('added_highlight'), {'selected': preselected_added_highlight, 'add_select': true, 'select_label_details': {'label': 'highlight all added witnesses', 'value': 'all'}})
 		}
-		//TODO: this is no longer needed because we show all units all of the time but might be worth keeping as a setting
-		// if (document.getElementById('show_hide_shared_units')) {
-		// 	$('#show_hide_shared_units').on('click', function (event) {
-		// 		if (SV.showSharedUnits === true) {
-		// 			SPN.show_loading_overlay();
-		// 			SV.showSharedUnits = false;
-		//
-		// 			document.getElementById('show_hide_shared_units').value = document.getElementById('show_hide_shared_units').value.replace('Hide', 'Show');
-		// 			showSetVariantsData();
-		// 		} else {
-		// 			SPN.show_loading_overlay();
-		// 			SV.showSharedUnits = true;
-		// 			document.getElementById('show_hide_shared_units').value = document.getElementById('show_hide_shared_units').value.replace('Show', 'Hide');
-		// 			showSetVariantsData();
-		// 		}
-		// 	});
-		// }
 
 		$('#move_to_reorder_button').on('click', function (event) {_moveToReorder();});
 
@@ -283,8 +266,12 @@ SV = (function () {
 			temp[2].push.apply(temp[2], overlaps[1]);
 		}
 		html.push('<ul id="context_menu" class="SimpleContextMenu"></ul>');
-		error_panel_html = '<div id="error_panel" class="dragdiv warning dialogue_form" style="display:none"><div class="dialogue_form_header"><span id="message_summary">Messages</span><span id="error_coll_ex">&#9660;</span></div><div id="error_message_panel"><span id="error_message">message</span></div></div>';
-		document.getElementById('scroller').innerHTML = '<table class="collation_overview">' + html.join('') + '</table>' + error_panel_html;
+		error_panel_html = '<div id="error_panel" class="dragdiv warning dialogue_form" style="display:none">' +
+											 '<div class="dialogue_form_header"><span id="message_summary">Messages</span>' +
+											 '<span id="error_coll_ex">&#9660;</span></div><div id="error_message_panel">' +
+											 '<span id="error_message">message</span></div></div>';
+		document.getElementById('scroller').innerHTML = '<table class="collation_overview">' + html.join('') +
+																										'</table>' + error_panel_html;
 
 		event_rows = temp[2];
 		for (i = 0; i < event_rows.length; i += 1) {
@@ -1158,7 +1145,7 @@ SV = (function () {
 	};
 
 
-
+	// TODO TUES: here is probably where to put highlighted added wits
 	/** the code for displaying subreadings present in the object model */
 	_showSubreadings = function (reading, id, i, hand) {
 		var html, j, subrow_id, row_list, type, suffixed, suffix, highlighted, text_string;
