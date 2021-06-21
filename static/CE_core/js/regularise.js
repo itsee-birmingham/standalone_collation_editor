@@ -23,7 +23,7 @@ RG = (function() {
   _setUpRuleMenu, _getRuleScopes, _getSuffix, _makeMenu, _redipsInitRegularise,
   _getAncestorRow, _showGlobalExceptions, _removeGlobalExceptions, _scheduleAddGlobalException,
   _scheduleRuleDeletion, _deleteUnappliedRule, _addContextMenuHandlers, _showCollationTable,
-  _scheduleSelectedRulesDeletion, _addFooterFunctions, _highlightAddedWitness;
+  _scheduleSelectedRulesDeletion, _addFooterFunctions, _highlightAddedWitness, _getRulesForDisplay;
 
   //*********  public functions *********
 
@@ -83,9 +83,9 @@ RG = (function() {
    *
    * */
   getUnitData = function(data, id, start, end, options) {
-    var i, html, j, k, l, decisions, rows, cells, row_list, temp, events, max_length, row_id, type,
-      subrow_id, colspan, highlighted_hand, classes, div_class_string, witness, id_dict, key, words, reg_class,
-      highlighted, cells_dict, rule_cells, keys_to_sort, class_list, variant_unit_id;
+    var html, decisions, rows, cells, row_list, temp, events, max_length, row_id, type, rowIdBase,
+      subrow_id, colspan, highlighted_hand, classes, div_class_string, witness, words, reg_class, highlighted,
+      cells_dict, rule_cells, keys_to_sort, class_list, variant_unit_id, deletableRules, nonDeletableRules;
     if (options === undefined) {
       options = {};
     }
@@ -100,7 +100,7 @@ RG = (function() {
     decisions = [];
     max_length = ((end - start) / 2) + 1;
     rows = [];
-    for (i = 0; i < data.length; i += 1) {
+    for (let i = 0; i < data.length; i += 1) {
       cells = [];
       row_id = 'variant_unit_' + id + '_row_' + i;
       row_list.push(row_id);
@@ -134,7 +134,7 @@ RG = (function() {
         if (data[i].text.length > max_length) {
           max_length = data[i].text.length;
         }
-        for (j = 0; j < data[i].text.length; j += 1) {
+        for (let j = 0; j < data[i].text.length; j += 1) {
           variant_unit_id = 'variant_unit_' + id + '_r' + i + '_w' + j;
           div_class_string = '';
 
@@ -164,88 +164,86 @@ RG = (function() {
             cells.push('<div class="gap spanlike"> &lt;' + words[j][words[j].reading[0]].gap_details + '&gt; </div>');
           }
           if (RG.showRegularisations) {
-            id_dict = {};
-            // TODO: check this covers globals
-            // TODO: if we need to see regularisations for other witnesses then add another id dict here
-            // and use different classes when exporting so they cannot be deleted. Will need to think about global
-            // behaviour as global exceptions should not really be changed in this mode as they will affect all
-            // witnesses
-            for (k = 0; k < data[i].witnesses.length; k += 1) {
+            deletableRules = {};
+            nonDeletableRules = {};
+
+            for (let k = 0; k < data[i].witnesses.length; k += 1) {
               witness = data[i].witnesses[k];
               if (CL.witnessAddingMode === false || CL.witnessesAdded.indexOf(witness) !== -1) {
-                if (data[i].text[j].hasOwnProperty(witness) && data[i].text[j][witness].hasOwnProperty('decision_details')) {
-                  for (l = 0; l < data[i].text[j][witness].decision_details.length; l += 1) {
-                    if (id_dict.hasOwnProperty(data[i].text[j][witness].decision_details[l].id)) {
-                      id_dict[data[i].text[j][witness].decision_details[l].id].witnesses.push(witness);
+                if (data[i].text[j].hasOwnProperty(witness) &&
+                      data[i].text[j][witness].hasOwnProperty('decision_details')) {
+                  for (let l = 0; l < data[i].text[j][witness].decision_details.length; l += 1) {
+                    if (deletableRules.hasOwnProperty(data[i].text[j][witness].decision_details[l].id)) {
+                      deletableRules[data[i].text[j][witness].decision_details[l].id].witnesses.push(witness);
                     } else {
-                      id_dict[data[i].text[j][witness].decision_details[l].id] = {
-                        'scope': data[i].text[j][witness].decision_details[l].scope,
-                        't': data[i].text[j][witness].decision_details[l].t.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
-                        'n': data[i].text[j][witness].decision_details[l].n.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
-                        'class': data[i].text[j][witness].decision_details[l].class.replace(/[^a-zA-Z]'/g, '_'),
-                        'witnesses': [witness]
-                      };
+                      if (data[i].text[j][witness].decision_details[l].scope !== 'always') {
+                        deletableRules[data[i].text[j][witness].decision_details[l].id] = {
+                          'scope': data[i].text[j][witness].decision_details[l].scope,
+                          't': data[i].text[j][witness].decision_details[l].t.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
+                          'n': data[i].text[j][witness].decision_details[l].n.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
+                          'class': data[i].text[j][witness].decision_details[l].class.replace(/[^a-zA-Z]'/g, '_'),
+                          'witnesses': [witness]
+                        };
+                      }
+                    }
+                  }
+                }
+              }
+              if (CL.witnessAddingMode === true) {
+                if (data[i].text[j].hasOwnProperty(witness) &&
+                      data[i].text[j][witness].hasOwnProperty('decision_details')) {
+                  for (let l = 0; l < data[i].text[j][witness].decision_details.length; l += 1) {
+                    if (!deletableRules.hasOwnProperty(data[i].text[j][witness].decision_details[l].id)) {
+                      if (nonDeletableRules.hasOwnProperty(data[i].text[j][witness].decision_details[l].id)) {
+                        nonDeletableRules[data[i].text[j][witness].decision_details[l].id].witnesses.push(witness);
+                      } else {
+                        if (data[i].text[j][witness].decision_details[l].scope !== 'always') {
+                          nonDeletableRules[data[i].text[j][witness].decision_details[l].id] = {
+                            'scope': data[i].text[j][witness].decision_details[l].scope,
+                            't': data[i].text[j][witness].decision_details[l].t.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
+                            'n': data[i].text[j][witness].decision_details[l].n.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
+                            'class': data[i].text[j][witness].decision_details[l].class.replace(/[^a-zA-Z]'/g, '_'),
+                            'witnesses': [witness]
+                          };
+                        }
+                      }
                     }
                   }
                 }
               }
             }
-            if (Object.keys(id_dict).length > 1) {
+            rowIdBase = row_id + '_word_' + j;
+            rule_cells = _getRulesForDisplay(deletableRules, events, true, highlighted_hand, rowIdBase);
+            keys_to_sort = rule_cells[0];
+            cells_dict = rule_cells[1];
+            events = rule_cells[2];
+            if (Object.keys(deletableRules).length > 1) {
               cells.push('<table><tbody class="selectable">');
             } else {
               cells.push('<table><tbody>');
             }
-            keys_to_sort = [];
-            cells_dict = {};
-            for (key in id_dict) {
-              if (id_dict.hasOwnProperty(key)) {
-                rule_cells = [];
-                if (id_dict[key].scope === 'always') {
-                  reg_class = 'regularised_global ';
-                } else {
-                  reg_class = 'regularised ';
-                }
-                if (_hasDeletionScheduled(key)) {
-                  reg_class += 'deleted ';
-                }
-		            reg_class += 'regclass_'+id_dict[key].class + ' ';
-                highlighted = '';
-                if (id_dict[key].witnesses.length > 1) {
-                  id_dict[key].witnesses = CL.sortWitnesses(id_dict[key].witnesses);
-                }
-                if (keys_to_sort.indexOf(id_dict[key].witnesses[0]) === -1) {
-                  keys_to_sort.push(id_dict[key].witnesses[0]);
-                }
-                if (id_dict[key].witnesses.indexOf(highlighted_hand) !== -1) {
-                  highlighted = 'highlighted ';
-                }
-                subrow_id = row_id + '_word_' + j + '_rule_' + key;
-                rule_cells.push('<tr class="' + reg_class + highlighted + '" id="' + subrow_id + '"><td>');
-                if (id_dict[key].witnesses.indexOf(highlighted_hand) !== -1) {
-                  rule_cells.push('<div class="spanlike">');
-                }
-                rule_cells.push(CL.project.prepareDisplayString(id_dict[key].t));
-                rule_cells.push(' &#9654; ');
-                rule_cells.push(CL.project.prepareDisplayString(id_dict[key].n));
-                if (id_dict[key].witnesses.indexOf(highlighted_hand) !== -1) {
-                  rule_cells.push('</div>');
-                }
-                rule_cells.push('</td></tr>');
-                if (cells_dict.hasOwnProperty(id_dict[key].witnesses[0])) {
-                  cells_dict[id_dict[key].witnesses[0]].push(rule_cells.join(' '));
-                } else {
-                  cells_dict[id_dict[key].witnesses[0]] = [rule_cells.join(' ')];
-                }
-                events[subrow_id] = id_dict[key].scope + ': ' + _getRegWitsAsString(id_dict[key].witnesses) + ' (' + id_dict[key].class + ')';
-              }
-            }
             keys_to_sort = CL.sortWitnesses(keys_to_sort);
-            for (k = 0; k < keys_to_sort.length; k += 1) {
+            for (let k = 0; k < keys_to_sort.length; k += 1) {
               if (cells_dict.hasOwnProperty(keys_to_sort[k])) {
                 cells.push(cells_dict[keys_to_sort[k]].join(' '));
               }
             }
             cells.push('</tbody></table>');
+            if (Object.keys(nonDeletableRules).length > 1) {
+              cells.push('<table><tbody>');
+              rule_cells = _getRulesForDisplay(nonDeletableRules, events, false, highlighted_hand, rowIdBase);
+              keys_to_sort = rule_cells[0];
+              cells_dict = rule_cells[1];
+              events = rule_cells[2];
+
+              keys_to_sort = CL.sortWitnesses(keys_to_sort);
+              for (let k = 0; k < keys_to_sort.length; k += 1) {
+                if (cells_dict.hasOwnProperty(keys_to_sort[k])) {
+                  cells.push(cells_dict[keys_to_sort[k]].join(' '));
+                }
+              }
+              cells.push('</tbody></table>');
+            }
           }
           cells.push('</td>');
         }
@@ -260,6 +258,63 @@ RG = (function() {
     html.push('</table>');
     html.push('</div></td>');
     return [html, row_list, events];
+  };
+
+  _getRulesForDisplay = function(rules, events, deletable, highlighted_hand, rowIdBase) {
+    var keys_to_sort, cells_dict, reg_class, highlighted, rule_cells, subrow_id;
+    keys_to_sort = [];
+    cells_dict = {};
+    for (let key in rules) {
+      if (rules.hasOwnProperty(key)) {
+        rule_cells = [];
+        if (deletable === true) {
+          if (rules[key].scope === 'always') {
+            reg_class = 'regularised_global ';
+          } else {
+            reg_class = 'regularised ';
+          }
+          if (_hasDeletionScheduled(key)) {
+            reg_class += 'deleted ';
+          }
+        } else {
+          reg_class = 'non_deletable_rule ';
+        }
+        reg_class += 'regclass_' + rules[key].class + ' ';
+        highlighted = '';
+        if (rules[key].witnesses.length > 1) {
+          rules[key].witnesses = CL.sortWitnesses(rules[key].witnesses);
+        }
+        if (keys_to_sort.indexOf(rules[key].witnesses[0]) === -1) {
+          keys_to_sort.push(rules[key].witnesses[0]);
+        }
+        if (rules[key].witnesses.indexOf(highlighted_hand) !== -1) {
+          highlighted = 'highlighted ';
+        }
+        subrow_id = rowIdBase + '_rule_' + key;
+        rule_cells.push('<tr class="' + reg_class + highlighted + '" id="' + subrow_id + '"><td>');
+        if (rules[key].witnesses.indexOf(highlighted_hand) !== -1) {
+          rule_cells.push('<div class="spanlike">');
+        }
+        rule_cells.push(CL.project.prepareDisplayString(rules[key].t));
+        rule_cells.push(' &#9654; ');
+        rule_cells.push(CL.project.prepareDisplayString(rules[key].n));
+        if (rules[key].witnesses.indexOf(highlighted_hand) !== -1) {
+          rule_cells.push('</div>');
+        }
+        rule_cells.push('</td></tr>');
+        if (cells_dict.hasOwnProperty(rules[key].witnesses[0])) {
+          cells_dict[rules[key].witnesses[0]].push(rule_cells.join(' '));
+        } else {
+          cells_dict[rules[key].witnesses[0]] = [rule_cells.join(' ')];
+        }
+        // if (deletable === true) {
+          events[subrow_id] = rules[key].scope + ': ' +
+                              _getRegWitsAsString(rules[key].witnesses) + ' (' +
+                              rules[key].class + ')';
+        // }
+      }
+    }
+    return [keys_to_sort, cells_dict, events];
   };
 
   recollate = function(reset_scroll) {
@@ -494,6 +549,7 @@ RG = (function() {
           _rules = {};
           _forDeletion = [];
           _forGlobalExceptions = [];
+          CL.isDirty = false;
         };
       	CL.returnToSummaryTable(callback);
     });
@@ -862,6 +918,7 @@ RG = (function() {
         }
       }
       RG.recollate();
+      CL.isDirty = true; // may not have changed but let's be safe
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('settings'));
     });
     $('#close_settings').on('click', function(event) {
@@ -1047,7 +1104,10 @@ RG = (function() {
         }
         rules.push(rule);
       }
-      console.log(rules)
+      console.log(rules);
+      if (CL.witnessEditingMode === true) {
+        CL.isDirty = true;
+      }
       return rules;
     }
   };
@@ -1452,6 +1512,9 @@ RG = (function() {
           id: rule_id,
           scope: rule_type
         });
+        if (CL.witnessEditingMode === true) {
+          CL.isDirty = true;
+        }
       } else {
         return;
       }
@@ -1461,6 +1524,9 @@ RG = (function() {
         id: rule_id,
         scope: rule_type
       });
+      if (CL.witnessEditingMode === true) {
+        CL.isDirty = true;
+      }
     }
   };
 

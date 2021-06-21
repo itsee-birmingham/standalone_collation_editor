@@ -67,7 +67,7 @@ CL = (function() {
   makeStandoffReading, doMakeStandoffReading, makeMainReading, getOrderedAppLines,
   loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses,
   calculatePosition, removeWitness, checkWitnessesAgainstProject, setUpRemoveWitnessesForm,
-  removeWitnesses, returnToSummaryTable, prepareAdditionalCollation,
+  removeWitnesses, getRemoveWitnessDataFromForm, returnToSummaryTable, prepareAdditionalCollation,
   removeSpecialWitnesses, runFunction;
 
   //private function declarations
@@ -581,17 +581,25 @@ CL = (function() {
   };
 
   getCollationHeader = function(data, col_spans, number_spaces) {
-    var html, words, cols, j, colspan;
+    var html, words, cols, j, colspan, previousLinkHtml, nextLinkHtml;
     html = [];
     words = _extractWordsForHeader(data);
+    if (CL.witnessEditingMode === false) {
+      previousLinkHtml = '<td class="nav" id="previous_verse">&larr;</td>';
+      nextLinkHtml = '<td class="nav" id="next_verse">&rarr;</td>';
+    } else {
+      previousLinkHtml = '<td></td>';
+      nextLinkHtml = '<td></td>';
+    }
 
     //columns is based on number of words*2 (to include spaces) + 1 (to add space at the end)
     cols = (words.length * 2) + 1;
     if (cols === 1) {
       j = 1;
-      html.push('<tr><td class="nav" id="previous_verse">&larr;</td><th colspan="' + col_spans[1] + '">Base text is ' + data.overtext + '</th><td class="nav" id="next_verse">&rarr;</td></tr>');
+      html.push('<tr>' + previousLinkHtml + '<th colspan="' + col_spans[1] + '">Base text is ' +
+                data.overtext + '</th>' + nextLinkHtml + '</tr>');
     } else {
-      html.push('<tr><td class="nav" id="previous_verse">&larr;</td>');
+      html.push('<tr>' + previousLinkHtml + '');
       //words are just in a list so index from 0 (j will go up slower than i)
       j = 0;
       //we don't want 0 based indexing so start i at 1
@@ -603,13 +611,15 @@ CL = (function() {
         }
         //if i is even add a word; if not add a blank cell
         if (i % 2 === 0) {
-          html.push('<th colspan="' + colspan + '" class="NAword mark ' + words[j][1] +'" id="NA_' + (i) + '"><div id="NA_' + (i) + '_div">' + words[j][0] + '</div></th>');
+          html.push('<th colspan="' + colspan + '" class="NAword mark ' + words[j][1] +'" id="NA_' + (i) +
+                    '"><div id="NA_' + (i) + '_div">' + words[j][0] + '</div></th>');
           j += 1;
         } else {
-          html.push('<th  colspan="' + colspan + '" id="NA_' + (i) + '" class="mark"><div id="NA_' + (i) + '_div"></div></th>');
+          html.push('<th  colspan="' + colspan + '" id="NA_' + (i) + '" class="mark"><div id="NA_' + (i) +
+                    '_div"></div></th>');
         }
       }
-      html.push('<td class="nav" id="next_verse">&rarr;</td></tr>');
+      html.push(nextLinkHtml + '</tr>');
 
       html.push('<tr id="number_row" class="number_row"><td></td>');
       j = 1;
@@ -2427,17 +2437,34 @@ CL = (function() {
   };
 
   setUpRemoveWitnessesForm = function(wits, data, stage, removeFunction) {
-    var html;
+    var html, transcriptionIds, sigla;
     document.getElementById('remove_witnesses_div').style.left = document.getElementById('scroller').offsetWidth - document.getElementById('remove_witnesses_div').offsetWidth - 15 + 'px';
+    transcriptionIds = {};
+    for (let i=0; i<wits.length; i+=1) {
+      for (let key in data.hand_id_map) {
+        if (data.hand_id_map.hasOwnProperty(key) && data.hand_id_map[key] === wits[i]) {
+          if (transcriptionIds.hasOwnProperty(wits[i])) {
+            transcriptionIds[wits[i]].push(key);
+          } else {
+            transcriptionIds[wits[i]] = [key];
+          }
+        }
+      }
+    }
     html = [];
     //add a select all option
     html.push('<input class="boolean" type="checkbox" id="select_all" name="select_all"/><label>Select all</label><br/>');
-    for (let i=0; i<wits.length; i+=1) {
-      for (let key in data.hand_id_map) {
-        if ( data.hand_id_map.hasOwnProperty(key) && data.hand_id_map[key] === wits[i]) {
-          html.push('<input class="boolean witness_select" type="checkbox" id="' + key + '" name="' + key + '"/><label>' + key + '</label><br/>');
-        }
+    for (let key in transcriptionIds) {
+      if (transcriptionIds[key].length > 1) {
+        sigla = transcriptionIds[key].join('/');
+        html.push('<input class="witness_select" type="checkbox" id="' + key + '" value="' + transcriptionIds[key].join('|') +
+                  '" name="' + key + '"/>' +'<label>' + sigla + '</label><br/>');
+      } else {
+        sigla = transcriptionIds[key][0];
+        html.push('<input class="witness_select" type="checkbox" id="' + key + '" value="' + sigla +
+                  '" name="' + key + '"/>' +'<label>' + sigla + '</label><br/>');
       }
+
     }
     document.getElementById('witness_checkboxes').innerHTML = html.join('');
     DND.InitDragDrop('remove_witnesses_div', true, true);
@@ -2446,29 +2473,45 @@ CL = (function() {
         $('.witness_select').each(function() {
           $(this).prop('checked', true);
         });
+      } else {
+        $('.witness_select').each(function() {
+          $(this).prop('checked', false);
+        });
       }
     });
     $('.witness_select').on('click', function () {
       if (!$(this).is(':checked')) {
         $('#select_all').prop('checked', false);
       }
-      //TODO: maybe you could improve this and if all are selected automatically click the select all box - look at the old code for witness selection for doing this
+      if ($('.witness_select').length == $('.witness_select:checked').length) {
+        $('#select_all').prop('checked', true);
+      }
     });
     if (removeFunction !== undefined) {
       $('#remove_selected_button').on('click', removeFunction);
     } else {
       $('#remove_selected_button').on('click', function () {
-        var data, handsToRemove;
-        handsToRemove = [];
-        data = cforms.serialiseForm('remove_witnesses_form');
-        for (let key in data) {
-          if (data.hasOwnProperty(key) && data[key] === true && key !== 'select_all') {
-            handsToRemove.push(key);
-          }
-        }
+        var handsToRemove;
+        handsToRemove = getRemoveWitnessDataFromForm('remove_witnesses_form');
         removeWitnesses(handsToRemove, stage);
+        CL.isDirty = true;
       });
     }
+  };
+
+  getRemoveWitnessDataFromForm = function (formId) {
+    var data, handsToRemove, hands;
+    handsToRemove = [];
+    data = cforms.serialiseForm('remove_witnesses_form');
+    for (let key in data) {
+      if (data.hasOwnProperty(key) && data[key] !== null && data[key] !== true) {
+        hands = data[key].split('|');
+        for (let i=0; i<hands.length; i+=1) {
+          handsToRemove.push(hands[i]);
+        }
+      }
+    }
+    return handsToRemove;
   };
 
   removeWitnesses = function(hands, stage) {
@@ -3512,13 +3555,16 @@ CL = (function() {
           temp = checkWitnessesAgainstProject(collation.data_settings.witness_list, project.witnesses);
           witsToAdd = temp[3];
           if (temp[3].length === 0) {
-            alert('No witnesses were found to add'); //should never happen but just in case - TODO: it should then reload the table
-            //HERE NOW
+            alert('No witnesses were found to add'); //should never happen but just in case
+            returnToSummaryTable();
             return;
           }
           CL.existingCollation = collation;
           if (collation.status === 'regularised') {
-            alert('When using the add witnesses functions rules can only be made for the witnesses being added.\nChanging the settings will also only have an affect on the witnesses being added.\n\nIf you need to add more rules for existing witnesses then you should recollate the unit from scratch and then redo all of the later stages.');
+            alert('When using the add witnesses functions rules can only be made for the witnesses being added.\n' +
+                  'Changing the settings will also only have an affect on the witnesses being added.\n\n' +
+                  'If you need to add more rules for existing witnesses then you should recollate the unit from ' +
+                  'scratch and then redo all of the later stages rather than adding witnesses.');
           }
           prepareAdditionalCollation(collation, witsToAdd);
         }
@@ -3534,9 +3580,16 @@ CL = (function() {
       CL.dataSettings.language = document.getElementById('language').value;
     }
     if (document.getElementById('base_text')) {
-      //TODO: mybe check that this agrees with the one in the existing collations data_settings for compatibility.
-      // especially since in the next block we take the base text siglum from there which in theory might not agree with this base text id.
-      CL.dataSettings.base_text = document.getElementById('base_text').value;
+      // if a base text is given, check that the base_text is the same as the one in the saved collation
+      if (document.getElementById('base_text').value === existing_collation.data_settings.base_text) {
+        CL.dataSettings.base_text = document.getElementById('base_text').value;
+      } else {
+        alert('You can only add witnesses if the project base text is currently the same as the one used for the ' +
+              'saved collation. This is not the case with yur data.\n\nTo add witnesses change the project base ' +
+              'text to match the saved collations.');
+        returnToSummaryTable();
+        return;
+      }
     }
     if (existing_collation.data_settings.hasOwnProperty('base_text_siglum')) {
       CL.dataSettings.base_text_siglum = existing_collation.data_settings.base_text_siglum;
@@ -3590,26 +3643,28 @@ CL = (function() {
                   //On save they will need smushing together in the case of witnesses or the main one overiding the new one in the case of displaysetting etc.
                   // like mergedCollation does but they should be separate until then
 
-                  CL.isDirty = true;
+                  // CL.isDirty = true;
                   //display the pre-merged data
                   _displaySavedCollation(mergedCollation);
 
                 } else if (existing_collation.status === 'set') {
                   //merge the existing and new collations
                   mergedCollation = _mergeCollationObjects(JSON.parse(JSON.stringify(existing_collation)), data, witsToAdd);
-                  CL.isDirty = true;
+                  // CL.isDirty = true;
                   //display the pre-merged data
                   _displaySavedCollation(mergedCollation);
                 }
               } else {
                 alert('The new witnesses could not be added this time due to a problem with the basetexts, please try again.');
-                //TODO: reload summary page?
                 SPN.remove_loading_overlay();
+                returnToSummaryTable();
+                return;
               }
             } else {
               alert('The new witnesses could not be added this time due to a problem with the context selected, please try again.');
-              //TODO: reload summary page?
               SPN.remove_loading_overlay();
+              returnToSummaryTable();
+              return;
             }
           });
       });
@@ -3653,7 +3708,6 @@ CL = (function() {
     //make reading for any combined or shared units and check against existing readings
     index = 1; //this refers to the position indicated by numbers under the basetext
     while (index<=(newData.overtext[0].tokens.length*2)+1) {
-      console.log(index);
       //if new data has one then
       newUnits = _getUnitsByStartIndex(index, newData.apparatus);
       existingUnits = _getUnitsByStartIndex(index, mainCollation.structure.apparatus);
@@ -3663,8 +3717,6 @@ CL = (function() {
       for (let z=0; z<Math.max(newUnits.length, existingUnits.length); z+=1) {
         newUnit = z<newUnits.length ? newUnits[z] : null; //_getUnitByStartIndex(index, newData.apparatus);
         existingUnit = z<existingUnits.length ? existingUnits[z] : null;//_getUnitByStartIndex(index, mainCollation.structure.apparatus);
-        console.log(newUnit);
-        console.log(existingUnit);
         if (existingUnit !== null && (newData.lac_readings.length > 0 || newData.om_readings.length > 0)) {
           _mergeNewLacOmVerseReadings(existingUnit, newData);
         }
@@ -3777,9 +3829,6 @@ CL = (function() {
             index = newUnit.end + 1;
           } else {
             if (newUnit.end == existingUnit.end) {
-              console.log(CL.witnessesAdded)
-              //HERE in this condition you must add om for any missing witnesses
-              //console.log('we agree on start and end so just merge')
               for (let j=0; j<newUnit.readings.length; j+=1) {
                 matchingReadingFound = false;
                 newReadingText = extractWitnessText(newUnit.readings[j]);
@@ -5609,6 +5658,7 @@ CL = (function() {
       removeWitness: removeWitness,
       setUpRemoveWitnessesForm: setUpRemoveWitnessesForm,
       removeWitnesses: removeWitnesses,
+      getRemoveWitnessDataFromForm: getRemoveWitnessDataFromForm,
       checkWitnessesAgainstProject: checkWitnessesAgainstProject,
 
       returnToSummaryTable: returnToSummaryTable,
@@ -5804,6 +5854,7 @@ CL = (function() {
       removeWitness: removeWitness,
       setUpRemoveWitnessesForm: setUpRemoveWitnessesForm,
       removeWitnesses: removeWitnesses,
+      getRemoveWitnessDataFromForm: getRemoveWitnessDataFromForm,
       checkWitnessesAgainstProject: checkWitnessesAgainstProject,
       returnToSummaryTable: returnToSummaryTable,
       prepareAdditionalCollation: prepareAdditionalCollation,

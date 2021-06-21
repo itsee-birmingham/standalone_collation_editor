@@ -185,9 +185,12 @@ SV = (function () {
 			CL.saveCollation('set');
 		});
 
-		//TODO: this code is repeated in RG - put in function?
 		$('#return_to_saved_table_button').on('click', function() {
-			CL.returnToSummaryTable();
+			let callback;
+			callback = function () {
+				CL.isDirty = false;
+			}
+			CL.returnToSummaryTable(callback);
     });
 
 		$('#highlighted').on('change', function (event) {_highlightWitness(event.target.value);});
@@ -237,19 +240,14 @@ SV = (function () {
             remove_wits_form.innerHTML = html;
             document.getElementsByTagName('body')[0].appendChild(remove_wits_form);
 						removeFunction = function () {
-					      var data, handsToRemove;
-					      handsToRemove = [];
-					      data = cforms.serialiseForm('remove_witnesses_form');
-					      for (let key in data) {
-					        if (data.hasOwnProperty(key) && data[key] === true) {
-					          handsToRemove.push(key);
-					        }
-					      }
+								var handsToRemove;
+								handsToRemove = CL.getRemoveWitnessDataFromForm('remove_witnesses_form');
 								prepareForOperation();
 					      CL.removeWitnesses(handsToRemove, 'set');
 								//clear undo stack so you can't go back to a point with the witnesses still present.
 								SV.undoStack = [];
 								unprepareForOperation();
+								CL.isDirty = true;
 					    };
 						CL.setUpRemoveWitnessesForm(wits[2], CL.data, 'set', removeFunction);
           }, 'text');
