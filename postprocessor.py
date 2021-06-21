@@ -201,8 +201,8 @@ class PostProcessor(Regulariser, SettingsApplier):
                         try:
                             new_readings[text] = {'text': [readings_list[j]['text'][i]]}
                         except Exception:
-                            print('**** Problem with readings_list[j][text] array max: {0}; i: {1}'
-                                  .format(len(readings_list[j]['text']), i), file=sys.stderr)
+                            print('**** Problem with readings_list[j][text] ({2}) array max: {0}; i: {1}'
+                                  .format(len(readings_list[j]['text']), i, readings_list[j]['text']), file=sys.stderr)
                             raise DataInputException('Error likely to have been caused by input data')
                     new_readings[text]['witnesses'] = readings_list[j]['witnesses']
             all_witnesses = copy.copy(witnesses)
@@ -233,12 +233,12 @@ class PostProcessor(Regulariser, SettingsApplier):
         token_matches = []
         base_text = None
         # if we have at least two actual readings (not including empty readings)
-        if len(readings.keys()) > 1 and ('_' not in readings.keys()) or \
-           len(readings.keys()) > 2 and ('_' in readings.keys()):
+        if ((len(readings.keys()) > 1 and ('_' not in readings.keys())) or
+                (len(readings.keys()) > 2 and ('_' in readings.keys()))):
             matrix = []  # a token matrix one row per reading one column per token
             readings_list = []  # the full reading data in same order as matrix
             for reading in readings.keys():
-                if len(reading.split()) > 0:
+                if len(reading.split()) > 0 and reading != '_':
                     matrix.append(reading.split())
                 else:
                     matrix.append(None)
@@ -271,11 +271,11 @@ class PostProcessor(Regulariser, SettingsApplier):
                 # this is a single word unit so just return existing readings
                 return [readings]
         else:
-            # there is only one reading in this unit (therefore all read a - a shared unit)
+            # there is only one content reading in this unit (therefore all read a - a shared unit) or are om
             # so just return existing readings except when the setting tells us to
             # In particular this is always True when we are combining new witnesses
             # into existing collations when we always want the new reading in smallest chunks possible
-            if (len([x for x in readings.keys() if x != '_']) == 1
+            if (len([x for x in readings.keys()]) == 1
                     and self.split_single_reading_units is True):
                 for key in readings:
                     if len(key.split(' ')) == len(readings[key]['text']):
