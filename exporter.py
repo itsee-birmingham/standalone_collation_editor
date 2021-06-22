@@ -99,7 +99,7 @@ class Exporter(object):
                 if optns['negative_apparatus'] is True:
                     if ((len(wits) > 0 or reading['label'] == 'a')
                             and ('overlap_status' not in reading
-                                 or reading['overlap_status'] not in overlap_status_to_ignore)):
+                                 or reading['overlap_status'] not in optns['overlap_status_to_ignore'])):
                         if reading['label'] == 'a':
                             wits = []
                         if len(wits) > 0:
@@ -119,7 +119,7 @@ class Exporter(object):
                 else:
                     if ((len(wits) > 0 or reading['label'] == 'a')
                             and ('overlap_status' not in reading
-                                 or reading['overlap_status'] not in overlap_status_to_ignore)):
+                                 or reading['overlap_status'] not in optns['overlap_status_to_ignore'])):
                         if len(wits) > 0:
                             readings = True
                         app.append(self.make_reading(reading, i, reading['label'], wits))

@@ -60,8 +60,6 @@ class PostProcessor(Regulariser, SettingsApplier):
     def produce_variant_units(self):
         """Produce variant units for display and editing."""
         variant_readings = self.create_readings_sets()
-        if self.split_single_reading_units is True:
-            print(variant_readings)
         return self.format_output(self.anchor_readings(variant_readings))
 
     def create_extra_reading(self, text_list, witness):
