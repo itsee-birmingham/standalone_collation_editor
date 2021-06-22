@@ -814,9 +814,9 @@ CL = (function() {
             unit_data = SV.getUnitData(unit.readings, id_string, unit.start, unit.end, unit_data_options);
             spacer_rows.push(SV.getSpacerUnitData(id_string, unit.start, unit.end));
           } else if (format === 'reorder') {
-            unit_data = OR.getUnitData(unit.readings, id_string, format, unit.start, unit.end, unit_data_options);
+            unit_data = OR.getUnitData(unit.readings, id_string, unit.start, unit.end, unit_data_options);
           } else {
-            unit_data = _getUnitData(unit.readings, id_string, format, unit.start, unit.end, unit_data_options);
+            unit_data = _getUnitData(unit.readings, id_string, unit.start, unit.end, unit_data_options);
           }
           rows.push(unit_data[0].join(''));
           row_list.push.apply(row_list, unit_data[1]);
@@ -1133,9 +1133,9 @@ CL = (function() {
             unit_data = SV.getUnitData(unit.readings, id_string, unit.start, unit.end, unit_data_options);
             spacer_rows.push(SV.getSpacerUnitData(id_string, unit.start, unit.end));
           } else if (format === 'reorder') {
-            unit_data = OR.getUnitData(unit.readings, id_string, format, unit.start, unit.end, unit_data_options);
+            unit_data = OR.getUnitData(unit.readings, id_string, unit.start, unit.end, unit_data_options);
           } else {
-            unit_data = OR.getUnitData(unit.readings, id_string, format, unit.start, unit.end, unit_data_options);
+            unit_data = OR.getUnitData(unit.readings, id_string, unit.start, unit.end, unit_data_options);
           }
           rows.push(unit_data[0].join(''));
           row_list.push.apply(row_list, unit_data[1]);
@@ -4183,7 +4183,7 @@ CL = (function() {
     return dict1;
   };
 
-  _getUnitData = function(data, id, format, start, end, options) {
+  _getUnitData = function(data, id, start, end, options) {
     var i, html, j, decisions, rows, cells, row_list, temp, events, max_length, row_id,
       type, subrow_id, colspan, hand, text, label, rules, key, reading_label, reading_suffix;
     html = [];

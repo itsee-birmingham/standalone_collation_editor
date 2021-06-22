@@ -265,8 +265,8 @@ OR = (function() {
     }
   };
 
-  getUnitData = function(data, id, format, start, end, options) {
-    var i, html, j, decisions, rows, cells, row_list, temp, events, max_length, row_id, type, overlapped, has_context_menu,
+  getUnitData = function(data, id, start, end, options) {
+    var html, j, decisions, rows, cells, row_list, temp, events, max_length, row_id, type, overlapped, has_context_menu,
       subrow_id, colspan, hand, OR_rules, key, reading_label, label_suffix, reading_suffix, text, label, overlap;
     html = [];
     row_list = [];
@@ -280,6 +280,11 @@ OR = (function() {
     } else {
       hand = null;
     }
+    if (options.hasOwnProperty('col_length')) {
+			colspan = options.col_length;
+		} else {
+			colspan = end - start + 1;
+		}
     OR_rules = CL.getRuleClasses(undefined, undefined, 'value', ['identifier', 'keep_as_main_reading', 'suffixed_label', 'suffixed_reading']);
     for (key in OR_rules) {
       if (OR_rules.hasOwnProperty(key) && OR_rules[key][1] === false) {
@@ -287,16 +292,16 @@ OR = (function() {
       }
     }
     if (_areAllEmptyReadings(data) && !options.hasOwnProperty('created')) {
-      html.push('<td class="mark start_' + start + ' " colspan="' + (end - start + 1) + '"><div class="drag_div deletable" id="drag_unit_' + id + '">');
+      html.push('<td class="mark start_' + start + ' " colspan="' + colspan + '"><div class="drag_div deletable" id="drag_unit_' + id + '">');
     } else {
-      html.push('<td class="mark start_' + start + ' " colspan="' + (end - start + 1) + '"><div class="drag_div" id="drag_unit_' + id + '">');
+      html.push('<td class="mark start_' + start + ' " colspan="' + colspan + '"><div class="drag_div" id="drag_unit_' + id + '">');
     }
     if (!overlap) {
       html.push('<table class="variant_unit" id="variant_unit_' + id + '">');
     } else {
       html.push('<table class="variant_unit overlap_unit" id="variant_unit_' + id + '">');
     }
-    for (i = 0; i < data.length; i += 1) {
+    for (let i = 0; i < data.length; i += 1) {
       //what is the reading text?
       if (data[i].type === 'lac') {
         has_context_menu = false;
@@ -453,6 +458,7 @@ OR = (function() {
     }
   };
 
+  // TODO: this does not work if there are multiple units at addition points.
   // Need to work this out from the top line references to the overlap units as we can't actually rely on the start
   // and end values in the overlaps
   mergeSharedExtentOverlaps = function() {
