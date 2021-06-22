@@ -230,7 +230,7 @@ RG = (function() {
             }
             cells.push('</tbody></table>');
             if (Object.keys(nonDeletableRules).length > 1) {
-              cells.push('<table><tbody>');
+              cells.push('<table class="unselectable"><tbody>');
               rule_cells = _getRulesForDisplay(nonDeletableRules, events, false, highlighted_hand, rowIdBase);
               keys_to_sort = rule_cells[0];
               cells_dict = rule_cells[1];
@@ -1134,7 +1134,9 @@ RG = (function() {
             if (clone.parentNode !== null) {
               clone.parentNode.removeChild(clone);
             }
-            alert('You are not allowed to regularise to multiple tokens, the normalised form must not include spaces.\nIf you need to regularise to multiple words this can be done in the Set Variants interface');
+            alert('You are not allowed to regularise to multiple tokens, the normalised form must not include ' +
+                  'spaces.\n\nIf you need to regularise to multiple words this can be done in the Set Variants ' +
+                  'interface');
             return;
           } else {
             //you are asking to regularise a single token to a single token that is allowed and we will continue

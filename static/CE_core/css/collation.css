@@ -238,14 +238,16 @@ div.regularisation_staged {
 	color: gray;
 }
 
+table.unselectable {
+  border-top: 1px solid gray;
+}
+
 tr.non_deletable_rule {
-  color: Dodgerblue;
+  color: #666699;
 }
 
 
-
 /** reordering table */
-
 
 table#reorder_table td, table#reorder_table th {
 	border: 1px solid black;

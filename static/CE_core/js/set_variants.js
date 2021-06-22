@@ -171,6 +171,7 @@ SV = (function () {
 		$('#return_to_saved_table_button').on('click', function() {
 			let callback;
 			callback = function () {
+				SV.undoStack = [];
 				CL.isDirty = false;
 			}
 			CL.returnToSummaryTable(callback);
@@ -285,6 +286,7 @@ SV = (function () {
 		}
 
 		if (SV.undoStack.length > 0) {
+			CL.isDirty = true;
 			document.getElementById("undo_button").style.display = 'inline';
 		} else {
 			document.getElementById("undo_button").style.display = 'none';
@@ -534,7 +536,7 @@ SV = (function () {
 
 				html.push('<li id="' + row_id + '" class="' + highlighted_classes.join(' ') + '">');
 				html.push('<div class="spanlike">' + reading_label + ' ' + text + reading_suffix + '  </div>');
-				temp = _showSubreadings(data[i], id, i, highlighted_hand);
+				temp = _showSubreadings(data[i], id, i, highlighted_hand, options.highlighted_added_wits);
 				html.push.apply(html, temp[0]);
 				row_list.push.apply(row_list, temp[1]);
 				html.push('</li>');
@@ -559,7 +561,7 @@ SV = (function () {
 					html.push('<li id="' + row_id + '" class="' + highlighted_classes.join(' ') + '">');
 				}
 				html.push('<div class="spanlike">' + reading_label  + ' ' + text + reading_suffix + '  </div>');
-				temp = _showSubreadings(data[i], id, i, highlighted_hand);
+				temp = _showSubreadings(data[i], id, i, highlighted_hand, options.highlighted_added_wits);
 				html.push.apply(html, temp[0]);
 				row_list.push.apply(row_list, temp[1]);
 				html.push('</li>');
@@ -1144,11 +1146,9 @@ SV = (function () {
 		document.getElementById('scroller').scrollTop = scroll_offset[1];
 	};
 
-
-	// TODO TUES: here is probably where to put highlighted added wits
 	/** the code for displaying subreadings present in the object model */
-	_showSubreadings = function (reading, id, i, hand) {
-		var html, j, subrow_id, row_list, type, suffixed, suffix, highlighted, text_string;
+	_showSubreadings = function (reading, id, i, hand, highlightedAdded) {
+		var html, j, subrow_id, row_list, type, suffixed, suffix, highlighted, text_string, highlightedClasses;
 		html = [];
 		row_list = [];
 		text_string = '';
@@ -1158,20 +1158,24 @@ SV = (function () {
 				if (reading.subreadings.hasOwnProperty(type)) {
 					suffix = reading.subreadings[type][0].suffix;
 					for (j = 0; j < reading.subreadings[type].length; j += 1) {
-						highlighted = '';
+						highlightedClasses = [];
 						subrow_id = 'subreading_unit_' + id + '_row_' + i + '_type_' + type + '_subrow_' + j;
 						row_list.push(subrow_id);
 						if (reading.subreadings[type][j].witnesses.indexOf(hand) !== -1) {
-							highlighted = ' highlighted';
+							highlightedClasses.push('highlighted');
+						}
+						if (highlightedAdded !== undefined &&
+									reading.subreadings[type][j].witnesses.filter(x => highlightedAdded.includes(x)).length > 0) {
+							highlightedClasses.push('added_highlighted');
 						}
 						if (reading.subreadings[type][j].type === 'lac') {
 							text_string = '&lt;' + reading.subreadings[type][j].text_string + '&gt;';
 						} else {
 							text_string = reading.subreadings[type][j].text_string;
 						}
-						html.push('<li class="subreading' + highlighted + '" id="' + subrow_id + '"><div class="spanlike"><div class="spanlike">' +
-								CL.getAlphaId(i) + suffix +
-								'. ' + text_string + '</div></div></li>');
+						html.push('<li class="subreading ' + highlightedClasses.join(' ') + '" id="' + subrow_id
+											+ '"><div class="spanlike"><div class="spanlike">' +
+											CL.getAlphaId(i) + suffix + 	'. ' + text_string + '</div></div></li>');
 					}
 				}
 			}
