@@ -624,7 +624,6 @@ RG = (function() {
   _calculateLacWits = function(collation_data, result_callback) {
     var i, transcription_id, lac_transcriptions;
     lac_transcriptions = JSON.parse(JSON.stringify(CL.dataSettings.witness_list));
-    console.log(collation_data)
     if (collation_data.results[0].hasOwnProperty('transcription_id')) {
       console.warn('The use of \'transcription_id\' is deprecated. \'transcription\' should be used instead.');
     }
@@ -1104,7 +1103,6 @@ RG = (function() {
         }
         rules.push(rule);
       }
-      console.log(rules);
       if (CL.witnessEditingMode === true) {
         CL.isDirty = true;
       }
@@ -1464,11 +1462,13 @@ RG = (function() {
   };
 
   _deleteUnappliedRule = function() {
-    var element;
+    var element, rd;
     element = SimpleContextMenu._target_element;
     delete _rules[element.id];
     $(element.parentNode).removeClass('mark');
     $(element).removeClass('regularisation_staged');
+    rd = REDIPS.drag;
+    rd.enableDrag(true, element);
   };
 
   _scheduleSelectedRulesDeletion = function () {

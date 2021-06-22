@@ -11,7 +11,7 @@ OR = (function() {
 
   //public function declarations
   let showOrderReadings, showApprovedVersion, getUnitData, relabelReadings,
-  addLabels, makeStandoffReading, removeSplits, mergeSharedExtentOverlaps,
+  addLabels, makeStandoffReading, removeSplits, mergeSharedExtentOverlaps, mergedSharedOverlapReadings,
   canUnitMoveTo, addToUndoStack, makeWasGapWordsGaps, mergeAllLacs, mergeAllOms;
 
   //private function declarations
@@ -453,36 +453,35 @@ OR = (function() {
     }
   };
 
-  // TODO: this also needs to combine shared readings (while preserving a reading - it should be required in most cases
-  // but with adding witnesses it might be if an added reading shares that of an existing overlap)
-  // Need to work this out from the top line as we can't actually rely on the start and end values in the overlaps
+  // Need to work this out from the top line references to the overlap units as we can't actually rely on the start
+  // and end values in the overlaps
   mergeSharedExtentOverlaps = function() {
-    var key, i, m, overlap_lines, overlap_indexes, shared_overlaps, new_key, lead_unit, to_delete;
-    to_delete = [];
-    overlap_lines = [];
-    overlap_indexes = {};
-    shared_overlaps = {};
-    for (key in CL.data) {
+    var match, overlapLineNumbers, overlapIndexes, sharedOverlaps, newKey, leadUnit, toDelete;
+    toDelete = [];
+    overlapLineNumbers = [];
+    overlapIndexes = {};
+    sharedOverlaps = {};
+    for (let key in CL.data) {
       if (CL.data.hasOwnProperty(key)) {
         if (key.match(/apparatus\d+/) !== null) {
-          m = key.match(/apparatus(\d+)/);
-          overlap_lines.push(parseInt(m[1]));
+          match = key.match(/apparatus(\d+)/);
+          overlapLineNumbers.push(parseInt(match[1]));
         }
       }
     }
-    overlap_lines.sort();
+    overlapLineNumbers.sort();
     // no point in even looking if we don't have more than one line of overlapped apparatus
-    if (overlap_lines.length > 1) {
+    if (overlapLineNumbers.length > 1) {
       // create a dictionary with each overlapped unit as key to a 2 entry list.
-      // By the end the first index will be pos 0 and the final pos 1
-      for (i = 0; i < CL.data.apparatus.length; i += 1) {
+      // by the end the first index will be pos 0 and the final pos 1
+      for (let i = 0; i < CL.data.apparatus.length; i += 1) {
         if (CL.data.apparatus[i].hasOwnProperty('overlap_units')) {
-          for (key in CL.data.apparatus[i].overlap_units) {
+          for (let key in CL.data.apparatus[i].overlap_units) {
             if (CL.data.apparatus[i].overlap_units.hasOwnProperty(key)) {
-              if (!overlap_indexes.hasOwnProperty(key)) {
-                overlap_indexes[key] = [i, i];
+              if (!overlapIndexes.hasOwnProperty(key)) {
+                overlapIndexes[key] = [i, i];
               } else {
-                overlap_indexes[key][1] = i;
+                overlapIndexes[key][1] = i;
               }
             }
           }
@@ -490,37 +489,37 @@ OR = (function() {
       }
     }
     // now switch the dictionary round so each set of index points are key to unit ids
-    for (key in overlap_indexes) {
-      if (overlap_indexes.hasOwnProperty(key)) {
-        new_key = overlap_indexes[key].join('-');
-        if (shared_overlaps.hasOwnProperty(new_key)) {
-          shared_overlaps[new_key].push(key);
+    for (let key in overlapIndexes) {
+      if (overlapIndexes.hasOwnProperty(key)) {
+        newKey = overlapIndexes[key].join('-');
+        if (sharedOverlaps.hasOwnProperty(newKey)) {
+          sharedOverlaps[newKey].push(key);
         } else {
-          shared_overlaps[new_key] = [key];
+          sharedOverlaps[newKey] = [key];
         }
       }
     }
     // now see if any have more than one unit at each pair of indexes and therefore need combining
-    for (key in shared_overlaps) {
-      if (shared_overlaps.hasOwnProperty(key)) {
-        if (shared_overlaps[key].length > 1) {
-          lead_unit = _findLeadUnit(shared_overlaps[key], overlap_lines);
-          _horizontalCombineOverlaps(key, shared_overlaps[key], lead_unit);
+    for (let key in sharedOverlaps) {
+      if (sharedOverlaps.hasOwnProperty(key)) {
+        if (sharedOverlaps[key].length > 1) {
+          leadUnit = _findLeadUnit(sharedOverlaps[key], overlapLineNumbers);
+          _horizontalCombineOverlaps(key, sharedOverlaps[key], leadUnit);
         }
       }
     }
     // now delete any apparatus keys which are empty
-    for (key in CL.data) {
+    for (let key in CL.data) {
       if (CL.data.hasOwnProperty(key)) {
         if (key.match(/apparatus\d+/) !== null) {
           if (CL.data[key].length === 0) {
-            to_delete.push(key);
+            toDelete.push(key);
           }
         }
       }
     }
-    for (i = 0; i < to_delete.length; i += 1) {
-      delete CL.data[to_delete[i]];
+    for (let i = 0; i < toDelete.length; i += 1) {
+      delete CL.data[toDelete[i]];
     }
     // this needs to be called at the end once we have deleted any empty overlap lines otherwise it will fill up
     // the empty ones again it reruns the empty line deletion once it is done so maybe make that a separate function?
@@ -528,8 +527,33 @@ OR = (function() {
     _throughNumberApps(2);
 
     // now check the reading in each of the overlaped units for matching ones and merge if necessary
+    mergedSharedOverlapReadings();
 
-    //HERE
+  };
+
+  // Merges any shared readings in overlap units. Most, if not all, will have been created in the process of adding
+  // witnesses but it is possible that they could happen in the course of editing depending on the editor.
+  mergedSharedOverlapReadings = function () {
+    var match, overlapLineNumbers, unit;
+    SV.prepareForOperation();
+    overlapLineNumbers = [];
+    for (let key in CL.data) {
+      if (CL.data.hasOwnProperty(key)) {
+        if (key.match(/apparatus\d+/) !== null) {
+          match = key.match(/apparatus(\d+)/);
+          overlapLineNumbers.push(parseInt(match[1]));
+        }
+      }
+    }
+    for (let i = 0; i < overlapLineNumbers.length; i += 1) {
+      for (let j = 0; j < CL.data['apparatus' + overlapLineNumbers[i]].length; j += 1) {
+        unit = CL.data['apparatus' + overlapLineNumbers[i]][j];
+        for (let k = 0; k < unit.readings.length; k += 1) {
+          SV.unsplitUnitWitnesses(k, 'apparatus' + overlapLineNumbers[i]);
+        }
+      }
+    }
+    SV.unprepareForOperation();
   };
 
   //
@@ -1707,6 +1731,7 @@ OR = (function() {
       makeStandoffReading: makeStandoffReading,
       removeSplits: removeSplits,
       mergeSharedExtentOverlaps: mergeSharedExtentOverlaps,
+      mergedSharedOverlapReadings: mergedSharedOverlapReadings,
       canUnitMoveTo: canUnitMoveTo,
       addToUndoStack: addToUndoStack,
       makeWasGapWordsGaps: makeWasGapWordsGaps,
@@ -1731,6 +1756,7 @@ OR = (function() {
       makeStandoffReading: makeStandoffReading,
       removeSplits: removeSplits,
       mergeSharedExtentOverlaps: mergeSharedExtentOverlaps,
+      mergedSharedOverlapReadings: mergedSharedOverlapReadings,
       canUnitMoveTo: canUnitMoveTo,
       addToUndoStack: addToUndoStack,
       makeWasGapWordsGaps: makeWasGapWordsGaps,

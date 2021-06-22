@@ -787,6 +787,8 @@ Other things to be aware of
 
 * In all stages of the editor the select box for highlighting a witness will say 'highlight witness' rather than 'select' as was the case in 1.x There is no way to change this as it is seen as a positive change but your users might need to be aware and any screen shots in documentation may need updating.
 
+* the option to delete a made rule before recollating used to work but then prevent the word from being regularised again until the unit was recollated. This has now been fixed and if a rule is deleted before recollation another rule can be made for the same word straight away.
+
 Changes required to collation service
 
 collation service in views.py (for me) can support an optional parameter 'debug' it must be optional if it is used as the add witness function does not use debug mode.

@@ -1272,7 +1272,6 @@ SV = (function () {
 		var first_word_index, i, j, k, l, index, start, end, unit, reading, found;
 		first_word_index = 1;
 		//find the unit
-		console.log('reindexing reading');
 		for (i = 0; i < CL.data.apparatus.length; i += 1) {
 			if (CL.data.apparatus[i].start === location) {
 				unit = CL.data.apparatus[i];

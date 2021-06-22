@@ -1267,11 +1267,12 @@ CL = (function() {
   };
 
   findOverlapUnitById = function(id) {
-    var app_id, key, unit;
+    var unit;
     unit = null;
-    for (key in CL.data) {
+    for (let key in CL.data) {
       if (key.match(/apparatus\d*/g) !== null) {
-        if (unit === null) {
+        // This test for length here is in case we have delted a witness and left an empty line
+        if (unit === null && CL.data[key].length > 0) {
           unit = findUnitById(key, id);
         }
       }
@@ -2416,15 +2417,15 @@ CL = (function() {
 
 
   _removeWitnessFromUnit = function(unit, hand) {
-    var reading;
-    for (let i=0; i<unit.readings.length; i+=1) {
+    var reading, overlapIdsForDeletion;
+    for (let i = 0; i < unit.readings.length; i += 1) {
       reading = unit.readings[i];
       if (reading.witnesses.indexOf(hand) !== -1) {
         reading.witnesses.splice(reading.witnesses.indexOf(hand), 1);
         if (reading.witnesses.length === 0) { //this was the only witness so remove the whole reading
           unit.readings[i] = null;
         } else { // we are not removing the whole reading so we need to remove the data from each word in 'text'
-          for (let j=0; j<reading.text.length; j+=1) {
+          for (let j = 0; j < reading.text.length; j += 1) {
             delete reading.text[j][hand];
             if (reading.text[j].reading.indexOf(hand) !== -1) {
               reading.text[j].reading.splice(reading.text[j].reading.indexOf(hand), 1);
@@ -2440,6 +2441,21 @@ CL = (function() {
       }
     }
     removeNullItems(unit.readings);
+    // this part removes the any references to a deleted overlap reading in the top line
+    overlapIdsForDeletion = [];
+    if (unit.hasOwnProperty('overlap_units')) {
+      for (let key in unit.overlap_units) {
+        if (unit.overlap_units[key].indexOf(hand) !== -1) {
+          unit.overlap_units[key].splice(unit.overlap_units[key].indexOf(hand), 1);
+          if (unit.overlap_units[key].length === 0) {
+            overlapIdsForDeletion.push(key);
+          }
+        }
+      }
+    }
+    for (let i = 0; i < overlapIdsForDeletion.length; i += 1) {
+      delete unit.overlap_units[overlapIdsForDeletion[i]];
+    }
     return true;
   };
 
@@ -2532,7 +2548,7 @@ CL = (function() {
     i = 0;
     while (success === true && i < hands.length) {
       success = removeWitness(hands[i]);
-      i+=1;
+      i += 1;
     }
     if (success === false) {
       CL.dataSettings.witness_list = witnessListCopy.slice(0);
@@ -2543,7 +2559,10 @@ CL = (function() {
     if (stage === 'regularised') {
       RG.showVerseCollation(CL.data, CL.context, CL.container);
     } else if (stage === 'set') {
-      SV.showSetVariantsData();
+      // must be the full showSetVariants here in order to update highlight menu and any highlighted text
+      SV.showSetVariants({
+        'container': CL.container
+      });
     }
     SPN.remove_loading_overlay();
   };
@@ -2585,13 +2604,13 @@ CL = (function() {
     for (let key in CL.data) {
       if (CL.data.hasOwnProperty(key)) {
         if (key.indexOf('apparatus') !== -1) {
-          for (let i=0; i<CL.data[key].length; i+=1) {
+          for (let i = 0; i < CL.data[key].length; i += 1) {
             _removeWitnessFromUnit(CL.data[key][i], hand);
             if (key === 'apparatus') { //this is a main apparatus unit so delete if only om and lac readings remain
               genuineReadingFound = false;
-              for (let j=0; j<CL.data[key][i].readings.length; j+=1) {
+              for (let j = 0; j < CL.data[key][i].readings.length; j += 1) {
                 if (CL.data[key][i].readings[j].text.length > 0 ||
-                    CL.data[key][i].readings[j].hasOwnProperty('SR_text')) {
+                      CL.data[key][i].readings[j].hasOwnProperty('SR_text')) {
                   genuineReadingFound = true;
                 }
               }
