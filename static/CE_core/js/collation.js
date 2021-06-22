@@ -3540,7 +3540,6 @@ CL = (function() {
 
   _addToSavedCollation = function(id) {
     var data, coll_id;
-    console.log('loading saved');
     if (id === undefined) {
       data = cforms.serialiseForm('saved_collation_form');
       coll_id = data.saved_collation;

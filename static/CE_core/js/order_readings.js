@@ -453,8 +453,9 @@ OR = (function() {
     }
   };
 
-  //TODO: this also needs to combine shared readings (while preserving a reading - it should be required in most cases but with adding witnesses it might be if an added reading shares that of an existing overlap)
-  //Need to work this out from the top line as we can't actually rely on the start and end values in the overlaps
+  // TODO: this also needs to combine shared readings (while preserving a reading - it should be required in most cases
+  // but with adding witnesses it might be if an added reading shares that of an existing overlap)
+  // Need to work this out from the top line as we can't actually rely on the start and end values in the overlaps
   mergeSharedExtentOverlaps = function() {
     var key, i, m, overlap_lines, overlap_indexes, shared_overlaps, new_key, lead_unit, to_delete;
     to_delete = [];
@@ -470,10 +471,10 @@ OR = (function() {
       }
     }
     overlap_lines.sort();
-    //no point in even looking if we don't have more than one line of overlapped apparatus
+    // no point in even looking if we don't have more than one line of overlapped apparatus
     if (overlap_lines.length > 1) {
-      //create a dictionary with each overlapped unit as key to a 2 entry list.
-      //By the end the first index will be pos 0 and the final pos 1
+      // create a dictionary with each overlapped unit as key to a 2 entry list.
+      // By the end the first index will be pos 0 and the final pos 1
       for (i = 0; i < CL.data.apparatus.length; i += 1) {
         if (CL.data.apparatus[i].hasOwnProperty('overlap_units')) {
           for (key in CL.data.apparatus[i].overlap_units) {
@@ -488,7 +489,7 @@ OR = (function() {
         }
       }
     }
-    //now switch the dictionary round so each set of index points are key to unit ids
+    // now switch the dictionary round so each set of index points are key to unit ids
     for (key in overlap_indexes) {
       if (overlap_indexes.hasOwnProperty(key)) {
         new_key = overlap_indexes[key].join('-');
@@ -499,7 +500,7 @@ OR = (function() {
         }
       }
     }
-    //now see if any have more than one unit at each pair of indexes and therefore need combining
+    // now see if any have more than one unit at each pair of indexes and therefore need combining
     for (key in shared_overlaps) {
       if (shared_overlaps.hasOwnProperty(key)) {
         if (shared_overlaps[key].length > 1) {
@@ -508,7 +509,7 @@ OR = (function() {
         }
       }
     }
-    //now delete any apparatus keys which are empty
+    // now delete any apparatus keys which are empty
     for (key in CL.data) {
       if (CL.data.hasOwnProperty(key)) {
         if (key.match(/apparatus\d+/) !== null) {
@@ -521,19 +522,19 @@ OR = (function() {
     for (i = 0; i < to_delete.length; i += 1) {
       delete CL.data[to_delete[i]];
     }
-    //this needs to be called at the end once we have deleted any empty overlap lines otherwise it will fill up the empty ones again
-    //it reruns the empty line deletion once it is done so maybe make that a separate function?
+    // this needs to be called at the end once we have deleted any empty overlap lines otherwise it will fill up
+    // the empty ones again it reruns the empty line deletion once it is done so maybe make that a separate function?
     _repositionOverlaps();
     _throughNumberApps(2);
 
-    //now check the reading in each of the overlaped units for matching ones and merge if necessary
+    // now check the reading in each of the overlaped units for matching ones and merge if necessary
 
     //HERE
   };
 
   //
   canUnitMoveTo = function(id, current_app_row, new_app_row) {
-    var i, conflict_units, conflict;
+    var conflict_units, conflict;
     conflict_units = _getPotentialConflicts(id);
     conflict = false;
     if (conflict_units.length === 0) {
@@ -542,7 +543,7 @@ OR = (function() {
     if (!CL.data.hasOwnProperty('apparatus' + new_app_row)) {
       return false;
     }
-    for (i = 0; i < CL.data['apparatus' + new_app_row].length; i += 1) {
+    for (let i = 0; i < CL.data['apparatus' + new_app_row].length; i += 1) {
       if (conflict_units.indexOf(CL.data['apparatus' + new_app_row][i]._id) !== -1) {
         conflict = true;
       }
@@ -564,10 +565,9 @@ OR = (function() {
   //this currently focuses only on gaps where they are the only thing in the reading
   //we may want to do something similar where they are combined too but it doesn't seem essential at this point
   makeWasGapWordsGaps = function() {
-    var i, j;
     //only needed on top line because this is a feature of overlapping
-    for (i = 0; i < CL.data.apparatus.length; i += 1) {
-      for (j = 0; j < CL.data.apparatus[i].readings.length; j += 1) {
+    for (let i = 0; i < CL.data.apparatus.length; i += 1) {
+      for (let j = 0; j < CL.data.apparatus[i].readings.length; j += 1) {
         if (CL.data.apparatus[i].readings[j].text.length === 1 && CL.data.apparatus[i].readings[j].text[0].hasOwnProperty('was_gap')) {
           //make it a real gap again
           CL.data.apparatus[i].readings[j].type = 'lac';
@@ -595,25 +595,26 @@ OR = (function() {
     _mergeAllSuppliedEmptyReadings(typeList, parentTemplate, true);
   };
 
-  //pub-e
 
   //*********  private functions *********
 
   _uniqueifyIds = function() {
-    var id_list, key, i, j, unit, new_id, extra;
-    id_list = [];
-    for (key in CL.data) {
+    var idList, extra;
+    idList = [];
+    for (let key in CL.data) {
       if (CL.data.hasOwnProperty(key) && key.indexOf('apparatus') != -1) {
-        for (i = 0; i < CL.data[key].length; i += 1) {
+        for (let i = 0; i < CL.data[key].length; i += 1) {
           //we are assuming units already have unique ids
           //if we start changing them we need to keep the overlapped_units ids in synch
-          for (j = 0; j < CL.data[key][i].readings.length; j += 1) {
+          for (let j = 0; j < CL.data[key][i].readings.length; j += 1) {
             extra = 0;
-            while (id_list.indexOf(CL.data[key][i].readings[j]._id) !== -1) {
-              CL.addReadingId(CL.data[key][i].readings[j], CL.data[key][i].start, CL.data[key][i].end + 'extra' + extra);
+            while (idList.indexOf(CL.data[key][i].readings[j]._id) !== -1) {
+              CL.addReadingId(CL.data[key][i].readings[j],
+                              CL.data[key][i].start,
+                              CL.data[key][i].end + 'extra' + extra);
               extra += 1;
             }
-            id_list.push(CL.data[key][i].readings[j]._id);
+            idList.push(CL.data[key][i].readings[j]._id);
           }
         }
       }
@@ -712,16 +713,15 @@ OR = (function() {
     };
 
     _orderWitnessesForOutput = function() {
-      var key, i, j, type, k;
-      for (key in CL.data) {
+      for (let key in CL.data) {
         if (CL.data.hasOwnProperty(key)) {
           if (key.indexOf('apparatus') != -1) {
-            for (i = 0; i < CL.data[key].length; i += 1) {
-              for (j = 0; j < CL.data[key][i].readings.length; j += 1) {
+            for (let i = 0; i < CL.data[key].length; i += 1) {
+              for (let j = 0; j < CL.data[key][i].readings.length; j += 1) {
                 CL.data[key][i].readings[j].witnesses = CL.sortWitnesses(CL.data[key][i].readings[j].witnesses);
                 if (CL.data[key][i].readings[j].hasOwnProperty('subreadings')) {
-                  for (type in CL.data[key][i].readings[j].subreadings) {
-                    for (k = 0; k < CL.data[key][i].readings[j].subreadings[type].length; k += 1) {
+                  for (let type in CL.data[key][i].readings[j].subreadings) {
+                    for (let k = 0; k < CL.data[key][i].readings[j].subreadings[type].length; k += 1) {
                       CL.data[key][i].readings[j].subreadings[type][k].witnesses = CL.sortWitnesses(CL.data[key][i].readings[j].subreadings[type][k].witnesses);
                     }
                   }
@@ -736,8 +736,7 @@ OR = (function() {
     };
 
     _areAllEmptyReadings = function(readings) {
-      var i;
-      for (i = 0; i < readings.length; i += 1) {
+      for (let i = 0; i < readings.length; i += 1) {
         if (readings[i].text.length > 0) {
           return false;
         }
@@ -746,15 +745,15 @@ OR = (function() {
     };
 
     _getSubunitData = function(data, parent_index, parent_id, parent_label, subtype, hand, overlapped) {
-      var type, i, row_type_id, row_list, html, subrow_id;
-      row_list = [];
+      var row_type_id, rowList, html, subrow_id;
+      rowList = [];
       html = [];
       row_type_id = 'subrow';
-      for (type in data) {
+      for (let type in data) {
         if (data.hasOwnProperty(type)) {
-          for (i = 0; i < data[type].length; i += 1) {
+          for (let i = 0; i < data[type].length; i += 1) {
             subrow_id = 'subreading_unit_' + parent_id + '_row_' + parent_index + '_type_' + type + '_' + row_type_id + '_' + i;
-            row_list.push(subrow_id);
+            rowList.push(subrow_id);
             if (data[type][i].witnesses.indexOf(hand) != -1) {
               html.push('<tr class="' + subtype + ' highlighted" id="' + subrow_id + '">');
             } else {
@@ -772,7 +771,7 @@ OR = (function() {
           }
         }
       }
-      return [html, row_list];
+      return [html, rowList];
     };
 
     _editLabel = function(rdg_details, menu_pos) {

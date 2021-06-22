@@ -263,7 +263,8 @@ ul {
 	margin: 0px;
 }
 
-div.unit, div.split_unit, div.split_unit_a, div.overlap_split_unit, div.overlap_split_unit_a, div.split_omlac_unit, div.overlap_unit, div.split_deleted_unit, div.split_overlapped_unit, div.gap_unit, div.split_duplicate_unit {
+div.unit, div.split_unit, div.split_unit_a, div.overlap_split_unit, div.overlap_split_unit_a, div.overlap_unit,
+div.split_deleted_unit, div.split_overlapped_unit, div.gap_unit, div.split_duplicate_unit, div.split_omlac_unit {
 	background: silver;
 	border: 1px solid silver;
 	padding: 5px;

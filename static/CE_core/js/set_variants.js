@@ -98,7 +98,6 @@ SV = (function () {
 			SimpleContextMenu.attach('overlap_split_unit_a', function () {return _makeMenu('overlap_split_unit_a');});
 			SimpleContextMenu.attach('overlap_split_unit', function () {return _makeMenu('overlap_split_unit');});
 			SimpleContextMenu.attach('subreading', function () {return _makeMenu('subreading');});
-			//I don't think the next two menus are ever used and I don't know what they ever did!
 			SimpleContextMenu.attach('split_omlac_unit', function () {return _makeMenu('split_omlac_unit');});
 			SimpleContextMenu.attach('split_duplicate_unit', function () {return _makeMenu('split_duplicate_unit');});
 		}
@@ -4192,7 +4191,7 @@ SV = (function () {
 	 * the others are determined from project configuration
 	 *  */
 	_makeMenu = function (menu_name) {
-		var menu, i, key, subreadings, SV_rules;
+		var menu, subreadings, SV_rules;
 		//menus for full units
 		if (menu_name === 'unit') {
 			document.getElementById('context_menu').innerHTML = '<li id="split_words"><span>Split words</span></li><li id="split_readings"><span>Split readings</span></li>';
@@ -4201,9 +4200,9 @@ SV = (function () {
 		} else if (menu_name === 'subreading') {
 			document.getElementById('context_menu').innerHTML = '<li id="make_main_reading"><span>Make main reading</span></li>';
 		} else if (menu_name === 'split_duplicate_unit') {
-			// I don't think this is ever user I have no idea what it did
+			// used for reading in top line labelled 'dubplicate' when the unit is in split readings state
 			menu = ['<li id="treat_as_main"><span>Make main reading</span></li>'];
-			for (i = 0; i < CL.overlappedOptions.length; i += 1) {
+			for (let i = 0; i < CL.overlappedOptions.length; i += 1) {
 				menu.push('<li id="' + CL.overlappedOptions[i].id + '"><span>' + CL.overlappedOptions[i].label + '</span></li>');
 			}
 			document.getElementById('context_menu').innerHTML = menu.join('');
@@ -4219,7 +4218,7 @@ SV = (function () {
 			if (menu_name === 'split_unit' || menu_name === 'split_omlac_unit' || menu_name === 'overlap_split_unit') {
 				SV_rules = CL.getRuleClasses('create_in_SV', true, 'name', ['subreading', 'value', 'identifier', 'keep_as_main_reading']);
 				subreadings = [];
-				for (key in SV_rules) {
+				for (let key in SV_rules) {
 					if (SV_rules.hasOwnProperty(key)) {
 						if (SV_rules[key][0]) {
 							subreadings.push([key,  SV_rules[key][1],  SV_rules[key][2]]);
@@ -4248,7 +4247,7 @@ SV = (function () {
 
 	/**adds events for context menu */
 	_addContextMenuHandlers = function () {
-		var i, SV_errors, SV_rules, key;
+		var SV_errors, SV_rules, key;
 		if (document.getElementById('split_words')) {
 			$('#split_words').off('click.swd_c');
 			$('#split_words').off('mouseover.swd_mo');
@@ -4330,14 +4329,13 @@ SV = (function () {
 				element = SimpleContextMenu._target_element;
 				div = CL.getSpecifiedAncestor(element, 'DIV', function (e) { if ($(e).hasClass('spanlike')) {return false;} return true;});
 				reading_details = CL.getUnitAppReading(div.id);
-				console.log(reading_details);
 				prepareForOperation();
 				_removeReadingFlag(reading_details);
 				unprepareForOperation();
 			});
 			$('#treat_as_main').on('mouseover.tam_mo', function(event) {CL.hideTooltip();});
 		}
-		for (i = 0; i < CL.overlappedOptions.length; i += 1) {
+		for (let i = 0; i < CL.overlappedOptions.length; i += 1) {
 			if (document.getElementById(CL.overlappedOptions[i].id)) {
 				_addOverlappedEvent(CL.overlappedOptions[i].id, CL.overlappedOptions[i].reading_flag);
 			}
@@ -4345,7 +4343,7 @@ SV = (function () {
 		//special added for SV
 		SV_rules = CL.getRuleClasses('create_in_SV', true, 'name', ['subreading', 'value', 'identifier', 'keep_as_main_reading']);
 		//this deals with all non-genuine subreadings which will always have their own entry in the context menu (!SV_rules[key][0])
-		for (key in SV_rules) {
+		for (let key in SV_rules) {
 			if (SV_rules.hasOwnProperty(key)) {
 				if (!SV_rules[key][0]) {
 					if (document.getElementById('mark_as_' + SV_rules[key][1])) {
@@ -4377,7 +4375,7 @@ SV = (function () {
 			});
 			$('#mark_as_' + key).on('mouseover.' + key + '_mo', function(event) {CL.hideTooltip();});
 		} else {
-			for (key in SV_rules) {
+			for (let key in SV_rules) {
 				if (SV_rules.hasOwnProperty(key)) {
 					if (SV_rules[key][0]) { //if this is a subreading (hence dealt with as subreading in menu)
 						if (document.getElementById('mark_as_' + SV_rules[key][1])) {
@@ -4843,7 +4841,7 @@ SV = (function () {
 			_hasStandoffSubreading: _hasStandoffSubreading,
 			_makeMainReading: _makeMainReading,
 			_addReadingFlag: _addReadingFlag,
-			_removeReadingFlag: _removeReadingFlag,
+			// _removeReadingFlag: _removeReadingFlag,
 			_subreadingIdSort: _subreadingIdSort,
 			_makeMenu: _makeMenu,
 			_addContextMenuHandlers: _addContextMenuHandlers,
