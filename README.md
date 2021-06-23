@@ -693,7 +693,7 @@ Code changes are largely the conversion of function names from snake case to cam
 
 There are also some required changes to the data structures that the collation editor uses. Most of these changes are deprecated so they will continue to work but support will be removed in future versions. Some changes are required now.
 
-I will try to list all of the changes required now and those that are deprecated below. If you find any other problems while upgrading please let me know by opening an issue in the github repository.
+I will try to list all of the changes required immediately and those that are deprecated below. If you find any other problems while upgrading please let me know by opening an issue in the github repository.
 
 #### Changes to the initialisation
 
@@ -706,9 +706,9 @@ The inclusion of the editor and initialisation of the editor has changed. Please
 
 #### New optional service functions
 
-- getWitnessesFromInputForm - descibed in the service file documentation above
-- getApparatusForContext - descibed in the service file documentation above
-- localCollationFunction - descibed in the service file documentation above
+- getWitnessesFromInputForm - described in the service file documentation above
+- getApparatusForContext - described in the service file documentation above
+- localCollationFunction - described in the service file documentation above
 
 #### Changes to service functions
 
@@ -792,3 +792,27 @@ Other things to be aware of
 Changes required to collation service
 
 collation service in views.py (for me) can support an optional parameter 'debug' it must be optional if it is used as the add witness function does not use debug mode.
+
+Exporter changes
+
+The export_data function now takes an addition keyword argument 'settings' which is a dictionary of settings or an empty dictionary. Any class inheriting from exporter.Exporter and implementing the 'export_data' function must add this additional keyword argument to the expected arguments for the function. These settings are not used in the Exporter code but are useful for passing settings into class which inherit from it or do not inherit from it but are called by exporter factory as part of the collation editor export.
+
+The export has generally been made more modular to allow easier customisation. Only one of the changes, the addition of the 'get_lemma_text' function, is likely to change the behaviour of existing code.
+To maintain previous behaviour this should be overidden in any classes inheriting from exporter.Exporter. The code in 1.x retrieved the lemma text from the apparatus from the a reading which is always the same as the overtext in the collation editor but always uses the t form of the word and does not follow the convention of the collation editor for using the data from the overtext in the very top line of each stage display. In addition not using the overtext values here limits reuse of the exporters in larger systems where a different editorial text might be selected for publication. To maintain existing behaviour any exporter classes inheriting from exporter.Exporter should include this function which still extracts from the overtext structure but uses the t value as the key which will be the same as that used in the a reading.
+
+
+
+```python
+def get_lemma_text(self, overtext, start, end):
+    if start == end and start % 2 == 1:
+        return ['', 'om']
+    real_start = int(start/2)-1
+    real_end = int(end/2)-1
+    word_list = [x['t'] for x in overtext['tokens']]
+    return [' '.join(word_list[real_start:real_end+1])]
+
+```
+
+The XML declaration returned by the Exporter class now uses double rather than single quotes (this will only break things if you ever have to remove it, in which case the match string will need to account for this change.)
+
+The 'make_reading' function of Exporter now takes an option argument 'subtype'. Any classes which inherit from Exporter and implement this function should add this optional argument. It is used in the core Exporter to add the subreading classification/s in the 'cause' attribute of the rdg element for any readings with the type=subreading. XML exports will all change compared to those exported from 1.x but only in the addition of this attribute which should not cause any problems.
