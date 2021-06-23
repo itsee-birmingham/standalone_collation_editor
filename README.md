@@ -291,6 +291,8 @@ This variable is a boolean. If it is set to true then in the move between set va
 
 The default is false.
 
+If you are using special category lac readings and you want these to appear in your final edition then this setting should not be used.
+
 - #### ```combineAllOmsInOR```
 
 **This variable can be overwritten in individual project settings**
@@ -306,6 +308,8 @@ The default is false.
 This is a boolean variable. It works in the same was as ```combineAllLacsInOR``` but is applied in the approval process. If this change has already been applied in the move to order readings then this boolean, regardless of its settings, has no influence.
 
 The default is false.
+
+If you are using special category lac readings and you want these to appear in your final edition then this setting should not be used.
 
 - #### ```combineAllOmsInApproved```
 
@@ -588,7 +592,7 @@ localPythonImplementations = {
 };
 ```
 
-The corresonding python for the config above is below:
+The corresponding python for the config above is below:
 
 ```python
 class PrepareData(object):
@@ -893,6 +897,8 @@ Some of these changes are required to keep things working. Most are only require
     - ```combineAllOmsInApproved```
 
   These variables can all be specified in the services file or in each project separately and the default for all four is false. To maintain existing behaviour of the editor the value of ```combineAllLacsInOR``` should be set to ```true```.
+  - To enable to new feature that enables witnesses to be added and/or removed from saved collations set the ```allowWitnessChangesInSavedCollations``` variable to ```true```. This can be set in either the services file or in the project configurations for the projects which need to use this feature.
+  - The undo stack length can now be altered in the services file. The default is in the code and is set at six. The variable ```undoStackLength``` can be used to increase this. A full version of the data structure is held in browser memory for each position in the stack. If you have  a lot of witnesses and/or longer units then setting this too high may cause problems.  Because of the possible memory issues this can only be set in services and cannot be changed in project settings.
 
 ##### Changes to functions
 
@@ -902,12 +908,16 @@ Some of these changes are required to keep things working. Most are only require
     - The return data for the function has changed (see description of service file above and details on special category lac readings **TODO where?**). To maintain previous behaviour wrap the array returned in earlier versions in a dictionary as the value for the key 'results'.
   - new optional functions ```prepareNormalisedString()``` and ```prepareDisplayString()```. These functions have been added to remove a hard coded action required from the early New Testament Greek implementation of the code. They are described fully in the optional services functions above. To maintain existing behaviour prepareNormalisedString should replace an underdot (\&#803;) with an underscore and prepareDisplayString the reverse. It is very unlikely that any projects will actually need this to be done unless unclear data is displayed with an underdot but stored in the database as an underscore.
 
+##### Optional changes
+
+
+  * extractWordsForHeader - also available in the project settings. This is used to extract the words for the header. This function was originally added so that special classes can be added to the words in the header of the collation editor if necessary and also to display additional uncollated text (ritual directions for MUYA for example) if required. The function will be given the list of tokens from the basetext of the data. It should return a list of words where each word is an array with two items, the first is the string representing the word (with any punctuation added into the string) and the second an optional class to be added to the word in the basetext which appears above the row of numbers. This can then be styled with css is required. If no class is required then the default can be used unless the word itself needs further manipulation. If you need to manipulate the word but do not need a class the second argument should be an empty string.
+
+
+
 ##### Changes to project settings
 
   - rules classes specified in project settings should use the key ```ruleClasses``` not ```regularisation_classes```. This bring them in line with the services equivalent. Both were supported for projects in earlier versions.
-
-
-
 
 
 * ensure that somewhere it is recorded how to specify functions such as sortWitnesses, prepareDisplay String etc in project settings (code for this has changed so essential it is done correctly now) include how to do it in services somewhere for good measure (might already be done)
@@ -915,27 +925,17 @@ Some of these changes are required to keep things working. Most are only require
 * new services file function applySettings required. This is to remove some hard coded NT Greek settings which were still present in the javascript code. The service function arguments are described in the service file documentation above. TODO: document the service required and the options for using it.
 
 
-#### Optional changes to the services file
-
-* extractWordsForHeader - also available in the project settings. This is used to extract the words for the header. This function was originally added so that special classes can be added to the words in the header of the collation editor if necessary and also to display additional uncollated text (ritual directions for MUYA for example) if required. The function will be given the list of tokens from the basetext of the data. It should return a list of words where each word is an array with two items, the first is the string representing the word (with any punctuation added into the string) and the second an optional class to be added to the word in the basetext which appears above the row of numbers. This can then be styled with css is required. If no class is required then the default can be used unless the word itself needs further manipulation. If you need to manipulate the word but do not need a class the second argument should be an empty string.
-
-* The undo stack is defaults to 6 (the current fixed setting) it can now be set to any length in the services file using the key 'undoStackLength' the value should be an integer. Keep in mind that a full version of the data structure is held in browser memory for each position in the stack. If you have  a lot of witnesses and/or longer units then setting this too high may cause problems. Because of the possible memory issues this can only be set in services and cannot be changed in project settings.
-
-
-
-* to enable to new add/remove witnesses function use the allowWitnessChangesInSavedCollations flag set to true on either project or services - default is false
-
-#### Other things to be aware of but that do not necessarily require actions
+#### Other changes to be aware of but that do not necessarily require actions
 
 - In all stages of the editor the select box for highlighting a witness will say 'highlight witness' rather than 'select' as was the case in 1.x There is no way to change this as it is seen as a positive change but your users might need to be aware and any screen shots in documentation may need updating.
 - The option to delete a made rule before recollating used to delete the rule but then prevent the word from being regularised again until the unit had been recollated. This has now been fixed and if a rule is deleted before recollation another rule can be made for the same word straight away.
 - The code for the overlay and spinner code has changed to simplify it. Any calls to ```SPN.show_loading_overlay()``` and/or ```SPN.remove_loading_overlay()``` in the services file should be changed to ```spinner.showLoadingOverlay()``` and ```spinner.removeLoadingOverlay()```.
 
-Changes required to collation service
+#### Changes required to collation service
 
 collation service in views.py (for me) can support an optional parameter 'debug' it must be optional if it is used as the add witness function does not use debug mode.
 
-Exporter changes
+#### Exporter changes
 
 The export_data function now takes an addition keyword argument 'settings' which is a dictionary of settings or an empty dictionary. Any class inheriting from exporter.Exporter and implementing the 'export_data' function must add this additional keyword argument to the expected arguments for the function. These settings are not used in the Exporter code but are useful for passing settings into class which inherit from it or do not inherit from it but are called by exporter factory as part of the collation editor export.
 
