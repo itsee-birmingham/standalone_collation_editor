@@ -137,21 +137,20 @@ Given the ids ```["JS", "RS"]``` the JSON object should be as follows (where nam
 This function must get the current project details as a JSON object and call ```callback``` with the result. The structure of the project JSON is discussed in the project configuration section.
 
 
-- #### ```getVerseData()```
+- #### ```getUnitData()```
 
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
 | context | <code>string</code> | the reference for the unit required |
 | documentIds | <code>array</code> | the list of ids for the documents required |
-| private | <code>boolean</code> | boolean to indicate if the witnesses are private or not (deprecated, will be removed in 2.0.0) |
 | callback  | <code>function</code> | function to be called on the data |
 
-This function must find all of the JSON data for this context in each of the documents requested. The callback should be run on the resulting list of JSON objects. Any documents that are lacunose for this unit can be ommitted from the data sent to the callback (they will be handled later).
+This function must find all of the JSON data for this context in each of the documents requested. The callback should be run on the resulting list of JSON objects. Any documents that are lacunose for this unit can be omitted from the data sent to the callback (they will be handled later). TODO: check this is true for special category readings and amend as necessary.
 
 The JSON structure provided for each unit in each document should match the unit structure as described in the data structures section.
 
-**NB:** In 2.0.0 this function will be renamed ```getUnitData()``` and the ```private``` parameter will be removed.
+**NB:** In previous versions this function was called ```getVerseData()``` and had a boolean ```private``` as the third argument before the callback.
 
 - #### ```saveCollation()```
 
@@ -184,7 +183,7 @@ In future versions this function may require an optional projectId parameter.
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
 | id | <code>string/int</code> | Id of collation object required. |
-| callback | <code>function</code> | The function to be called on the retreived data. |
+| callback | <code>function</code> | The function to be called on the retrieved data. |
 
 This should retrieve the collation with the given id and run the callback on the result, if no collation object is found the callback should be run with ```null```.
 
@@ -193,6 +192,27 @@ This should retrieve the collation with the given id and run the callback on the
 - #### ```localJavascript```
 
 This variable should be an array of strings giving the full url of any additional javascript you need the collation editor to load. These might be required run the services for your framework (an internal api file for example) or you might want to use additional files to store configuration functions that you call in the services. These files will be loaded as part of the collation editor initialisation functions called once the services are set.
+
+- #### ```lacUnitLabel```
+
+**This variable can be overwritten in individual project settings**
+
+This variable should be a string and should be the text the collation editor should display for any witnesses which are lacunose for the entire collation unit. The default, which will be used if this variable is not present, is 'lac unit'. Until version 2.0.0 the default text was 'lac verse'.
+
+
+- #### ```omUnitLabel```
+
+**This variable can be overwritten in individual project settings**
+
+This variable should be a string and should be the text the collation editor should display for any witnesses which omit the entire collation unit. The default, which will be used if this variable is not present, is 'om unit'. Until version 2.0.0 the default text was 'om verse'.
+
+- #### ```showCollapseAllUnitsButton```
+
+**This variable can be overwritten in individual project settings**
+
+This variable is a boolean which determines whether or not to show the button in the footer of all stages of the collation editor which allows all the units to be collapsed to show only the a reading. The default is false.
+
+**NB:** In previous versions this button was included by default.
 
 - #### ```extraFooterButtons```
 
@@ -428,7 +448,6 @@ Not all of the features make sense when combined and not all combinations will w
 
 An example can be seen in ```static/CE_core/js/default_setting.js```
 
-**NB:** legacy support for regularisation_classes instead of this variable will be removed in 2.0.0. The content of the two is the same and will remain so.
 
 - #### ```ruleConditions```
 
@@ -665,10 +684,27 @@ This default behaviour can be overridden by providing this function in the servi
 
 This function can be used to override the default in the collation editor core code. It takes as an argument a success callback which can be used in conjunction with the export settings to control the export process. Can be useful if a CSRF token is required to download the output.
 
+- #### ```prepareNormalisedString()```
+
+**This variable can be overwritten in individual project settings**
+
+**The default is to leave the provided string untouched**
+
+**TODO: write this**
+
+- #### ```prepareDisplayString()```
+
+**This variable can be overwritten in individual project settings**
+
+**The default is to leave the provided string untouched**
+
+**TODO: write this**
+
+
 Data Structures
 ---
 
-Please see the documentation for the standalone collation editor repository.
+Please see the documentation for the stand alone collation editor repository.
 
 
 Configuration
@@ -751,57 +787,96 @@ Upgrading to collation_editor_core 1.1.x from 1.0.x
 ---
 
 In 1.1.0 the way regularisation rules are applied has been significantly altered because in some circumstances rules
-were not being applied as users (and the developer) intended. The older way of applying regularisation rules is
-preserved in XXX. Any projects which started regularising in a version of the collation editor code prior to release
-1.1.0 should use the legacy system. explain the difference and what might happen. Both can be run in parallel.
+were not being applied as users (and the developer) intended. The problem stemmed from the way rules were divided into
+pre- and post-collation rules. The distinction between pre- and post-collate rules was always internal to the collation
+editor and was determined based on whether or not the application of the rule changed the value of the token to be sent
+to collateX. This distinction meant that pre-collation rules were not always being applied if they were made after a
+post-collation rule for the same word. This lead to confusion for several users.
 
-Upgrading to collation_editor_core 2.0.x from collation_editor_core 1.1.x
+In 1.1.0 the pre- post-collation distinction has been scrapped to remove this problem with rule chaining. This is the regularisation
+system which any new projects should be using.
+
+It is recommended that projects which started regularising on a version before 1.1.x including those started on the now
+deprecated code continue to use the older system. This has been preserved in a separate repository and can be run in
+parallel with the new system so different projects can use different regularisation applications. The risk of using the
+new system for existing projects is that rules which had been created but had never previously been applied to the data
+with the old system might be applied in the new system. In many, perhaps most, cases this will not make any difference.
+However, in some cases it might. It could change the visible token or the classification of a
+regularisation/subreading. The decision will need to be taken on a project by project basis for existing projects
+taking into account the stage the project has reached and in consultation with the project editors.
+
+No changes are required to upgrade to 1.1.x from a 1.0.x version.
+
+To run the legacy version instead of or as well as the new version see the legacy_regularisation repository at
+https://github.com/itsee-birmingham/legacy_regularisation.
+
+
+Upgrading to collation_editor_core v2.0.x from collation_editor_core 1.1.x
 ---
+
+New features in this version:
+  - The option to add and/or remove witnesses from saved collations in the first two stages of the collation editor.
+  - Support for lac/om unit readings where the editor need to be more specific about the reason for the absence.
+
+As well as the new features several changes have been made to remove hard coded behaviour which might need to differ for different texts and to remove some of the vocabulary that references biblical verses to be more consistent across projects.
 
 The 2.0.x release of the collation editor core code is mostly backwards compatible with 1.1x. There are, however, some
 additions required to the services file and the settings and some of the deprecated features from 1.x have been removed
 as planned.
 
-If you are not yet using 1.1.x you are advised to work through each upgrade in turn.
-
-New features are also introduced in this release including the ability to add and remove witnesses from existing collations as the first two stages.
+If you are not yet using 1.1.x you are advised to work through each upgrade listed above in turn rather than starting here. You should use the readme file for the version you are upgrading to with the exception of the upgrade to 1.1.x which is covered in this file.
 
 
 
-Changes required to the services file.
+#### Required changes to the services file.
 
-* getVerseData function no longer takes a boolean argument in third position. The third and final argument should now be the callback.
-* getVerseData renamed to getCollationData (removing biblical reference)
-* getCollationData (formally getVerseData) should now return a dictionary containing the current array returned in the key 'results' this is to allow for special category readings to also be passed if nec. This is optional and covered elsewhere.
-* variables lacUnitLabel and omUnitLabel should be provided in the services file to maintain current behaviour of 'lac verse' and 'om verse' the defaults have changed to 'lac unit' and 'om unit' to remove biblical verse assumption. The services choices can also be overridden in individual project settings if required.
-* To maintain past behaviour prepareNormalisedString and prepareDisplayString must be provided, this is to remove a hard coded weird switch from the early Greek implementations. To maintain existing behaviour the prepareNormalisedString must replace an underdot with an underscore and prepareDisplayString the reverse - see Django implementation for more detail to add here. Very few if any projects will need this it depends how data was prepared for NT stuff. Explain how this works and where it is called so people know how to use it if they choose.
-* To maintain past behaviour showCollapseAllUnitsButton: true  determines whether to show the collapse all button. Default is now false so to keep previous behaviour changes are required. This can also be overridden in project settings.
+Some of these changes are required to keep things working. Most are only required in order to maintain existing behaviour. Where a change is required only to preserve existing behaviour it is noted in the explanation.
 
-* rules specified in project settings should use the key ruleClasses not regularisation_classes (this bring it in line with the services equivalent - both have been supported previously)
+##### Changes to variables
+  - ```lacUnitLabel``` and ```omUnitLabel``` should be provided in the services file to maintain the existing behaviour which displays 'lac verse' and 'om verse' respectively. The defaults have changed to 'lac unit' and 'om unit' to remove biblical verse assumption. The services choices can also be overridden in individual project settings if required.
+  - In this version the seldom used 'collapse all' button in the footer of all stages of the collation editor has been removed by default. The code which performs the function is still present in the core code and the button can be returned by adding the variable ```showCollapseAllUnitsButton``` and setting the value to the boolean ```true```. This should be done to maintain existing behaviour. This setting can also be used at the project level.
+
+##### Changes to functions
+
+  - changes to existing function ```getVerseData()```
+    - ```getVerseData()``` function should be renamed to ```getUnitData()```.
+    - The boolean argument 'private' in the third position should be removed. The third and final argument should now be the callback.
+    - The return data for the function has changed (see description of service file above and details on special category lac readings **TODO where?**). To maintain previous behaviour wrap the array returned in earlier versions in a dictionary as the value for the key 'results'.
+  - new optional functions ```prepareNormalisedString()``` and ```prepareDisplayString()```. These functions have been added to remove a hard coded action required from the early New Testament Greek implementation of the code. They are described fully in the optional services functions above. To maintain existing behaviour prepareNormalisedString should replace an underdot (\&#803;) with an underscore and prepareDisplayString the reverse. It is very unlikely that any projects will need this to be done unless unclear data is displayed with an underdot but stored in the database as an underscore.
+
+##### Changes to project settings
+
+  - rules classes specified in project settings should use the key ```ruleClasses``` not ```regularisation_classes```. This bring them in line with the services equivalent. Both were supported for projects in earlier versions.
+
+
+* To maintain past behaviour prepareNormalisedString and prepareDisplayString must be provided, this is to remove a hard coded weird switch from the early Greek implementations. To maintain existing behaviour the prepareNormalisedString must replace an underdot with an underscore and prepareDisplayString the reverse - see Django implementation for more detail to add here.
+
+ Very few if any projects will need this it depends how data was prepared for NT stuff. Explain how this works and where it is called so people know how to use it if they choose.
+
+
 
 * ensure that somewhere it is recorded how to specify functions such as sortWitnesses, prepareDisplay String etc in project settings (code for this has changed so essential it is done correctly now) include how to do it in services somewhere for good measure (might already be done)
 
 * new services file function applySettings required. This is to remove some hard coded NT Greek settings which were still present in the javascript code. The service function arguments are described in the service file documentation above. TODO: document the service required and the options for using it.
 
 * to maintain existing behaviour the optional setting combineAllLacsInOR should be set to true in the services file (full details in optional changes)
+* servicesFile and project settings have 4 new settings combineAllOmsInApproved, combineAllOmsInOR, combineAllLacsInOR, combineAllOmsInOR the defaults for all are false, to keep exisitng bahaviour
+combineAllLacsInOR should be set to true in the services file.
 
-
-Optional changes to the services file.
+#### Optional changes to the services file
 
 * extractWordsForHeader - also available in the project settings. This is used to extract the words for the header. This function was originally added so that special classes can be added to the words in the header of the collation editor if necessary and also to display additional uncollated text (ritual directions for MUYA for example) if required. The function will be given the list of tokens from the basetext of the data. It should return a list of words where each word is an array with two items, the first is the string representing the word (with any punctuation added into the string) and the second an optional class to be added to the word in the basetext which appears above the row of numbers. This can then be styled with css is required. If no class is required then the default can be used unless the word itself needs further manipulation. If you need to manipulate the word but do not need a class the second argument should be an empty string.
 
 * The undo stack is defaults to 6 (the current fixed setting) it can now be set to any length in the services file using the key 'undoStackLength' the value should be an integer. Keep in mind that a full version of the data structure is held in browser memory for each position in the stack. If you have  a lot of witnesses and/or longer units then setting this too high may cause problems. Because of the possible memory issues this can only be set in services and cannot be changed in project settings.
 
-* servicesFile and project settings have 4 new settings combineAllOmsInApproved, combineAllOmsInOR, combineAllLacsInOR, combineAllOmsInOR the defaults for all are false, to keep exisitng bahaviour
-combineAllLacsInOR should be set to true in the services file.
+
 
 * to enable to new add/remove witnesses function use the allowWitnessChangesInSavedCollations flag set to true on either project or services - default is false
 
-Other things to be aware of
+#### Other things to be aware of but that do not necessarily require actions
 
-* In all stages of the editor the select box for highlighting a witness will say 'highlight witness' rather than 'select' as was the case in 1.x There is no way to change this as it is seen as a positive change but your users might need to be aware and any screen shots in documentation may need updating.
-
-* the option to delete a made rule before recollating used to work but then prevent the word from being regularised again until the unit was recollated. This has now been fixed and if a rule is deleted before recollation another rule can be made for the same word straight away.
+- In all stages of the editor the select box for highlighting a witness will say 'highlight witness' rather than 'select' as was the case in 1.x There is no way to change this as it is seen as a positive change but your users might need to be aware and any screen shots in documentation may need updating.
+- The option to delete a made rule before recollating used to delete the rule but then prevent the word from being regularised again until the unit had been recollated. This has now been fixed and if a rule is deleted before recollation another rule can be made for the same word straight away.
 
 Changes required to collation service
 
