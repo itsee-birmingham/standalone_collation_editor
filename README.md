@@ -689,15 +689,20 @@ Upgrading to collation_editor_core 1.0.x from deprecated collation_editor
 
 This code is not backwards compatible with early versions of the code archived at https://github.com/itsee-birmingham/collation_editor
 
-Code changes are largely the conversion of function names from snake case to camel case in the services file.
+Code changes are largely the conversion of function names from snake case to camel case in the services file. The
+required and optional function names, arguments and required behaviours are details in the Services File section above.
+Please check all function in the services file use these details.
 
-There are also some required changes to the data structures that the collation editor uses. Most of these changes are deprecated so they will continue to work but support will be removed in future versions. Some changes are required now.
+There are also some required changes to the data structures that the collation editor uses. Most of these changes are
+deprecated so they will continue to work but support will be removed in future versions. Some changes are required now.
 
-I will try to list all of the changes required immediately and those that are deprecated below. If you find any other problems while upgrading please let me know by opening an issue in the github repository.
+I will try to list all of the changes required immediately and those that are deprecated below. If you find any other
+problems while upgrading please let me know by opening an issue in the github repository.
 
 #### Changes to the initialisation
 
-The inclusion of the editor and initialisation of the editor has changed. Please follow the initialisation instructions above to correct this.
+The inclusion of the editor and initialisation of the editor has changed. Please follow the initialisation instructions
+above to correct this.
 
 #### New service functions required
 
@@ -712,47 +717,56 @@ The inclusion of the editor and initialisation of the editor has changed. Please
 
 #### Changes to service functions
 
-- doCollation does not need context in url to collation server
+- doCollation does not need context in the url provided for the collation server
 - getUserInfoByIds needs to return 'id' in user model rather than '\_id'
 
 
-#### Changes to keys required/suggested in data models (most are deprecated and carry warnings but will be removed in future versions)
+#### Changes to keys required/suggested in data models
+Most of these are deprecated and carry warnings but will be removed in future versions.
 
 - project model
-  - 'id' should be used rather than '\_id'
-  - 'name' should be used rather than 'project'
-  - 'basetext' should be used rather than 'base_text'
+  - 'id' should be used rather than '\_id'.
+  - 'name' should be used rather than 'project'.
+  - 'basetext' should be used rather than 'base_text'.
 
 - decision/rule model
-  - 'id' should be used rather than '\_id'.  **this change must be made either in the data or in the services file as 'id' is now used for rule deletion not _id** **Collation objects saved in early versions of the software also need to be updated to use id instead of _id in any items in 'decision_details' array if they are to be fully functional in this version**
-  - '\_model' no longer required/used
-  - 'active' no longer required/used
-  - use 'created_time' for sorting rather than '\_meta.\_last_modified_time' (both still work for now but \_meta is deprecated)
+  - 'id' should be used rather than '\_id'.  **This change must be made either in the data or in the services file as 'id' is now used for rule deletion not _id.** **Collation objects saved in early versions of the software also need to be updated to use id instead of _id in any items in 'decision_details' array if they are to be fully functional in this version.**
+  - '\_model' no longer required/used.
+  - 'active' no longer required/used.
+  - 'created_time' is used for sorting rather than '\_meta.\_last_modified_time' (both still work for now but \_meta is deprecated).
 
 - collation model
-  - '\_model' no longer required/used
-  - 'id' is used in the collation editor rather than '\_id' (this can be fixed in services by switching it if the database models need to stay the same)
-  - should provide 'user' which is the id of the user owning the collation
+  - '\_model' no longer required/used.
+  - 'id' is used in the collation editor rather than '\_id' (this can be fixed in services by switching it if the database models need to stay the same).
+  - should provide 'user' which is the id of the user owning the collation.
 
 - user model
-  - 'id' should be used rather than '\_id'
+  - 'id' should be used rather than '\_id'.
 
 - collation unit model
-  - data for collation should use 'transcription' rather than 'transcription_id'
+  - data for collation should use 'transcription' rather than 'transcription_id'.
 
 
-Upgrading to collation_editor_core 2.x from collation_editor_core 1.x
+Upgrading to collation_editor_core 1.1.x from 1.0.x
 ---
 
-The 2.x release of the collation editor core code is mostly backwards compatible with 1.x.
+In 1.1.0 the way regularisation rules are applied has been significantly altered because in some circumstances rules
+were not being applied as users (and the developer) intended. The older way of applying regularisation rules is
+preserved in XXX. Any projects which started regularising in a version of the collation editor code prior to release
+1.1.0 should use the legacy system. explain the difference and what might happen. Both can be run in parallel.
 
-There are, however, some additions required to the services file and the settings and some of the deprecated features from 1.x have been removed as planned.
+Upgrading to collation_editor_core 2.0.x from collation_editor_core 1.1.x
+---
+
+The 2.0.x release of the collation editor core code is mostly backwards compatible with 1.1x. There are, however, some
+additions required to the services file and the settings and some of the deprecated features from 1.x have been removed
+as planned.
+
+If you are not yet using 1.1.x you are advised to work through each upgrade in turn.
 
 New features are also introduced in this release including the ability to add and remove witnesses from existing collations as the first two stages.
 
-In 1.1.0 the way regularisation rules are applied was significantly altered because in some circumstances rules were not being
-applied as intended. The older way of applying regularisation rules is preserved in XXX. Any projects which started regularising in a version
-of the collation editor code prior to release 1.1.0 should use the legacy system. explain the difference and what might happen. both can be run in parallel.
+
 
 Changes required to the services file.
 
