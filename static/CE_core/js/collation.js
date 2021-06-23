@@ -1222,7 +1222,7 @@ CL = (function() {
     text = [];
 
     document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + hand + ':</b><img id="loadingbar" src="' + staticUrl + 'CE_core/images/loadingbar.gif"/></span>';
-    CL.services.getCollationData(CL.context, [transcription_id], function(response) {
+    CL.services.getUnitData(CL.context, [transcription_id], function(response) {
       var transcriptions;
       transcriptions = response.results;
       if (transcriptions.length > 0) {

@@ -54,7 +54,7 @@ RG = (function() {
 
   getCollationData = function(output, scroll_offset, callback) {
     CL.container = document.getElementById('container');
-    CL.services.getCollationData(CL.context, CL.dataSettings.witness_list, function(collation_data) {
+    CL.services.getUnitData(CL.context, CL.dataSettings.witness_list, function(collation_data) {
       _calculateLacWits(collation_data, function(lac_witness_list) {
         CL.services.getSiglumMap(lac_witness_list, function(lac_witnesses) {
           CL.collateData = {
