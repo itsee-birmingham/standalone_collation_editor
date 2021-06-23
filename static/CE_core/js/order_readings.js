@@ -139,7 +139,7 @@ OR = (function() {
     document.getElementById('footer').innerHTML = footer_html.join('');
     CL.addExtraFooterButtons('ordered');
     CL.addStageLinks();
-    SPN.remove_loading_overlay();
+    spinner.removeLoadingOverlay();
     CL.addTriangleFunctions('table');
     cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected': options.highlighted_wit, 'add_select': true, 'select_label_details': {'label': 'highlight witness', 'value': 'none' }});
     $('#highlighted').on('change', function(event) {
@@ -174,7 +174,7 @@ OR = (function() {
     }
     if (document.getElementById('undo_button')) {
       $('#undo_button').on('click', function(event) {
-        SPN.show_loading_overlay();
+        spinner.showLoadingOverlay();
         _undo();
       });
     }
@@ -247,7 +247,7 @@ OR = (function() {
     document.getElementById('footer').innerHTML = footer_html.join('');
     CL.addExtraFooterButtons('approved');
     CL.addStageLinks();
-    SPN.remove_loading_overlay();
+    spinner.removeLoadingOverlay();
     CL.addTriangleFunctions('table');
     cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected': options.highlighted_wit, 'add_select': true, 'select_label_details': {'label': 'highlight witness', 'value': 'none' }});
     $('#highlighted').on('change', function(event) {
@@ -653,7 +653,7 @@ OR = (function() {
 
   _approveVerse = function() {
     var standoff_problems, extra_results;
-    SPN.show_loading_overlay();
+    spinner.showLoadingOverlay();
     SR.loseSubreadings(); //for preparation and is needed
     standoff_problems = SV.checkStandoffReadingProblems();
     if (!standoff_problems[0]) {
@@ -693,7 +693,7 @@ OR = (function() {
           });
         }
         alert(extra_results[1]);
-        SPN.remove_loading_overlay();
+        spinner.removeLoadingOverlay();
       }
     } else if (standoff_problems[0]) {
       SR.loseSubreadings(); //always lose before finding
@@ -705,7 +705,7 @@ OR = (function() {
         });
       }
       alert('You cannot approve this verse because ' + standoff_problems[1]);
-      SPN.remove_loading_overlay();
+      spinner.removeLoadingOverlay();
     }
   };
 
@@ -1388,10 +1388,10 @@ OR = (function() {
 
     _getApparatusForContext = function() {
       if (CL.services.hasOwnProperty('getApparatusForContext')) {
-        CL.services.getApparatusForContext(function () {SPN.remove_loading_overlay();});
+        CL.services.getApparatusForContext(function () {spinner.removeLoadingOverlay();});
       } else { //this just uses all the defaults in the exporter factory
         var url;
-        SPN.show_loading_overlay();
+        spinner.showLoadingOverlay();
         url = staticUrl + '/collation/apparatus';
         $.fileDownload(url, {
           httpMethod: "POST",
@@ -1403,7 +1403,7 @@ OR = (function() {
             }])
           },
           successCallback: function() {
-            SPN.remove_loading_overlay();
+            spinner.removeLoadingOverlay();
           }
           //can also add a failCallback here if you want
         });

@@ -319,7 +319,7 @@ RG = (function() {
 
   recollate = function(reset_scroll) {
     var options, scroll_offset;
-    SPN.show_loading_overlay();
+    spinner.showLoadingOverlay();
     if (reset_scroll === undefined) {
       reset_scroll = false;
     }
@@ -462,7 +462,7 @@ RG = (function() {
 		}
     document.getElementById('footer').innerHTML = footerHtml.join('');
 
-    SPN.remove_loading_overlay();
+    spinner.removeLoadingOverlay();
     CL.addExtraFooterButtons('regularised');
     CL.addStageLinks();
     _addFooterFunctions();
@@ -556,7 +556,7 @@ RG = (function() {
     $('#go_to_sv_button').on('click',
       function(event) {
         var extra_results;
-        SPN.show_loading_overlay();
+        spinner.showLoadingOverlay();
         //remove any forms still present
         if (document.getElementById('reg_form')) {
           document.getElementById('reg_form').parentNode.removeChild(document.getElementById('reg_form'));
@@ -583,15 +583,15 @@ RG = (function() {
                 SR.findSubreadings();
               }
               alert(extra_results[1]);
-              SPN.remove_loading_overlay();
+              spinner.removeLoadingOverlay();
             }
           } else {
             alert('You cannot move to set variants because one of the units does not have all of its required witnesses');
-            SPN.remove_loading_overlay();
+            spinner.removeLoadingOverlay();
           }
         } else {
           alert('You must recollate before moving to set variants because there are rule changes that have not yet been applied.');
-          SPN.remove_loading_overlay();
+          spinner.removeLoadingOverlay();
         }
       });
     $('#settings_button').on('click',
@@ -853,7 +853,7 @@ RG = (function() {
       result_callback = function(data) {
         if (data === null) {
           alert(CL.context + ' does not collate.');
-          SPN.remove_loading_overlay();
+          spinner.removeLoadingOverlay();
           location.reload();
           return;
         }
@@ -951,7 +951,7 @@ RG = (function() {
         document.getElementById('show_hide_regularisations_button').value = document.getElementById('show_hide_regularisations_button').value.replace('show', 'hide');
         $('#show_hide_regularisations_button').on('click.hide_regularisations', function(event) {
           var scroll_offset;
-          SPN.show_loading_overlay();
+          spinner.showLoadingOverlay();
           scroll_offset = [document.getElementById('scroller').scrollLeft,
             document.getElementById('scroller').scrollTop
           ];
@@ -966,7 +966,7 @@ RG = (function() {
         document.getElementById('show_hide_regularisations_button').value = document.getElementById('show_hide_regularisations_button').value.replace('hide', 'show');
         $('#show_hide_regularisations_button').on('click.show_regularisations', function(event) {
           var scroll_offset;
-          SPN.show_loading_overlay();
+          spinner.showLoadingOverlay();
           scroll_offset = [document.getElementById('scroller').scrollLeft,
             document.getElementById('scroller').scrollTop
           ];

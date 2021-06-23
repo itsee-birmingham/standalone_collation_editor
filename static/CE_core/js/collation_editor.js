@@ -14,8 +14,7 @@ collation_editor = (function() {
         $.getScript( staticUrl + 'CE_core/js/regularise.js' ),
         $.getScript( staticUrl + 'CE_core/js/set_variants.js' ),
         $.getScript( staticUrl + 'CE_core/js/order_readings.js' ),
-        $.getScript( staticUrl + 'CE_core/js/spin.js' ),
-        $.getScript( staticUrl + 'CE_core/js/spinner_controller.js' ),
+        $.getScript( staticUrl + 'CE_core/js/spinner.js' ),
         $.getScript( staticUrl + 'CE_core/js/default_settings.js' ),
         $.getScript( staticUrl + 'CE_core/js/context_menu.js' ),
         $.getScript( staticUrl + 'CE_core/js/redips-drag-source.js' ),
@@ -34,6 +33,7 @@ collation_editor = (function() {
         ).done(function () {
           $('head').append($('<link rel="stylesheet" type="text/css" href="' + staticUrl + 'CE_core/css/collation.css">'));
           $('head').append($('<link rel="stylesheet" type="text/css" href="' + staticUrl + 'CE_core/css/structure.css">'));
+          $('head').append($('<link rel="stylesheet" type="text/css" href="' + staticUrl + 'CE_core/css/spinner.css">'));
           if (callback !== undefined) {
             callback();
           }

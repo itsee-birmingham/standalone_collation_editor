@@ -1602,7 +1602,7 @@ CL = (function() {
 
   saveCollation = function(status, success_callback) {
     var collation, confirmed, confirm_message, success_message, approval_settings;
-    SPN.show_loading_overlay();
+    spinner.showLoadingOverlay();
     CL.services.getUserInfo(function(user) {
       if (user) {
         collation = {
@@ -1651,7 +1651,7 @@ CL = (function() {
               success_callback();
             }
           }
-          SPN.remove_loading_overlay();
+          spinner.removeLoadingOverlay();
         });
       }
     });
@@ -2540,7 +2540,7 @@ CL = (function() {
   removeWitnesses = function(hands, stage) {
     console.log('^^^^^^^^^^ remove witnesses');
     var success, i, dataCopy, witnessListCopy;
-    SPN.show_loading_overlay();
+    spinner.showLoadingOverlay();
 
     dataCopy = JSON.parse(JSON.stringify(CL.data));
     witnessListCopy = CL.dataSettings.witness_list.slice(0);
@@ -2564,7 +2564,7 @@ CL = (function() {
         'container': CL.container
       });
     }
-    SPN.remove_loading_overlay();
+    spinner.removeLoadingOverlay();
   };
 
   returnToSummaryTable = function (callback) {
@@ -3192,7 +3192,7 @@ CL = (function() {
 
   _prepareCollation = function(output) {
     var context;
-    SPN.show_loading_overlay();
+    spinner.showLoadingOverlay();
     CL.dataSettings.language = document.getElementById('language').value;
     CL.dataSettings.base_text = document.getElementById('base_text').value;
     context = _getContextFromInputForm();
@@ -3206,7 +3206,7 @@ CL = (function() {
 
   /* Initial page load functions */
   _findSaved = function(context) {
-    SPN.show_loading_overlay();
+    spinner.showLoadingOverlay();
     if (context === undefined) {
       context = _getContextFromInputForm();
     }
@@ -3217,7 +3217,7 @@ CL = (function() {
         });
       });
     } else {
-      SPN.remove_loading_overlay();
+      spinner.removeLoadingOverlay();
     }
 
   };
@@ -3324,7 +3324,7 @@ CL = (function() {
       }
     } else {
       document.getElementById('witnesses').innerHTML = '<p>There are no saved collations of this verse</p>';
-      SPN.remove_loading_overlay();
+      spinner.removeLoadingOverlay();
     }
     CL.services.getUserInfoByIds(users, function(user_info) {
       if (user_info) {
@@ -3340,7 +3340,7 @@ CL = (function() {
       } else {
         _makeSavedCollationTable(by_user, approved, undefined, context);
       }
-      SPN.remove_loading_overlay();
+      spinner.removeLoadingOverlay();
     });
   };
 
@@ -3586,7 +3586,7 @@ CL = (function() {
 
   prepareAdditionalCollation = function(existing_collation, witsToAdd) {
     var context;
-    SPN.show_loading_overlay();
+    spinner.showLoadingOverlay();
 
     if (document.getElementById('language')) {
       CL.dataSettings.language = document.getElementById('language').value;
@@ -3665,13 +3665,13 @@ CL = (function() {
                 }
               } else {
                 alert('The new witnesses could not be added this time due to a problem with the basetexts, please try again.');
-                SPN.remove_loading_overlay();
+                spinner.removeLoadingOverlay();
                 returnToSummaryTable();
                 return;
               }
             } else {
               alert('The new witnesses could not be added this time due to a problem with the context selected, please try again.');
-              SPN.remove_loading_overlay();
+              spinner.removeLoadingOverlay();
               returnToSummaryTable();
               return;
             }
@@ -3757,7 +3757,7 @@ CL = (function() {
               alert('The new witnesses could not be added this time due to a base text conflict.\n' +
                     'Please check that your current project base text is the same as that used for the saved ' +
                     'collations and then try again.');
-              SPN.remove_loading_overlay();
+              spinner.removeLoadingOverlay();
               returnToSummaryTable();
               return;
             }
@@ -3963,7 +3963,7 @@ CL = (function() {
   _loadSavedCollation = function(id) {
     var i, value, bk, data, coll_id, temp, witnessStatus;
     CL.isDirty = false;
-    SPN.show_loading_overlay();
+    spinner.showLoadingOverlay();
     if (id === undefined) {
       data = cforms.serialiseForm('saved_collation_form');
       coll_id = data.saved_collation;
@@ -4026,7 +4026,7 @@ CL = (function() {
           OR.showApprovedVersion(options);
         }
       } else {
-        SPN.remove_loading_overlay();
+        spinner.removeLoadingOverlay();
       }
   };
 
@@ -4916,7 +4916,7 @@ CL = (function() {
 
   _findLatestStageVerse = function(verse) {
     var levels, found, latest, approved;
-    SPN.show_loading_overlay();
+    spinner.showLoadingOverlay();
     CL.context = verse;
     CL.services.getUserInfo(function(user) {
       if (user) {

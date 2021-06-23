@@ -182,7 +182,7 @@ SV = (function () {
 		}
 		if (document.getElementById('undo_button')) {
 			$('#undo_button').on('click', function (event) {
-				SPN.show_loading_overlay();
+				spinner.showLoadingOverlay();
 				_undo();
 			});
 		}
@@ -278,7 +278,7 @@ SV = (function () {
 			row = document.getElementById(event_rows[i]);
 			CL.addHoverEvents(row);
 		}
-		SPN.remove_loading_overlay();
+		spinner.removeLoadingOverlay();
 		if (CL.witnessRemovingMode !== true) {
 			//initialise DnD
 			_redipsInitSV(CL.data.apparatus.length);
@@ -1006,7 +1006,7 @@ SV = (function () {
 		var i, all_complete, all_in_order, standoff_problems, extra_results;
 		//we are keeping any empty units from the last state of SV
 		//we need to combined overlaps with identical index points
-		SPN.show_loading_overlay();
+		spinner.showLoadingOverlay();
 		SR.loseSubreadings(); //for preparation and is needed
 		all_complete = areAllUnitsComplete();
 		all_in_order = _checkAllWitnessesIntegrity();
@@ -1052,27 +1052,27 @@ SV = (function () {
 					SR.findSubreadings();
 				}
 				alert(extra_results[1]);
-				SPN.remove_loading_overlay();
+				spinner.removeLoadingOverlay();
 			}
 		} else if (!all_complete) {
 			if (CL.showSubreadings === true) {
 				SR.findSubreadings();
 			}
 			alert('You cannot move to order readings because one of the units does not have all of its required witnesses');
-			SPN.remove_loading_overlay();
+			spinner.removeLoadingOverlay();
 		} else if (!all_in_order) {
 			if (CL.showSubreadings === true) {
 				SR.findSubreadings();
 			}
 			alert('You cannot move to order readings because one of the witnesses has words out of order');
-			SPN.remove_loading_overlay();
+			spinner.removeLoadingOverlay();
 			//TODO: more informative errors for the above including highlighting the problems on the screen
 		} else if (standoff_problems[0]) {
 			if (CL.showSubreadings === true) {
 				SR.findSubreadings();
 			}
 			alert('You cannot move to order readings because ' + standoff_problems[1]);
-			SPN.remove_loading_overlay();
+			spinner.removeLoadingOverlay();
 		}
 	};
 

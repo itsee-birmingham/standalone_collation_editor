@@ -282,6 +282,40 @@ The example below shows two checks added between set variants and order readings
   };
 ```
 
+- #### ```combineAllLacsInOR```
+
+**This variable can be overwritten in individual project settings**
+
+
+This variable is a boolean. If it is set to true then in the move between set variants and order readings any lac readings, whatever their text value on the screen, will be automatically regularised to lac in every unit. For example '<ill 4 char>' and '<lac 4 char>' would both be regularised to '<lac>'. These regularised readings work as subreadings and can be viewed like all other subreadings in the interface.
+
+The default is false.
+
+- #### ```combineAllOmsInOR```
+
+**This variable can be overwritten in individual project settings**
+
+This is a boolean variable. It works in the same was as ```combineAllLacsInOR``` but with om readings.
+
+The default is false.
+
+- #### ```combineAllLacsInApproved```
+
+**This variable can be overwritten in individual project settings**
+
+This is a boolean variable. It works in the same was as ```combineAllLacsInOR``` but is applied in the approval process. If this change has already been applied in the move to order readings then this boolean, regardless of its settings, has no influence.
+
+The default is false.
+
+- #### ```combineAllOmsInApproved```
+
+**This variable can be overwritten in individual project settings**
+
+This is a boolean variable. It works in the same was as ```combineAllLacsInApproved``` but with om readings. If this change has already been applied in the move to order readings then this boolean, regardless of its settings, has no influence.
+
+The default is false.
+
+
 - #### ```approvalSettings```
 
 **This variable can be overwritten in individual project settings**
@@ -684,21 +718,38 @@ This default behaviour can be overridden by providing this function in the servi
 
 This function can be used to override the default in the collation editor core code. It takes as an argument a success callback which can be used in conjunction with the export settings to control the export process. Can be useful if a CSRF token is required to download the output.
 
-- #### ```prepareNormalisedString()```
-
-**This variable can be overwritten in individual project settings**
-
-**The default is to leave the provided string untouched**
-
-**TODO: write this**
-
 - #### ```prepareDisplayString()```
 
+| Param  | Type                | Description  |
+| ------ | ------------------- | ------------ |
+| string | <code>string</code> | The text of the reading |
+
+**This function should not be used unless there is a very good reason to do so**
+
+**This function can be overwritten in individual project settings**
+
+**The default is to leave the provided string untouched**
+
+This function is called every time a reading is displayed in the collation editor (not including the full text of the highlighted witness that appears at the bottom of the screen). It is given the string from the data structure and must return the string with any required changes.
+
+There are probably very few, if any, good reasons to use this. It is present to support some very early implementations while the system was being developed.
+
+
+- #### ```prepareNormalisedString()```
+
+| Param  | Type                | Description  |
+| ------ | ------------------- | ------------ |
+| string | <code>string</code> | The display string of the reading |
+
+**This function must be provided if prepareDisplayString() is used**
+
 **This variable can be overwritten in individual project settings**
 
 **The default is to leave the provided string untouched**
 
-**TODO: write this**
+
+This function is required if ```prepareDisplayString()``` is used. It must exactly reverse the changes made to the string by that function. It is used when making regularisation rules to ensure the stored strings are what is expected and can be transformed by prepareNormalisedString() correctly in the display.
+
 
 
 Data Structures
@@ -835,6 +886,13 @@ Some of these changes are required to keep things working. Most are only require
 ##### Changes to variables
   - ```lacUnitLabel``` and ```omUnitLabel``` should be provided in the services file to maintain the existing behaviour which displays 'lac verse' and 'om verse' respectively. The defaults have changed to 'lac unit' and 'om unit' to remove biblical verse assumption. The services choices can also be overridden in individual project settings if required.
   - In this version the seldom used 'collapse all' button in the footer of all stages of the collation editor has been removed by default. The code which performs the function is still present in the core code and the button can be returned by adding the variable ```showCollapseAllUnitsButton``` and setting the value to the boolean ```true```. This should be done to maintain existing behaviour. This setting can also be used at the project level.
+  - Four new boolean variables have been introduced to determine whether lac and om readings should be combined at either the Order readings or approved stages. They are:
+    - ```combineAllLacsInOR```
+    - ```combineAllOmsInOR```
+    - ```combineAllLacsInApproved```
+    - ```combineAllOmsInApproved```
+
+  These variables can all be specified in the services file or in each project separately and the default for all four is false. To maintain existing behaviour of the editor the value of ```combineAllLacsInOR``` should be set to ```true```.
 
 ##### Changes to functions
 
@@ -842,16 +900,13 @@ Some of these changes are required to keep things working. Most are only require
     - ```getVerseData()``` function should be renamed to ```getUnitData()```.
     - The boolean argument 'private' in the third position should be removed. The third and final argument should now be the callback.
     - The return data for the function has changed (see description of service file above and details on special category lac readings **TODO where?**). To maintain previous behaviour wrap the array returned in earlier versions in a dictionary as the value for the key 'results'.
-  - new optional functions ```prepareNormalisedString()``` and ```prepareDisplayString()```. These functions have been added to remove a hard coded action required from the early New Testament Greek implementation of the code. They are described fully in the optional services functions above. To maintain existing behaviour prepareNormalisedString should replace an underdot (\&#803;) with an underscore and prepareDisplayString the reverse. It is very unlikely that any projects will need this to be done unless unclear data is displayed with an underdot but stored in the database as an underscore.
+  - new optional functions ```prepareNormalisedString()``` and ```prepareDisplayString()```. These functions have been added to remove a hard coded action required from the early New Testament Greek implementation of the code. They are described fully in the optional services functions above. To maintain existing behaviour prepareNormalisedString should replace an underdot (\&#803;) with an underscore and prepareDisplayString the reverse. It is very unlikely that any projects will actually need this to be done unless unclear data is displayed with an underdot but stored in the database as an underscore.
 
 ##### Changes to project settings
 
   - rules classes specified in project settings should use the key ```ruleClasses``` not ```regularisation_classes```. This bring them in line with the services equivalent. Both were supported for projects in earlier versions.
 
 
-* To maintain past behaviour prepareNormalisedString and prepareDisplayString must be provided, this is to remove a hard coded weird switch from the early Greek implementations. To maintain existing behaviour the prepareNormalisedString must replace an underdot with an underscore and prepareDisplayString the reverse - see Django implementation for more detail to add here.
-
- Very few if any projects will need this it depends how data was prepared for NT stuff. Explain how this works and where it is called so people know how to use it if they choose.
 
 
 
@@ -859,9 +914,6 @@ Some of these changes are required to keep things working. Most are only require
 
 * new services file function applySettings required. This is to remove some hard coded NT Greek settings which were still present in the javascript code. The service function arguments are described in the service file documentation above. TODO: document the service required and the options for using it.
 
-* to maintain existing behaviour the optional setting combineAllLacsInOR should be set to true in the services file (full details in optional changes)
-* servicesFile and project settings have 4 new settings combineAllOmsInApproved, combineAllOmsInOR, combineAllLacsInOR, combineAllOmsInOR the defaults for all are false, to keep exisitng bahaviour
-combineAllLacsInOR should be set to true in the services file.
 
 #### Optional changes to the services file
 
@@ -877,6 +929,7 @@ combineAllLacsInOR should be set to true in the services file.
 
 - In all stages of the editor the select box for highlighting a witness will say 'highlight witness' rather than 'select' as was the case in 1.x There is no way to change this as it is seen as a positive change but your users might need to be aware and any screen shots in documentation may need updating.
 - The option to delete a made rule before recollating used to delete the rule but then prevent the word from being regularised again until the unit had been recollated. This has now been fixed and if a rule is deleted before recollation another rule can be made for the same word straight away.
+- The code for the overlay and spinner code has changed to simplify it. Any calls to ```SPN.show_loading_overlay()``` and/or ```SPN.remove_loading_overlay()``` in the services file should be changed to ```spinner.showLoadingOverlay()``` and ```spinner.removeLoadingOverlay()```.
 
 Changes required to collation service
 
