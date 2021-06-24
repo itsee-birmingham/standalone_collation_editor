@@ -2646,17 +2646,25 @@ CL = (function() {
 
   /* Menu Loading */
   //optionally called by initialise editor in services if they want to set up the page using js
-  //alternatively services can control this themselves but instead must call addIndexHandlers in the initialisation function
+  //alternatively services can control this themselves but instead must call addIndexHandlers in the
+  //initialisation function
   loadIndexPage = function(project) {
     var url;
     url = staticUrl;
-    if (_contextInput) {
+    // the form not always used but the default will always have a form value and if implementations are skipping
+    // it then that is fine because they will deal with the form themselves.
+    if (_contextInput && contextInput.hasOwnProperty('form') && contextInput.form !== null) {
       url += _contextInput.form;
+    }
+    if (url === staticUrl) {
+      alert('The location of the form has not been specified so the page cannot be loaded.');
+      console.log('The form url should be specified contextInput.form in either the services file or project configuration.');
+      return;
     }
     $.get(url, function(html) {
       CL.container.innerHTML = html;
       document.getElementById('project_name').innerHTML = CL.project.name;
-      if (_contextInput && _contextInput.hasOwnProperty('onload_function')) {
+      if (_contextInput && _contextInput.hasOwnProperty('onload_function') && _contextInput.onload_function !== null) {
         runFunction(_contextInput.onload_function, [CL.project]);
       } else {
         //run the default function to populate hideen form elements
@@ -3074,8 +3082,6 @@ CL = (function() {
     }
 
     //this bit does the index page settings.
-    //If the services want to do their own thing regarding forms (like Django)
-    //then CL.services.contextInput or relevant subsections should be null
     if (project.hasOwnProperty('contextInput')) {
       _contextInput = project.contextInput;
     } else if (CL.services.hasOwnProperty('contextInput')) {
@@ -3224,7 +3230,7 @@ CL = (function() {
 
   _getContextFromInputForm = function() {
     var context;
-    if (_contextInput && _contextInput.hasOwnProperty('result_provider')) {
+    if (_contextInput && _contextInput.hasOwnProperty('result_provider') && _contextInput.result_provider !== null) {
       context = runFunction(_contextInput.result_provider);
     } else {
       context = document.getElementById('context').value;

@@ -4199,7 +4199,7 @@ SV = (function () {
 		} else if (menu_name === 'subreading') {
 			document.getElementById('context_menu').innerHTML = '<li id="make_main_reading"><span>Make main reading</span></li>';
 		} else if (menu_name === 'split_duplicate_unit') {
-			// used for reading in top line labelled 'dubplicate' when the unit is in split readings state
+			// used for reading in top line labelled 'duplicate' when the unit is in split readings state
 			menu = ['<li id="treat_as_main"><span>Make main reading</span></li>'];
 			for (let i = 0; i < CL.overlappedOptions.length; i += 1) {
 				menu.push('<li id="' + CL.overlappedOptions[i].id + '"><span>' + CL.overlappedOptions[i].label + '</span></li>');

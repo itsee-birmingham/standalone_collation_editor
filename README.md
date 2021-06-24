@@ -9,10 +9,16 @@ Referencing
 
 To cite the collation editor core code please use the doi:   [![DOI](https://zenodo.org/badge/142011800.svg)](https://zenodo.org/badge/latestdoi/142011800)
 
+Acknowledgements
+---
+
+Add in funding bodies, funding project details and other libraries used like redips
+
+
 Documentation
 ---
 
-This documentation is a work in progress. I will gradually fill in the gaps as time allows. The data structures required as input are fairly well documentated in the README file of the standalone collation editor repository on github:
+This documentation is a work in progress. I will gradually fill in the gaps as time allows. The data structures required as input are fairly well documented in the README file of the standalone collation editor repository on github:
 
  https://github.com/itsee-birmingham/standalone_collation_editor
 
@@ -21,7 +27,7 @@ Terminology
 
 For the purposes of this documentation the Documents/Works/Texts model will be used.(See David C. Parker, *Textual Scholarship and the making of the New Testament* Oxford: OUP (2011), pp. 10-14,29)
 
-- **Document** - The physical artifact on which the text of a work is preserved
+- **Document** - The physical artefact on which the text of a work is preserved
 - **Work** - The work which is distilled from the texts that exist of it
 - **Text** - The version or versions of a work preserved in document
 
@@ -53,11 +59,24 @@ Once these two variables have been set you need to call ```collation_editor.init
 
 Once the services file has loaded it must call ```CL.setServiceProvider()``` providing itself as the argument. Setting this will trigger the initialisation of the editor.
 
+An example of the initialisation code.
+
+```html
+<link rel=stylesheet href="collation/pure-release-1.0.0/pure-min.css" type="text/css"/>
+<script type="text/javascript" src="collation/js/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="collation/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="collation/CE_core/js/collation_editor.js"></script>
+<script type="text/javascript">
+  let staticUrl = 'http://localhost:8080/collation/';
+  let servicesFile = 'js/local_services.js';
+  collation_editor.init();
+</script>
+```
 
 Services File
 ---
 
-To connect the collation editor to your own database or platform a services file must be provided. Some variables and functions are required, others are optional and additional configuration can also be added. The first two types are described in this section and the configuration additions are expalined in the configuration section.  
+To connect the collation editor to your own database or platform a services file must be provided. Some variables and functions are required, others are optional and additional configuration can also be added. The first two types are described in this section and the configuration additions are explained in the configuration section.
 
 On loading the services file must call ```CL.setServiceProvider()``` passing a reference to the service file object as the argument.
 
@@ -96,11 +115,17 @@ In future releases it may be possible for projects to limit the supported rules 
 
 - #### ```initialiseEditor()```
 
+| Param  | Type                | Description  |
+| ------ | ------------------- | ------------ |
+| project | <code>JSON</code> | [optional] The JSON of project object |
+
 This function is called as part of the initialisation sequence.
 
 The only requirement for this function is that it set ```CL.managingEditor``` to either ```true``` or ```false``` depending on whether the current user is the managing editor of the current project.
 
-The functional can also be used to set any platform specific requirements such as loading the correct home page for the current project.
+
+The function can also be used to set any platform specific requirements such as loading the correct home page for the current project.
+
 
 - #### ```getUserInfo()```
 
@@ -108,7 +133,7 @@ The functional can also be used to set any platform specific requirements such a
 | ------ | ------------------- | ------------ |
 | callback  | <code>function</code> | function to be called on the user data |
 
-This function must get the current user details as a JSON object and call ```callback``` with the result. The user object iself must contain an **id** key. Any other data can be included for use in your own functions for example ```showLoginStatus``` might want to show the username.
+This function must get the current user details as a JSON object and call ```callback``` with the result. The user object itself must contain an **id** key. Any other data can be included in the object returned for use in your other service functions for example ```showLoginStatus``` might want to show the username.
 
 - #### ```getUserInfoByIds()```
 
@@ -146,7 +171,7 @@ This function must get the current project details as a JSON object and call ```
 | documentIds | <code>array</code> | the list of ids for the documents required |
 | callback  | <code>function</code> | function to be called on the data |
 
-This function must find all of the JSON data for this context in each of the documents requested. The callback should be run on the resulting list of JSON objects. Any documents that are lacunose for this unit can be omitted from the data sent to the callback (they will be handled later). TODO: check this is true for special category readings and amend as necessary.
+This function must find all of the JSON data for this context in each of the documents requested. The callback should be run on the resulting list of JSON objects. Any documents that are lacunose for this unit can be omitted from the data sent to the callback (they will be handled later). **TODO:** check this is true for special category readings and amend as necessary.
 
 The JSON structure provided for each unit in each document should match the unit structure as described in the data structures section.
 
@@ -187,6 +212,7 @@ In future versions this function may require an optional projectId parameter.
 
 This should retrieve the collation with the given id and run the callback on the result, if no collation object is found the callback should be run with ```null```.
 
+
 ### Optional Service File Variables
 
 - #### ```localJavascript```
@@ -210,13 +236,11 @@ This variable should be a string and should be the text the collation editor sho
 
 **This variable can be overwritten in individual project settings**
 
-This variable is a boolean which determines whether or not to show the button in the footer of all stages of the collation editor which allows all the units to be collapsed to show only the a reading. The default is false.
-
-**NB:** In previous versions this button was included by default.
+This variable is a boolean which determines whether or not to show the button in the footer of all stages of the collation editor which allows all the units to be collapsed to show only the a reading. The default is false. In previous versions this button was included by default.
 
 - #### ```extraFooterButtons```
 
-**This variable can be overwritten in individual project settings on a stage by stage basis but the services file supports the functions added**
+**This variable can be overwritten in individual project settings on a stage by stage basis but addExtraFooterFunctions() in the services file must provide all the functions added in the projects**
 
 This variable can be used to add your own custom buttons to the footer of the display in the four stages of the collation editor. Each stage is treated separately. The data should be structured as a JSON object with the stage/s to be modified as the top level key/s using the following values: regularised, set, ordered, approved. The value for each key should be an array of objects where each object has the following two keys:
 
@@ -244,11 +268,11 @@ extraFooterButtons = {
 
 This variable can be used to add additional checks before moving to the next stage of the collation editor. It can be used to enforce particular editorial rules for example.
 
-The data should be structured as a JSON object with the stage/s to be modified as the top level key/s using the following values: set_variants, order_readings, approve. The key refers to the stage being moved to so the checks in the key *set_variants* will be run when the *move to set variants* button is clicked in the regulariser screen.
+The data should be structured as a JSON object with the stage/s to be modified as the top level key/s using the following values: set_variants, order_readings, approve. The key refers to the stage being moved to; so the checks in the key *set_variants* will be run when the *move to set variants* button is clicked in the regularisation screen.
 
 The value of this key should be an array of JSON objects each with the following three keys:
 
-- **function** *[string]* - the function to run. The can either be the function itself or, as in the example below a reference to a function elsewhere sich as the javascript files listed in the ```localJavascript``` variable.
+- **function** *[string]* - the function to run. The can either be the function itself (in the services file only) or, as in the example below a reference to a function elsewhere such as the javascript files listed in the ```localJavascript``` variable.
 -  **pass_condition** *[boolean]* - the boolean returned from the function if the test has passed and the user may continue to the next stage.
 -  **fail_message** *[string]* - the string displayed to the user if a test condition fails and they are prevented from moving to the next stage.
 
@@ -286,8 +310,7 @@ The example below shows two checks added between set variants and order readings
 
 **This variable can be overwritten in individual project settings**
 
-
-This variable is a boolean. If it is set to true then in the move between set variants and order readings any lac readings, whatever their text value on the screen, will be automatically regularised to lac in every unit. For example '<ill 4 char>' and '<lac 4 char>' would both be regularised to '<lac>'. These regularised readings work as subreadings and can be viewed like all other subreadings in the interface.
+This variable is a boolean. If it is set to true then in the move to order readings any lac readings, whatever their text value on the screen, will be automatically regularised to '<lac>' in every unit. For example '<ill 4 char>' and '<lac 4 char>' would both be regularised to '<lac>'. These regularised readings work as subreadings and can be viewed like all other subreadings in the interface.
 
 The default is false.
 
@@ -345,11 +368,11 @@ approval_settings = {
 
 **This variable can be overwritten in individual project settings**
 
-**There is a default in the core code which just gives the option to treat the reading as a main reading** (this option is always shown even if this variable is provided in services or project - this may change in future releases)
+**There is a default in the core code which just gives the option to treat the reading as a main reading** (this option is always shown even if this variable is provided in services or project)
 
-This variables controls the options that are available for the reading in the topline which it has been made into an overlapped reading. The default 'Make main reading' allows the words used in the overlapping reading to be used as evidence for the top line. The rearranging of these words is permitted out of transcription order as the order of words is often something which leads to overlapping readings being created. Any number of additional options can be added to the menu.
+This variables controls the additional options that are available for the reading in the top line which it has been made into an overlapped reading. The default, and always present, option 'Make main reading' allows the words used in the overlapping reading to be used as evidence for the top line. The rearranging of these words is permitted out of transcription order as the order of words is often something which leads to overlapping readings being created. Any number of additional options can be added to the menu. This option cannot be overridden by settings and is always present.
 
-The data should be structured as an array of JSON objects. Each object represents an entry in the menu. The object should have the following keys (the final one is optional):
+The data for any additional options should be structured as an array of JSON objects. Each object represents an entry in the menu. The object should have the following keys (the final one is optional):
 
 -  **id** *[string]* - The string to be used as the id in the menu item (only used for HTML)
 -  **label** *[string]* - The string to display to the user in the menu to explain what this option does.
@@ -383,22 +406,28 @@ overlappedOptions = [{
 
 **There is a default in the core code**
 
-This variable is used to control the way the collation unit is provided to and retrieved from the initial index page of the collation editor. There is a default in the core code which will use the form at ```CE_core/html_fragments/default_index_input.html``` and take the collation unit context from the value of the HTML element with the id 'context'.
+This variable is used to control the way the collation unit is provided to and retrieved from the initial index page of
+the collation editor. There is a default in the core code which will use the form at ```CE_core/html_fragments/default_index_input.html```
+and take the collation unit context from the value of the HTML element with the id 'context'.
 
-The data should be structured as a JSON object with the following two keys:
+The data should be structured as a JSON object with any of the following option keys as required:
 
 -  **form** *[string]* - The string representing the location of the html index file. This value will be appended to the value of ```staticUrl```.
--  **result_provider** *[function]* - The function to use to contruct the collation context required from the form provided.
+-  **result_provider** *[function]* - The function to use to construct the collation context required from the form provided.
+-  **onload_function** *[function]* - The function to run when the form loads.
 
-If you chose to provide contextInput then both keys should be provided if you only need to overwrite part of the default behaviour the key not in use must be provided and set to ```null```. If you are not providing a value for form and not using the default then you should not use CL.loadIndexPage but instead the framework should provide the index page independently.
+
+
+
+If you chose to provide contextInput then both keys should be provided if you only need to overwrite part of the default behaviour the key not in use must be provided and set to ```null```. If you are not providing a value for form and not using the default then you should not use ```CL.loadIndexPage()``` but instead the framework should provide the index page independently.
 
 An example is below:
 
 ```js
-contextInput = { //this is only a partial implementation as form itself is handled by the framework
-     'form' : null,
-     'result_provider' : function () {
-         var book, chapter, verse, ref;
+contextInput = {
+     "form" : "html/index.html",
+     "result_provider" : function () {
+         let book, chapter, verse, ref;
          book = document.getElementById('book').value;
          chapter = document.getElementById('chapter').value;
          verse = document.getElementById('verse').value;
@@ -406,7 +435,8 @@ contextInput = { //this is only a partial implementation as form itself is handl
              ref = book + '.' + chapter + '.' + verse;
          }
          return ref;
-     }
+     },
+     "onload_function": null
    };
 ```
 
@@ -722,6 +752,22 @@ This default behaviour can be overridden by providing this function in the servi
 
 This function can be used to override the default in the collation editor core code. It takes as an argument a success callback which can be used in conjunction with the export settings to control the export process. Can be useful if a CSRF token is required to download the output.
 
+- #### ```extractWordsForHeader()```
+
+| Param  | Type                | Description  |
+| ------ | ------------------- | ------------ |
+| data | <code>list</code> | The list of token objects from the base text |
+
+**This function can be overwritten in individual project settings**
+
+**There is a default in the core code which is explained below**
+
+ This function is used to extract the words that appear in the collation editor at the very top of each unit above the numbers. It can be used to both change the visible text and to add css class values to be added to the html so that the presentation can be changed in the html.
+
+ The function is given the token list of the base text. It should return a list of lists where the first item in the inner list is the string to display for the token and the second item in the inner list is a string representing the class values that should be added to the html. If multiple classes need to applied they can be put in a single string value separated by spaces. If not classes need to be added then the second item in the inner list should be an empty string. Any punctuation or other data which should be displayed on the screen should be combined into the display string for the token.
+
+The default does not add any extra text or classes and maintains the behaviour of previous releases. It extracts the words from the data in the sected base text using the 'original' key if that is present or 't' if it is not. It also adds any punctuation to the words based on the 'pc_before' and 'pc_after' keys.
+
 - #### ```prepareDisplayString()```
 
 | Param  | Type                | Description  |
@@ -754,6 +800,9 @@ There are probably very few, if any, good reasons to use this. It is present to 
 
 This function is required if ```prepareDisplayString()``` is used. It must exactly reverse the changes made to the string by that function. It is used when making regularisation rules to ensure the stored strings are what is expected and can be transformed by prepareNormalisedString() correctly in the display.
 
+
+Python/Server Services
+---
 
 
 Data Structures
@@ -870,6 +919,7 @@ Upgrading to collation_editor_core v2.0.x from collation_editor_core 1.1.x
 ---
 
 New features in this version:
+
   - The option to add and/or remove witnesses from saved collations in the first two stages of the collation editor.
   - Support for lac/om unit readings where the editor need to be more specific about the reason for the absence.
 
@@ -900,7 +950,7 @@ Some of these changes are required to keep things working. Most are only require
   - To enable to new feature that enables witnesses to be added and/or removed from saved collations set the ```allowWitnessChangesInSavedCollations``` variable to ```true```. This can be set in either the services file or in the project configurations for the projects which need to use this feature.
   - The undo stack length can now be altered in the services file. The default is in the code and is set at six. The variable ```undoStackLength``` can be used to increase this. A full version of the data structure is held in browser memory for each position in the stack. If you have  a lot of witnesses and/or longer units then setting this too high may cause problems.  Because of the possible memory issues this can only be set in services and cannot be changed in project settings.
 
-##### Changes to functions
+##### Changes to functions and new required functions
 
   - changes to existing function ```getVerseData()```
     - ```getVerseData()``` function should be renamed to ```getUnitData()```.
@@ -910,14 +960,11 @@ Some of these changes are required to keep things working. Most are only require
 
 ##### Optional changes
 
-
-  * extractWordsForHeader - also available in the project settings. This is used to extract the words for the header. This function was originally added so that special classes can be added to the words in the header of the collation editor if necessary and also to display additional uncollated text (ritual directions for MUYA for example) if required. The function will be given the list of tokens from the basetext of the data. It should return a list of words where each word is an array with two items, the first is the string representing the word (with any punctuation added into the string) and the second an optional class to be added to the word in the basetext which appears above the row of numbers. This can then be styled with css is required. If no class is required then the default can be used unless the word itself needs further manipulation. If you need to manipulate the word but do not need a class the second argument should be an empty string.
-
-
+  - A new ```extractWordsForHeader()``` function can be specified in either the services file or project settings. The default option maintains current behaviour so it is unlikely that this will be needed for any existing projects. It is used to change the way the text above the numbers appears in all stages of the collation editor. It can be useful to add css classes to these words if some of them need to be highlighted or to display other text which is present in the data but which is not collated. This was introduced for the MUYA project, the first case is used to identifier main text and commentary text the second is used to display the ritual direction text.
 
 ##### Changes to project settings
 
-  - rules classes specified in project settings should use the key ```ruleClasses``` not ```regularisation_classes```. This bring them in line with the services equivalent. Both were supported for projects in earlier versions.
+  - rules classes specified in project settings should use the JSON key **ruleClasses** not ***regularisation_classes***. This bring them in line with the services equivalent. Both were supported for projects in earlier versions.
 
 
 * ensure that somewhere it is recorded how to specify functions such as sortWitnesses, prepareDisplay String etc in project settings (code for this has changed so essential it is done correctly now) include how to do it in services somewhere for good measure (might already be done)
@@ -935,14 +982,14 @@ Some of these changes are required to keep things working. Most are only require
 
 collation service in views.py (for me) can support an optional parameter 'debug' it must be optional if it is used as the add witness function does not use debug mode.
 
-#### Exporter changes
+#### Exporter changes which may need action in inherited classes
 
-The export_data function now takes an addition keyword argument 'settings' which is a dictionary of settings or an empty dictionary. Any class inheriting from exporter.Exporter and implementing the 'export_data' function must add this additional keyword argument to the expected arguments for the function. These settings are not used in the Exporter code but are useful for passing settings into class which inherit from it or do not inherit from it but are called by exporter factory as part of the collation editor export.
+The following changes relate to the Exporter class in the exporter.py file in the collation editor code.
 
-The export has generally been made more modular to allow easier customisation. Only one of the changes, the addition of the 'get_lemma_text' function, is likely to change the behaviour of existing code.
-To maintain previous behaviour this should be overidden in any classes inheriting from exporter.Exporter. The code in 1.x retrieved the lemma text from the apparatus from the a reading which is always the same as the overtext in the collation editor but always uses the t form of the word and does not follow the convention of the collation editor for using the data from the overtext in the very top line of each stage display. In addition not using the overtext values here limits reuse of the exporters in larger systems where a different editorial text might be selected for publication. To maintain existing behaviour any exporter classes inheriting from exporter.Exporter should include this function which still extracts from the overtext structure but uses the t value as the key which will be the same as that used in the a reading.
+The export_data function now takes an addition keyword argument 'settings' which is a dictionary of settings or an empty dictionary. Any class inheriting from Exporter and implementing the ```export_data()``` function must add this additional keyword argument to the expected arguments for the function. These settings are not used in the Exporter code but are useful for passing settings into class which inherit from it or do not inherit from it but are called by exporter factory as part of the collation editor export.
 
-
+The export has generally been made more modular to allow easier customisation. Only one of the changes, the addition of the ```get_lemma_text()``` function, is likely to change the behaviour of existing code.
+To maintain previous behaviour this should be overidden in any classes inheriting from Exporter. The code in 1.x retrieved the lemma text from the apparatus from the a reading which is always the same as the overtext in the collation editor but always uses the t form of the word and does not follow the convention of the collation editor for using the data from the overtext in the very top line of each stage display. In addition not using the overtext values here limits reuse of the exporters in larger systems where a different editorial text might be selected for publication. To maintain existing behaviour any exporter classes inheriting from Exporter should include this function which still extracts from the overtext structure but uses the t value as the key which will be the same as that used in the a reading.
 
 ```python
 def get_lemma_text(self, overtext, start, end):
@@ -955,6 +1002,6 @@ def get_lemma_text(self, overtext, start, end):
 
 ```
 
-The XML declaration returned by the Exporter class now uses double rather than single quotes (this will only break things if you ever have to remove it, in which case the match string will need to account for this change.)
+The XML declaration returned by the Exporter class now uses double rather than single quotes. This will only break things if you ever have to remove it using a string match which is sometimes necessary for python XML processors. If this is the case then the match string will need to account for this change.
 
-The 'make_reading' function of Exporter now takes an option argument 'subtype'. Any classes which inherit from Exporter and implement this function should add this optional argument. It is used in the core Exporter to add the subreading classification/s in the 'cause' attribute of the rdg element for any readings with the type=subreading. XML exports will all change compared to those exported from 1.x but only in the addition of this attribute which should not cause any problems.
+The ```make_reading()``` function of Exporter now takes an option argument 'subtype'. Any classes which inherit from Exporter and implement this function should add this optional argument. It is used in the core Exporter to add the subreading classification/s in the 'cause' attribute of the rdg element for any readings with the reading is a subreading. XML exports will all change compared to those exported from 1.x but only in the addition of this attribute which should not cause any problems.
