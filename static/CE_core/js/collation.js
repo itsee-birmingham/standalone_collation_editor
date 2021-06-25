@@ -1490,8 +1490,8 @@ CL = (function() {
 
   makeVerseLinks = function() {
     var verse, ok;
-    if (document.getElementById('previous_verse') && CL.services.hasOwnProperty('getAdjoiningVerse')) {
-      CL.services.getAdjoiningVerse(CL.context, true, function(verse) { // previous
+    if (document.getElementById('previous_verse') && CL.services.hasOwnProperty('getAdjoiningUnit')) {
+      CL.services.getAdjoiningUnit(CL.context, true, function(verse) { // previous
         if (verse) {
           $('#previous_verse').on('click', function() {
             if (!RG.hasOwnProperty('_rules') || (RG.hasOwnProperty('_rules') && RG.allRuleStacksEmpty())) {
@@ -1510,8 +1510,8 @@ CL = (function() {
         }
       });
     }
-    if (document.getElementById('next_verse') && CL.services.hasOwnProperty('getAdjoiningVerse')) {
-      CL.services.getAdjoiningVerse(CL.context, false, function(verse) { // next
+    if (document.getElementById('next_verse') && CL.services.hasOwnProperty('getAdjoiningUnit')) {
+      CL.services.getAdjoiningUnit(CL.context, false, function(verse) { // next
         if (verse) {
           $('#next_verse').on('click', function() {
             if (!RG.hasOwnProperty('_rules') || (RG.hasOwnProperty('_rules') && RG.allRuleStacksEmpty())) {
