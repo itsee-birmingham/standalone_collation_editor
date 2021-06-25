@@ -3564,7 +3564,7 @@ SV = (function () {
 		for (i = 0; i < newunit.readings[0].text.length; i += 1) {
 			for (key in newunit.readings[0].text[i]) {
 				if (newunit.readings[0].text[i].hasOwnProperty(key)) {
-					if ([CL.dataSettings.base_text_siglum, 'verse', 'interface', 't', 'rule_string', 'index', 'siglum'].indexOf(key) === -1) {
+					if ([CL.dataSettings.base_text_siglum, 'verse', 'interface', 't', 'index', 'siglum'].indexOf(key) === -1) {
 						delete newunit.readings[0].text[i][key];
 					}
 				}

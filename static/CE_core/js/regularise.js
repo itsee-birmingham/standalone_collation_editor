@@ -932,11 +932,12 @@ RG = (function() {
     });
   };
 
+  // This is not really needed anymore as we are no longer adding rule_string into the data It is still here because
+  // we may have data at the regularisation stage which does still have this key and it may as well be deleted.
   _removeUnrequiredData = function() {
-    var i, j, k;
-    for (i = 0; i < CL.data.apparatus.length; i += 1) {
-      for (j = 0; j < CL.data.apparatus[i].readings.length; j += 1) {
-        for (k = 0; k < CL.data.apparatus[i].readings[j].text.length; k += 1) {
+    for (let i = 0; i < CL.data.apparatus.length; i += 1) {
+      for (let j = 0; j < CL.data.apparatus[i].readings.length; j += 1) {
+        for (let k = 0; k < CL.data.apparatus[i].readings[j].text.length; k += 1) {
           if (CL.data.apparatus[i].readings[j].text[k].hasOwnProperty('rule_string')) {
             delete CL.data.apparatus[i].readings[j].text[k].rule_string;
           }

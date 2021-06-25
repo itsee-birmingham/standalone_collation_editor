@@ -123,7 +123,7 @@ This function is called as part of the initialisation sequence.
 
 The only requirement for this function is that it set ```CL.managingEditor``` to either ```true``` or ```false``` depending on whether the current user is the managing editor of the current project.
 
-If the index page is to be set up with javascript using the settings provided in the ```contextInput``` variable in the services file then the function should call ```CL.loadIndexPage``` with the current project as the only argument. If the index page is to be provided in an alternative way they this function must show that index page and set any other platform requirements for its use.
+If the index page is to be set up with javascript using the settings provided in the ```contextInput``` variable in the services file then the function should call ```CL.loadIndexPage()``` with the current project as the only argument. If the index page is to be provided in an alternative way they this function must show that index page and set any other platform requirements for its use. If ```CL.loadIndexPage()``` is not used then this function also needs to add a *switch project* button and a *view project summary* button if they are required on the platform. Details of how to activate the buttons can be found in the relevant entries in the Optional Service File Functions section.
 
 - #### ```getUserInfo()```
 
@@ -173,7 +173,7 @@ This function must find all of the JSON data for this context in each of the doc
 
 The JSON structure provided for each unit in each document should match the unit structure as described in the data structures section.
 
-**NB:** In previous versions this function was called ```getVerseData()``` and had a boolean ```private``` as the third argument before the callback.
+**NB:** Until version 2.0.0 this function was called ```getVerseData()``` and had a boolean ```private``` as the third argument before the callback.
 
 - #### ```saveCollation()```
 
@@ -198,7 +198,7 @@ This function needs to save the collation object in the database. It must be sto
 
 This should return all of the saved collations of the requested unit restricted by the current project and, if supplied, the provided user id.
 
-In future versions this function may require an optional projectId parameter.
+In future versions this function may include an optional projectId parameter rather than using the current project.
 
 
 - #### ```loadSavedCollation()```
@@ -208,33 +208,33 @@ In future versions this function may require an optional projectId parameter.
 | id | <code>string/int</code> | Id of collation object required. |
 | callback | <code>function</code> | The function to be called on the retrieved data. |
 
-This should retrieve the collation with the given id and run the callback on the result, if no collation object is found the callback should be run with ```null```.
+This should retrieve the collation with the given id and run the callback on the result, if no collation object is found the callback should be run with ```null```. The id here is the unique identifier used by the database to refer to this collation.
 
 
 ### Optional Service File Variables
 
 - #### ```localJavascript```
 
-This variable should be an array of strings giving the full url of any additional javascript you need the collation editor to load. These might be required run the services for your framework (an internal api file for example) or you might want to use additional files to store configuration functions that you call in the services. These files will be loaded as part of the collation editor initialisation functions called once the services are set.
+This variable should be an array of strings giving the full url of any additional javascript you need the collation editor to load. These might be required run the services for your framework (an internal api file for example) or you might want to use additional files to store configuration functions that you call in the services. These files will be loaded as part of the collation editor initialisation functions called after the services have been set.
 
 - #### ```lacUnitLabel```
 
 **This variable can be overwritten in individual project settings**
 
-This variable should be a string and should be the text the collation editor should display for any witnesses which are lacunose for the entire collation unit. The default, which will be used if this variable is not present, is 'lac unit'. Until version 2.0.0 the default text was 'lac verse'.
+This variable should be a string and should be the text the collation editor needs to display for any witnesses which are lacunose for the entire collation unit. The default, which will be used if this variable is not present, is 'lac unit'. Until version 2.0.0 the default text was 'lac verse'.
 
 
 - #### ```omUnitLabel```
 
 **This variable can be overwritten in individual project settings**
 
-This variable should be a string and should be the text the collation editor should display for any witnesses which omit the entire collation unit. The default, which will be used if this variable is not present, is 'om unit'. Until version 2.0.0 the default text was 'om verse'.
+This variable should be a string and should be the text the collation editor needs to display for any witnesses which omit the entire collation unit. The default, which will be used if this variable is not present, is 'om unit'. Until version 2.0.0 the default text was 'om verse'.
 
 - #### ```showCollapseAllUnitsButton```
 
 **This variable can be overwritten in individual project settings**
 
-This variable is a boolean which determines whether or not to show the button in the footer of all stages of the collation editor which allows all the units to be collapsed to show only the a reading. The default is false. In previous versions this button was included by default.
+This variable is a boolean which determines whether or not to show the button in the footer of all stages of the collation editor which allows all the units to be collapsed to show only the a reading. The default is false. Until version 2.0.0  this button was included by default.
 
 - #### ```extraFooterButtons```
 
@@ -518,80 +518,6 @@ For an example of the javascript configuration see the [default_settings.js](htt
 The python requirements to support any additional rule conditions is covered in the section later in the documentation titled Python/Server Services.
 
 
-- #### ```localPythonImplementations```
-
-**This variable can be overwritten in individual project settings**
-
-There are a few functions which can be provided as python methods if required.
-
-- **prepare_t** should be provided if any processing was done in the extraction of the token JSON in  
-  order to create the t value. This method should do the same as that process. It is used to determine if rules should be applied before or after the data is sent to collateX. For example, if when preparing the JSON data, you lowercase the value of t then collateX will be sent the lowercase version and therefore any rules which change the case should be applied to the data once it is returned from collateX.
-
-  This method is provided with:
-  - a string representing the value of the current word
-  - a dictionary of the display settings with the id of each setting providing the key to a boolean that describes whether it is selected or not
-  - an array containing the JSON objects of the full display_settings configuration.
-
-  It should return the string modified to the same way as the t values in the token JSON data is created.
-
-- **set_rule_string** This seems to be important in the regularisation process but I can't remember exactly why (I think it is probably to do with rule chaining). I will look into this and update the documentation when I work it out. Sorry!
-
-The data should be provided as a JSON object with the function names above as top level keys (only required for the functions you wish to provide). The data for each of those keys should be another JSON object with the following keys:
-
-- **python_file** *[string]* - The import path for the python file containing the class
-- **class_name** *[string]* - The name of the class containing the methods
-- **function** *[string]* - the name of the method of the python class to run for this function. Requirements of the python methods are given in the descriptions above.
-
-An example of the config is shown below:
-
-```js
-localPythonImplementations = {
-    "prepare_t": {
-        "python_file": "collation.greek_implementations",
-        "class_name": "PrepareData",
-        "function": "prepare_t"
-    },
-    "set_rule_string": {
-        "python_file": "collation.greek_implementations",
-        "class_name": "PrepareData",
-        "function": "set_rule_string"
-    }
-};
-```
-
-The corresponding python for the config above is below:
-
-```python
-class PrepareData(object):
-
-    def prepare_t(self, string, display_settings={}, display_settings_config=[]):
-        #turn it into a dictionary so we can use other functions
-        settingsApplier = ApplySettings()
-        token = {'interface': string}
-        token = settingsApplier.lower_case_greek(token)
-        token = settingsApplier.hide_supplied_text(token)
-        token = settingsApplier.hide_unclear_text(token)
-        token = settingsApplier.hide_apostrophes(token)
-        token = settingsApplier.hide_diaeresis(token)
-        return token['interface']
-
-
-    def set_rule_string(self, token, display_settings={}, display_settings_config=[]):
-        if 'n' in token:
-            word = token['n']
-        elif 'expand_abbreviations' in display_settings and 'expanded' in token.keys():
-            word = token['expanded']
-        else:
-            word = token['original']
-        temp_token = {'interface': word}
-        settingsApplier = ApplySettings()
-        temp_token = settingsApplier.lower_case_greek(temp_token)
-        temp_token = settingsApplier.hide_apostrophes(temp_token)
-        temp_token = settingsApplier.hide_diaeresis(temp_token)
-        token['rule_string'] = temp_token['interface']
-        return token
-```
-
 - ```localCollationFunction```
 
 **This variable can be overwritten in individual project settings (but this may not be advisable)**
@@ -629,8 +555,7 @@ More will be added here soon.
 | ------ | ------------------- | ------------ |
 | callback | <code>function</code> |[optional] The function to be called when the function completes. |
 
-This function can be used to display the currently logged in user. It is called when pages are displayed. It should get the current user, display the details in the desired way and then run the callback if there is one.
-
+This function can be used to display the currently logged in user. It is called when pages are displayed. It should get the current user and display the required details in the preferred way for the platform. There is a <div> element on each page that calls this function which has the id 'login_status' which should be used to display the user details. When this is done the function should run the callback if one was provided.
 
 - #### ```getSavedStageIds()```
 
@@ -639,31 +564,34 @@ This function can be used to display the currently logged in user. It is called 
 | context | <code>string</code> | The reference for the unit required. |
 | callback | <code>function</code> |The function to be called on the returned data. |
 
-This function populates the links to saved collations in the footer of the page. This function must get the saved callations for this user and the approved from the project even if it does not belong to this user. The callback must be run with the saved objects from the four collation stages as paramters in order of the stages (regularised, set variants, order readings, approved). If there are no saved objects for any of the stages this position in the parameters should be null.
+This function populates the links to saved collations in the footer of the page. This function must get the saved collations for the context belonging to this user and the approved collation from the project even if it does not belong to this user. The callback must be run with the saved objects from the four collation stages as parameters in order of the stages (regularised, set variants, order readings, approved). If there are no saved objects for any of the stages this position in the parameters should be null.
 
 - #### ```addExtraFooterFunctions()```
 
-This is required if any extra footer buttons are specified in the services file variable ```extraFooterButtons```. It must attach onclick listeners to all of the buttons specified in the variable.
+This is required if any extra footer buttons are specified in the services file variable ```extraFooterButtons```. It must attach onclick listeners to all of the buttons specified in the variable. This function must cover all buttons added in the services file and in any projects hosted on the system.
 
-- #### ```getAdjoiningVerse()```
+- #### ```getAdjoiningUnit()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
-| context | <code>string</code> | The reference for the current unit. |
-| isPrevious | <code>boolean</code> | true if we are looking for the previous unit, false if we are looking for the next unit.
+| context | <code>string</code> | The unit reference for the current unit. |
+| isPrevious | <code>boolean</code> | true if we are looking for the previous unit, false if we are looking for the next unit. |
 | callback | <code>function</code> |The function to be called on the unit identifier string for the next or previous unit. |
 
-This function is used to provide the data needed move through the data by collation unit using the arrows at the beginning and end of the overtext. It should return either the next (if isPrevious is false) or previous unit based on the provided context. The callback should be run on the string that represents the next/previous unit. If no unit is found the callback should be run with ```null```.
+This function is used to provide the data needed move through the data by collation unit using the arrows at the beginning and end of the overtext. It should return either the next (if isPrevious is false) or previous unit based on the provided context. The callback should be run on the string that represents the context string for the next/previous unit. Context here and in the parameters refers to the string used to identify the collation unit. i.e. what the user would type into the index page to run a collation for that unit. If no unit is found the callback should be run with ```null```.
+
+**NB** Prior to release 2.0.0 this function was named ```getAdjoiningVerse()```
 
 - #### ```switchProject()```
 
-If this function is present in the services file and ```CL.loadIndexPage()``` is called by the services as part of the ```initialiseEditor()``` function in the services then a *switch project* button will be added to the footer of the index page and this function will be attached as an onclick event. The function itself should redirect the user to a page that allows them to select a project from the projects they are authorised to access.
+If this function is present in the services file and ```CL.loadIndexPage()``` is called by the services as part of the ```initialiseEditor()``` function in the services then a *switch project* button will be added to the footer of the index page and this function will be attached as an onclick event. The function itself should redirect the user to a page that allows them to select a project from the projects they are authorised to access and then return the user to the page they were viewing when they clicked the button.
 
 
 - #### ```viewProjectSummary()```
 
-If this function is present in the services file and ```CL.loadIndexPage()``` is called by the services as part of the ```initialiseEditor()``` function in the services then a *view projct summary* button will be added to the footer of the index page and this function will be attached as an onclick event. The function itself should redirect the user to a page that shows a summary of the work on the project. This might, for example, include how many of the collation units have been saved at each stage and how many have been aproved.
+If this function is present in the services file and ```CL.loadIndexPage()``` is called by the services as part of the ```initialiseEditor()``` function in the services then a *view project summary* button will be added to the footer of the index page and this function will be attached as an onclick event. The function itself should redirect the user to a page that shows a summary of the work on the project. This might, for example, include how many of the collation units have been saved at each stage and how many have been approved.
 
+HERE
 
 - #### ```witnessSort()```
 
@@ -957,11 +885,15 @@ Some of these changes are required to keep things working. Most are only require
     - ```getVerseData()``` function should be renamed to ```getUnitData()```.
     - The boolean argument 'private' in the third position should be removed. The third and final argument should now be the callback.
     - The return data for the function has changed (see description of service file above and details on special category lac readings **TODO where?**). To maintain previous behaviour wrap the array returned in earlier versions in a dictionary as the value for the key 'results'.
+  - ```getAdjoiningVerse()``` should be renamed to ```getAdjoiningUnit```.
   - new optional functions ```prepareNormalisedString()``` and ```prepareDisplayString()```. These functions have been added to remove a hard coded action required from the early New Testament Greek implementation of the code. They are described fully in the optional services functions above. To maintain existing behaviour prepareNormalisedString should replace an underdot (\&#803;) with an underscore and prepareDisplayString the reverse. It is very unlikely that any projects will actually need this to be done unless unclear data is displayed with an underdot but stored in the database as an underscore.
 
 ##### Optional changes
 
   - A new ```extractWordsForHeader()``` function can be specified in either the services file or project settings. The default option maintains current behaviour so it is unlikely that this will be needed for any existing projects. It is used to change the way the text above the numbers appears in all stages of the collation editor. It can be useful to add css classes to these words if some of them need to be highlighted or to display other text which is present in the data but which is not collated. This was introduced for the MUYA project, the first case is used to identifier main text and commentary text the second is used to display the ritual direction text.
+  - The *set_rule_string* key of ```localPythonFunctions``` which was used in previous releases is no longer used in this release and can be deleted from the services file and the python files.
+  - The *prepare_t* key of ```localPythonFunctions``` is not required for version 2.x. However, it is still required if the legacy regularisation system is being used and any processing was done in the extraction of the token JSON in  
+    order to create the t value. It is now documented as part of the [legacy_regularisation repository](https://github.com/itsee-birmingham/legacy_regularisation).
 
 ##### Changes to project settings
 
@@ -1000,7 +932,6 @@ def get_lemma_text(self, overtext, start, end):
     real_end = int(end/2)-1
     word_list = [x['t'] for x in overtext['tokens']]
     return [' '.join(word_list[real_start:real_end+1])]
-
 ```
 
 The XML declaration returned by the Exporter class now uses double rather than single quotes. This will only break things if you ever have to remove it using a string match which is sometimes necessary for python XML processors. If this is the case then the match string will need to account for this change.
