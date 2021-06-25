@@ -13,11 +13,6 @@ class Regulariser(object):
         self.instance = MyClass()
         if local_python_functions:
             self.local_python_functions = local_python_functions
-            # if 'prepare_t' in local_python_functions:
-            #     module_name = local_python_functions['prepare_t']['python_file']
-            #     class_name = local_python_functions['prepare_t']['class_name']
-            #     MyClass = getattr(importlib.import_module(module_name), class_name)
-            #     self.prepare_t_instance = MyClass()
         else:
             self.local_python_functions = None
 
@@ -92,14 +87,3 @@ class Regulariser(object):
                 if matched is True:
                     return (True, last_match[1], classes)
         return (False, None, None)
-
-    # def prepare_t(self, data):
-    #     """the result of this determines if a rule is to be applied pre- or post-collate
-    #     It should match whatever you do to the tokens to prepare them for collation"""
-    #     if self.local_python_functions and 'prepare_t' in self.local_python_functions:
-    #         return getattr(self.prepare_t_instance,
-    #                        self.local_python_functions['prepare_t']['function']
-    #                        )(data, self.settings, self.display_settings_config)
-    #     else:
-    #         # default is not to touch the input
-    #         return data
