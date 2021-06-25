@@ -123,9 +123,7 @@ This function is called as part of the initialisation sequence.
 
 The only requirement for this function is that it set ```CL.managingEditor``` to either ```true``` or ```false``` depending on whether the current user is the managing editor of the current project.
 
-
-The function can also be used to set any platform specific requirements such as loading the correct home page for the current project.
-
+If the index page is to be set up with javascript using the settings provided in the ```contextInput``` variable in the services file then the function should call ```CL.loadIndexPage``` with the current project as the only argument. If the index page is to be provided in an alternative way they this function must show that index page and set any other platform requirements for its use.
 
 - #### ```getUserInfo()```
 
@@ -414,12 +412,7 @@ The data should be structured as a JSON object with any of the following option 
 
 -  **form** *[string]* - The string representing the location of the html index file. This value will be appended to the value of ```staticUrl```.
 -  **result_provider** *[function]* - The function to use to construct the collation context required from the form provided.
--  **onload_function** *[function]* - The function to run when the form loads.
-
-
-
-
-If you chose to provide contextInput then both keys should be provided if you only need to overwrite part of the default behaviour the key not in use must be provided and set to ```null```. If you are not providing a value for form and not using the default then you should not use ```CL.loadIndexPage()``` but instead the framework should provide the index page independently.
+-  **onload_function** *[function]* - The function to run when the form loads (for example, this can be used to populate menus from the database).
 
 An example is below:
 
@@ -435,8 +428,7 @@ contextInput = {
              ref = book + '.' + chapter + '.' + verse;
          }
          return ref;
-     },
-     "onload_function": null
+     }
    };
 ```
 
@@ -462,35 +454,12 @@ Each JSON object in the **configs** array should have the following keys:
 - **function** *[string]* - The name of the method of the python class to run for this setting. Requirements of the python method are given below.
 - **apply_when** *[boolean]* - A boolean that states whether the method should be run if the setting is selected (in which case the boolean should be true), or unselected (in which case the boolean should be false)
 - **check_by_default** *[boolean]* - A boolean to determine if this setting should be selected by default or not.
-- **menu_pos** *[integer]* - An integer to desribe where in the list of settings this one should appear on the settings menu.
+- **menu_pos** *[integer]* - An integer to describe where in the list of settings this one should appear on the settings menu (use ```null``` if this is to run behind the scenes and therefore not appear on the menu).
 - **execution_pos** *[integer]* - An integer to determine the order in which settings functions are applied. This can be important in some cases as the settings can interact in different ways depending on the order in which they are applied.
 
-- **Python Method Requirements**
+For an example of the javascript configuration see the [default_settings.js](https://github.com/itsee-birmingham/standalone_collation_editor/blob/master/collation/core/static/CE_core/js/default_settings.js) file.
 
-  The method is passed the JSON object for the token and must retrun the same token with the 'interface' key modified as appropriate for the setting being applied. For example if a setting is provided which hides markers of supplied text then these markers must be removed from the 'interface' key value before returning the token. If a setting for showing expanded form of the word exists then an expanded form of the text should have been stored in the JSON object and this can then be used to replace the interface version. more details of the JSON token structure can be found in the documentation for the standalone collation editor on github. This type of setting where the interface value is swapped for another in the JSON token data is an example of why the order of execution is important. When swapping the interface value it is important that any already applied rules are respected and therefore if an 'n' key is present in the token JSON it should be returned instead of any other value. An example of this is given in the 'expand_abbreviations' method example in the python code below.
-
-All of the python methods required for the display settings must be supplied in a single class. That means if you want to add to the defaults with your own functions you should copy the default code into your own python class.
-
-If a settings is required to run behind the scenes then ```null``` can be provided as the menu_pos value and it will not appear.
-
-An example of the settings can be seen in ```static/CE_core/js/default_setting.js```
-
-An example of the python functions can be seen in the ```collation/core/default_implementations.py``` file but  a sample of the two methods described above can also be seen below:
-
-```python
-class ApplySettings(object):
-
-    def expand_abbreviations(self, token):
-        if 'n' in token: #applied rules override this setting
-            token['interface'] = token['n']
-        elif 'expanded' in token:
-            token['interface'] = token['expanded']
-        return token
-
-    def hide_supplied_text(self, token):
-        token['interface'] = re.sub('\[(?!\d)', '', re.sub('(?<!\d)\]', '', token['interface']))
-        return token
-```
+The python requirements to support any customisation of the settings is covered in the section later in the documentation titled Python/Server Services.
 
 - #### ```ruleClasses```
 
@@ -500,7 +469,7 @@ class ApplySettings(object):
 
 This variable provides details of the rule classes/categories that will be available for regularising the data. The data should be structured as an array of JSON objects. The JSON object for each rule class should have the keys described below except any that are described as optional which are only required should that particular feature be needed.  
 
--  **value** *[string]* - The name of the class/category to be used internally to identify it. This must be unique amoung your specified classes and should not contain spaces.
+-  **value** *[string]* - The name of the class/category to be used internally to identify it. This must be unique among your specified classes and should not contain spaces.
 - **name** *[string]* - The human readable name for this class of rule.
 - **create_in_RG** *[boolean]* - Set to true if you want this classification to be available in the regularisation screen, false if not.
 - **create_in_SV** *[boolean]* - Set to true if you want this classification to be available in the set variants screen, false if not.
@@ -512,9 +481,9 @@ This variable provides details of the rule classes/categories that will be avail
 - **subreading** *[boolean]* - Set to true if you want readings regularised using this rule to appear as subreadings in the final edition rather than merged with the parent reading, false if not.
 - **keep_as_main_reading** *[boolean]* - Set to true if you want readings regularised with this rule to continue to appear as main readings. This is mostly used when you want to mark readings in some way to explain why they are different from the others rather than for genuine regularisations.
 
-Not all of the features make sense when combined and not all combinations will work, for example it does not make sense to mark a regularisation with a suffix to the label if you do not want to have it appear as a subreading in the final edition. For clarity when viewing subreading in set variants or viewing non-edition subreadings in order reading all regularisation classes applied will appear suffixed to the reading label, any which do not have 'suffixed_reading' set to true in the settings will appear in parentheses.
+Not all of the features make sense when combined and not all combinations will work, for example it does not make sense to mark a regularisation with a suffix to the label if you do not want to have it appear as a subreading in the final edition. For clarity when viewing subreadings in set variants or viewing non-edition subreadings in order reading all regularisation classes applied will appear suffixed to the reading label, any labels for categories that do not have 'suffixed_reading' set to true in the settings will appear in parentheses.
 
-An example can be seen in ```static/CE_core/js/default_setting.js```
+For an example of the javascript configuration see the [default_settings.js](https://github.com/itsee-birmingham/standalone_collation_editor/blob/master/collation/core/static/CE_core/js/default_settings.js) file.
 
 
 - #### ```ruleConditions```
@@ -523,63 +492,31 @@ An example can be seen in ```static/CE_core/js/default_setting.js```
 
 **There is a default provided in default_settings.js**
 
-Rule conditions are used to give users the option to specify additional conditions in the application of rules. These rules are applied in python and are supplied as python methods. Examples of when this might be useful are to ignore supplied or unclear markers when applying rules. These are provided in the defaults and are linked to the settings so that if the settings are hiding spplied markers the markers are automatically ignored when making rules. Another circumstance in which they are useful for the New Testament is to restrict the application of a rule only to tokens which have been marked as nomen sacrum in the transcriptions.
+Rule conditions are used to give users the option to specify additional conditions in the application of rules. These rules are applied in python and are supplied as python methods. Examples of when this might be useful are to ignore supplied or unclear markers when applying rules. These are provided in the defaults and are linked to the settings so that if the settings are hiding supplied markers the markers are automatically ignored when making rules. Another circumstance in which they are useful for the New Testament is to restrict the application of a rule only to tokens which have been marked as nomen sacrum in the transcriptions.
 
 The data should be structured as a JSON object. It should have three top level keys:
 
 - **python_file** *[string]* - The import path for the python file containing the class
 - **class_name** *[string]* - The name of the class containing the methods
-- **configs** *[array]* - A list of JSON objects whcih each specified the configs for a single condition
+- **configs** *[array]* - A list of JSON objects which each specified the configs for a single condition
 
 Each JSON object in the **configs** array should have the following keys (optional keys are marked):
 
 - **id** *[string]* - a unique identifier for this condition which should not contain spaces
 - **label** *[string]* - a human readable name for this condition
-- **function** *[string]* - the name of the method of the python class to run for this condition. Requirements of the python method are given below.
+- **function** *[string]* - the name of the method of the python class to run for this condition.
 - **apply_when** *[boolean]* - a boolean that states whether the method should be run if the condition is selected (in which case the boolean should be true), or unselected (in which case the boolean should be false)
 - **check_by_default** *[boolean]* - a boolean to determine if this condition should be selected by default or not
 - **type** *[string]* - This should contain one of two values depending on what is returned by the function. If the function returns a boolean the string should be 'boolean', if the function modifies the data such as removing supplied markers then this should read 'string_application'.
 - **linked_to_settings** *[boolean]* optional - set to true if this condition should be linked to the display settings.
 - **setting_id** *[string]* optional - the id of the setting to which this condition should be linked. Required if linked_to_settings is true.
 
+The 'linked_to_settings' key gives you the option to ensure that conditions are selected depending on the value of the setting at the point the rule is made. For example, if you have a setting which hides all the supplied text markers and that is active at the time a rule is made then the ignore supplied makers condition should also be selected since the user has no idea what supplied markers are in the text they are regularising. If the display setting value is the same as the 'apply_when' value of that setting then the condition will be automatically selected and disabled so the user cannot override that selection. it is important that the setting linked to and the condition do the same thing.
 
-- **Python Method Requirements**
+For an example of the javascript configuration see the [default_settings.js](https://github.com/itsee-birmingham/standalone_collation_editor/blob/master/collation/core/static/CE_core/js/default_settings.js) file.
 
-  The data provided to and the data returned from the method differ depending on the method type specified in the config.
+The python requirements to support any additional rule conditions is covered in the section later in the documentation titled Python/Server Services.
 
-  If the method is a boolean type it will be provided with two pieces of data: the JSON for the token and the JSON for the rule. The method should return True if the given rule should be applied to the given token and False if it should not. For example if a rule has a condition that says it should only be applied to nomena sacra and this token does not have a flag to say that it is one then false would be returned.
-
-  If the method is a string_application type then it will be provided with two pieces of data: the string match for the rule and an array of all the possible matches for the token. ()*NB:* please note that the data is provided in reverse order in this type of method than with the boolean type. This may be rectified in future releases.) This type of method must return a tuple of the modified data having applied the condition. The rule match must come first followed by the array of token words. For example if the condition is to ignore supplied markers when applying this rule and the supplied text in your project is indicated by [] then all instances of [ and ] must be removed from the rule match string and all of the token match strings before they are returned.
-
-- **Link to Settings**
-
-  The link to settings gives you the option to ensure that conditions are selected depending on the value of the setting at the point the rule is made. For example, if you have a setting which hides all the supplied text markers and that is active at the time a rule is made then the ignore supplied makers condition should also be selected since the user has no idea what supplied markers are in the text they are regularising. If the display setting value is the same as the 'apply_when' value of that setting then the condition will be automatically selected and disabled so the user cannot override that selection. it is important that the setting linked to and the condition do the same thing.
-
-
-
-The function will only be called if there is a possibility of the rule being applied. The function is not responsible for the application of the rule itself just applying the single condition it is responsible for.
-
-All of the python methods required for the rule conditions must be supplied in a single class. That means if you want to add to the defaults with your own functions you should copy the default code into your own python class.
-
-
-An example of the settings can be seen in ```static/CE_core/js/default_setting.js```
-
-An example of the python functions can be seen in the ```collation/core/default_implementations.py``` file but  a sample of the two methods described above can also be seen below:
-
-```python
-class RuleConditions(object):
-
-    def match_nomsac(self, token, decision):
-        if 'only_nomsac' in decision['conditions'].keys() and decision['conditions']['only_nomsac'] == True \
-            and ('nomSac' not in token.keys() or token['nomSac'] == False):
-            return False
-        return True
-
-    def ignore_supplied(self, decision_word, token_words):
-        decision_word = re.sub('\[(?!\d)', '', re.sub('(?<!\d)\]', '', decision_word))
-        token_words = [re.sub('\[(?!\d)', '', re.sub('(?<!\d)\]', '', w)) for w in token_words]
-        return(decision_word, token_words)
-```
 
 - #### ```localPythonImplementations```
 
@@ -804,6 +741,70 @@ This function is required if ```prepareDisplayString()``` is used. It must exact
 Python/Server Services
 ---
 
+### settingsApplier
+
+- **Python Method Requirements**
+
+  The method is passed the JSON object for the token and must return the same token with the 'interface' key modified as appropriate for the setting being applied. For example if a setting is provided which hides markers of supplied text then these markers must be removed from the 'interface' key value before returning the token. If a setting for showing expanded form of the word exists then an expanded form of the text should have been stored in the JSON object and this can then be used to replace the interface version. More details of the JSON token structure can be found in the documentation for the standalone collation editor on github. This type of setting where the interface value is swapped for another in the JSON token data is an example of why the order of execution is important. When swapping the interface value it is important that any already applied rules are respected and therefore if an 'n' key is present in the token JSON it should be returned instead of any other value. An example of this is given in the 'expand_abbreviations' method example in the python code below.
+
+All of the python methods required for the display settings must be supplied in a single class. That means if you want to add to the defaults with your own functions you should copy the default code into your own python class.
+
+If a settings is required to run behind the scenes then ```null``` can be provided as the menu_pos value and it will not appear in the menu.
+
+An example of the settings can be seen in ```static/CE_core/js/default_setting.js```
+
+An example of the python functions can be seen in the ```collation/core/default_implementations.py``` file but  a sample of the two methods described above can also be seen below:
+
+```python
+class ApplySettings(object):
+
+    def expand_abbreviations(self, token):
+        if 'n' in token: #applied rules override this setting
+            token['interface'] = token['n']
+        elif 'expanded' in token:
+            token['interface'] = token['expanded']
+        return token
+
+    def hide_supplied_text(self, token):
+        token['interface'] = re.sub('\[(?!\d)', '', re.sub('(?<!\d)\]', '', token['interface']))
+        return token
+```
+
+### Rule conditions
+
+- **Python Method Requirements**
+
+  The data provided to and the data returned from the method differ depending on the method type specified in the config.
+
+  If the method is a boolean type it will be provided with two pieces of data: the JSON for the token and the JSON for the rule. The method should return True if the given rule should be applied to the given token and False if it should not. For example if a rule has a condition that says it should only be applied to nomena sacra and this token does not have a flag to say that it is one then false would be returned.
+
+  If the method is a string_application type then it will be provided with two pieces of data: the string match for the rule and an array of all the possible matches for the token. **NB:** please note that the data is provided in reverse order in this type of method than with the boolean type. This may be rectified in future releases.) This type of method must return a tuple of the modified data having applied the condition. The rule match must come first followed by the array of token words. For example if the condition is to ignore supplied markers when applying this rule and the supplied text in your project is indicated by [] then all instances of [ and ] must be removed from the rule match string and all of the token match strings before they are returned.
+
+
+The function in the 'function' key in the rule settings will only be called if there is a possibility of the rule being applied. The function is not responsible for the application of the rule itself just applying the single condition it is responsible for.
+
+
+All of the python methods required for the rule conditions must be supplied in a single class. That means if you want to add to the defaults with your own functions you should copy the default code into your own python class.
+
+
+An example of the settings can be seen in ```static/CE_core/js/default_setting.js```
+
+An example of the python functions can be seen in the ```collation/core/default_implementations.py``` file but  a sample of the two methods described above can also be seen below:
+
+```python
+class RuleConditions(object):
+
+    def match_nomsac(self, token, decision):
+        if 'only_nomsac' in decision['conditions'].keys() and decision['conditions']['only_nomsac'] == True \
+            and ('nomSac' not in token.keys() or token['nomSac'] == False):
+            return False
+        return True
+
+    def ignore_supplied(self, decision_word, token_words):
+        decision_word = re.sub('\[(?!\d)', '', re.sub('(?<!\d)\]', '', decision_word))
+        token_words = [re.sub('\[(?!\d)', '', re.sub('(?<!\d)\]', '', w)) for w in token_words]
+        return(decision_word, token_words)
+```
 
 Data Structures
 ---
