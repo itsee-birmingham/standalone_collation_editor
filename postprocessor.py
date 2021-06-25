@@ -45,10 +45,6 @@ class PostProcessor(Regulariser, SettingsApplier):
         self.display_settings_config['configs'].sort(key=lambda k: k['execution_pos'])
         if local_python_functions:
             self.local_python_functions = local_python_functions
-            module_name = local_python_functions['set_rule_string']['python_file']
-            class_name = local_python_functions['set_rule_string']['class_name']
-            MyClass = getattr(importlib.import_module(module_name), class_name)
-            self.set_rule_string_instance = MyClass()
         else:
             self.local_python_functions = None
         self.split_single_reading_units = split_single_reading_units
@@ -66,7 +62,7 @@ class PostProcessor(Regulariser, SettingsApplier):
         new = {'witnesses': [witness], 'text': []}
         for token in text_list:
             new_word = {}
-            for item in ['rule_string', 't', 'interface', 'verse', witness]:
+            for item in ['t', 'interface', 'verse', witness]:
                 if item in token:
                     new_word[item] = token[item]
             new_word['reading'] = [witness]
@@ -329,7 +325,7 @@ class PostProcessor(Regulariser, SettingsApplier):
             token['reading'] = [token['reading']]
             token[reading] = {}
             for key in list(token.keys())[:]:
-                if key not in ['reading', 'interface', 'verse', 'rule_string'] and key != reading:
+                if key not in ['reading', 'interface', 'verse'] and key != reading:
                     token[reading][key] = token[key]
                     del token[key]
             new_witness.append(token)
@@ -346,13 +342,11 @@ class PostProcessor(Regulariser, SettingsApplier):
 
     def combine_tokens(self, token, new_token):
         """combine token dictionaries"""
-        if 'rule_string' not in token.keys() and 'rule_string' in new_token.keys():
-            token['rule_string'] = new_token['rule_string']
         reading = new_token['reading']
         token['reading'].append(new_token['reading'])
         token[reading] = {}
         for key in new_token.keys():
-            if key not in ['reading', 'interface', 'verse', 'rule_string'] and key != reading:
+            if key not in ['reading', 'interface', 'verse'] and key != reading:
                 token[reading][key] = new_token[key]
         return token
 
@@ -449,23 +443,9 @@ class PostProcessor(Regulariser, SettingsApplier):
             new_witness = []
             for token in witness:
                 if 'decision_details' in token and len(token['decision_details']) > 0:
-                    token['rule_string'] = token['decision_details'][-1]['n']
                     token['interface'] = token['decision_details'][-1]['n'].replace('<', '&lt;').replace('>', '&gt;')
                 else:
-                    token = self.set_rule_string(token)
                     # create the word we will see in the interface
                     self.apply_settings(token)
                 new_witness.append(token)
             return new_witness
-
-    def set_rule_string(self, token):
-        if self.local_python_functions and 'set_rule_string' in self.local_python_functions:
-            return getattr(self.set_rule_string_instance,
-                           self.local_python_functions['set_rule_string']['function']
-                           )(token, self.settings, self.display_settings_config)
-        else:
-            if 'n' in token:
-                token['rule_string'] = token['n']
-            else:
-                token['rule_string'] = token['t']
-            return token
