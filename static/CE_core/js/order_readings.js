@@ -1389,7 +1389,7 @@ OR = (function() {
     _getApparatusForContext = function() {
       if (CL.services.hasOwnProperty('getApparatusForContext')) {
         CL.services.getApparatusForContext(function () {spinner.removeLoadingOverlay();});
-      } else { //this just uses all the defaults in the exporter factory
+      } else { 
         var url;
         spinner.showLoadingOverlay();
         url = staticUrl + '/collation/apparatus';

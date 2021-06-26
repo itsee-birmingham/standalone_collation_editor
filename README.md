@@ -175,6 +175,17 @@ The JSON structure provided for each unit in each document should match the unit
 
 **NB:** Until version 2.0.0 this function was called ```getVerseData()``` and had a boolean ```private``` as the third argument before the callback.
 
+
+- #### ```doCollation()```
+
+| Param  | Type                | Description  |
+| ------ | ------------------- | ------------ |
+| context | <code>string</code> | the reference for the unit being collated |
+
+**TODO** finish this
+
+
+
 - #### ```saveCollation()```
 
 | Param  | Type                | Description  |
@@ -543,8 +554,9 @@ It should return the JSON output from collateX or equivalent.
 
 **There is a default provided in the core exporter factory code**
 
-More will be added here soon.
+The exporter settings are used to control the export of data from the approved collation screen when the 'Get Apparatus' button is pressed. This export is simply intended to be a check point for editors and should be set to provide the best export format for this task. The project summary page or a similar page in the overall platform should also provide options to export much larger units of text and more options can be provided to users in these export functions.
 
+**TODO** Sort out settings for this and simplify
 
 
 ### Optional Service File Functions
@@ -553,7 +565,7 @@ More will be added here soon.
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
-| callback | <code>function</code> |[optional] The function to be called when the function completes. |
+| callback | <code>function</code> |[optional] A function to be called when this function completes. |
 
 This function can be used to display the currently logged in user. It is called when pages are displayed. It should get the current user and display the required details in the preferred way for the platform. There is a <div> element on each page that calls this function which has the id 'login_status' which should be used to display the user details. When this is done the function should run the callback if one was provided.
 
@@ -591,7 +603,6 @@ If this function is present in the services file and ```CL.loadIndexPage()``` is
 
 If this function is present in the services file and ```CL.loadIndexPage()``` is called by the services as part of the ```initialiseEditor()``` function in the services then a *view project summary* button will be added to the footer of the index page and this function will be attached as an onclick event. The function itself should redirect the user to a page that shows a summary of the work on the project. This might, for example, include how many of the collation units have been saved at each stage and how many have been approved.
 
-HERE
 
 - #### ```witnessSort()```
 
@@ -599,7 +610,7 @@ HERE
 | ------ | ------------------- | ------------ |
 | witnesses | <code>array</code> | The list of witness sigla to be sorted. |
 
-**This function can be overridden with another in individual project settings**
+**This function can be overridden in individual project settings**
 
 **There is a default in the core code which just sorts the witnesses as strings**
 
@@ -609,13 +620,21 @@ This function is used to sort the witness sigla into the desired order. It is us
 
 **There is a default in the core code which is explained below**
 
-This function tells the collation editor how to extract the list of witnesses from the index page. If there is an element on the page with the id *preselected_witnesses* the default code will take that value and split on commas. If there is no such element the default will assume that there is a form with the id *collation_form* whih has a series of checkboxes for the witnesses and it will use any values that are selected.
+This function tells the collation editor how to extract the list of witnesses from the index page. If there is an element on the page with the id *preselected_witnesses* the default code will take that value and split on commas. If there is no such element the default will assume that there is a form with the id *collation_form* which has a series of checkboxes for the witnesses and it will use any values that are selected.
 
-This default behaviour can be overridden by providing this function in the services. It cannot be overwritten in the project settings so the function must work for all projects you host. The function must return an array containing the ids of the documents selected to be collated.
+This default behaviour can be overridden by providing this function in the services. It cannot be overwritten in the project settings so the function must work for all projects you host. The function must return an array containing the ids of the documents selected for collation.
 
 - #### ```getApparatusForContext()```
 
-This function can be used to override the default in the collation editor core code. It takes as an argument a success callback which can be used in conjunction with the export settings to control the export process. Can be useful if a CSRF token is required to download the output.
+| Param  | Type                | Description  |
+| ------ | ------------------- | ------------ |
+| callback | <code>function</code> |[optional] A function to be called when this function completes. |
+
+**There is a default in the core code which is explained below**
+
+This function can be used to override the default export function in the collation editor core code. The default will probably be good enough for many use cases as it generates the file download based on the settings specified in the ```exporterSettings``` variable in the services file. It can be useful to override the function if a CSRF token is required by the platform to download the output or to control other aspects of the export.
+
+The function has an optional success callback argument which should be run when the function is complete.
 
 - #### ```extractWordsForHeader()```
 
@@ -631,7 +650,7 @@ This function can be used to override the default in the collation editor core c
 
  The function is given the token list of the base text. It should return a list of lists where the first item in the inner list is the string to display for the token and the second item in the inner list is a string representing the class values that should be added to the html. If multiple classes need to applied they can be put in a single string value separated by spaces. If not classes need to be added then the second item in the inner list should be an empty string. Any punctuation or other data which should be displayed on the screen should be combined into the display string for the token.
 
-The default does not add any extra text or classes and maintains the behaviour of previous releases. It extracts the words from the data in the sected base text using the 'original' key if that is present or 't' if it is not. It also adds any punctuation to the words based on the 'pc_before' and 'pc_after' keys.
+The default does not add any extra text or classes and maintains the behaviour of previous releases. It extracts the words from the data in the selected base text using the 'original' key if that is present or 't' if it is not. It also adds any punctuation to the words based on the 'pc_before' and 'pc_after' keys.
 
 - #### ```prepareDisplayString()```
 
@@ -668,6 +687,10 @@ This function is required if ```prepareDisplayString()``` is used. It must exact
 
 Python/Server Services
 ---
+
+### collation service (for default)
+
+
 
 ### settingsApplier
 
@@ -734,6 +757,10 @@ class RuleConditions(object):
         return(decision_word, token_words)
 ```
 
+### apparatus exporters
+
+
+
 Data Structures
 ---
 
@@ -744,12 +771,6 @@ Configuration
 ---
 
 Much of this is explained above but I will put more of a step by step guide here at some point.
-
-
-
-
-
-
 
 
 

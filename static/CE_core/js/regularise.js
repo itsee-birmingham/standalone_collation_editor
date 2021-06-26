@@ -830,25 +830,6 @@ RG = (function() {
       result_callback = function(data) {
         callback(data);
       }
-    //TODO: this needs deleting or moving to services
-    // if (output === 'table') {
-    //   if (document.getElementById('book').value !== 'none' &&
-    //     document.getElementById('chapter').value !== 'none' &&
-    //     document.getElementById('verse').value !== 'none') {
-    //
-    //     CL.context = document.getElementById('book').value + 'K' +
-    //       document.getElementById('chapter').value +
-    //       'V' + document.getElementById('verse').value;
-    //
-    //     result_callback = function(data) {
-    //
-    //       _showCollationTable(CL.data, CL.context, document.getElementById('container'));
-    //     };
-    //     options.accept = 'json';
-    //   } else {
-    //     return;
-    //   }
-    //
     } else {
       result_callback = function(data) {
         if (data === null) {
