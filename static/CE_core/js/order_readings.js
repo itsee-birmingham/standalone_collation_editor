@@ -365,12 +365,9 @@ OR = (function() {
         if (data[i].hasOwnProperty('overlap_status')) {
           overlapped = true;
         }
-
         temp = _getSubunitData(data[i].subreadings, i, id, data[i].label, 'subreading', hand, overlapped);
         html.push.apply(html, temp[0]);
         row_list.push.apply(row_list, temp[1]);
-
-
         html.push('</table>');
       }
       html.push('</td>');
@@ -382,12 +379,12 @@ OR = (function() {
   };
 
   relabelReadings = function(readings, overwrite) {
-    var i, j, label;
-    for (i = 0; i < readings.length; i += 1) {
+    var label;
+    for (let i = 0; i < readings.length; i += 1) {
       if (readings[i].hasOwnProperty('type') && (readings[i].type === 'lac' || readings[i].type === 'lac_verse')) {
         label = 'zz';
       } else if (readings[i].hasOwnProperty('overlap_status')) {
-        for (j = 0; j < CL.overlappedOptions.length; j += 1) {
+        for (let j = 0; j < CL.overlappedOptions.length; j += 1) {
           if (CL.overlappedOptions[j].reading_flag === readings[i].overlap_status) {
             label = CL.overlappedOptions[j].reading_label;
           }
@@ -402,12 +399,11 @@ OR = (function() {
   };
 
   addLabels = function(overwrite) {
-    var i, key;
-    for (key in CL.data) {
+    for (let key in CL.data) {
       if (CL.data.hasOwnProperty(key)) {
         //TODO: replace with proper string match
         if (key.match(/apparatus\d?/) !== null) {
-          for (i = 0; i < CL.data[key].length; i += 1) {
+          for (let i = 0; i < CL.data[key].length; i += 1) {
             relabelReadings(CL.data[key][i].readings, overwrite);
           }
         }
@@ -415,14 +411,14 @@ OR = (function() {
     }
   };
 
-  makeStandoffReading = function(type, reading_details, parent_reading, outerCallback) {
-    var scroll_offset, apparatus, unit, callback;
-    scroll_offset = [document.getElementById('scroller').scrollLeft,
+  makeStandoffReading = function(type, readingDetails, parentReading, outerCallback) {
+    var scrollOffset, apparatus, unit, callback;
+    scrollOffset = [document.getElementById('scroller').scrollLeft,
       document.getElementById('scroller').scrollTop
     ];
     addToUndoStack(CL.data);
-    apparatus = reading_details.app_id;
-    unit = CL.findUnitById(apparatus, reading_details.unit_id);
+    apparatus = readingDetails.app_id;
+    unit = CL.findUnitById(apparatus, readingDetails.unit_id);
     callback = function () {
       relabelReadings(unit.readings, true);
       if (CL.showSubreadings === false) { //make sure we are still showing the edition subreadings
@@ -433,23 +429,22 @@ OR = (function() {
       showOrderReadings({
         'container': CL.container
       });
-      document.getElementById('scroller').scrollLeft = scroll_offset[0];
-      document.getElementById('scroller').scrollTop = scroll_offset[1];
+      document.getElementById('scroller').scrollLeft = scrollOffset[0];
+      document.getElementById('scroller').scrollTop = scrollOffset[1];
       if (outerCallback !== undefined) {
         outerCallback();
       }
     };
-    CL.makeStandoffReading(type, reading_details, parent_reading, callback);
+    CL.makeStandoffReading(type, readingDetails, parentReading, callback);
   };
 
   removeSplits = function() {
-    var i, j, apparatus, key;
-    for (key in CL.data) {
+    var apparatus;
+    for (let key in CL.data) {
       if (CL.data.hasOwnProperty(key)) {
-        //TODO: replace with proper string match
         if (key.match(/apparatus\d?/g) !== null) {
           apparatus = CL.data[key];
-          for (i = 0; i < apparatus.length; i += 1) {
+          for let (i = 0; i < apparatus.length; i += 1) {
             delete apparatus[i].split_readings;
           }
           CL.data[key] = apparatus;
@@ -458,7 +453,6 @@ OR = (function() {
     }
   };
 
-  // TODO: this does not work if there are multiple units at addition points.
   // Need to work this out from the top line references to the overlap units as we can't actually rely on the start
   // and end values in the overlaps
   mergeSharedExtentOverlaps = function() {
@@ -710,16 +704,15 @@ OR = (function() {
   };
 
   _getSiglaSuffixes = function() {
-      var key, i, j, k, readings_with_suffixes, suffixes, type;
-      for (key in CL.data) {
+      for (let key in CL.data) {
         if (CL.data.hasOwnProperty(key)) {
           if (key.indexOf('apparatus') != -1) {
-            for (i = 0; i < CL.data[key].length; i += 1) {
-              for (j = 0; j < CL.data[key][i].readings.length; j += 1) {
+            for (let i = 0; i < CL.data[key].length; i += 1) {
+              for (let j = 0; j < CL.data[key][i].readings.length; j += 1) {
                 CL.data[key][i].readings[j].suffixes = _doGetSiglaSuffixes(CL.data[key][i].readings[j], key, CL.data[key][i].start, CL.data[key][i].end, CL.data[key][i].first_word_index);
                 if (CL.data[key][i].readings[j].hasOwnProperty('subreadings')) {
-                  for (type in CL.data[key][i].readings[j].subreadings) {
-                    for (k = 0; k < CL.data[key][i].readings[j].subreadings[type].length; k += 1) {
+                  for (let type in CL.data[key][i].readings[j].subreadings) {
+                    for (let k = 0; k < CL.data[key][i].readings[j].subreadings[type].length; k += 1) {
                       CL.data[key][i].readings[j].subreadings[type][k].suffixes = _doGetSiglaSuffixes(CL.data[key][i].readings[j].subreadings[type][k], key, CL.data[key][i].start, CL.data[key][i].end, CL.data[key][i].first_word_index);
                     }
                   }
@@ -732,11 +725,11 @@ OR = (function() {
     };
 
     _doGetSiglaSuffixes = function(data, app, start, end, first_word_index) {
-      var readings_with_suffixes, suffixes, i;
+      var readings_with_suffixes, suffixes;
       readings_with_suffixes = CL.getReadingWitnesses(data, app, start, end, first_word_index, true);
       suffixes = [];
       data.witnesses = CL.sortWitnesses(data.witnesses);
-      for (i = 0; i < readings_with_suffixes.length; i += 1) {
+      for (let i = 0; i < readings_with_suffixes.length; i += 1) {
         suffixes.push(readings_with_suffixes[i].replace(data.witnesses[i].replace('_private', ''), ''));
       }
       return suffixes;
@@ -1389,7 +1382,7 @@ OR = (function() {
     _getApparatusForContext = function() {
       if (CL.services.hasOwnProperty('getApparatusForContext')) {
         CL.services.getApparatusForContext(function () {spinner.removeLoadingOverlay();});
-      } else { 
+      } else {
         var url;
         spinner.showLoadingOverlay();
         url = staticUrl + '/collation/apparatus';

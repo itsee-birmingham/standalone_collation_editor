@@ -149,12 +149,12 @@ CL = (function() {
   //will not overwrite existing unit ids as these are used for offset reading recording
   //will overwrite readings as consistency is not needed over sessions
   addUnitAndReadingIds = function() {
-    var data, key, i;
+    var data;
     data = CL.data;
-    for (key in data) {
+    for (let key in data) {
       if (data.hasOwnProperty(key)) {
         if (key.indexOf('apparatus') !== -1) {
-          for (i = 0; i < data[key].length; i += 1) {
+          for (let i = 0; i < data[key].length; i += 1) {
             if (!data[key][i].hasOwnProperty('_id')) {
               addUnitId(data[key][i]);
             }
@@ -200,7 +200,7 @@ CL = (function() {
 
   /** */
   extractWitnessText = function(reading, options, test) {
-    var text, witness_text, i, j, witness, reading_type, unit_id, app_id, required_rules, found_word;
+    var text, witness_text, witness, reading_type, unit_id, app_id, required_rules, found_word;
 
     if (test === true) {
       console.log(JSON.parse(JSON.stringify(reading)));
@@ -253,7 +253,7 @@ CL = (function() {
     }
     //if no witness was supplied try to find a main reading witness and if not just return interface reading of all words or lac/om stuff
     if (typeof witness === 'undefined' && !reading.hasOwnProperty('created')) { //don't do this for created readings as you are overwriting the genuine witness text in these cases
-      for (i = 0; i < reading.witnesses.length; i += 1) {
+      for (let i = 0; i < reading.witnesses.length; i += 1) {
         if (reading.text.length > 0 && reading.text[0].hasOwnProperty(reading.witnesses[i])) {
           witness = reading.witnesses[i];
           if (test === true) {
@@ -280,7 +280,7 @@ CL = (function() {
         if (test === true) {
           console.log('here are all the interface values of the reading');
         }
-        for (i = 0; i < reading.text.length; i += 1) {
+        for (let i = 0; i < reading.text.length; i += 1) {
           text.push(reading.text[i]['interface']);
         }
         return CL.project.prepareDisplayString(text.join(' '));
@@ -398,7 +398,7 @@ CL = (function() {
       }
     }
     //deal with text and internal gaps
-    for (i = 0; i < witness_text.length; i += 1) {
+    for (let i = 0; i < witness_text.length; i += 1) {
       found_word = undefined;
       if (reading_type === 'subreading' && witness_text[i][witness].hasOwnProperty('decision_details')) {
         //loop backwards and only use t of rules that match your list of supplied types
@@ -408,7 +408,7 @@ CL = (function() {
             console.log('I am a subreading but have not been given specific rules to apply');
           }
         } else {
-          for (j = witness_text[i][witness].decision_details.length - 1; j >= 0; j -= 1) {
+          for (let j = witness_text[i][witness].decision_details.length - 1; j >= 0; j -= 1) {
             if (required_rules.indexOf(witness_text[i][witness].decision_details[j]['class']) !== -1) {
               found_word = witness_text[i][witness].decision_details[j].t;
             }
@@ -471,12 +471,12 @@ CL = (function() {
   };
 
   getAllReadingWitnesses = function(reading) {
-    var i, witnesses, key;
+    var witnesses;
     witnesses = reading.witnesses.slice(0); //make a copy
     if (reading.hasOwnProperty('subreadings')) {
-      for (key in reading.subreadings) {
+      for (let key in reading.subreadings) {
         if (reading.subreadings.hasOwnProperty(key)) {
-          for (i = 0; i < reading.subreadings[key].length; i += 1) {
+          for (let i = 0; i < reading.subreadings[key].length; i += 1) {
             witnesses.push.apply(witnesses, reading.subreadings[key][i].witnesses);
           }
         }
@@ -484,7 +484,7 @@ CL = (function() {
     }
     //this has been added in to help with the fix_lac_om stuff with om as subreading of existing reading
     if (reading.hasOwnProperty('SR_text')) {
-      for (key in reading.SR_text) {
+      for (let key in reading.SR_text) {
         if (reading.SR_text.hasOwnProperty(key)) {
           if (witnesses.indexOf(key) === -1) {
             witnesses.push(key);
@@ -495,25 +495,24 @@ CL = (function() {
     return witnesses;
   };
 
-  findUnitById = function(app_id, unit_id) {
-    var i, data;
-    if (CL.data.hasOwnProperty(app_id)) {
-      for (i = 0; i < CL.data[app_id].length; i += 1) {
-        if (CL.data[app_id][i]._id === unit_id) {
-          return CL.data[app_id][i];
+  findUnitById = function(appId, unitId) {
+    var data;
+    if (CL.data.hasOwnProperty(appId)) {
+      for (let i = 0; i < CL.data[appId].length; i += 1) {
+        if (CL.data[appId][i]._id === unitId) {
+          return CL.data[appId][i];
         }
       }
     }
     return null;
   };
 
-  findStandoffRegularisation = function(unit, witness, app_id) {
-    var key, i;
+  findStandoffRegularisation = function(unit, witness, appId) {
     if (CL.data.hasOwnProperty('marked_readings')) {
-      for (key in CL.data.marked_readings) {
+      for (let key in CL.data.marked_readings) {
         if (CL.data.marked_readings.hasOwnProperty(key)) {
-          for (i = 0; i < CL.data.marked_readings[key].length; i += 1) {
-            if (CL.data.marked_readings[key][i].apparatus === app_id &&
+          for (let i = 0; i < CL.data.marked_readings[key].length; i += 1) {
+            if (CL.data.marked_readings[key][i].apparatus === appId &&
               CL.data.marked_readings[key][i].start === unit.start &&
               CL.data.marked_readings[key][i].end === unit.end &&
               CL.data.marked_readings[key][i].witness === witness) {
@@ -896,12 +895,12 @@ CL = (function() {
   };
 
   getReadingLabel = function(reading_pos, reading, rules) {
-    var alpha_id, i, label_suffix, reading_label;
+    var alpha_id, label_suffix, reading_label;
     reading_label = '';
     label_suffix = '';
     alpha_id = getAlphaId(reading_pos);
     if (reading.hasOwnProperty('reading_classes')) {
-      for (i = 0; i < reading.reading_classes.length; i += 1) {
+      for (let i = 0; i < reading.reading_classes.length; i += 1) {
         if (rules[reading.reading_classes[i]][2] === true) {
           if (typeof rules[reading.reading_classes[i]][0] !== 'undefined') {
             label_suffix += rules[reading.reading_classes[i]][0];
@@ -919,7 +918,7 @@ CL = (function() {
       if (reading.overlap_status === 'duplicate') {
         reading_label = '↓';
       } else {
-        for (i = 0; i < CL.overlappedOptions.length; i += 1) {
+        for (let i = 0; i < CL.overlappedOptions.length; i += 1) {
           if (CL.overlappedOptions[i].reading_flag === reading.overlap_status &&
             CL.overlappedOptions[i].hasOwnProperty('reading_label_display')) {
             reading_label = CL.overlappedOptions[i].reading_label_display;
@@ -944,10 +943,10 @@ CL = (function() {
   };
 
   getReadingSuffix = function(reading, rules) {
-    var reading_suffix, i;
+    var reading_suffix;
     reading_suffix = '';
     if (reading.hasOwnProperty('reading_classes')) {
-      for (i = 0; i < reading.reading_classes.length; i += 1) {
+      for (let i = 0; i < reading.reading_classes.length; i += 1) {
         if (rules[reading.reading_classes[i]][3] === true) {
           if (typeof rules[reading.reading_classes[i]][0] !== 'undefined') {
             reading_suffix += rules[reading.reading_classes[i]][0];
@@ -1179,15 +1178,14 @@ CL = (function() {
    * @return {boolean} returns true if the unit contains a reading with text or false if all om/lac etc.
    * */
   unitHasText = function(unit) {
-    var i, j, key;
-    for (i = 0; i < unit.readings.length; i += 1) {
+    for (let i = 0; i < unit.readings.length; i += 1) {
       if (unit.readings[i].text.length > 0) {
         return true;
       }
       if (unit.readings[i].hasOwnProperty('subreadings')) {
-        for (key in unit.readings[i].subreadings) {
+        for (let key in unit.readings[i].subreadings) {
           if (unit.readings[i].subreadings.hasOwnProperty(key)) {
-            for (j = 0; j < unit.readings[i].subreadings[key].length; j += 1) {
+            for (let j = 0; j < unit.readings[i].subreadings[key].length; j += 1) {
               if (unit.readings[i].subreadings[key][j].text.length > 0) {
                 return true;
               }
@@ -1196,7 +1194,7 @@ CL = (function() {
         }
       }
       if (unit.readings[i].hasOwnProperty('SR_text')) {
-        for (key in unit.readings[i].SR_text) {
+        for (let key in unit.readings[i].SR_text) {
           if (unit.readings[i].SR_text.hasOwnProperty(key)) {
             if (unit.readings[i].SR_text[key].text.length > 0) {
               return true;
@@ -1281,14 +1279,13 @@ CL = (function() {
   };
 
   getReading = function(reading, witness) {
-    var key, i;
     if (reading.hasOwnProperty('SR_text') && reading.SR_text.hasOwnProperty(witness)) {
       return reading.SR_text[witness];
     }
     if (reading.hasOwnProperty('subreadings')) {
-      for (key in reading.subreadings) {
+      for (let key in reading.subreadings) {
         if (reading.subreadings.hasOwnProperty(key)) {
-          for (i = 0; i < reading.subreadings[key].length; i += 1) {
+          for (let i = 0; i < reading.subreadings[key].length; i += 1) {
             if (reading.subreadings[key][i].witnesses.indexOf(witness) !== -1) {
               return reading.subreadings[key][i];
             }
@@ -1308,14 +1305,14 @@ CL = (function() {
    *
    *  */
   lacOmFix = function() {
-    var i, j, k, apparatus, witnesses, empty_witnesses, token, extra_readings, overlap, key, subreading_data, text, overlap_status;
+    var apparatus, witnesses, empty_witnesses, token, extra_readings, overlap, key, subreading_data, text, overlap_status;
     //first strip all the empty units displaying gaps and then recreate the ones we still need
     _cleanExtraGaps();
     _createExtraGaps();
     apparatus = CL.data.apparatus;
-    for (i = 0; i < apparatus.length; i += 1) { // loop through units
+    for (let i = 0; i < apparatus.length; i += 1) { // loop through units
       extra_readings = [];
-      for (j = 0; j < apparatus[i].readings.length; j += 1) { // loop through readings
+      for (let j = 0; j < apparatus[i].readings.length; j += 1) { // loop through readings
         //if this is reading contains an empty reading and if this isn't a whole verse lac or whole verse om
         if (_containsEmptyReading(apparatus[i].readings[j]) && //includes subreadings and SR_text
           apparatus[i].readings[j].type !== 'lac_verse' &&
@@ -1329,7 +1326,7 @@ CL = (function() {
           //get all the witnesses for the reading
           witnesses = getAllReadingWitnesses(apparatus[i].readings[j]);
           //now work out from context if it should be lac or om
-          for (k = 0; k < witnesses.length; k += 1) {
+          for (let k = 0; k < witnesses.length; k += 1) {
             //if this witness is overlapped do not try to fix - it should be displayed as om regardless
             if (!_isOverlapped(apparatus[i], witnesses[k])) {
               //TODO: need to test that this works if first unit word has gap before and after I think it probably does
@@ -1370,7 +1367,7 @@ CL = (function() {
         }
       }
       apparatus[i].readings = removeNullItems(apparatus[i].readings);
-      for (j = 0; j < extra_readings.length; j += 1) {
+      for (let j = 0; j < extra_readings.length; j += 1) {
         addReadingId(extra_readings[j], apparatus[i].start, apparatus[i].end);
         apparatus[i].readings.push(extra_readings[j]);
       }
@@ -1378,11 +1375,10 @@ CL = (function() {
   };
 
   getSubreadingOfWitness = function(reading, witness, inc_SR_text) {
-    var key, i;
     if (reading.hasOwnProperty('subreadings')) {
-      for (key in reading.subreadings) {
+      for (let key in reading.subreadings) {
         if (reading.subreadings.hasOwnProperty(key)) {
-          for (i = 0; i < reading.subreadings[key].length; i += 1) {
+          for (let i = 0; i < reading.subreadings[key].length; i += 1) {
             if (reading.subreadings[key][i].witnesses.indexOf(witness) !== -1) {
               return reading.subreadings[key][i];
             }
@@ -1391,7 +1387,7 @@ CL = (function() {
       }
     }
     if (inc_SR_text === true && reading.hasOwnProperty('SR_text')) {
-      for (key in reading.SR_text) {
+      for (let key in reading.SR_text) {
         if (key === witness) {
           return reading.SR_text[key];
         }
@@ -1417,8 +1413,7 @@ CL = (function() {
   };
 
   removeNullItems = function(list) {
-    var i;
-    for (i = list.length - 1; i >= 0; i -= 1) {
+    for (let i = list.length - 1; i >= 0; i -= 1) {
       if (list[i] === null) {
         list.splice(i, 1);
       }
@@ -1452,10 +1447,10 @@ CL = (function() {
 
 
   addExtraFooterButtons = function(stage) {
-    var i, html;
+    var html;
     html = [];
     if (CL.project.hasOwnProperty('extraFooterButtons') && CL.project.extraFooterButtons.hasOwnProperty(stage)) {
-      for (i = 0; i < CL.project.extraFooterButtons[stage].length; i += 1) {
+      for (let i = 0; i < CL.project.extraFooterButtons[stage].length; i += 1) {
         if (CL.project.extraFooterButtons[stage][i].hasOwnProperty('id')) {
           html.push('<input class="pure-button left_foot" type="button" id="' + CL.project.extraFooterButtons[stage][i].id + '" value="');
           if (CL.project.extraFooterButtons[stage][i].hasOwnProperty('label')) {
@@ -1467,7 +1462,7 @@ CL = (function() {
         }
       }
     } else if (CL.services.hasOwnProperty('extraFooterButtons') && CL.services.extraFooterButtons.hasOwnProperty(stage)) {
-      for (i = 0; i < CL.services.extraFooterButtons[stage].length; i += 1) {
+      for (let i = 0; i < CL.services.extraFooterButtons[stage].length; i += 1) {
         if (CL.services.extraFooterButtons[stage][i].hasOwnProperty('id')) {
           html.push('<input class="pure-button left_foot" type="button" id="' + CL.services.extraFooterButtons[stage][i].id + '" value="');
           if (CL.services.extraFooterButtons[stage][i].hasOwnProperty('label')) {
@@ -1566,10 +1561,10 @@ CL = (function() {
     return set;
   };
 
-  getActiveUnitWitnesses = function(unit, app_id) {
-    var witnesses, i, j, key;
+  getActiveUnitWitnesses = function(unit, appId) {
+    var witnesses, i;
     witnesses = [];
-    if (app_id === 'apparatus') {
+    if (appId === 'apparatus') {
       i = 0;
     } else {
       i = 1;
@@ -1577,9 +1572,9 @@ CL = (function() {
     for (i; i < unit.readings.length; i += 1) {
       witnesses.push.apply(witnesses, unit.readings[i].witnesses);
       if (unit.readings[i].hasOwnProperty('subreadings')) {
-        for (key in unit.readings[i].subreadings) {
+        for (let key in unit.readings[i].subreadings) {
           if (unit.readings[i].subreadings.hasOwnProperty(key)) {
-            for (j = 0; j < unit.readings[i].subreadings[key].length; j += 1) {
+            for (let j = 0; j < unit.readings[i].subreadings[key].length; j += 1) {
               witnesses.push.apply(witnesses, unit.readings[i].subreadings[key][j].witnesses);
             }
           }
@@ -2024,7 +2019,7 @@ CL = (function() {
     resultCallback = function(data) {
       var baseReadingsWithSettingsApplied;
       baseReadingsWithSettingsApplied = {};
-      for (let i=0; i<data.tokens.length; i+=1) {
+      for (let i = 0; i < data.tokens.length; i += 1) {
         baseReadingsWithSettingsApplied[data.tokens[i].t] = data.tokens[i]['interface'];
       }
       _makeStandoffReading2(reading, fosilised_reading, parent, baseReadingsWithSettingsApplied, type, unit, apparatus, reading_details);
@@ -2037,7 +2032,7 @@ CL = (function() {
 
   _makeStandoffReading2 = function (reading, fosilised_reading, parent, baseReadingsWithSettingsApplied, type, unit,
                                     apparatus, reading_details) {
-    var k, ids, new_reading, witness;
+    var ids, new_reading, witness;
     //do any existing subreadings
     if (reading.hasOwnProperty('subreadings')) {
       // now here is the tricky bit - if this subreading is a subreading because of work done in the regulariser we
@@ -2047,7 +2042,7 @@ CL = (function() {
       for (let key in reading.subreadings) {
         if (reading.subreadings.hasOwnProperty(key)) {
           for (let i = reading.subreadings[key].length - 1; i >= 0; i -= 1) {
-            k = reading.subreadings[key][i].witnesses.length - 1;
+            let k = reading.subreadings[key][i].witnesses.length - 1;
             //TODO: what is this doing and why is it so complicated! i is going backwards anyway so why check i here?
             while (reading.hasOwnProperty('subreadings') && reading.subreadings.hasOwnProperty(key) && i < reading.subreadings[key].length && k >= 0) {
               witness = reading.subreadings[key][i].witnesses[k];
@@ -2110,11 +2105,11 @@ CL = (function() {
 
   //at this point the reading is *always* a main reading never a subreading
   doMakeStandoffReading = function(type, apparatus, unit, reading, parent) {
-    var key, i, rule_details, reading_text, details, existing_standoff, position, total, temp, type_string;
+    var key, rule_details, reading_text, details, existing_standoff, position, total, temp, type_string;
     SR.loseSubreadings(); //needs to be done so the main reading we are dealing with contains *all* witnesses including those of subreadings
     rule_details = getRuleClasses('value', type, 'value', ['suffixed_sigla', 'identifier', 'name', 'subreading', 'suffixed_label']);
     //mark it as a standoff reading
-    for (i = 0; i < reading.witnesses.length; i += 1) {
+    for (let i = 0; i < reading.witnesses.length; i += 1) {
       //we must find reading_text value in this loop as we need witness for extracting any regulariser created subreading text
       reading_text = extractWitnessText(reading, {
         'witness': reading.witnesses[i],
