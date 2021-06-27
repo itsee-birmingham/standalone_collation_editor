@@ -785,22 +785,23 @@ RG = (function() {
   _doRunCollation = function(collation_data, rules, output, scroll_offset, callback) {
     var options, setting, result_callback, data_settings,
       algorithm_settings, displaySettings;
-    options = {};
-    options.rules = rules;
-    if (!$.isEmptyObject(CL.localPythonFunctions)) {
-      options.local_python_functions = CL.localPythonFunctions;
-    }
-    options.data_input = collation_data;
-    if (CL.project.hasOwnProperty('id')) {
-      options.project = CL.project.id;
-    }
+
+    options = {'configs': {},
+               'data': {}};
+
+    // set the data values
+    options.data.rules = rules;
+    options.data.unit_data = collation_data;
+    // if (CL.project.hasOwnProperty('id')) {
+    //   options.data.project = CL.project.id;
+    // }
     //data settings
     data_settings = {};
     data_settings.base_text = CL.dataSettings.base_text;
     data_settings.base_text_siglum = CL.dataSettings.base_text_siglum;
     data_settings.language = CL.dataSettings.language;
     data_settings.witness_list = CL.dataSettings.witness_list;
-    options.data_settings = data_settings;
+    options.data.data_settings = data_settings;
 
     displaySettings = {};
     for (setting in CL.displaySettings) {
@@ -810,23 +811,27 @@ RG = (function() {
         }
       }
     }
-    options.display_settings = displaySettings;
-    options.display_settings_config = CL.displaySettingsDetails;
-    options.rule_conditions_config = CL.ruleConditions;
-    options.debug = CL.debug;
+    options.data.display_settings = displaySettings;
 
+    // Set all the config options
+    options.configs.display_settings_config = CL.displaySettingsDetails;
+    options.configs.rule_conditions_config = CL.ruleConditions;
+    options.configs.debug = CL.debug;
+    if (!$.isEmptyObject(CL.localPythonFunctions)) {
+      options.configs.local_python_functions = CL.localPythonFunctions;
+    }
     algorithm_settings = {};
-    for (setting in CL.algorithmSettings) {
-      if (CL.algorithmSettings.hasOwnProperty(setting)) {
-        if (CL.algorithmSettings[setting] !== false) {
-          algorithm_settings[setting] = CL.algorithmSettings[setting];
+    for (setting in CL.collationAlgorithmSettings) {
+      if (CL.collationAlgorithmSettings.hasOwnProperty(setting)) {
+        if (CL.collationAlgorithmSettings[setting] !== false) {
+          algorithm_settings[setting] = CL.collationAlgorithmSettings[setting];
         }
       }
     }
-    options.algorithm_settings = algorithm_settings;
+    options.configs.algorithm_settings = algorithm_settings;
 
     if (output === 'add_witnesses') {
-      options.split_single_reading_units = true;
+      options.config.split_single_reading_units = true;
       result_callback = function(data) {
         callback(data);
       }

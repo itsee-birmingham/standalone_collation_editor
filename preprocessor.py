@@ -11,23 +11,68 @@ from collation.core.regulariser import Regulariser
 
 class PreProcessor(Regulariser):
 
-    def __init__(self, display_settings_config=None, local_python_functions=None,
-                 rule_conditions_config=None, split_single_reading_units=False):
-        self.display_settings_config = display_settings_config
-        self.local_python_functions = local_python_functions
-        self.rule_conds_config = rule_conditions_config
-        self.split_single_reading_units = split_single_reading_units
-        Regulariser.__init__(self, rule_conditions_config, local_python_functions)
+    def __init__(self, configs):
 
-    def process_witness_list(self, data_input, requested_witnesses, rules, basetext_transcription,
-                             project, settings, collation_settings, accept):
-        self.settings = settings
+        # if not present these are set to the previous default values to maintain consistency
+        if 'display_settings_config' in configs:
+            self.display_settings_config = configs['display_settings_config']
+        else:
+            self.display_settings_config = None
+
+        if 'local_python_functions' in configs:
+            self.local_python_functions = configs['local_python_functions']
+        else:
+            self.local_python_functions = None
+
+        if 'rule_conditions_config' in configs:
+            self.rule_conds_config = configs['rule_conditions_config']
+        else:
+            self.rule_conds_config = None
+
+        if 'algorithm_settings' in configs:
+            algorithm_settings = {}
+            algorithm_settings['algorithm'] = configs['algorithm_settings']['algorithm']
+            algorithm_settings['tokenComparator'] = {}
+            if 'fuzzy_match' in configs['algorithm_settings']:
+                algorithm_settings['tokenComparator']['type'] = 'levenshtein'
+                if 'distance' in configs['algorithm_settings']:
+                    algorithm_settings['tokenComparator']['distance'] = configs['algorithm_settings']['distance']
+                else:
+                    # default to 2
+                    algorithm_settings['tokenComparator']['distance'] = 2
+            else:
+                algorithm_settings['tokenComparator']['type'] = 'equality'
+            self.algorithm_settings = algorithm_settings
+        else:
+            self.algorithm_settings = None
+
+        if 'debug' in configs:
+            self.debug = configs['debug']
+        else:
+            self.debug = False
+
+        if 'split_single_reading_units' in configs:
+            self.split_single_reading_units = configs['split_single_reading_units']
+        else:
+            self.split_single_reading_units = False
+
+        Regulariser.__init__(self, self.rule_conds_config, self.local_python_functions)
+
+    # def process_witness_list(self, data_input, requested_witnesses, rules, basetext_transcription,
+    #                          project, settings, accept='lcs'):
+    def process_witness_list(self, collation_input_data, accept='lcs'):
+        self.display_settings = collation_input_data['display_settings']
+        data_input = collation_input_data['unit_data']
         data = data_input['data']
+        rules = collation_input_data['rules']
+        basetext_transcription = collation_input_data['data_settings']['base_text']
+        print(basetext_transcription)
         witnesses = {}
         collatable_witnesses = []
         om_witnesses = []
         lac_hands = []
-        lac_witnesses = requested_witnesses  # assume everything is lac until we find it
+        # assume everything is lac until we find out it isn't
+        lac_witnesses = collation_input_data['data_settings']['witness_list']
         hand_to_transcript_map = {}
         if 'special_categories' in data_input:
             special_categories = data_input['special_categories']
@@ -139,7 +184,7 @@ class PreProcessor(Regulariser):
                      'missing_reason': missing_reason,
                      'index': 1
                      }
-        return self.regularise(rules, witnesses, verse, settings, collation_settings, project, accept)
+        return self.regularise(rules, witnesses, verse, accept)
 
     def add_to_special_categories(self, special_categories, reading):
         added = False
@@ -153,7 +198,7 @@ class PreProcessor(Regulariser):
                                        'type': 'lac'})
         return special_categories
 
-    def regularise(self, decisions, witnesses, verse, settings, collation_settings, project, accept):
+    def regularise(self, decisions, witnesses, verse, accept):
         """Regularise the witness."""
         print('There are {} decisions'.format(len(decisions)), file=sys.stderr)
         for witness in witnesses['collatable']:
@@ -170,20 +215,21 @@ class PreProcessor(Regulariser):
                             token['decision_details'].extend(details)
                         except KeyError:
                             token['decision_details'] = details
-        return self.get_collation(witnesses, verse, decisions, settings, collation_settings, project, accept)
+        return self.get_collation(witnesses, verse, decisions, accept)
 
-    def get_collation(self, witnesses, verse, decisions, settings, collation_settings, project, accept):
+    def get_collation(self, witnesses, verse, decisions, accept):
         """
         Get the collation for the context.
         """
-        algorithm = 'auto'
+        algorithm = 'dekker'
         tokenComparator = {}
-        if collation_settings['algorithm']:
-            algorithm = collation_settings['algorithm']
-        if collation_settings['tokenComparator'] and collation_settings['tokenComparator']['type']:
+        print(self.algorithm_settings)
+        if self.algorithm_settings['algorithm']:
+            algorithm = self.algorithm_settings['algorithm']
+        if self.algorithm_settings['tokenComparator'] and self.algorithm_settings['tokenComparator']['type']:
             tokenComparator['type'] = 'levenshtein'
-            if collation_settings['tokenComparator'] and collation_settings['tokenComparator']['distance']:
-                tokenComparator['distance'] = collation_settings['tokenComparator']['distance']
+            if self.algorithm_settings['tokenComparator'] and self.algorithm_settings['tokenComparator']['distance']:
+                tokenComparator['distance'] = self.algorithm_settings['tokenComparator']['distance']
             else:
                 # default to 2
                 tokenComparator['distance'] = 2
@@ -202,8 +248,8 @@ class PreProcessor(Regulariser):
             options = {'outputFormat': accept,
                        'algorithm': algorithm,
                        'tokenComparator': tokenComparator,
-                       'collatexHost': collation_settings['host'],
-                       'debug': collation_settings['debug']
+                       'collatexHost': self.algorithm_settings['host'],
+                       'debug': self.algorithm_settings['debug']
                        }
             collatex_response = self.do_collate(witness_list, options)
 
@@ -233,10 +279,10 @@ class PreProcessor(Regulariser):
             print('collation done', file=sys.stderr)
             return self.do_post_processing(alignment_table, decisions, overtext_details[0], overtext_details[1],
                                            witnesses['om'], witnesses['lac'], witnesses['hand_id_map'],
-                                           witnesses['special_categories'], settings)
+                                           witnesses['special_categories'])
 
     def do_post_processing(self, alignment_table, decisions, overtext_name, overtext, om_readings,
-                           lac_readings, hand_id_map, special_categories, settings):
+                           lac_readings, hand_id_map, special_categories):
 
         pp = PostProcessor(
             alignment_table=alignment_table,
@@ -246,7 +292,7 @@ class PreProcessor(Regulariser):
             lac_readings=lac_readings,
             hand_id_map=hand_id_map,
             special_categories=special_categories,
-            settings=settings,
+            settings=self.display_settings,
             decisions=decisions,
             display_settings_config=self.display_settings_config,
             local_python_functions=self.local_python_functions,

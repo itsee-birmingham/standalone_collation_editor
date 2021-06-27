@@ -186,7 +186,7 @@ The JSON structure provided for each unit in each document should match the unit
 | options | <code>JSON</code> | a JSON object containing all of the data and settings needed for collation |
 | resultCallback  | <code>function</code> | The function called when the collation is complete which displays the data in the collation editor |
 
-This function should send the options JSON to a python service for collation, the url used for collation can be used to determine whether a project uses the current version of the regularisation system or the legacy version. The python service required is explained in the Python/Server functions section.
+This function should send the options JSON to a python service for collation, the url used for collation can be used to determine whether a project uses the current version of the regularisation system or the legacy version. The python service required for the collation process is explained in the Python/Server functions section.
 
 The options JSON object will contain the following details (all handled by the core javascript code):
 
@@ -196,13 +196,14 @@ The options JSON object will contain the following details (all handled by the c
 - **display_settings** *[object]* - The current display settings selection (this must only contain the settings for which the value is true).
 - **display_settings_config** *[object]* - The display settings data as stored by ```displaySettings``` or the default in the collation editor if not supplied.
 - **rule_conditions_config** *[object]* - The display settings data as stored by ```ruleConditions``` or the default in the collation editor if not supplied.
-- **algorithm_settings** *[object]* -
+- **algorithm_settings** *[object]* - The algorithm settings as stored by ```collationAlgorithmSettings``` or as selected by the user in the interface.
 - **split_single_reading_units** *[boolean]* - a flag to determine which readings with only one reading should be separated into tokens, by default this is false but it can be changed depending on the desired result. When collating witnesses to be added to existing collations this will be set to true to enable the merge process to work.
-- **local_python_functions** *[object]* - the local python functions provided in the services file.
+- **local_python_functions** *[object]* - the local python functions provided in the services file including the local collation function specified in the ```localCollationFunction``` in the services file.
 - **project** *[string/integer]* - The id for the current project if one exists.
 - **debug** *[boolean]* - a flag which tells the collation process to run in debug mode (if this is supported in the python functions).
 
 When the collation process has completed the JSON response from the Python collation system should be passed to resultCallback.
+
 
 
 - #### ```saveCollation()```
@@ -247,7 +248,7 @@ This should retrieve the collation with the given id and run the callback on the
 
 This variable should be an array of strings giving the full url of any additional javascript you need the collation editor to load. These might be required run the services for your framework (an internal api file for example) or you might want to use additional files to store configuration functions that you call in the services. These files will be loaded as part of the collation editor initialisation functions called after the services have been set.
 
-- #### ```algorithmSettings```
+- #### ```collationAlgorithmSettings```
 
 **This variable can be overwritten in individual project settings**
 
@@ -576,9 +577,9 @@ This variable can be used to configure an alternative method of interacting with
 
 the configuration should be provided as a JSON object with the following keys:
 
-- **python_file** *[string]* - The import path for the python file containing the class
-- **class_name** *[string]* - The name of the class containing the methods
-- **function** *[string]* - the name of the method of the python class to run for this function. Requirements of the python methods are given in the descriptions above.
+- **python_file** *[string]* - The import path for the python file containing the class.
+- **class_name** *[string]* - The name of the class containing the methods.
+- **function** *[string]* - The name of the method of the python class to run for this function.
 
 The method will be provided with the data to collate in the JSON format required by collateX and an optional dictionary of collateX settings requested by the user such as what algorithm to use and whether or not to use the Levenshtein distance matching.
 
@@ -725,7 +726,7 @@ This function is required if ```prepareDisplayString()``` is used. It must exact
 Python/Server Services
 ---
 
-### collation service (for default)
+### Collation Service
 
 
 
@@ -926,7 +927,7 @@ Some of these changes are required to keep things working. Most are only require
 
 ##### Changes to variables
   - ```lacUnitLabel``` and ```omUnitLabel``` should be provided in the services file to maintain the existing behaviour which displays 'lac verse' and 'om verse' respectively. The defaults have changed to 'lac unit' and 'om unit' to remove biblical verse assumption. The services choices can also be overridden in individual project settings if required.
-  - The variable ```algorithmSettings``` has been introduced in this release which can be set in the services file and/or the project configurations. The previous defaults may not have been the best option for many projects but to maintain the previous behaviour the services file should set the ```algorithmSettings``` keys to 'auto', true, 2. The 'auto' setting for the algorithm means that the collation preprocessor will choose an algorithm based on the presence of gaps at the end of the data to be collated. 
+  - The variable ```collationAlgorithmSettings``` has been introduced in this release which can be set in the services file and/or the project configurations. The previous defaults may not have been the best option for many projects but to maintain the previous behaviour the services file should set the ```collationAlgorithmSettings``` keys to 'auto', true, 2. The 'auto' setting for the algorithm means that the collation preprocessor will choose an algorithm based on the presence of gaps at the end of the data to be collated.
   - In this version the seldom used 'collapse all' button in the footer of all stages of the collation editor has been removed by default. The code which performs the function is still present in the core code and the button can be returned by adding the variable ```showCollapseAllUnitsButton``` and setting the value to the boolean ```true```. This should be done to maintain existing behaviour. This setting can also be used at the project level.
   - Four new boolean variables have been introduced to determine whether lac and om readings should be combined at either the Order readings or approved stages. They are:
     - ```combineAllLacsInOR```
