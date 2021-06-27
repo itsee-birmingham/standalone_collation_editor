@@ -123,7 +123,9 @@ This function is called as part of the initialisation sequence.
 
 The only requirement for this function is that it set ```CL.managingEditor``` to either ```true``` or ```false``` depending on whether the current user is the managing editor of the current project.
 
-If the index page is to be set up with javascript using the settings provided in the ```contextInput``` variable in the services file then the function should call ```CL.loadIndexPage()``` with the current project as the only argument. If the index page is to be provided in an alternative way they this function must show that index page and set any other platform requirements for its use. If ```CL.loadIndexPage()``` is not used then this function also needs to add a *switch project* button and a *view project summary* button if they are required on the platform. Details of how to activate the buttons can be found in the relevant entries in the Optional Service File Functions section.
+If the index page is to be set up with javascript using the settings provided in the ```contextInput``` variable in the services file then the function should call ```CL.loadIndexPage()``` with the current project as the only argument. If the index page is to be provided in an alternative way they this function must show the index page and set any other platform requirements for its use.
+
+If ```CL.loadIndexPage()``` is not used as part of the index page setup then this function also needs to add a button with the id *switch_project_button* and one with the id *project_summary* if those functions are required on the platform. In addition, if you want users to be able to change the collation algorithm settings then a button with the id *collation_settings* should also be added. Details of how to activate the buttons can be found in the relevant entries in the Optional Service File Functions section.
 
 - #### ```getUserInfo()```
 
@@ -181,9 +183,26 @@ The JSON structure provided for each unit in each document should match the unit
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
 | context | <code>string</code> | the reference for the unit being collated |
+| options | <code>JSON</code> | a JSON object containing all of the data and settings needed for collation |
+| resultCallback  | <code>function</code> | The function called when the collation is complete which displays the data in the collation editor |
 
-**TODO** finish this
+This function should send the options JSON to a python service for collation, the url used for collation can be used to determine whether a project uses the current version of the regularisation system or the legacy version. The python service required is explained in the Python/Server functions section.
 
+The options JSON object will contain the following details (all handled by the core javascript code):
+
+- **data_input** *[object]* - All of the data to be collated for this unit (generated using the ```getUnitData()``` services function).
+- **rules** *[array]* - the array of rules which could apply to this verse (generated using the ```getRules()``` services function).
+- **data_settings** *[object]* - The JSON for the data settings containing the keys *base_text*, *base_text_siglum*, *language* and *witness_list* (the list of witnesses requested for the collation).
+- **display_settings** *[object]* - The current display settings selection (this must only contain the settings for which the value is true).
+- **display_settings_config** *[object]* - The display settings data as stored by ```displaySettings``` or the default in the collation editor if not supplied.
+- **rule_conditions_config** *[object]* - The display settings data as stored by ```ruleConditions``` or the default in the collation editor if not supplied.
+- **algorithm_settings** *[object]* -
+- **split_single_reading_units** *[boolean]* - a flag to determine which readings with only one reading should be separated into tokens, by default this is false but it can be changed depending on the desired result. When collating witnesses to be added to existing collations this will be set to true to enable the merge process to work.
+- **local_python_functions** *[object]* - the local python functions provided in the services file.
+- **project** *[string/integer]* - The id for the current project if one exists.
+- **debug** *[boolean]* - a flag which tells the collation process to run in debug mode (if this is supported in the python functions).
+
+When the collation process has completed the JSON response from the Python collation system should be passed to resultCallback.
 
 
 - #### ```saveCollation()```
@@ -227,6 +246,24 @@ This should retrieve the collation with the given id and run the callback on the
 - #### ```localJavascript```
 
 This variable should be an array of strings giving the full url of any additional javascript you need the collation editor to load. These might be required run the services for your framework (an internal api file for example) or you might want to use additional files to store configuration functions that you call in the services. These files will be loaded as part of the collation editor initialisation functions called after the services have been set.
+
+- #### ```algorithmSettings```
+
+**This variable can be overwritten in individual project settings**
+
+**There is a default in the core code which is explained below**
+
+This variable is used to set the starting point for the algorithm settings to be used for collateX. The data should be provided in a JSON object with the following keys:
+
+- **algorithm** *[string]* - The name of the algorithm to use for collateX. This can be any algorithm supported by the version of collateX you are running. You can also use the string 'auto' which will allow the collation preprocessor to make a decision for you. This is probably not optimised for any projects other than the Greek New Testament and should be avoided outside this field.
+- **fuzzy_match** *[boolean]* - A boolean to tell collateX whether or not to use fuzzy matching
+- **distance** *[integer]* - The value to be used for the fuzzy match distance (this will only be used if the fuzzy match boolean is also true).
+
+The default setting in the code will use the Dekker algorithm with fuzzy matching turned on and a distance of 2.
+
+If ```CL.loadIndexPage()``` or a button with the id *collation_settings* was provided on the index page then the user can override these settings on a unit by unit basis.
+
+**NB:** this setting is new in version 2.0 and the default settings have changed from previous versions.
 
 - #### ```lacUnitLabel```
 
@@ -889,6 +926,7 @@ Some of these changes are required to keep things working. Most are only require
 
 ##### Changes to variables
   - ```lacUnitLabel``` and ```omUnitLabel``` should be provided in the services file to maintain the existing behaviour which displays 'lac verse' and 'om verse' respectively. The defaults have changed to 'lac unit' and 'om unit' to remove biblical verse assumption. The services choices can also be overridden in individual project settings if required.
+  - The variable ```algorithmSettings``` has been introduced in this release which can be set in the services file and/or the project configurations. The previous defaults may not have been the best option for many projects but to maintain the previous behaviour the services file should set the ```algorithmSettings``` keys to 'auto', true, 2. The 'auto' setting for the algorithm means that the collation preprocessor will choose an algorithm based on the presence of gaps at the end of the data to be collated. 
   - In this version the seldom used 'collapse all' button in the footer of all stages of the collation editor has been removed by default. The code which performs the function is still present in the core code and the button can be returned by adding the variable ```showCollapseAllUnitsButton``` and setting the value to the boolean ```true```. This should be done to maintain existing behaviour. This setting can also be used at the project level.
   - Four new boolean variables have been introduced to determine whether lac and om readings should be combined at either the Order readings or approved stages. They are:
     - ```combineAllLacsInOR```
