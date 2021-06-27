@@ -17,7 +17,7 @@ CL = (function() {
         'base_text': '',
         'language': ''
       },
-      algorithmSettings = {},
+      collationAlgorithmSettings = {},
       highlighted = 'none',
       highlightedAdded = [],
       showSubreadings = false,
@@ -1608,7 +1608,7 @@ CL = (function() {
           collation.display_settings = CL.savedDisplaySettings;
         } else {
           collation.data_settings = CL.dataSettings;
-          collation.algorithm_settings = CL.algorithmSettings;
+          collation.algorithm_settings = CL.collationAlgorithmSettings;
           collation.display_settings = CL.displaySettings;
         }
         //approved has different rules than others.
@@ -3001,13 +3001,13 @@ CL = (function() {
     }
 
     // set the algorithm settings
-    if (project.hasOwnProperty('algorithmSettings')) {
-      CL.algorithmSettings = project.algorithmSettings;
-    } else if (CL.services.hasOwnProperty('algorithmSettings')) {
-      CL.algorithmSettings = CL.services.algorithmSettings;
+    if (project.hasOwnProperty('collationAlgorithmSettings')) {
+      CL.collationAlgorithmSettings = project.collationAlgorithmSettings;
+    } else if (CL.services.hasOwnProperty('collationAlgorithmSettings')) {
+      CL.collationAlgorithmSettings = CL.services.collationAlgorithmSettings;
     } else {
       //default is changed from previous releases
-      CL.algorithmSettings = {'algorithm': 'dekker',
+      CL.collationAlgorithmSettings = {'algorithm': 'dekker',
                               'fuzzy_match': true,
                               'distance': 2};
     }
@@ -4003,7 +4003,7 @@ CL = (function() {
           //otherwise we can use them
           CL.displaySettings = collation.display_settings;
           CL.dataSettings = collation.data_settings;
-          CL.algorithmSettings = collation.algorithm_settings;
+          CL.collationAlgorithmSettings = collation.algorithm_settings;
         }
         CL.container = document.getElementById('container');
 
@@ -5157,16 +5157,16 @@ CL = (function() {
       '<input class="pure-button dialogue-form-button" type="button" id="close_settings" value="Cancel"/></form>';
     document.getElementsByTagName('body')[0].appendChild(settings_div);
     if (document.getElementById('algorithm')) {
-      document.getElementById('algorithm').value = CL.algorithmSettings.algorithm;
+      document.getElementById('algorithm').value = CL.collationAlgorithmSettings.algorithm;
     }
     if (document.getElementById('fuzzy_match')) {
-      document.getElementById('fuzzy_match').checked = CL.algorithmSettings.fuzzy_match;
-      if (CL.algorithmSettings.fuzzy_match === false) {
+      document.getElementById('fuzzy_match').checked = CL.collationAlgorithmSettings.fuzzy_match;
+      if (CL.collationAlgorithmSettings.fuzzy_match === false) {
         document.getElementById('distance').disabled = 'disabled';
       }
     }
     if (document.getElementById('distance')) {
-      document.getElementById('distance').value = CL.algorithmSettings.distance;
+      document.getElementById('distance').value = CL.collationAlgorithmSettings.distance;
     }
     $('#fuzzy_match').on('click', function(event) {
       if (document.getElementById('fuzzy_match').checked === true) {
@@ -5178,12 +5178,12 @@ CL = (function() {
     $('#save_settings').on('click', function(event) {
       var setting;
       data = cforms.serialiseForm('settings_form');
-      for (setting in CL.algorithmSettings) {
-        if (CL.algorithmSettings.hasOwnProperty(setting)) {
+      for (setting in CL.collationAlgorithmSettings) {
+        if (CL.collationAlgorithmSettings.hasOwnProperty(setting)) {
           if (data.hasOwnProperty(setting)) {
-            CL.algorithmSettings[setting] = data[setting];
+            CL.collationAlgorithmSettings[setting] = data[setting];
           } else {
-            CL.algorithmSettings[setting] = false;
+            CL.collationAlgorithmSettings[setting] = false;
           }
         }
       }
@@ -5613,7 +5613,7 @@ CL = (function() {
       localPythonFunctions: localPythonFunctions,
       overlappedOptions: overlappedOptions,
       dataSettings: dataSettings,
-      algorithmSettings: algorithmSettings,
+      collationAlgorithmSettings: collationAlgorithmSettings,
       highlighted: highlighted,
       highlightedAdded: highlightedAdded,
       showSubreadings: showSubreadings,
@@ -5809,7 +5809,7 @@ CL = (function() {
       localPythonFunctions: localPythonFunctions,
       overlappedOptions: overlappedOptions,
       dataSettings: dataSettings,
-      algorithmSettings: algorithmSettings,
+      collationAlgorithmSettings: collationAlgorithmSettings,
       highlighted: highlighted,
       highlightedAdded: highlightedAdded,
       showSubreadings: showSubreadings,
