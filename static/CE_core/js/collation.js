@@ -17,11 +17,7 @@ CL = (function() {
         'base_text': '',
         'language': ''
       },
-      algorithmSettings = {
-        'algorithm': 'auto',
-        'fuzzy_match': true,
-        'distance': 2
-      },
+      algorithmSettings = {},
       highlighted = 'none',
       highlightedAdded = [],
       showSubreadings = false,
@@ -3002,6 +2998,18 @@ CL = (function() {
     } else {
       //default is false
       CL.project.showCollapseAllUnitsButton = false;
+    }
+
+    // set the algorithm settings
+    if (project.hasOwnProperty('algorithmSettings')) {
+      CL.algorithmSettings = project.algorithmSettings;
+    } else if (CL.services.hasOwnProperty('algorithmSettings')) {
+      CL.algorithmSettings = CL.services.algorithmSettings;
+    } else {
+      //default is changed from previous releases
+      CL.algorithmSettings = {'algorithm': 'dekker',
+                              'fuzzy_match': true,
+                              'distance': 2};
     }
 
     //OR lac and OM
