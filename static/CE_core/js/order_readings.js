@@ -444,7 +444,7 @@ OR = (function() {
       if (CL.data.hasOwnProperty(key)) {
         if (key.match(/apparatus\d?/g) !== null) {
           apparatus = CL.data[key];
-          for let (i = 0; i < apparatus.length; i += 1) {
+          for (let i = 0; i < apparatus.length; i += 1) {
             delete apparatus[i].split_readings;
           }
           CL.data[key] = apparatus;
