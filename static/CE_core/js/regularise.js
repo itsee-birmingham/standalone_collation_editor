@@ -830,6 +830,10 @@ RG = (function() {
     }
     options.configs.algorithm_settings = algorithm_settings;
 
+    if (CL.services.hasOwnProperty('collatexHost')) {
+      options.configs.collatexHost = CL.services.collatexHost;
+    }
+
     if (output === 'add_witnesses') {
       options.config.split_single_reading_units = true;
       result_callback = function(data) {

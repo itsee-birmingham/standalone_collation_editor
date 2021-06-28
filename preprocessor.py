@@ -51,6 +51,11 @@ class PreProcessor(Regulariser):
         else:
             self.debug = False
 
+        if 'collatexHost' in configs:
+            self.host = configs['collatexHost']
+        else:
+            self.host = 'http://localhost:7369/collate'
+
         if 'split_single_reading_units' in configs:
             self.split_single_reading_units = configs['split_single_reading_units']
         else:
@@ -223,7 +228,6 @@ class PreProcessor(Regulariser):
         """
         algorithm = 'dekker'
         tokenComparator = {}
-        print(self.algorithm_settings)
         if self.algorithm_settings['algorithm']:
             algorithm = self.algorithm_settings['algorithm']
         if self.algorithm_settings['tokenComparator'] and self.algorithm_settings['tokenComparator']['type']:
@@ -244,12 +248,11 @@ class PreProcessor(Regulariser):
                     if len(witness['tokens']) > 0 and 'gap_after' in witness['tokens'][-1].keys():
                         algorithm = 'dekker'
                         break
+
             print('preprocessing complete', file=sys.stderr)
             options = {'outputFormat': accept,
                        'algorithm': algorithm,
-                       'tokenComparator': tokenComparator,
-                       'collatexHost': self.algorithm_settings['host'],
-                       'debug': self.algorithm_settings['debug']
+                       'tokenComparator': tokenComparator
                        }
             collatex_response = self.do_collate(witness_list, options)
 
@@ -337,7 +340,7 @@ class PreProcessor(Regulariser):
             print('tokenComparator - {}'.format(options['tokenComparator']), file=sys.stderr)
         except KeyError:
             pass
-        if 'debug' in options and options['debug'] is True:
+        if self.debug is True:
             problem_wits = []
             for wit in data['witnesses']:
                 for token in wit['tokens']:
@@ -365,10 +368,7 @@ class PreProcessor(Regulariser):
                 # examples include {"type": "levenshtein", "distance": 2}#{'type': 'equality'}
                 data['tokenComparator'] = options['tokenComparator']
 
-            if 'collatexHost' in options:
-                target = 'http://{}/collate'.format(options['collatexHost'])
-            else:
-                target = 'http://localhost:7369//collate'
+            target = self.host
 
             json_witnesses = json.dumps(data)
             if 'outputFormat' in options:

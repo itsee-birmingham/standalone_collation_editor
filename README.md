@@ -266,6 +266,12 @@ If ```CL.loadIndexPage()``` or a button with the id *collation_settings* was pro
 
 **NB:** this setting is new in version 2.0 and the default settings have changed from previous versions.
 
+- #### ```collatexHost```
+
+**There is a default in the core code which is explained below**
+
+This variable should be used if the system uses the collateX Java microservices and they are not running at the default location of ```http://localhost:7369/collate```. The variable should provide the full url at which the collateX microservices can be found.
+
 - #### ```lacUnitLabel```
 
 **This variable can be overwritten in individual project settings**
@@ -723,11 +729,56 @@ There are probably very few, if any, good reasons to use this. It is present to 
 This function is required if ```prepareDisplayString()``` is used. It must exactly reverse the changes made to the string by that function. It is used when making regularisation rules to ensure the stored strings are what is expected and can be transformed by prepareNormalisedString() correctly in the display.
 
 
+Python code to support configurations
+---
+
+### Rule conditions
+
+If you specify new rule conditions in the javascript they need to be supported by appropriate python code since the rule conditions are applied on the server side.
+
+The data provided to, and the data returned from, the method differ depending on the method type specified in the config.
+
+If the method is a boolean type it will be provided with two pieces of data: the JSON for the token and the JSON for the rule. The method should return ```True``` if the given rule should be applied to the given token and ```False``` if it should not. For example if a rule has a condition that says it should only be applied to nomena sacra and this token does not have a flag to say that it is one then false would be returned.
+
+If the method is a string_application type then it will be provided with two pieces of data: the string match for the rule and an array of all the possible matches for the token. **NB:** please note that the data is provided in reverse order in this type of method than with the boolean type. This may be rectified in future releases.) This type of method must return a tuple of the modified data having applied the condition. The rule match must come first followed by the array of token words. For example if the condition is to ignore supplied markers when applying this rule and the supplied text in your project is indicated by [] then all instances of [ and ] must be removed from the rule match string and all of the token match strings before they are returned.
+
+
+The function in the 'function' key in the rule settings will only be called if there is a possibility of the rule being applied. The function is not responsible for the application of the rule itself just applying the single condition it is responsible for.
+
+All of the python methods required for the rule conditions must be supplied in a single class. That means if you want to add to the defaults with your own functions you should copy the default code into your own python class.
+
+An example of the settings can be seen in ```static/CE_core/js/default_setting.js```
+
+An example of the python functions can be seen in the ```collation/core/default_implementations.py``` file but  a sample of the two methods described above can also be seen below:
+
+```python
+class RuleConditions(object):
+
+    def match_nomsac(self, token, decision):
+        if 'only_nomsac' in decision['conditions'].keys() and decision['conditions']['only_nomsac'] == True \
+            and ('nomSac' not in token.keys() or token['nomSac'] == False):
+            return False
+        return True
+
+    def ignore_supplied(self, decision_word, token_words):
+        decision_word = re.sub('\[(?!\d)', '', re.sub('(?<!\d)\]', '', decision_word))
+        token_words = [re.sub('\[(?!\d)', '', re.sub('(?<!\d)\]', '', w)) for w in token_words]
+        return(decision_word, token_words)
+```
+
+Settings
+
+
+
+
 Python/Server Services
 ---
 
+To support the server side code packaged with the collation editor some urls are required to provide the connection between the python and the javascript. The code required for each service should be minimal as they largely serve to pass data from the client side to the server side.
+
 ### Collation Service
 
+The collation service needs
 
 
 ### settingsApplier
@@ -759,41 +810,6 @@ class ApplySettings(object):
         return token
 ```
 
-### Rule conditions
-
-- **Python Method Requirements**
-
-  The data provided to and the data returned from the method differ depending on the method type specified in the config.
-
-  If the method is a boolean type it will be provided with two pieces of data: the JSON for the token and the JSON for the rule. The method should return True if the given rule should be applied to the given token and False if it should not. For example if a rule has a condition that says it should only be applied to nomena sacra and this token does not have a flag to say that it is one then false would be returned.
-
-  If the method is a string_application type then it will be provided with two pieces of data: the string match for the rule and an array of all the possible matches for the token. **NB:** please note that the data is provided in reverse order in this type of method than with the boolean type. This may be rectified in future releases.) This type of method must return a tuple of the modified data having applied the condition. The rule match must come first followed by the array of token words. For example if the condition is to ignore supplied markers when applying this rule and the supplied text in your project is indicated by [] then all instances of [ and ] must be removed from the rule match string and all of the token match strings before they are returned.
-
-
-The function in the 'function' key in the rule settings will only be called if there is a possibility of the rule being applied. The function is not responsible for the application of the rule itself just applying the single condition it is responsible for.
-
-
-All of the python methods required for the rule conditions must be supplied in a single class. That means if you want to add to the defaults with your own functions you should copy the default code into your own python class.
-
-
-An example of the settings can be seen in ```static/CE_core/js/default_setting.js```
-
-An example of the python functions can be seen in the ```collation/core/default_implementations.py``` file but  a sample of the two methods described above can also be seen below:
-
-```python
-class RuleConditions(object):
-
-    def match_nomsac(self, token, decision):
-        if 'only_nomsac' in decision['conditions'].keys() and decision['conditions']['only_nomsac'] == True \
-            and ('nomSac' not in token.keys() or token['nomSac'] == False):
-            return False
-        return True
-
-    def ignore_supplied(self, decision_word, token_words):
-        decision_word = re.sub('\[(?!\d)', '', re.sub('(?<!\d)\]', '', decision_word))
-        token_words = [re.sub('\[(?!\d)', '', re.sub('(?<!\d)\]', '', w)) for w in token_words]
-        return(decision_word, token_words)
-```
 
 ### apparatus exporters
 
@@ -954,6 +970,7 @@ Some of these changes are required to keep things working. Most are only require
   - The *set_rule_string* key of ```localPythonFunctions``` which was used in previous releases is no longer used in this release and can be deleted from the services file and the python files.
   - The *prepare_t* key of ```localPythonFunctions``` is not required for version 2.x. However, it is still required if the legacy regularisation system is being used and any processing was done in the extraction of the token JSON in  
     order to create the t value. It is now documented as part of the [legacy_regularisation repository](https://github.com/itsee-birmingham/legacy_regularisation).
+  - The new variable ```collatexHost``` can be used to specify the location of the collateX microservices if they do not use the default of ```http://localhost:7369/collate```.
 
 ##### Changes to project settings
 
@@ -973,7 +990,7 @@ Some of these changes are required to keep things working. Most are only require
 
 #### Changes required to collation service
 
-collation service in views.py (for me) can support an optional parameter 'debug' it must be optional if it is used as the add witness function does not use debug mode.
+The collation service requirements have been simplified a lot in this release. Instead of having to unpack all of the data received from the javascript the collation service can now just pass it on to the collation editor python code. If you need to make changes at this stage you can still do so but if that is not necessary then the code can be much simpler. The minimum required code is provided as an example in the description of the collation service above.
 
 #### Exporter changes which may need action in inherited classes
 
