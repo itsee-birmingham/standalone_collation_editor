@@ -49,7 +49,8 @@ class PostProcessor(Regulariser, SettingsApplier):
             self.local_python_functions = None
         self.split_single_reading_units = split_single_reading_units
         Regulariser.__init__(self, rule_conditions_config, local_python_functions)
-        SettingsApplier.__init__(self, settings, display_settings_config)
+        SettingsApplier.__init__(self, {'display_settings': settings,
+                                        'display_settings_config': display_settings_config})
 
     ###########################################################
     # this is the starting function

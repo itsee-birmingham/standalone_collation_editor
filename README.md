@@ -82,6 +82,8 @@ On loading the services file must call ```CL.setServiceProvider()``` passing a r
 
 Example services files can be found in the services directory of the collation_editor_contrib repository here: **TODO: make contrib repository and put stuff in it**
 
+**TODO:** ensure that somewhere it is recorded how to specify functions such as sortWitnesses, prepareDisplay String etc in project settings (code for this has changed so essential it is done correctly now) include how to do it in services somewhere for good measure (might already be done)
+
 
 ### Required Service File Variables
 
@@ -153,6 +155,18 @@ Given the ids ```["JS", "RS"]``` the JSON object should be as follows (where nam
 }
 ```
 
+- #### ```applySettings()```
+
+| Param  | Type                | Description  |
+| ------ | ------------------- | ------------ |
+| data | <code>object</code> | a list of tokens and the display settings options |
+| callback  | <code>function</code> | function to be called on the returned data |
+
+The function should pass the data object to a Python service and run the callback on the data returned.
+
+The Python service required is described in the Python services section below.
+
+
 - #### ```getCurrentEditingProject()```
 
 | Param  | Type                | Description  |
@@ -186,21 +200,9 @@ The JSON structure provided for each unit in each document should match the unit
 | options | <code>JSON</code> | a JSON object containing all of the data and settings needed for collation |
 | resultCallback  | <code>function</code> | The function called when the collation is complete which displays the data in the collation editor |
 
-This function should send the options JSON to a python service for collation, the url used for collation can be used to determine whether a project uses the current version of the regularisation system or the legacy version. The python service required for the collation process is explained in the Python/Server functions section.
+This function should send the options JSON to a python service for collation, the url used for collation can be used to determine whether a project uses the current version of the regularisation system or the legacy version. The options JSON object will contain all the options required for the collation process on the server.
 
-The options JSON object will contain the following details (all handled by the core javascript code):
-
-- **data_input** *[object]* - All of the data to be collated for this unit (generated using the ```getUnitData()``` services function).
-- **rules** *[array]* - the array of rules which could apply to this verse (generated using the ```getRules()``` services function).
-- **data_settings** *[object]* - The JSON for the data settings containing the keys *base_text*, *base_text_siglum*, *language* and *witness_list* (the list of witnesses requested for the collation).
-- **display_settings** *[object]* - The current display settings selection (this must only contain the settings for which the value is true).
-- **display_settings_config** *[object]* - The display settings data as stored by ```displaySettings``` or the default in the collation editor if not supplied.
-- **rule_conditions_config** *[object]* - The display settings data as stored by ```ruleConditions``` or the default in the collation editor if not supplied.
-- **algorithm_settings** *[object]* - The algorithm settings as stored by ```collationAlgorithmSettings``` or as selected by the user in the interface.
-- **split_single_reading_units** *[boolean]* - a flag to determine which readings with only one reading should be separated into tokens, by default this is false but it can be changed depending on the desired result. When collating witnesses to be added to existing collations this will be set to true to enable the merge process to work.
-- **local_python_functions** *[object]* - the local python functions provided in the services file including the local collation function specified in the ```localCollationFunction``` in the services file.
-- **project** *[string/integer]* - The id for the current project if one exists.
-- **debug** *[boolean]* - a flag which tells the collation process to run in debug mode (if this is supported in the python functions).
+The python service required for the collation process is explained in the Python/Server functions section.
 
 When the collation process has completed the JSON response from the Python collation system should be passed to resultCallback.
 
@@ -248,6 +250,33 @@ This should retrieve the collation with the given id and run the callback on the
 
 This variable should be an array of strings giving the full url of any additional javascript you need the collation editor to load. These might be required run the services for your framework (an internal api file for example) or you might want to use additional files to store configuration functions that you call in the services. These files will be loaded as part of the collation editor initialisation functions called after the services have been set.
 
+
+- ```localCollationFunction```
+
+**This variable can be overwritten in individual project settings (but this may not be advisable)**
+
+**There is a default provided in core code which uses the collateX Java microservices**
+
+This variable can be used to configure an alternative method of interacting with collateX, or, assuming the output format is the same as the JSON output provided by collateX replacing it with a different collation service. By default the collation editor will use the collateX java microservices running at the default port (7369) at localhost.
+
+the configuration should be provided as a JSON object with the following keys:
+
+- **python_file** *[string]* - The import path for the python file containing the class.
+- **class_name** *[string]* - The name of the class containing the methods.
+- **function** *[string]* - The name of the method of the python class to run for this function.
+
+The method will be provided with the data to collate in the JSON format required by collateX and an optional dictionary of collateX settings requested by the user such as what algorithm to use and whether or not to use the Levenshtein distance matching.
+
+It should return the JSON output from collateX or equivalent.
+
+
+- #### ```collatexHost```
+
+**There is a default in the core code which is explained below**
+
+This variable should be used if the system uses the collateX Java microservices and they are not running at the default location of ```http://localhost:7369/collate```. The variable should provide the full url at which the collateX microservices can be found. If the ```localCollationFunction``` has been set then that function will be used rather than the microservices and this variable will not be used.
+
+
 - #### ```collationAlgorithmSettings```
 
 **This variable can be overwritten in individual project settings**
@@ -266,11 +295,6 @@ If ```CL.loadIndexPage()``` or a button with the id *collation_settings* was pro
 
 **NB:** this setting is new in version 2.0 and the default settings have changed from previous versions.
 
-- #### ```collatexHost```
-
-**There is a default in the core code which is explained below**
-
-This variable should be used if the system uses the collateX Java microservices and they are not running at the default location of ```http://localhost:7369/collate```. The variable should provide the full url at which the collateX microservices can be found.
 
 - #### ```lacUnitLabel```
 
@@ -285,11 +309,13 @@ This variable should be a string and should be the text the collation editor nee
 
 This variable should be a string and should be the text the collation editor needs to display for any witnesses which omit the entire collation unit. The default, which will be used if this variable is not present, is 'om unit'. Until version 2.0.0 the default text was 'om verse'.
 
+
 - #### ```showCollapseAllUnitsButton```
 
 **This variable can be overwritten in individual project settings**
 
 This variable is a boolean which determines whether or not to show the button in the footer of all stages of the collation editor which allows all the units to be collapsed to show only the a reading. The default is false. Until version 2.0.0  this button was included by default.
+
 
 - #### ```extraFooterButtons```
 
@@ -369,6 +395,7 @@ The default is false.
 
 If you are using special category lac readings and you want these to appear in your final edition then this setting should not be used.
 
+
 - #### ```combineAllOmsInOR```
 
 **This variable can be overwritten in individual project settings**
@@ -376,6 +403,7 @@ If you are using special category lac readings and you want these to appear in y
 This is a boolean variable. It works in the same was as ```combineAllLacsInOR``` but with om readings.
 
 The default is false.
+
 
 - #### ```combineAllLacsInApproved```
 
@@ -386,6 +414,7 @@ This is a boolean variable. It works in the same was as ```combineAllLacsInOR```
 The default is false.
 
 If you are using special category lac readings and you want these to appear in your final edition then this setting should not be used.
+
 
 - #### ```combineAllOmsInApproved```
 
@@ -417,6 +446,7 @@ approval_settings = {
 
 ```
 
+
 - #### ```overlappedOptions```
 
 **This variable can be overwritten in individual project settings**
@@ -432,7 +462,6 @@ The data for any additional options should be structured as an array of JSON obj
 -  **reading_flag** *[string]* - The string to be used in the data structure to describe the status of this reading (must not contain spaces).
 -  **reading_label** *[string]* - The label to use for the reading in the data structure - if the display label needs to be different it can be provided in the reading_label_display key.
 -  **reading_label_display** *[string]* - If the display of the label in the collation editor should be different from the reading_label value then it should be provided here.
-
 
 An example is below:
 
@@ -514,7 +543,32 @@ Each JSON object in the **configs** array should have the following keys:
 
 For an example of the javascript configuration see the [default_settings.js](https://github.com/itsee-birmingham/standalone_collation_editor/blob/master/collation/core/static/CE_core/js/default_settings.js) file.
 
-The python requirements to support any customisation of the settings is covered in the section later in the documentation titled Python/Server Services.
+
+**Python requirements**
+
+  The method is passed the JSON object for the token and must return the same token with the 'interface' key modified as appropriate for the setting being applied. For example if a setting is provided which hides markers of supplied text then these markers must be removed from the 'interface' key value before returning the token. If a setting for showing expanded form of the word exists then an expanded form of the text should have been stored in the JSON object and this can then be used to replace the interface version. More details of the JSON token structure can be found in the documentation for the standalone collation editor on github. This type of setting where the interface value is swapped for another in the JSON token data is an example of why the order of execution is important. When swapping the interface value it is important that any already applied rules are respected and therefore if an 'n' key is present in the token JSON it should be returned instead of any other value. An example of this is given in the 'expand_abbreviations' method example in the python code below.
+
+All of the python methods required for the display settings must be supplied in a single class. That means if you want to add to the defaults with your own functions you should copy the default code into your own python class.
+
+If a settings is required to run behind the scenes then ```null``` can be provided as the menu_pos value and it will not appear in the menu.
+
+An example of the python functions can be seen in the [default_implementations.py](https://github.com/itsee-birmingham/collation_editor_core/blob/master/default_implementations.py) file but  a sample of the two methods described above can also be seen below:
+
+```python
+class ApplySettings(object):
+
+    def expand_abbreviations(self, token):
+        if 'n' in token:  # applied rules override this setting
+            token['interface'] = token['n']
+        elif 'expanded' in token:
+            token['interface'] = token['expanded']
+        return token
+
+    def hide_supplied_text(self, token):
+        token['interface'] = re.sub('\[(?!\d)', '', re.sub('(?<!\d)\]', '', token['interface']))
+        return token
+```
+
 
 - #### ```ruleClasses```
 
@@ -570,27 +624,38 @@ The 'linked_to_settings' key gives you the option to ensure that conditions are 
 
 For an example of the javascript configuration see the [default_settings.js](https://github.com/itsee-birmingham/standalone_collation_editor/blob/master/collation/core/static/CE_core/js/default_settings.js) file.
 
-The python requirements to support any additional rule conditions is covered in the section later in the documentation titled Python/Server Services.
+**Python requirements**
+
+If you specify new rule conditions in the javascript they need to be supported by appropriate python code since the rule conditions are applied on the server side.
+
+The data provided to, and the data returned from, the method differ depending on the method type specified in the config.
+
+If the method is a boolean type it will be provided with two pieces of data: the JSON for the token and the JSON for the rule. The method should return ```True``` if the given rule should be applied to the given token and ```False``` if it should not. For example if a rule has a condition that says it should only be applied to nomena sacra and this token does not have a flag to say that it is one then false would be returned.
+
+If the method is a string_application type then it will be provided with two pieces of data: the string match for the rule and an array of all the possible matches for the token. **NB:** please note that the data is provided in reverse order in this type of method than with the boolean type. This may be rectified in future releases.) This type of method must return a tuple of the modified data having applied the condition. The rule match must come first followed by the array of token words. For example if the condition is to ignore supplied markers when applying this rule and the supplied text in your project is indicated by [] then all instances of [ and ] must be removed from the rule match string and all of the token match strings before they are returned.
 
 
-- ```localCollationFunction```
+The function in the 'function' key in the rule settings will only be called if there is a possibility of the rule being applied. The function is not responsible for the application of the rule itself just applying the single condition it is responsible for.
 
-**This variable can be overwritten in individual project settings (but this may not be advisable)**
+All of the python methods required for the rule conditions must be supplied in a single class. That means if you want to add to the defaults with your own functions you should copy the default code into your own python class.
 
-**There is a default provided in core code which uses the collateX Java microservices**
 
-This variable can be used to configure an alternative method of interacting with collateX, or, assuming the output format is the same as the JSON output provided by collateX replacing it with a different collation service. By default the collation editor will use the collateX java microservices running at the default port (7369) at localhost.
+An example of the python functions can be seen in the [default_implementations.py](https://github.com/itsee-birmingham/collation_editor_core/blob/master/default_implementations.py) file but  a sample of the two methods described above can also be seen below:
 
-the configuration should be provided as a JSON object with the following keys:
+```python
+class RuleConditions(object):
 
-- **python_file** *[string]* - The import path for the python file containing the class.
-- **class_name** *[string]* - The name of the class containing the methods.
-- **function** *[string]* - The name of the method of the python class to run for this function.
+    def match_nomsac(self, token, decision):
+        if 'only_nomsac' in decision['conditions'].keys() and decision['conditions']['only_nomsac'] == True \
+            and ('nomSac' not in token.keys() or token['nomSac'] == False):
+            return False
+        return True
 
-The method will be provided with the data to collate in the JSON format required by collateX and an optional dictionary of collateX settings requested by the user such as what algorithm to use and whether or not to use the Levenshtein distance matching.
-
-It should return the JSON output from collateX or equivalent.
-
+    def ignore_supplied(self, decision_word, token_words):
+        decision_word = re.sub('\[(?!\d)', '', re.sub('(?<!\d)\]', '', decision_word))
+        token_words = [re.sub('\[(?!\d)', '', re.sub('(?<!\d)\]', '', w)) for w in token_words]
+        return(decision_word, token_words)
+```
 
 - #### ```exporterSettings```
 
@@ -726,49 +791,7 @@ There are probably very few, if any, good reasons to use this. It is present to 
 **The default is to leave the provided string untouched**
 
 
-This function is required if ```prepareDisplayString()``` is used. It must exactly reverse the changes made to the string by that function. It is used when making regularisation rules to ensure the stored strings are what is expected and can be transformed by prepareNormalisedString() correctly in the display.
-
-
-Python code to support configurations
----
-
-### Rule conditions
-
-If you specify new rule conditions in the javascript they need to be supported by appropriate python code since the rule conditions are applied on the server side.
-
-The data provided to, and the data returned from, the method differ depending on the method type specified in the config.
-
-If the method is a boolean type it will be provided with two pieces of data: the JSON for the token and the JSON for the rule. The method should return ```True``` if the given rule should be applied to the given token and ```False``` if it should not. For example if a rule has a condition that says it should only be applied to nomena sacra and this token does not have a flag to say that it is one then false would be returned.
-
-If the method is a string_application type then it will be provided with two pieces of data: the string match for the rule and an array of all the possible matches for the token. **NB:** please note that the data is provided in reverse order in this type of method than with the boolean type. This may be rectified in future releases.) This type of method must return a tuple of the modified data having applied the condition. The rule match must come first followed by the array of token words. For example if the condition is to ignore supplied markers when applying this rule and the supplied text in your project is indicated by [] then all instances of [ and ] must be removed from the rule match string and all of the token match strings before they are returned.
-
-
-The function in the 'function' key in the rule settings will only be called if there is a possibility of the rule being applied. The function is not responsible for the application of the rule itself just applying the single condition it is responsible for.
-
-All of the python methods required for the rule conditions must be supplied in a single class. That means if you want to add to the defaults with your own functions you should copy the default code into your own python class.
-
-An example of the settings can be seen in ```static/CE_core/js/default_setting.js```
-
-An example of the python functions can be seen in the ```collation/core/default_implementations.py``` file but  a sample of the two methods described above can also be seen below:
-
-```python
-class RuleConditions(object):
-
-    def match_nomsac(self, token, decision):
-        if 'only_nomsac' in decision['conditions'].keys() and decision['conditions']['only_nomsac'] == True \
-            and ('nomSac' not in token.keys() or token['nomSac'] == False):
-            return False
-        return True
-
-    def ignore_supplied(self, decision_word, token_words):
-        decision_word = re.sub('\[(?!\d)', '', re.sub('(?<!\d)\]', '', decision_word))
-        token_words = [re.sub('\[(?!\d)', '', re.sub('(?<!\d)\]', '', w)) for w in token_words]
-        return(decision_word, token_words)
-```
-
-Settings
-
-
+This function is required if ```prepareDisplayString()``` is used. It must exactly reverse the changes made to the string by that function. It is used when making regularisation rules to ensure the stored strings are what is expected and can be transformed by ```prepareNormalisedString()``` correctly in the display.
 
 
 Python/Server Services
@@ -778,40 +801,56 @@ To support the server side code packaged with the collation editor some urls are
 
 ### Collation Service
 
-The collation service needs
+The collation service needs to respond to an ajax call from the ```doCollation()``` services function and start the collation process by initialising and calling the collation preprocessor. The preprocessor applies the regularisation rules, runs the collation with collateX using the provided settings and processes and formats the collateX export for display in the collation editor.
 
+All of the settings required are provided by the javascript. They can be altered here if needed but in most cases that will not be necessary.
 
-### settingsApplier
+The service needs to create a PreProcessor object using the data passed in the request as as options.configs. In should then call the process_witness_list function of that object using the data passed in the request as options.data. It should then return the output of this process as JSON or, if something goes wrong, an error message.
 
-- **Python Method Requirements**
+if the legacy regularisation system is also being used either this service or the ```doCollation()``` function can decide which one to create for the provided data. To use the legacy preprocessor the code requirements are the same but should use the legacy preprocessor object.
 
-  The method is passed the JSON object for the token and must return the same token with the 'interface' key modified as appropriate for the setting being applied. For example if a setting is provided which hides markers of supplied text then these markers must be removed from the 'interface' key value before returning the token. If a setting for showing expanded form of the word exists then an expanded form of the text should have been stored in the JSON object and this can then be used to replace the interface version. More details of the JSON token structure can be found in the documentation for the standalone collation editor on github. This type of setting where the interface value is swapped for another in the JSON token data is an example of why the order of execution is important. When swapping the interface value it is important that any already applied rules are respected and therefore if an 'n' key is present in the token JSON it should be returned instead of any other value. An example of this is given in the 'expand_abbreviations' method example in the python code below.
-
-All of the python methods required for the display settings must be supplied in a single class. That means if you want to add to the defaults with your own functions you should copy the default code into your own python class.
-
-If a settings is required to run behind the scenes then ```null``` can be provided as the menu_pos value and it will not appear in the menu.
-
-An example of the settings can be seen in ```static/CE_core/js/default_setting.js```
-
-An example of the python functions can be seen in the ```collation/core/default_implementations.py``` file but  a sample of the two methods described above can also be seen below:
+This example of the minimum code required for this service is taken from a Django implementation.
 
 ```python
-class ApplySettings(object):
+from collation.core.exceptions import DataInputException
+from collation.core.preprocessor import PreProcessor
 
-    def expand_abbreviations(self, token):
-        if 'n' in token: #applied rules override this setting
-            token['interface'] = token['n']
-        elif 'expanded' in token:
-            token['interface'] = token['expanded']
-        return token
+def collate(request):
 
-    def hide_supplied_text(self, token):
-        token['interface'] = re.sub('\[(?!\d)', '', re.sub('(?<!\d)\]', '', token['interface']))
-        return token
+    options = json.loads(request.POST.get('options'))    
+    p = PreProcessor(options['configs'])
+    try:
+        output = p.process_witness_list(options['data'])
+    except DataInputException as e:
+        return JsonResponse({'message': str(e)}, status=500)
+
+    return JsonResponse(output)
+```
+
+### Settings Applier
+
+There is one point in the collation editor code where the javascript needs to be able to apply the current settings to a string. This code was overlooked in the initial abstraction of the code away from the New Testament Greek context in which it was developed and the original Greek settings remained hard coded into the javascript code. This meant that the correct settings were not being applied for most other projects. The hard coded settings have now been removed from the javascript but a Python service is now required in its place. No one has reported problems with the way this worked in versions before 2.0 so it is very unlikely that any existing projects were negatively affected by this.
+
+The collation editor provides a SettingsApplier class which uses the same configuration and Python support code as is used in the display settings configuration applied during the collation process.
+
+The function should create an isntance of the SettingsApplier class using the data in the *options* key of the request data object and then call the ```apply_settings_to_token_list()``` function from that objects using the data in the *tokens* key of the request data object.
+
+The service will be called by the ```applySettings()``` function in the services file.
+
+This example of the minimum code required for this service is taken from a Django implementation.
+
+```python
+from collation.core.settings_applier import SettingsApplier
+
+def apply_settings(request):
+    data = json.loads(request.POST.get('data'))
+    applier = SettingsApplier(data['options'])
+    tokens = applier.apply_settings_to_token_list(data['tokens'])
+    return JsonResponse({'tokens': tokens})
 ```
 
 
-### apparatus exporters
+### Apparatus exporters
 
 
 
@@ -962,7 +1001,8 @@ Some of these changes are required to keep things working. Most are only require
     - The boolean argument 'private' in the third position should be removed. The third and final argument should now be the callback.
     - The return data for the function has changed (see description of service file above and details on special category lac readings **TODO where?**). To maintain previous behaviour wrap the array returned in earlier versions in a dictionary as the value for the key 'results'.
   - ```getAdjoiningVerse()``` should be renamed to ```getAdjoiningUnit```.
-  - new optional functions ```prepareNormalisedString()``` and ```prepareDisplayString()```. These functions have been added to remove a hard coded action required from the early New Testament Greek implementation of the code. They are described fully in the optional services functions above. To maintain existing behaviour prepareNormalisedString should replace an underdot (\&#803;) with an underscore and prepareDisplayString the reverse. It is very unlikely that any projects will actually need this to be done unless unclear data is displayed with an underdot but stored in the database as an underscore.
+  - new optional functions ```prepareNormalisedString()``` and ```prepareDisplayString()```. These functions have been added to remove a hard coded action required from the early New Testament Greek implementation of the code. They are described fully in the optional services functions above. To maintain existing behaviour ```prepareNormalisedString()``` should replace an underdot (\&#803;) with an underscore and ```prepareDisplayString()``` the reverse. It is very unlikely that any projects will actually need this to be done unless unclear data is displayed with an underdot but stored in the database as an underscore.
+  - ```applySettings()``` function is required along with a supporting Python service. Both are fully documented above.
 
 ##### Optional changes
 
@@ -974,12 +1014,7 @@ Some of these changes are required to keep things working. Most are only require
 
 ##### Changes to project settings
 
-  - rules classes specified in project settings should use the JSON key **ruleClasses** not ***regularisation_classes***. This bring them in line with the services equivalent. Both were supported for projects in earlier versions.
-
-
-* ensure that somewhere it is recorded how to specify functions such as sortWitnesses, prepareDisplay String etc in project settings (code for this has changed so essential it is done correctly now) include how to do it in services somewhere for good measure (might already be done)
-
-* new services file function applySettings required. This is to remove some hard coded NT Greek settings which were still present in the javascript code. The service function arguments are described in the service file documentation above. TODO: document the service required and the options for using it.
+  - rules classes specified in project settings should use the JSON key **ruleClasses** not **regularisation_classes**. This bring them in line with the services equivalent. Both were supported for projects in earlier versions.
 
 
 #### Other changes to be aware of but that do not necessarily require actions
@@ -988,9 +1023,10 @@ Some of these changes are required to keep things working. Most are only require
 - The option to delete a made rule before recollating used to delete the rule but then prevent the word from being regularised again until the unit had been recollated. This has now been fixed and if a rule is deleted before recollation another rule can be made for the same word straight away.
 - The code for the overlay and spinner code has changed to simplify it. Any calls to ```SPN.show_loading_overlay()``` and/or ```SPN.remove_loading_overlay()``` in the services file should be changed to ```spinner.showLoadingOverlay()``` and ```spinner.removeLoadingOverlay()```.
 
-#### Changes required to collation service
+#### Changes required to Python services
 
-The collation service requirements have been simplified a lot in this release. Instead of having to unpack all of the data received from the javascript the collation service can now just pass it on to the collation editor python code. If you need to make changes at this stage you can still do so but if that is not necessary then the code can be much simpler. The minimum required code is provided as an example in the description of the collation service above.
+- The collation service requirements have been simplified a lot in this release. Instead of having to unpack all of the data received from the javascript the collation service can now just pass it on to the collation editor python code. If you need to make changes at this stage you can still do so but if that is not necessary then the code can be much simpler. The minimum required code is provided as an example in the description of the collation service above.
+- An new service is required to apply settings and is described above in the Python/Server Services section under Settings Applier. It is called from the new javascript services function ```applySettings()``` (also documented above).
 
 #### Exporter changes which may need action in inherited classes
 

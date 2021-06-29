@@ -5,9 +5,10 @@ import importlib
 
 class SettingsApplier(object):
 
-    def __init__(self, display_settings, display_settings_config):
-        self.settings = display_settings
-        self.display_settings_config = display_settings_config
+    # def __init__(self, display_settings, display_settings_config):
+    def __init__(self, options):
+        self.settings = options['display_settings']
+        self.display_settings_config = options['display_settings_config']
         self.display_settings_config['configs'].sort(key=lambda k: k['execution_pos'])
 
         module_name = self.display_settings_config['python_file']

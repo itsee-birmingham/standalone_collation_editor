@@ -1989,7 +1989,8 @@ CL = (function() {
 
   makeStandoffReading = function(type, reading_details, parent_id, outerCallback) {
     var apparatus, unit, parent, reading, fosilised_reading, tValuesForSettings, options, displaySettings,
-        resultCallback;
+        resultCallback, data;
+    data = {};
     apparatus = reading_details.app_id;
     unit = findUnitById(apparatus, reading_details.unit_id);
     parent = findReadingById(unit, parent_id);
@@ -2023,7 +2024,9 @@ CL = (function() {
         outerCallback();
       }
     };
-    CL.services.applySettings(tValuesForSettings, options, resultCallback);
+    data.tokens = tValuesForSettings;
+    data.options = options;
+    CL.services.applySettings(data, resultCallback);
   };
 
   _makeStandoffReading2 = function (reading, fosilised_reading, parent, baseReadingsWithSettingsApplied, type, unit,
