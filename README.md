@@ -185,11 +185,29 @@ This function must get the current project details as a JSON object and call ```
 | documentIds | <code>array</code> | the list of ids for the documents required |
 | callback  | <code>function</code> | function to be called on the data |
 
-This function must find all of the JSON data for this context in each of the documents requested. The callback should be run on the resulting list of JSON objects. Any documents that are lacunose for this unit can be omitted from the data sent to the callback (they will be handled later). **TODO:** check this is true for special category readings and amend as necessary.
+This function must find all of the JSON data for this context in each of the documents requested. The function should return a dictionary which in its minimal form needs to have a single key **results** which should contain an array of JSON objects. The JSON structure provided for each unit in each document should match the unit structure as described in the data structures section. The exception to this is lacunose readings that need special labels in the collation editor display. The should be handled in one of the following ways depending on the nature of the reading. Any documents that are lacunose for this unit and do not need a special label should be omitted from the data set entirely.
 
-The JSON structure provided for each unit in each document should match the unit structure as described in the data structures section.
+Special category lac readings for which the special category can be determined from the input format of the transcription, such as TEI XML, can be sent in the results data using the following structure for the unit data object:
 
-**NB:** Until version 2.0.0 this function was called ```getVerseData()``` and had a boolean ```private``` as the third argument before the callback.
+TODO: check this against overall data structure to find optional tokens
+
+- **id** the sigla of the witness
+- **hand** the hand of the witness (for example 'firsthand')
+- **hand_abbreviation** the abbreviation used in the display for this hand (for example '*')
+- **tokens** an empty array representing the absence of tokens
+- **gap_reading** the string to use in the display of this lac reading
+
+
+If any special lac labels are required for data that cannot be determined from the input format then a second key can be added to the main datastrcutre with the name **special_categories**. This should contain an array of JSON objects where each object is structured as follows:
+
+- **label** The string to use as the label in the interface for this special category of lac.
+- **witnesses** An array of sigla for the witnesses that need to be given this label.
+
+The witnesses listed in the special_categories array structure should not appear elsewhere in the data returned.
+
+When all of the data has been retrieved the callback should be run on the resulting object.
+
+**NB:** Until version 2.0.0 this function was called ```getVerseData()```, had a boolean ```private``` as the third argument before the callback and returned a list (which is now the list in the **results** key).
 
 
 - #### ```doCollation()```
@@ -999,7 +1017,7 @@ Some of these changes are required to keep things working. Most are only require
   - changes to existing function ```getVerseData()```
     - ```getVerseData()``` function should be renamed to ```getUnitData()```.
     - The boolean argument 'private' in the third position should be removed. The third and final argument should now be the callback.
-    - The return data for the function has changed (see description of service file above and details on special category lac readings **TODO where?**). To maintain previous behaviour wrap the array returned in earlier versions in a dictionary as the value for the key 'results'.
+    - The return data for the function has changed (see description of service file above and details on special category lac readings). To maintain previous behaviour wrap the array returned in earlier versions in a dictionary as the value for the key *results*.
   - ```getAdjoiningVerse()``` should be renamed to ```getAdjoiningUnit```.
   - new optional functions ```prepareNormalisedString()``` and ```prepareDisplayString()```. These functions have been added to remove a hard coded action required from the early New Testament Greek implementation of the code. They are described fully in the optional services functions above. To maintain existing behaviour ```prepareNormalisedString()``` should replace an underdot (\&#803;) with an underscore and ```prepareDisplayString()``` the reverse. It is very unlikely that any projects will actually need this to be done unless unclear data is displayed with an underdot but stored in the database as an underscore.
   - ```applySettings()``` function is required along with a supporting Python service. Both are fully documented above.
