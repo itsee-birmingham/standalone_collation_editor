@@ -71,7 +71,7 @@ class PreProcessor(Regulariser):
         data = data_input['data']
         rules = collation_input_data['rules']
         basetext_transcription = collation_input_data['data_settings']['base_text']
-        print(basetext_transcription)
+
         witnesses = {}
         collatable_witnesses = []
         om_witnesses = []
@@ -91,7 +91,7 @@ class PreProcessor(Regulariser):
         # this means we don't have to use the numerical pk
         # it must match with whatever is used in the services 'get_siglum_map' code
         if 'transcription_id' in data[0]:
-            warnings.warn('''The use of 'transcription_id' as a key in 'verse'
+            warnings.warn('''The use of 'transcription_id' as a key in the collation unit
             object is deprecated in favour of 'transcription'. Support will be removed in future releases''',
                           PendingDeprecationWarning)
         # Add all the witness texts and keep record of witnesses omitting the verse and lacunose witnesses

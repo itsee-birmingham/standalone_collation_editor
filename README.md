@@ -185,25 +185,19 @@ This function must get the current project details as a JSON object and call ```
 | documentIds | <code>array</code> | the list of ids for the documents required |
 | callback  | <code>function</code> | function to be called on the data |
 
-This function must find all of the JSON data for this context in each of the documents requested. The function should return a dictionary which in its minimal form needs to have a single key **results** which should contain an array of JSON objects. The JSON structure provided for each unit in each document should match the unit structure as described in the data structures section. The exception to this is lacunose readings that need special labels in the collation editor display. The should be handled in one of the following ways depending on the nature of the reading. Any documents that are lacunose for this unit and do not need a special label should be omitted from the data set entirely.
+This function must find all of the JSON data for this context in each of the documents requested. The function should return a dictionary which in its minimal form needs to have a single key **results** which should contain an array of JSON objects. The JSON structure provided for each unit in each document should match the unit structure as described in the data structures section. Pay particular attention to the treatment of lacunose and omitted units which need to be handled in different ways depending on the result required in the collation editor.
 
-Special category lac readings for which the special category can be determined from the input format of the transcription, such as TEI XML, can be sent in the results data using the following structure for the unit data object:
+- Any documents that are lacunose for this unit and do not need a special label should be omitted from the data set entirely.
 
-TODO: check this against overall data structure to find optional tokens
+- Special category lac readings for which the special category can be determined from the input format of the transcription, such as TEI XML, can be sent in the results data using the following structure outlined in the data structures section.
 
-- **id** the sigla of the witness
-- **hand** the hand of the witness (for example 'firsthand')
-- **hand_abbreviation** the abbreviation used in the display for this hand (for example '*')
-- **tokens** an empty array representing the absence of tokens
-- **gap_reading** the string to use in the display of this lac reading
+- If any special lac labels are required for data that cannot be determined from the input format then a second key can be added to the main data structure with the name **special_categories**. This should contain an array of JSON objects where each object is structured as follows:
 
+  - **label** The string to use as the label in the interface for this special category of lac.
+  - **witnesses** An array of sigla for the witnesses that need to be given this label.
 
-If any special lac labels are required for data that cannot be determined from the input format then a second key can be added to the main datastrcutre with the name **special_categories**. This should contain an array of JSON objects where each object is structured as follows:
+  The witnesses listed in the special_categories array structure should not appear elsewhere in the data returned.
 
-- **label** The string to use as the label in the interface for this special category of lac.
-- **witnesses** An array of sigla for the witnesses that need to be given this label.
-
-The witnesses listed in the special_categories array structure should not appear elsewhere in the data returned.
 
 When all of the data has been retrieved the callback should be run on the resulting object.
 
@@ -285,7 +279,7 @@ the configuration should be provided as a JSON object with the following keys:
 
 The method will be provided with the data to collate in the JSON format required by collateX and an optional dictionary of collateX settings requested by the user such as what algorithm to use and whether or not to use the Levenshtein distance matching.
 
-It should return the JSON output from collateX or equivalent.
+The reference python function should return the JSON output from collateX or equivalent.
 
 
 - #### ```collatexHost```
@@ -311,7 +305,7 @@ The default setting in the code will use the Dekker algorithm with fuzzy matchin
 
 If ```CL.loadIndexPage()``` or a button with the id *collation_settings* was provided on the index page then the user can override these settings on a unit by unit basis.
 
-**NB:** this setting is new in version 2.0 and the default settings have changed from previous versions.
+**NB:** this setting is new in version 2.0.0 and the default settings have changed from previous versions.
 
 
 - #### ```lacUnitLabel```
@@ -342,7 +336,7 @@ This variable is a boolean which determines whether or not to show the button in
 This variable can be used to add your own custom buttons to the footer of the display in the four stages of the collation editor. Each stage is treated separately. The data should be structured as a JSON object with the stage/s to be modified as the top level key/s using the following values: regularised, set, ordered, approved. The value for each key should be an array of objects where each object has the following two keys:
 
 - **id** *[string]* - the string to be used in the id attribute of the button
--  **label** *[string]* - the string visible to the user on the created button
+- **label** *[string]* - the string visible to the user on the created button
 
 This variable is used just to add the buttons to the GUI in order to make the buttons work the functions must be added in the ```addExtraFooterFunctions()``` function in the services file using the id provided in this variable to add the function.
 
@@ -370,8 +364,8 @@ The data should be structured as a JSON object with the stage/s to be modified a
 The value of this key should be an array of JSON objects each with the following three keys:
 
 - **function** *[string]* - the function to run. The can either be the function itself (in the services file only) or, as in the example below a reference to a function elsewhere such as the javascript files listed in the ```localJavascript``` variable.
--  **pass_condition** *[boolean]* - the boolean returned from the function if the test has passed and the user may continue to the next stage.
--  **fail_message** *[string]* - the string displayed to the user if a test condition fails and they are prevented from moving to the next stage.
+- **pass_condition** *[boolean]* - the boolean returned from the function if the test has passed and the user may continue to the next stage.
+- **fail_message** *[string]* - the string displayed to the user if a test condition fails and they are prevented from moving to the next stage.
 
 Functions will be run in the order they are provided in the array.
 
@@ -851,7 +845,7 @@ There is one point in the collation editor code where the javascript needs to be
 
 The collation editor provides a SettingsApplier class which uses the same configuration and Python support code as is used in the display settings configuration applied during the collation process.
 
-The function should create an isntance of the SettingsApplier class using the data in the *options* key of the request data object and then call the ```apply_settings_to_token_list()``` function from that objects using the data in the *tokens* key of the request data object.
+The function should create an instance of the SettingsApplier class using the data in the *options* key of the request data object and then call the ```apply_settings_to_token_list()``` function from that objects using the data in the *tokens* key of the request data object.
 
 The service will be called by the ```applySettings()``` function in the services file.
 
@@ -875,7 +869,33 @@ def apply_settings(request):
 Data Structures
 ---
 
-Please see the documentation for the stand alone collation editor repository.
+### Data structure required for collation input
+
+The data structure for each witness retrieved for collation by the ```getUnitData()``` function should a JSON object with the following keys:
+
+- **transcription**
+- **transcription_identifier** *[optional]*
+- **siglum**
+- **duplicate_position** *[optional]*
+- **witnesses**
+
+Other keys can be included if they are needed for other functions in the platform.
+
+If an entire unit is omitted then the witnesses key value should either be ```null``` or an empty array (both are treated in the same way).
+
+If an entire unit is lac and does not require any special category label in the collation editor then it should not be returned in the data.
+
+If an entire unit is lac and requires a special category label in the collation editor then this information can be provided in one of two ways.
+- It can be pre-calculated and supplied in the **special_categories** key of the object returned from ```getUnitData()``` in which case no other data for the unit should be returned in data
+- It can be encoded in the witnesses data by providing an empty array for the **tokens** key value and adding the key **gap_reading** which should contain the string value to be assigned to this lacunose reading in the collation editor. It is up to the platform developers to decide which is most appropriate in each circumstance. The in the collation editor should be the same regardless of how the data is provided.
+
+TODO: check this against overall data structure to find optional tokens
+
+- **id** the sigla of the witness
+- **hand** the hand of the witness (for example 'firsthand')
+- **hand_abbreviation** the abbreviation used in the display for this hand (for example '*')
+- **tokens** an empty array representing the absence of tokens
+- **gap_reading** the string to use in the display of this lac reading
 
 
 Configuration
