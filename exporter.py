@@ -8,7 +8,22 @@ import xml.etree.ElementTree as etree
 
 class Exporter(object):
 
-    def export_data(self, data, format, ignore_basetext=False, settings={}):
+    # def export_data(self, data, format, ignore_basetext=False, settings={}):
+    def export_data(self, data, settings={}):
+
+        if 'ignore_basetext' not in settings:
+            ignore_basetext = False
+        else:
+            ignore_basetext = settings['ignore_basetext']
+        if 'format' not in settings:
+            format = 'positive_xml'
+        else:
+            format = settings['format']
+        if 'overlap_status_to_ignore' not in settings:
+            overlap_status_to_ignore = []
+        else:
+            overlap_status_to_ignore = ['overlapped', 'deleted']
+
         output = []
         for unit in data:
             if format == 'negative_xml':
@@ -26,8 +41,9 @@ class Exporter(object):
                 return [reading['text_string'].replace('&lt;', '<').replace('&gt;', '>')]
             return [' '.join(i['interface'] for i in reading['text'])]
         else:
-            if 'overlap_status' in reading.keys() and (reading['overlap_status'] in ['overlapped', 'deleted']):
+            if 'overlap_status' in reading.keys() and (reading['overlap_status'] in overlap_status_to_ignore):
                 text = ['', reading['overlap_status']]
+            # TODO: make sure this works for special category readings
             elif 'type' in reading.keys() and reading['type'] in ['om_verse', 'om']:
                 if 'details' in reading.keys():
                     text = [reading['details'], reading['type']]
