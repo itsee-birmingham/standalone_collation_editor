@@ -767,6 +767,8 @@ This default behaviour can be overridden by providing this function in the servi
 
 This function can be used to override the default export function in the collation editor core code. The default will probably be good enough for many use cases as it generates the file download based on the settings specified in the ```exporterSettings``` variable in the services file. It can be useful to override the function if a CSRF token is required by the platform to download the output or to control other aspects of the export. If this function is not provided and the default code used then the ```apparatusServiceUrl``` variable must be set so that the default code can find the python service.
 
+
+
 The function has an optional success callback argument which should be run when the function is complete.
 
 - #### ```extractWordsForHeader()```
@@ -1224,8 +1226,8 @@ Some of these changes are required to keep things working. Most are only require
   - ```getAdjoiningVerse()``` should be renamed to ```getAdjoiningUnit```.
   - new optional functions ```prepareNormalisedString()``` and ```prepareDisplayString()```. These functions have been added to remove a hard coded action required from the early New Testament Greek implementation of the code. They are described fully in the optional services functions above. To maintain existing behaviour ```prepareNormalisedString()``` should replace an underdot (\&#803;) with an underscore and ```prepareDisplayString()``` the reverse. It is very unlikely that any projects will actually need this to be done unless unclear data is displayed with an underdot but stored in the database as an underscore.
   - ```applySettings()``` function is required along with a supporting Python service. Both are fully documented above.
+  - If the 'get apparatus' button is shown (the default) and ```getApparatusForContext()``` is not provided in the services file then the new variable ```apparatusServiceUrl``` must be set in the services to the full url at which the python service for the apparatus export is running.
 
-  TODO: here add in the new stuff with showApparatus functions
 
 ##### Optional changes
 
