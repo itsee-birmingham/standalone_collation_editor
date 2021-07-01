@@ -328,6 +328,13 @@ This variable should be a string and should be the text the collation editor nee
 
 This variable is a boolean which determines whether or not to show the button in the footer of all stages of the collation editor which allows all the units to be collapsed to show only the a reading. The default is false. Until version 2.0.0  this button was included by default.
 
+- #### ```showGetApparatusButton```
+
+**This variable can be overwritten in individual project settings**
+
+This variable is a boolean which determines whether or not to show the button in the footer of the approved stage of the collation editor. When present the button allows the user to download an export of the current unit apparatus based on the settings provided in the ```exporterSettings``` variable. If this variable is set to true (or the default is being used) then either ```getApparatusForContext()``` or ```apparatusServiceUrl``` must also be provided in the services file. If neither of these items are available then the get apparatus button will not be shown.
+
+The default is true which maintains the behaviour of earlier releases.
 
 - #### ```extraFooterButtons```
 
@@ -457,6 +464,10 @@ approval_settings = {
 };
 
 ```
+
+- #### ```apparatusServiceUrl```
+
+This variable specifies the location of the apparatus export service on this platform. If the ```showGetApparatusButton``` is set to true (or the default is used) and ```getApparatusForContext()``` is not used, then this url must be provided as it is used in the default code used to generate and export the apparatus. It should provide the full path to the apparatus export services as described in the Python services section.
 
 
 - #### ```overlappedOptions```
@@ -675,9 +686,10 @@ class RuleConditions(object):
 
 **There is a default provided in the core exporter factory code**
 
-The exporter settings are used to control the export of data from the approved collation screen when the 'Get Apparatus' button is pressed. This export is simply intended to be a check point for editors and should be set to provide the best export format for this task. The project summary page or a similar page in the overall platform should also provide options to export much larger units of text and more options can be provided to users in these export functions.
+The exporter settings are used to control the export of data from the approved collation screen when the 'Get Apparatus' button is present. If the function is not required then the button can be hidden by setting the ```showGetApparatusButton``` variable to false. This export is simply intended to be a check point for editors and should be set to provide the best export format for this task. The project summary page or a similar page in the overall platform should also provide options to export much larger units of text and more options can be provided to users in these export functions.
 
 **TODO** Sort out settings for this and simplify
+
 
 
 ### Optional Service File Functions
@@ -753,7 +765,7 @@ This default behaviour can be overridden by providing this function in the servi
 
 **There is a default in the core code which is explained below**
 
-This function can be used to override the default export function in the collation editor core code. The default will probably be good enough for many use cases as it generates the file download based on the settings specified in the ```exporterSettings``` variable in the services file. It can be useful to override the function if a CSRF token is required by the platform to download the output or to control other aspects of the export.
+This function can be used to override the default export function in the collation editor core code. The default will probably be good enough for many use cases as it generates the file download based on the settings specified in the ```exporterSettings``` variable in the services file. It can be useful to override the function if a CSRF token is required by the platform to download the output or to control other aspects of the export. If this function is not provided and the default code used then the ```apparatusServiceUrl``` variable must be set so that the default code can find the python service.
 
 The function has an optional success callback argument which should be run when the function is complete.
 
@@ -861,8 +873,9 @@ def apply_settings(request):
     return JsonResponse({'tokens': tokens})
 ```
 
-
 ### Apparatus exporters
+
+
 
 
 
@@ -873,29 +886,199 @@ Data Structures
 
 The data structure for each witness retrieved for collation by the ```getUnitData()``` function should a JSON object with the following keys:
 
-- **transcription**
-- **transcription_identifier** *[optional]*
-- **siglum**
-- **duplicate_position** *[optional]*
-- **witnesses**
+- **transcription** *[string/integer]* An identifier for the transcription represented by this object.
+- **transcription_identifier** *[string]* [optional] If the value of the **transcription** key is not the same as the value used in the index form to request the transcriptions then that value should be provided here.
+- **siglum** *[string]* The siglum for the manuscript represented by this object.
+- **duplicate_position** *[integer]* [optional] The position of the unit in relation to other instances of this same unit if this unit appears multiple.
+- **witnesses** *[array]* An array of witness object, an empty array or ```null``` depending on the unit, this and the data structure expected is explained below.
 
 Other keys can be included if they are needed for other functions in the platform.
+
+For transcriptions which have text for this unit the witness array should contain an entry for each hand present in the unit. When dealing with corrected text the collation editor treats each hand as a completely separate witness to the text. For this reason it is advisable to provide a full representation of the reading and not just the corrected words if you do not want the shared words to appear as omitted in the collation editor. Each hand should be represented by a JSON object with two keys.
+
+- **id** *[string]* The sigla used to refer to this hand in the collation editor.
+- **tokens** *[array]* The array of JSON objects each of which represents a single word in this reading.
+
+
+Each token object must include the following keys
+
+- **index** *[string]* - the collation editor requires each reading in each witness to be numbered with sequential even numbers starting at 2. Data format though should be a string.
+- **reading** *[string]* - this should be the same as the id for this reading.
+- **t** *[string]* - a string representation of the word which will be sent to collateX. This could be normalised in some way such as always being lowercase. **NB:** this must not be an empty string or collateX will fail. If the collation editor is running in debug mode all t values will be checked before being sent to collateX and an error will be raised if any empty strings are found.
+- **original** *[string]* - a string representation of the word in its original state in the witness. If you do no normalisation to t then this will be the same string. Having this value in addition allows the editor to go back to the original version before processing the display settings which are always applied to the original string (unless you have specified a setting that uses something else).
+- **rule_match** *[array]* - a list of strings which should include all strings that would be considered a match for this token when applying rules. In simple cases this will just be a list of a single string equal to the same value as original. The most obvious use case when more than one token would be added is where there is an abbreviated form of a word in the text and an editor can choose to see either the expanded or abbreviated form in the collation editor. In this case a rule created for one form would need to apply to either and so both would appear in this list.
+
+Any number of additional keys can be included in this list. If you are going to customise the settings then you may need to encode extra data in the token such as punctuation for example. You may also want to encode information about gaps in the text which is explained in the next section.
+
+#### Encoding Units which are Entirely Omitted or Lacunose
 
 If an entire unit is omitted then the witnesses key value should either be ```null``` or an empty array (both are treated in the same way).
 
 If an entire unit is lac and does not require any special category label in the collation editor then it should not be returned in the data.
 
 If an entire unit is lac and requires a special category label in the collation editor then this information can be provided in one of two ways.
-- It can be pre-calculated and supplied in the **special_categories** key of the object returned from ```getUnitData()``` in which case no other data for the unit should be returned in data
-- It can be encoded in the witnesses data by providing an empty array for the **tokens** key value and adding the key **gap_reading** which should contain the string value to be assigned to this lacunose reading in the collation editor. It is up to the platform developers to decide which is most appropriate in each circumstance. The in the collation editor should be the same regardless of how the data is provided.
+- It can be pre-calculated and supplied in the **special_categories** key of the object returned from ```getUnitData()``` (see the documentation of that function for details of the format required) in which case no other data for the unit should be returned in data.
+- It can be encoded in the witnesses data by providing an empty array for the **tokens** key value and adding the key **gap_reading** which should contain the string value to be assigned to this lacunose reading in the collation editor.
+It is up to the platform developers to decide which is most appropriate in each circumstance. The result in the collation editor will be the same regardless of how the data is provided.
 
-TODO: check this against overall data structure to find optional tokens
 
-- **id** the sigla of the witness
-- **hand** the hand of the witness (for example 'firsthand')
-- **hand_abbreviation** the abbreviation used in the display for this hand (for example '*')
-- **tokens** an empty array representing the absence of tokens
-- **gap_reading** the string to use in the display of this lac reading
+
+#### Encoding Gaps within a Collation Unit
+
+Within a collation unit the collation editor assumes text is omitted unless your witnesses data tells it otherwise.
+
+To encode lacunose text in addition to the required keys in the token object you will need to add additional keys and details about the lacunose section. When the gap follows a word (as in is not before the first word of the context unit). This is done by adding two extra keys to the token object.
+
+- **gap_after** *[boolean]* - should always be true.
+- **gap_details** *[string]*  - the details of the gap which will appear between <> in the editor eg. lac 2 char
+
+If this is a gap before the very first extant word in the given unit then you must add the following two keys to the first token.
+
+- **gap_before** *[boolean]* - should always be true.
+- **gap_before_details** *[string]* - the details of the gap which will appear between <> in the editor eg. lac 2 char
+
+
+#### Examples
+
+##### Simple collation unit JSON example
+
+**Document siglum:** 01  
+**Text:** A simple example sentence
+
+```json
+[
+  {
+    "id": "01",
+    "tokens": [
+        {
+          "index": 2,
+          "reading": "01",
+          "original": "A",
+          "t": "a",
+          "rule_match": ["a"]
+        },
+        {
+          "index": 4,
+          "reading": "01",
+          "original": "simple",
+          "t": "simple",
+          "rule_match": ["simple"]
+        },
+        {
+          "index": 6,
+          "reading": "01",
+          "original": "example",
+          "t": "example",
+          "rule_match": ["example"]
+        },
+        {
+          "index": 8,
+          "reading": "01",
+          "original": "sentence",
+          "t": "sentence",
+          "rule_match": ["sentence"]
+        }
+    ]
+  }
+]
+```
+
+##### Complex collation unit JSON example
+
+**Document siglum:** 02   
+**Text:** A ~~complex~~ <sup>corrected</sup> example [lac 7-8 char] with damage
+
+02\* will be used for the first hand and 02C for the correction
+
+```json
+[
+  {
+    "id": "02*",
+    "tokens": [
+        {
+          "index": 2,
+          "reading": "02*",
+          "original": "A",
+          "t": "a",
+          "rule_match": ["a"]
+        },
+        {
+          "index": 4,
+          "reading": "02*",
+          "original": "complex",
+          "t": "complex",
+          "rule_match": ["complex"]
+        },
+        {
+          "index": 6,
+          "reading": "02*",
+          "original": "example",
+          "t": "example",
+          "rule_match": ["example"],
+          "gap_after": true,
+          "gap_details": "lac 7-8 char"
+        },
+        {
+          "index": 8,
+          "reading": "02*",
+          "original": "with",
+          "t": "with",
+          "rule_match": ["with"]
+        },
+        {
+          "index": 10,
+          "reading": "02*",
+          "original": "damage",
+          "t": "damage",
+          "rule_match": ["damage"]
+        }
+    ]
+  },
+  {
+    "id": "02C",
+    "tokens": [
+        {
+          "index": 2,
+          "reading": "02C",
+          "original": "A",
+          "t": "a",
+          "rule_match": ["a"]
+        },
+        {
+          "index": 4,
+          "reading": "02C",
+          "original": "corrected",
+          "t": "corrected",
+          "rule_match": ["corrected"]
+        },
+        {
+          "index": 6,
+          "reading": "02C",
+          "original": "example",
+          "t": "example",
+          "rule_match": ["example"],
+          "gap_after": true,
+          "gap_details": "lac 7-8 char"
+        },
+        {
+          "index": 8,
+          "reading": "02C",
+          "original": "with",
+          "t": "with",
+          "rule_match": ["with"]
+        },
+        {
+          "index": 10,
+          "reading": "02C",
+          "original": "damage",
+          "t": "damage",
+          "rule_match": ["damage"]
+        }
+    ]
+  }
+]
+```
+
 
 
 Configuration
@@ -1042,6 +1225,8 @@ Some of these changes are required to keep things working. Most are only require
   - new optional functions ```prepareNormalisedString()``` and ```prepareDisplayString()```. These functions have been added to remove a hard coded action required from the early New Testament Greek implementation of the code. They are described fully in the optional services functions above. To maintain existing behaviour ```prepareNormalisedString()``` should replace an underdot (\&#803;) with an underscore and ```prepareDisplayString()``` the reverse. It is very unlikely that any projects will actually need this to be done unless unclear data is displayed with an underdot but stored in the database as an underscore.
   - ```applySettings()``` function is required along with a supporting Python service. Both are fully documented above.
 
+  TODO: here add in the new stuff with showApparatus functions
+
 ##### Optional changes
 
   - A new ```extractWordsForHeader()``` function can be specified in either the services file or project settings. The default option maintains current behaviour so it is unlikely that this will be needed for any existing projects. It is used to change the way the text above the numbers appears in all stages of the collation editor. It can be useful to add css classes to these words if some of them need to be highlighted or to display other text which is present in the data but which is not collated. This was introduced for the MUYA project, the first case is used to identifier main text and commentary text the second is used to display the ritual direction text.
@@ -1049,6 +1234,7 @@ Some of these changes are required to keep things working. Most are only require
   - The *prepare_t* key of ```localPythonFunctions``` is not required for version 2.x. However, it is still required if the legacy regularisation system is being used and any processing was done in the extraction of the token JSON in  
     order to create the t value. It is now documented as part of the [legacy_regularisation repository](https://github.com/itsee-birmingham/legacy_regularisation).
   - The new variable ```collatexHost``` can be used to specify the location of the collateX microservices if they do not use the default of ```http://localhost:7369/collate```.
+  - A new setting ```showGetApparatusButton``` will remove the 'get apparatus' button from the approved page if set to false. The default is to show the button which was always the case in previous versions so no change is required to maintain existing behaviour.
 
 ##### Changes to project settings
 

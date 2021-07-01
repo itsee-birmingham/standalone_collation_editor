@@ -3003,6 +3003,26 @@ CL = (function() {
       CL.project.showCollapseAllUnitsButton = false;
     }
 
+    //settings for get apparatus button in approved view
+    if (project.hasOwnProperty('showGetApparatusButton')) {
+      CL.project.showGetApparatusButton = project.showGetApparatusButton;
+    } else if (CL.services.hasOwnProperty('showGetApparatusButton')) {
+      CL.project.showGetApparatusButton = CL.services.showGetApparatusButton;
+    } else {
+      //default is true
+      CL.project.showGetApparatusButton = true;
+    }
+
+    if (CL.project.showGetApparatusButton === true &&
+          !CL.services.hasOwnProperty('getApparatusForContext') &&
+          !CL.services.hasOwnProperty('apparatusServiceUrl')) {
+      //then we don't have enough info to use get apparatus so override settings and do not show the button
+      console.log('The get apparatus button will not be shown as the required data for running the service was not ' +
+                  'available. Either getApparatusForContext or apparatusServiceUrl must be provided in the services ' +
+                  'file to be able to show the get apparatus button.');
+      CL.project.showGetApparatusButton = false;
+    }
+
     // set the algorithm settings
     if (project.hasOwnProperty('collationAlgorithmSettings')) {
       CL.collationAlgorithmSettings = project.collationAlgorithmSettings;

@@ -242,21 +242,31 @@ OR = (function() {
     }
     footer_html.push('<span id="extra_buttons"></span>');
     footer_html.push('<span id="stage_links"></span>');
-    footer_html.push('<button class="pure-button right_foot" id="get_apparatus">Get apparatus</button>');
+    if (CL.project.showGetApparatusButton === true) {
+      footer_html.push('<button class="pure-button right_foot" id="get_apparatus">Get apparatus</button>');
+    }
     footer_html.push('<select class="right_foot" id="highlighted" name="highlighted"></select>');
     document.getElementById('footer').innerHTML = footer_html.join('');
     CL.addExtraFooterButtons('approved');
     CL.addStageLinks();
     spinner.removeLoadingOverlay();
     CL.addTriangleFunctions('table');
-    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected': options.highlighted_wit, 'add_select': true, 'select_label_details': {'label': 'highlight witness', 'value': 'none' }});
+    cforms.populateSelect(CL.getHandsAndSigla(),
+                          document.getElementById('highlighted'),
+                          {'value_key': 'document',
+                           'text_keys': 'hand',
+                           'selected': options.highlighted_wit,
+                           'add_select': true,
+                           'select_label_details': {'label': 'highlight witness', 'value': 'none' }});
     $('#highlighted').on('change', function(event) {
       _highlightWitness(event.target.value, 'approved');
     });
-    $('#get_apparatus').off('click.download_link');
-    $('#get_apparatus').on('click.download_link', function() {
-      _getApparatusForContext();
-    });
+    if (document.getElementById('get_apparatus')) {
+      $('#get_apparatus').off('click.download_link');
+      $('#get_apparatus').on('click.download_link', function() {
+        _getApparatusForContext();
+      });
+    }
     CL.makeVerseLinks();
     event_rows = temp[2];
     for (i = 0; i < event_rows.length; i += 1) {
@@ -1385,7 +1395,7 @@ OR = (function() {
       } else {
         var url;
         spinner.showLoadingOverlay();
-        url = staticUrl + '/collation/apparatus';
+        url = CL.services.apparatusServiceUrl;
         $.fileDownload(url, {
           httpMethod: "POST",
           data: {
