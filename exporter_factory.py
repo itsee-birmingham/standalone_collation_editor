@@ -9,20 +9,16 @@ class ExporterFactory (object):
             module_name = exporter_settings['python_file']
             class_name = exporter_settings['class_name']
             self.exporter_function = exporter_settings['function']
-            # if 'ignore_basetext' in exporter_settings:
-            #     self.ignore_basetext = exporter_settings['ignore_basetext']
-            # else:
-            #     self.ignore_basetext = False
         else:
             module_name = 'collation.core.exporter'
             class_name = 'Exporter'
             self.exporter_function = 'export_data'
-            # self.ignore_basetext = False
+
         MyClass = getattr(importlib.import_module(module_name), class_name)
         self.exporter = MyClass()
 
     def export_data(self, data, settings={}):
-        return getattr(self.exporter, self.exporter_function)(data, settings=settings)
+        return getattr(self.exporter, self.exporter_function)(data, **settings)
 
     # def export_data(self, data, format='positive_xml', settings={}):
     #     return getattr(self.exporter, self.exporter_function)(data, format, self.ignore_basetext, settings=settings)

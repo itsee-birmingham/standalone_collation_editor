@@ -8,30 +8,33 @@ import xml.etree.ElementTree as etree
 
 class Exporter(object):
 
-    # def export_data(self, data, format, ignore_basetext=False, settings={}):
-    def export_data(self, data, settings={}):
-
-        if 'ignore_basetext' not in settings:
-            ignore_basetext = False
-        else:
-            ignore_basetext = settings['ignore_basetext']
-        if 'format' not in settings:
-            format = 'positive_xml'
-        else:
-            format = settings['format']
-        if 'overlap_status_to_ignore' not in settings:
-            overlap_status_to_ignore = []
-        else:
-            overlap_status_to_ignore = ['overlapped', 'deleted']
-
+    def export_data(self,
+                    data,
+                    format='positive_xml',
+                    negative_apparatus=False,
+                    ignore_basetext=False,
+                    overlap_status_to_ignore=['overlapped', 'deleted'],
+                    consolidate_om_verse=True,
+                    consolidate_lac_verse=True,
+                    include_lemma_when_no_variants=False):
+        print('using core Exporter')
+        print(overlap_status_to_ignore)
+        print(format)
         output = []
         for unit in data:
             if format == 'negative_xml':
-                output.append(etree.tostring(self.get_unit_xml(unit, ignore_basetext, True), 'utf-8'))
-            else:
-                output.append(etree.tostring(self.get_unit_xml(unit, ignore_basetext), 'utf-8'))
-        return b'<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0">{}' \
-               b'</TEI>'.format(b'\n'.join(output).replace(b'<?xml version=\'1.0\' encoding=\'utf-8\'?>', b''))
+                negative_apparatus = True
+            output.append(etree.tostring(self.get_unit_xml(unit,
+                                                           ignore_basetext=ignore_basetext,
+                                                           negative_apparatus=negative_apparatus,
+                                                           overlap_status_to_ignore=overlap_status_to_ignore,
+                                                           consolidate_om_verse=consolidate_om_verse,
+                                                           consolidate_lac_verse=consolidate_lac_verse,
+                                                           include_lemma_when_no_variants=include_lemma_when_no_variants
+                                                           ), 'utf-8').decode())
+
+        return '<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0">{}' \
+               '</TEI>'.format('\n'.join(output).replace('<?xml version=\'1.0\' encoding=\'utf-8\'?>', ''))
 
     def get_text(self, reading, type=None):
         if type == 'subreading':
@@ -94,8 +97,18 @@ class Exporter(object):
             rdg.append(wit)
         return rdg
 
-    def get_app_units(self, apparatus, overtext, context, missing, optns):
+    def get_app_units(self,
+                      apparatus,
+                      overtext,
+                      context,
+                      missing,
+                      negative_apparatus=False,
+                      include_lemma_when_no_variants=False,
+                      overlap_status_to_ignore=['overlapped', 'deleted']):
         app_list = []
+        print('get_app_units')
+        print(overlap_status_to_ignore)
+        print(negative_apparatus)
         for unit in apparatus:
             start = unit['start']
             end = unit['end']
@@ -108,14 +121,14 @@ class Exporter(object):
                 lem.set('type', text[1])
             app.append(lem)
             readings = False
-            if optns['include_lemma_when_no_variants']:
+            if include_lemma_when_no_variants:
                 readings = True
             for i, reading in enumerate(unit['readings']):
                 wits = self.get_witnesses(reading, missing)
-                if optns['negative_apparatus'] is True:
+                if negative_apparatus is True:
                     if ((len(wits) > 0 or reading['label'] == 'a')
                             and ('overlap_status' not in reading
-                                 or reading['overlap_status'] not in optns['overlap_status_to_ignore'])):
+                                 or reading['overlap_status'] not in overlap_status_to_ignore)):
                         if reading['label'] == 'a':
                             wits = []
                         if len(wits) > 0:
@@ -135,7 +148,7 @@ class Exporter(object):
                 else:
                     if ((len(wits) > 0 or reading['label'] == 'a')
                             and ('overlap_status' not in reading
-                                 or reading['overlap_status'] not in optns['overlap_status_to_ignore'])):
+                                 or reading['overlap_status'] not in overlap_status_to_ignore)):
                         if len(wits) > 0:
                             readings = True
                         app.append(self.make_reading(reading, i, reading['label'], wits))
@@ -154,11 +167,14 @@ class Exporter(object):
                 app_list.append(app)
         return app_list
 
-    def get_unit_xml(self, entry, ignore_basetext, negative_apparatus=False,
+    def get_unit_xml(self,
+                     entry,
+                     ignore_basetext=False,
+                     negative_apparatus=False,
                      overlap_status_to_ignore=['overlapped', 'deleted'],
-                     consolidate_om_verse=True, consolidate_lac_verse=True,
-                     include_lemma_when_no_variants=False
-                     ):
+                     consolidate_om_verse=True,
+                     consolidate_lac_verse=True,
+                     include_lemma_when_no_variants=False):
         context = entry['context']
         basetext_siglum = entry['structure']['overtext'][0]['id']
 
@@ -226,7 +242,7 @@ class Exporter(object):
                  'negative_apparatus': negative_apparatus,
                  'overlap_status_to_ignore': overlap_status_to_ignore
                  }
-        app_units = self.get_app_units(apparatus, entry['structure']['overtext'][0], context, missing, optns)
+        app_units = self.get_app_units(apparatus, entry['structure']['overtext'][0], context, missing, **optns)
         for app in app_units:
             vtree.append(app)
 
