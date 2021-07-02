@@ -17,9 +17,6 @@ class Exporter(object):
                     consolidate_om_verse=True,
                     consolidate_lac_verse=True,
                     include_lemma_when_no_variants=False):
-        print('using core Exporter')
-        print(overlap_status_to_ignore)
-        print(format)
         output = []
         for unit in data:
             if format == 'negative_xml':
@@ -106,9 +103,6 @@ class Exporter(object):
                       include_lemma_when_no_variants=False,
                       overlap_status_to_ignore=['overlapped', 'deleted']):
         app_list = []
-        print('get_app_units')
-        print(overlap_status_to_ignore)
-        print(negative_apparatus)
         for unit in apparatus:
             start = unit['start']
             end = unit['end']
