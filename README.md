@@ -688,6 +688,8 @@ class RuleConditions(object):
 
 The exporter settings are used to control the export of data from the approved collation screen when the 'Get Apparatus' button is present. If the function is not required then the button can be hidden by setting the ```showGetApparatusButton``` variable to false. This export is simply intended to be a check point for editors and should be set to provide the best export format for this task. The project summary page or a similar page in the overall platform should also provide options to export much larger units of text and more options can be provided to users in these export functions.
 
+**TODO** options is now a key which contains all of the options sent to the export_data function
+
 **TODO** Sort out settings for this and simplify
 
 
@@ -1258,10 +1260,13 @@ Some of these changes are required to keep things working. Most are only require
 
 The following changes relate to the Exporter class in the exporter.py file in the collation editor code.
 
-The export_data function now takes an addition keyword argument 'settings' which is a dictionary of settings or an empty dictionary. Any class inheriting from Exporter and implementing the ```export_data()``` function must add this additional keyword argument to the expected arguments for the function. These settings are not used in the Exporter code but are useful for passing settings into class which inherit from it or do not inherit from it but are called by exporter factory as part of the collation editor export.
+The ```export_data()``` function now takes an addition keyword argument 'options' which is a dictionary of options or an empty dictionary. The previous second and third positional arguments 'format' and 'ignore_basetext' should now be contained in the options dictionary. This means that the export_data function accepts two arguments: the positional argument 'data' and the keyword argument 'options'. Any class inheriting from Exporter and implementing the ```export_data()``` function must change the expected arguments for the function accordingly. Some code may also need to change to handle 'format' and 'ignore_basetext' as an entries in the options rather than as a positional arguments.
 
-The export has generally been made more modular to allow easier customisation. Only one of the changes, the addition of the ```get_lemma_text()``` function, is likely to change the behaviour of existing code.
-To maintain previous behaviour this should be overidden in any classes inheriting from Exporter. The code in 1.x retrieved the lemma text from the apparatus from the a reading which is always the same as the overtext in the collation editor but always uses the t form of the word and does not follow the convention of the collation editor for using the data from the overtext in the very top line of each stage display. In addition not using the overtext values here limits reuse of the exporters in larger systems where a different editorial text might be selected for publication. To maintain existing behaviour any exporter classes inheriting from Exporter should include this function which still extracts from the overtext structure but uses the t value as the key which will be the same as that used in the a reading.
+The default behaviour has changed for the list of overlap status categories listed for top line readings which are ignored in the output. If you are using the Exporter class directly or inhereting from it but still using its ```export_data()``` function a small change is required to maintain existing behaviour. The options dictionary used by the ```export_data()``` should have an entry with the key *overlap_status_to_ignore* and the value ['overlapped', 'deleted']. This can be done in the ```exporterSettings``` variable or in the python code in the export service which instantiates the Exporter class.
+
+The functions in the exporter code have been made smaller where possible to allow easier customisation, this should not cause problems for any existing code.
+
+Only one of the changes, the addition of the ```get_lemma_text()``` function, is likely to change the behaviour of existing code. To maintain previous behaviour this should be overidden in any classes inheriting from Exporter. The code in 1.x retrieved the lemma text from the apparatus from the a reading which is always the same as the overtext in the collation editor but always uses the t form of the word and does not follow the convention of the collation editor for using the data from the overtext in the very top line of each stage display. In addition not using the overtext values here limits reuse of the exporters in larger systems where a different editorial text might be selected for publication. To maintain existing behaviour any exporter classes inheriting from Exporter should include this function which still extracts from the overtext structure but uses the t value as the key which will be the same as that used in the a reading.
 
 ```python
 def get_lemma_text(self, overtext, start, end):
