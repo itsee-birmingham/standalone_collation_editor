@@ -899,11 +899,25 @@ def apply_settings(request):
 
 ### Apparatus Exporter
 
-To use the exporter code a python service is required to pass the data and configuration from the javascript into the exporterFactory which itself passes everything onto the exporter specified in the configuration.  The configuration is explained in the documentation for the ```exporterSettings``` variable.
+The apparatus exporter should be available at the URL specified in the ```apparatusServiceUrl``` variable or the ```getApparatusForContext()``` function depending on which is used.
+
+The service is required to pass the data and configuration from the javascript into the ExporterFactory which in turn passes everything onto the exporter specified in the configuration.  The configuration is explained in the documentation for the ```exporterSettings``` variable.
+
+The service needs to accept the data to export and the settings for the exporter. It should instantiate the ExporterFactory class using the settings passed in and then call the export_data function of the ExporterFactory with the data and, if present, the **options** object from the configuration. The result should then be returned to the user in a suitable way. Single units are usually processed quickly enough to enable the service to return the file to the user using a standard file download in an HTTP response. When processing larger volumes of data some kind of asynchronous task manager will probably be required. The code below shows an example of how to instantiate the classes but does not give an example of how to return the data. If no settings are provided then the ExporterFactory can be created with no arguments. If there is no **options** key in the settings then no options argument passed to the export_data function.
+
+New exporters can be added by creating new classes from scratch or inheriting from the basic exporter class provided in the core code. Options are passed from the ExporterFactory to the exporter function as keyword arguments. Some exporter examples are provided in the contrib repository.
 
 
+```python
+from collation.core.exporter_factory import ExporterFactory
 
+def get_apparatus(request):
+    data = json.loads(request.POST.get('data'))
+    exporter_settings = request.POST.get('settings', None)
+    exf = ExporterFactory(exporter_settings)
+    app = exf.export_data(data, options=exporter_settings['options'])
 
+```
 
 Data Structures
 ---
@@ -1280,15 +1294,15 @@ Some of these changes are required to keep things working. Most are only require
 
 #### Exporter changes which may need action in inherited classes
 
-The following changes relate to the Exporter class in the exporter.py file in the collation editor code.
+The following changes relate to the ExporterFactory class in the collation editor code.
 
-The ```export_data()``` function now takes an addition keyword argument 'options' which is a dictionary of options or an empty dictionary. The previous second and third positional arguments 'format' and 'ignore_basetext' should now be contained in the options dictionary. This means that the export_data function accepts two arguments: the positional argument 'data' and the keyword argument 'options'. Any class inheriting from Exporter and implementing the ```export_data()``` function must change the expected arguments for the function accordingly. Some code may also need to change to handle 'format' and 'ignore_basetext' as an entries in the options rather than as a positional arguments.
+The ```export_data()``` function now takes an addition keyword argument *options* which is a dictionary of options or an empty dictionary. The previous second and third positional arguments *format* and *ignore_basetext* should now be contained in the options dictionary. This means that the export_data function accepts two arguments: the positional argument *data* and the keyword argument *options*. Any class inheriting from Exporter and implementing the ```export_data()``` function must change the expected arguments for the function accordingly. Some code may also need to change to handle *format* and *ignore_basetext* as an entries in the options rather than as a positional arguments.
 
-The default behaviour has changed for the list of overlap status categories listed for top line readings which are ignored in the output. If you are using the Exporter class directly or inhereting from it but still using its ```export_data()``` function a small change is required to maintain existing behaviour. The options dictionary used by the ```export_data()``` should have an entry with the key *overlap_status_to_ignore* and the value ['overlapped', 'deleted']. This can be done in the ```exporterSettings``` variable or in the python code in the export service which instantiates the Exporter class.
+The default behaviour has changed for the list of overlap status categories listed for top line readings which are ignored in the output. If you are using the Exporter class directly or inheriting from it but still using its ```export_data()``` function a small change is required to maintain existing behaviour. The options dictionary used by the ```export_data()``` should have an entry with the key *overlap_status_to_ignore* and the value ['overlapped', 'deleted']. This can be done in the ```exporterSettings``` variable or, if it is always required, in the python code in the export service which instantiates the Exporter class.
 
-The functions in the exporter code have been made smaller where possible to allow easier customisation, this should not cause problems for any existing code.
+The functions in the exporter code have been made smaller where possible to allow easier customisation. In most cases this will not cause problems for any existing code. The important changes are listed below with guidance on how to maintain existing behaviour if applicable.
 
-Only one of the changes, the addition of the ```get_lemma_text()``` function, is likely to change the behaviour of existing code. To maintain previous behaviour this should be overidden in any classes inheriting from Exporter. The code in 1.x retrieved the lemma text from the apparatus from the a reading which is always the same as the overtext in the collation editor but always uses the t form of the word and does not follow the convention of the collation editor for using the data from the overtext in the very top line of each stage display. In addition not using the overtext values here limits reuse of the exporters in larger systems where a different editorial text might be selected for publication. To maintain existing behaviour any exporter classes inheriting from Exporter should include this function which still extracts from the overtext structure but uses the t value as the key which will be the same as that used in the a reading.
+Only one of the changes, the addition of the ```get_lemma_text()``` function, is likely to change the behaviour of existing code. To maintain previous behaviour this should be overridden in any classes inheriting from Exporter. The code in 1.x retrieved the lemma text from the apparatus from the a reading which is always the same as the overtext in the collation editor but always uses the t form of the word and does not follow the convention of the collation editor for using the data from the overtext in the very top line of each stage display. In addition not using the overtext values here limits reuse of the exporters in larger systems where a different editorial text might be selected for publication. To maintain existing behaviour any exporter classes inheriting from Exporter should include this function which still extracts from the overtext structure but uses the t value as the key which will be the same as that used in the a reading.
 
 ```python
 def get_lemma_text(self, overtext, start, end):
