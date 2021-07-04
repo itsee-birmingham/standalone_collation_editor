@@ -17,8 +17,5 @@ class ExporterFactory (object):
         MyClass = getattr(importlib.import_module(module_name), class_name)
         self.exporter = MyClass()
 
-    def export_data(self, data, settings={}):
-        return getattr(self.exporter, self.exporter_function)(data, **settings)
-
-    # def export_data(self, data, format='positive_xml', settings={}):
-    #     return getattr(self.exporter, self.exporter_function)(data, format, self.ignore_basetext, settings=settings)
+    def export_data(self, data, options={}):
+        return getattr(self.exporter, self.exporter_function)(data, **options)
