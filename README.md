@@ -688,10 +688,30 @@ class RuleConditions(object):
 
 The exporter settings are used to control the export of data from the approved collation screen when the 'Get Apparatus' button is present. If the function is not required then the button can be hidden by setting the ```showGetApparatusButton``` variable to false. This export is simply intended to be a check point for editors and should be set to provide the best export format for this task. The project summary page or a similar page in the overall platform should also provide options to export much larger units of text and more options can be provided to users in these export functions.
 
-**TODO** options is now a key which contains all of the options sent to the export_data function
+If this variable is used then the following keys must be provided.
 
-**TODO** Sort out settings for this and simplify
+- **python_file** *[string]* - The import path for the python file containing the exporter class
+- **class_name** *[string]* - The name of the exporter class to use
+- **function** *[string]* - The name of the exporter function to call to start the process.
 
+In addition to these keys an **options** key can be provided which should contain a JSON object. The contents of this object will be passed into the specified python function as keyword arguments. The example below shows all of the options supported by the default exporter provided with the collation editor code along with the default values. This object can contain any keys that are accepted as keyword arguments by the function and python class in the exporterSettings. If you want to pass options to the core function then you must also supply the three required keys above. In the example below the default exporter class details are used so can be copied into your code if needed.
+
+```json
+"exporterSettings": {
+    "python_file": "collation.core.exporter",
+    "class_name": "Exporter",
+    "function": "export_data",
+    "options": {
+      "format":"positive_xml",
+      "negative_apparatus": false,
+      "ignore_basetext": false,
+      "overlap_status_to_ignore": ["overlapped", "deleted"],
+      "consolidate_om_verse": true,
+      "consolidate_lac_verse": true,
+      "include_lemma_when_no_variants": false
+    }
+}
+```
 
 
 ### Optional Service File Functions
@@ -877,7 +897,9 @@ def apply_settings(request):
     return JsonResponse({'tokens': tokens})
 ```
 
-### Apparatus exporters
+### Apparatus Exporter
+
+To use the exporter code a python service is required to pass the data and configuration from the javascript into the exporterFactory which itself passes everything onto the exporter specified in the configuration.  The configuration is explained in the documentation for the ```exporterSettings``` variable.
 
 
 
