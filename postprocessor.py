@@ -24,7 +24,7 @@ class PostProcessor(Regulariser, SettingsApplier):
                  lac_readings,
                  hand_id_map,
                  special_categories,
-                 settings,
+                 display_settings,
                  decisions,
                  display_settings_config,
                  local_python_functions,
@@ -39,7 +39,7 @@ class PostProcessor(Regulariser, SettingsApplier):
         self.lac_readings = lac_readings
         self.special_categories = special_categories
         self.hand_id_map = hand_id_map
-        self.settings = settings
+        self.display_settings = display_settings
         self.decisions = decisions
         self.display_settings_config = display_settings_config
         self.display_settings_config['configs'].sort(key=lambda k: k['execution_pos'])
@@ -49,8 +49,8 @@ class PostProcessor(Regulariser, SettingsApplier):
             self.local_python_functions = None
         self.split_single_reading_units = split_single_reading_units
         Regulariser.__init__(self, rule_conditions_config, local_python_functions)
-        SettingsApplier.__init__(self, {'display_settings': settings,
-                                        'display_settings_config': display_settings_config})
+        SettingsApplier.__init__(self, {'display_settings': self.display_settings,
+                                        'display_settings_config': self.display_settings_config})
 
     ###########################################################
     # this is the starting function
@@ -420,7 +420,7 @@ class PostProcessor(Regulariser, SettingsApplier):
 
         for reading in unit:
             # TODO: do we need to do this if there is only one word? also could we throw multi-word ones back to
-            # collate nd let it do better aligning?
+            # collate and let it do better aligning?
             i = sub_index_start
             for token in reading['text']:
                 token['index'] = '{}.{}'.format(start, i)

@@ -63,8 +63,6 @@ class PreProcessor(Regulariser):
 
         Regulariser.__init__(self, self.rule_conds_config, self.local_python_functions)
 
-    # def process_witness_list(self, data_input, requested_witnesses, rules, basetext_transcription,
-    #                          project, settings, accept='lcs'):
     def process_witness_list(self, collation_input_data, accept='lcs'):
         self.display_settings = collation_input_data['display_settings']
         data_input = collation_input_data['unit_data']
@@ -91,8 +89,8 @@ class PreProcessor(Regulariser):
         # this means we don't have to use the numerical pk
         # it must match with whatever is used in the services 'get_siglum_map' code
         if 'transcription_id' in data[0]:
-            warnings.warn('''The use of 'transcription_id' as a key in the collation unit
-            object is deprecated in favour of 'transcription'. Support will be removed in future releases''',
+            warnings.warn('''The use of 'transcription_id' as a key in the collation unit object is deprecated
+                          in favour of 'transcription'. Support will be removed in future releases''',
                           PendingDeprecationWarning)
         # Add all the witness texts and keep record of witnesses omitting the verse and lacunose witnesses
         for transcription_verse in data:
@@ -280,8 +278,12 @@ class PreProcessor(Regulariser):
             # get overtext details
             overtext_details = self.get_overtext(verse)
             print('collation done', file=sys.stderr)
-            return self.do_post_processing(alignment_table, decisions, overtext_details[0], overtext_details[1],
-                                           witnesses['om'], witnesses['lac'], witnesses['hand_id_map'],
+            return self.do_post_processing(alignment_table,
+                                           decisions, overtext_details[0],
+                                           overtext_details[1],
+                                           witnesses['om'],
+                                           witnesses['lac'],
+                                           witnesses['hand_id_map'],
                                            witnesses['special_categories'])
 
     def do_post_processing(self, alignment_table, decisions, overtext_name, overtext, om_readings,
@@ -295,7 +297,7 @@ class PreProcessor(Regulariser):
             lac_readings=lac_readings,
             hand_id_map=hand_id_map,
             special_categories=special_categories,
-            settings=self.display_settings,
+            display_settings=self.display_settings,
             decisions=decisions,
             display_settings_config=self.display_settings_config,
             local_python_functions=self.local_python_functions,
