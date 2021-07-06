@@ -1913,7 +1913,7 @@ CL = (function() {
         if (format === 'set_variants') {
           SV.makeStandoffReading(type, reading_details, data.parent_reading, callback);
         } else if (format === 'order_readings') {
-          OR.makeStandoffReading(type, reading_details, data.parent_readingm, callback);
+          OR.makeStandoffReading(type, reading_details, data.parent_reading, callback);
         }
       }
     });
