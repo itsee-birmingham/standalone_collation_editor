@@ -10,16 +10,16 @@ OR = (function() {
   let _undoStackLength = 6;
 
   //public function declarations
-  let showOrderReadings, showApprovedVersion, getUnitData, relabelReadings,
+  let showOrderReadings, showApprovedVersion, getUnitData, relabelReadings, reorderRows,
   addLabels, makeStandoffReading, removeSplits, mergeSharedExtentOverlaps, mergedSharedOverlapReadings,
-  canUnitMoveTo, addToUndoStack, makeWasGapWordsGaps, mergeAllLacs, mergeAllOms;
+  canUnitMoveTo, addToUndoStack, makeWasGapWordsGaps, mergeAllLacs, mergeAllOms, redipsInitOrderReadings;
 
   //private function declarations
   let _uniqueifyIds, _approveVerse, _getSiglaSuffixes, _doGetSiglaSuffixes,
   _orderWitnessesForOutput, _areAllEmptyReadings, _getSubunitData, _editLabel,
   _manualChangeLabel, _highlightWitness, _makeMenu, _makeMainReading, _getDeleteUnit,
   _moveOverlapUp, _compareStartIndexes, _moveOverlapDown, _addContextMenuHandlers,
-  _addEvent, _markReading, _redipsInitOrderReadings, _reorderRows, _sortArrayByIndexes,
+  _addEvent, _markReading, _sortArrayByIndexes,
   _getApparatusForContext, _compareOverlaps, _throughNumberApps, _repositionOverlaps,
   _getPotentialConflicts, _unitCanMoveTo, _findLeadUnit, _deleteUnit, _undo,
   _findOverlapApparatusAndUnitById, _horizontalCombineOverlaps,
@@ -158,7 +158,7 @@ OR = (function() {
     }
     for (i = 0; i < highest_unit; i += 1) {
       if (document.getElementById('drag_unit_' + i) !== null) {
-        _redipsInitOrderReadings('drag_unit_' + i);
+        redipsInitOrderReadings('drag_unit_' + i);
       }
     }
     for (key in CL.data) {
@@ -166,7 +166,7 @@ OR = (function() {
         if (key.match(/apparatus\d/g) !== null) {
           for (i = 0; i < CL.data[key].length; i += 1) {
             if (document.getElementById('drag_unit_' + i + '_app_' + key.replace('apparatus', '')) !== null) {
-              _redipsInitOrderReadings('drag_unit_' + i + '_app_' + key.replace('apparatus', ''));
+              redipsInitOrderReadings('drag_unit_' + i + '_app_' + key.replace('apparatus', ''));
             }
           }
         }
@@ -1335,17 +1335,28 @@ OR = (function() {
       document.getElementById('scroller').scrollTop = scroll_offset[1];
     };
 
-    _redipsInitOrderReadings = function(id) {
+    redipsInitOrderReadings = function(id, onDropFunction) {
       var rd = REDIPS.drag;
       rd.init(id);
-      rd.event.rowDropped = function() {
-        _reorderRows(rd);
-      };
+      if (onDropFunction !== undefined) {
+        rd.event.rowDropped =  onDropFunction;
+      } else {
+        rd.event.rowDropped = function() {
+          var scroll_offset
+          addToUndoStack(CL.data);
+          reorderRows(rd);
+          scroll_offset = document.getElementById('scroller').scrollLeft;
+          showOrderReadings({
+            'container': CL.container
+          });
+          document.getElementById('scroller').scrollLeft = scroll_offset;
+        };
+      }
     };
 
-    _reorderRows = function(rd) {
-      var table, rows, i, readings, order, new_order, j, reading, reading_id, unit, scroll_offset, temp, app;
-      addToUndoStack(CL.data);
+    reorderRows = function(rd) {
+      var table, rows, readings, order, new_order, reading, reading_id, unit, scroll_offset, temp, app;
+      // addToUndoStack(CL.data);
       table = document.getElementById(rd.obj.id);
       temp = table.getElementsByTagName('TR');
       rows = [];
@@ -1356,13 +1367,13 @@ OR = (function() {
         app = 'apparatus' + rd.obj.id.substring(rd.obj.id.indexOf('_app_') + 5);
         unit = parseInt(rd.obj.id.substring(rd.obj.id.indexOf('unit_') + 5, rd.obj.id.indexOf('_app_')), 10);
       }
-      for (i = 0; i < temp.length; i += 1) {
+      for (let i = 0; i < temp.length; i += 1) {
         if (temp[i].id.indexOf('subreading') === -1) {
           rows.push(temp[i]);
         }
       }
       order = [];
-      for (i = 0; i < rows.length; i += 1) {
+      for (let i = 0; i < rows.length; i += 1) {
         if (rows[i].id) {
           reading_id = rows[i].id;
           order.push(parseInt(reading_id.substring(reading_id.indexOf('row_') + 4), 10));
@@ -1373,17 +1384,17 @@ OR = (function() {
       readings = _sortArrayByIndexes(readings, order);
       relabelReadings(readings, true);
       CL.data[app][unit].readings = readings;
-      scroll_offset = document.getElementById('scroller').scrollLeft;
-      showOrderReadings({
-        'container': CL.container
-      });
-      document.getElementById('scroller').scrollLeft = scroll_offset;
+      // scroll_offset = document.getElementById('scroller').scrollLeft;
+      // showOrderReadings({
+      //   'container': CL.container
+      // });
+      // document.getElementById('scroller').scrollLeft = scroll_offset;
     };
 
     _sortArrayByIndexes = function(array, indexes) {
-      var result, i;
+      var result;
       result = [];
-      for (i = 0; i < array.length; i += 1) {
+      for (let i = 0; i < array.length; i += 1) {
         result[i] = array[indexes[i]];
       }
       return result;
@@ -1746,6 +1757,9 @@ OR = (function() {
       makeWasGapWordsGaps: makeWasGapWordsGaps,
       mergeAllLacs: mergeAllLacs,
       mergeAllOms: mergeAllOms,
+      redipsInitOrderReadings: redipsInitOrderReadings,
+      reorderRows: reorderRows,
+
 
       // private for testing
       _mergeAllSuppliedEmptyReadings: _mergeAllSuppliedEmptyReadings,
@@ -1771,156 +1785,9 @@ OR = (function() {
       makeWasGapWordsGaps: makeWasGapWordsGaps,
       mergeAllLacs: mergeAllLacs,
       mergeAllOms: mergeAllOms,
+      redipsInitOrderReadings: redipsInitOrderReadings,
+      reorderRows: reorderRows,
 
     };
   }
 }());
-
-// //TODO: I am fairly sure this is never used. Check not needed in version app
-// open_subreading_menu: function(unit, row) {
-//   console.log('open_subreading_menu')
-//   var html, data, subreading_menu, i, parents, scroll_offset;
-//   html = [];
-//   subreading_menu = document.createElement('div');
-//   subreading_menu.setAttribute('id', 'subreading_menu');
-//   subreading_menu.setAttribute('class', 'subreading_form');
-//   subreading_menu.innerHTML = '<p>Sub-reading menu</p><form id="subreading_form">' +
-//     '<input type="hidden" class="integer" value="' + unit + '" name="unit_number" id="unit_number"/>' +
-//     '<input type="hidden" class="integer" value="' + row + '" name="row_number" id="row_number"/>' +
-//     '<label>Parent reading<select name="parent_reading" id="parent_reading"></select></label>' +
-//     '<br/><label>Type<select name="sub_type" id="sub_type"><option value="o">orthographic</option><option value="v">vowel interchange</option><option value="ov">orthographic and vowel interchange</option></select></label>' +
-//     '<input type="button" value="submit" id="subreading_submit"/><input type="button" value="cancel" id="subreading_cancel"/></form>';
-//   document.getElementsByTagName('body')[0].appendChild(subreading_menu);
-//   parents = [];
-//   for (i = 0; i < CL.data.apparatus[unit].readings.length; i += 1) {
-//     if (i !== parseInt(row, 10)) {
-//       parents.push(CL.data.apparatus[unit].readings[i].label);
-//     }
-//   }
-//   cforms.populateSelect(parents, document.getElementById('parent_reading'));
-//   $('#subreading_cancel').on('click', function(event) {
-//     document.getElementsByTagName('body')[0].removeChild(document.getElementById('subreading_menu'));
-//   });
-//   $('#subreading_submit').on('click', function(event) {
-//     data = cforms.serialiseForm('subreading_form');
-//     document.getElementsByTagName('body')[0].removeChild(document.getElementById('subreading_menu'));
-//     OR.make_subreading(data.unit_number, data.row_number, data.parent_reading, data.sub_type);
-//     scroll_offset = document.getElementById('scroller').scrollLeft;
-//     showOrderReadings({
-//       'container': CL.container
-//     });
-//     document.getElementById('scroller').scrollLeft = scroll_offset;
-//   });
-// },
-//
-// add_mark_reading_event: function(value) {
-//   $('#mark_as_' + value).on('click.mr_c', function(event) {
-//     var element, div, row_elem, row;
-//     element = SimpleContextMenu._target_element;
-//     div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
-//       if ($(e).hasClass('spanlike')) {
-//         return false;
-//       }
-//       return true;
-//     });
-//     unit_number = div.id.replace('drag_unit_', '');
-//     row_elem = element.parentNode;
-//     if (row_elem.id.indexOf('subrow') === -1) {
-//       row = row_elem.id.substring(row_elem.id.indexOf('_row_') + 5);
-//     } else {
-//       row = row_elem.id.substring(row_elem.id.indexOf('_row_') + 5, row_elem.id.indexOf('_type_'));
-//     }
-//     _markReading(value, unit_number, row, SimpleContextMenu._menuElement.style.top, SimpleContextMenu._menuElement.style.left);
-//   });
-// },
-
-// //this one is used in interface
-// make_subreading: function(unit, reading_no, parent_letter, type) {
-//   var readings, parent, reading, i, subreadings, text_string, text_list, exists;
-//   readings = CL.data.apparatus[unit].readings;
-//   reading = readings[reading_no];
-//   parent = null;
-//   for (i = 0; i < readings.length; i += 1) {
-//     if (readings[i].label === parent_letter) {
-//       parent = readings[i];
-//     }
-//   }
-//   if (parent === null) {
-//     return false;
-//   }
-//   if (parent.hasOwnProperty('subreadings')) {
-//     subreadings = parent.subreadings;
-//   } else {
-//     subreadings = {};
-//   }
-//   text_list = [];
-//   for (i = 0; i < reading.text.length; i += 1) {
-//     text_list.push(reading.text[i].t);
-//   }
-//   text_string = text_list.join(' ');
-//   if (subreadings.hasOwnProperty(type)) {
-//     exists = false;
-//     for (i = 0; i < subreadings[type].length; i += 1) {
-//       if (subreadings[type][i] === text_string) {
-//         exists = true;
-//       }
-//     }
-//     if (exists) {
-//       alert('Talk to Cat, She wasn\'t sure this situation could ever occur and hasn\'t written the code!');
-//     } else {
-//       reading.label = parent.label;
-//       reading.text_string = text_string;
-//       subreadings[type].push(reading);
-//       parent.subreadings = subreadings;
-//       readings.splice(reading_no, 1);
-//     }
-//   } else {
-//     reading.label = parent.label;
-//     reading.text_string = text_string;
-//     subreadings[type] = [reading];
-//     parent.subreadings = subreadings;
-//     readings.splice(reading_no, 1);
-//   }
-//   relabelReadings(readings, true);
-// },
-
-// change_label: function(event) {
-//   var new_label, id, app, unit, reading, i, scroll_offset, key;
-//   new_label = event.target.innerHTML;
-//   id = event.target.parentNode.parentNode.id;
-//   if (id.indexOf('_app_') === -1) {
-//     app = 'apparatus';
-//     unit = parseInt(id.substring(id.indexOf('_unit_') + 6, id.indexOf('_row_')), 10);
-//   } else {
-//     app = 'apparatus' + id.substring(id.indexOf('_app_') + 5, id.indexOf('_row_'));
-//     unit = parseInt(id.substring(id.indexOf('_unit_') + 6, id.indexOf('_app_')), 10);
-//   }
-//   reading = parseInt(id.substring(id.indexOf('_row_') + 5), 10);
-//   CL.data[app][unit].readings[reading].label = new_label;
-//   if (CL.data[app][unit].readings[reading].hasOwnProperty('subreadings')) {
-//     for (key in CL.data[app][unit].readings[reading].subreadings) {
-//       if (CL.data[app][unit].readings[reading].subreadings.hasOwnProperty(key)) {
-//         for (i = 0; i < CL.data[app][unit].readings[reading].subreadings[key].length; i += 1) {
-//           CL.data[app][unit].readings[reading].subreadings[key][i].label = new_label;
-//         }
-//       }
-//     }
-//   }
-//   scroll_offset = document.getElementById('scroller').scrollLeft;
-//   showOrderReadings({
-//     'container': CL.container
-//   });
-//   //TODO: add height scroller sticker
-//   document.getElementById('scroller').scrollLeft = scroll_offset;
-// },
-
-// move_overlapped_readings: function() {
-//   var data, apparatus, readings, i;
-//   //make sure all overlapped readings are at the bottom of the list so they don't interfere with lettering system.
-//   data = CL.data;
-//   apparatus = data.apparatus;
-//   for (i = 0; i < apparatus.length; i += 1) {
-//     readings = apparatus[i].readings;
-//     readings.sort(_compareOverlaps);
-//   }
-// },
