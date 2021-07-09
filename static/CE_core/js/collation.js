@@ -64,11 +64,11 @@ CL = (function() {
   loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses,
   calculatePosition, removeWitness, checkWitnessesAgainstProject, setUpRemoveWitnessesForm,
   removeWitnesses, getRemoveWitnessDataFromForm, returnToSummaryTable, prepareAdditionalCollation,
-  removeSpecialWitnesses, runFunction;
+  removeSpecialWitnesses, runFunction, setOverlappedOptions, setRuleClasses;
 
   //private function declarations
   let _initialiseEditor, _initialiseProject, _setProjectConfig, _setDisplaySettings,
-   _setLocalPythonFunctions, _setRuleClasses, _setRuleConditions, _setOverlappedOptions,
+   _setLocalPythonFunctions, _setRuleConditions,
    _includeJavascript, _prepareCollation, _findSaved, _getContextFromInputForm,
    _getWitnessesFromInputForm, _getDebugSetting, _showSavedVersions, _getSavedRadio, _makeSavedCollationTable,
    _loadSavedCollation, _getSubreadingWitnessData, _findStandoffRegularisationText,
@@ -3118,14 +3118,14 @@ CL = (function() {
         'form': 'CE_core/html_fragments/default_index_input.html'
       };
     }
-    _setRuleClasses(project);
+    setRuleClasses(project);
     _setDisplaySettings(project);
     _setLocalPythonFunctions(project);
     _setRuleConditions(project);
-    _setOverlappedOptions(project);
+    setOverlappedOptions(project);
   };
 
-  _setRuleClasses = function(project) {
+  setRuleClasses = function(project) {
     if (project.hasOwnProperty('ruleClasses') && project.ruleClasses !== undefined) {
       CL.ruleClasses = project.ruleClasses;
     } else if (CL.services && CL.services.hasOwnProperty('ruleClasses')) {
@@ -3191,7 +3191,7 @@ CL = (function() {
     }
   };
 
-  _setOverlappedOptions = function(project) {
+  setOverlappedOptions = function(project) {
     if (project.hasOwnProperty('overlappedOptions')) {
       CL.overlappedOptions = project.overlappedOptions;
     } else if (CL.services.hasOwnProperty('overlappedOptions')) {
@@ -5720,7 +5720,8 @@ CL = (function() {
       removeWitnesses: removeWitnesses,
       getRemoveWitnessDataFromForm: getRemoveWitnessDataFromForm,
       checkWitnessesAgainstProject: checkWitnessesAgainstProject,
-
+      setOverlappedOptions: setOverlappedOptions,
+      setRuleClasses: setRuleClasses,
       returnToSummaryTable: returnToSummaryTable,
       prepareAdditionalCollation: prepareAdditionalCollation,
       removeSpecialWitnesses: removeSpecialWitnesses,
@@ -5740,9 +5741,7 @@ CL = (function() {
        _setProjectConfig: _setProjectConfig,
        _setDisplaySettings: _setDisplaySettings,
        _setLocalPythonFunctions: _setLocalPythonFunctions,
-       _setRuleClasses: _setRuleClasses,
        _setRuleConditions: _setRuleConditions,
-       _setOverlappedOptions: _setOverlappedOptions,
        _includeJavascript: _includeJavascript,
        _loadSavedCollation: _loadSavedCollation,
        _prepareCollation: _prepareCollation,
@@ -5916,6 +5915,8 @@ CL = (function() {
       removeWitnesses: removeWitnesses,
       getRemoveWitnessDataFromForm: getRemoveWitnessDataFromForm,
       checkWitnessesAgainstProject: checkWitnessesAgainstProject,
+      setOverlappedOptions: setOverlappedOptions,
+      setRuleClasses: setRuleClasses,
       returnToSummaryTable: returnToSummaryTable,
       prepareAdditionalCollation: prepareAdditionalCollation,
       removeSpecialWitnesses: removeSpecialWitnesses,
