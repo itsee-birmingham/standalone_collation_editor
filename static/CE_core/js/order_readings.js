@@ -10,13 +10,13 @@ OR = (function() {
   let _undoStackLength = 6;
 
   //public function declarations
-  let showOrderReadings, showApprovedVersion, getUnitData, relabelReadings, reorderRows,
+  let showOrderReadings, showApprovedVersion, getUnitData, relabelReadings, reorderRows, editLabel,
   addLabels, makeStandoffReading, removeSplits, mergeSharedExtentOverlaps, mergedSharedOverlapReadings,
   canUnitMoveTo, addToUndoStack, makeWasGapWordsGaps, mergeAllLacs, mergeAllOms, redipsInitOrderReadings;
 
   //private function declarations
   let _uniqueifyIds, _approveVerse, _getSiglaSuffixes, _doGetSiglaSuffixes,
-  _orderWitnessesForOutput, _areAllEmptyReadings, _getSubunitData, _editLabel,
+  _orderWitnessesForOutput, _areAllEmptyReadings, _getSubunitData,
   _manualChangeLabel, _highlightWitness, _makeMenu, _makeMainReading, _getDeleteUnit,
   _moveOverlapUp, _compareStartIndexes, _moveOverlapDown, _addContextMenuHandlers,
   _addEvent, _markReading, _sortArrayByIndexes,
@@ -807,7 +807,7 @@ OR = (function() {
       return [html, rowList];
     };
 
-    _editLabel = function(rdg_details, menu_pos) {
+    editLabel = function(rdg_details, menu_pos, saveFunction) {
       var left, top, label_form, html, new_label, reading, current_label;
       left = menu_pos.left;
       top = menu_pos.top;
@@ -815,31 +815,39 @@ OR = (function() {
       reading = CL.data[rdg_details[1]][rdg_details[0]].readings[rdg_details[2]];
       current_label = reading.label;
       label_form.setAttribute('id', 'label_form');
-      label_form.setAttribute('class', 'label_form');
+      label_form.setAttribute('class', 'label_form dragdiv');
       html = [];
+      html.push('<div class="dialogue_form_header">Edit Label</div>')
       html.push('<form id="label_change_form">');
       html.push('<label for="new_label">new label:<br/><input type="text" id="new_label"/></label><br/><br/>');
-      html.push('<input id="close_button" type="button" value="Cancel"/>');
-      html.push('<input id="save_button" type="button" value="save"/>');
+      html.push('<input class="pure-button dialogue-form-button" id="close_label_button" type="button" value="Cancel"/>');
+      html.push('<input class="pure-button dialogue-form-button" id="save_label_button" type="button" value="Save"/>');
       html.push('</form>');
       label_form.innerHTML = html.join('');
       document.getElementsByTagName('body')[0].appendChild(label_form);
 
-      //the +25 here is to move it out of the way of the other labels so you can still see them
+      //the +25 here is to move it out of the way of the other labels and readings so you can still see them
       left = parseInt(left) - document.getElementById('scroller').scrollLeft + 25;
       top = parseInt(top) - document.getElementById('scroller').scrollTop;
       document.getElementById('label_form').style.left = left + 'px';
       document.getElementById('label_form').style.top = top + 'px';
       document.getElementById('new_label').value = current_label; //populate field with current label value
-      $('#close_button').on('click', function(event) {
+      DND.InitDragDrop('label_form', true, true);
+      $('#close_label_button').on('click', function(event) {
         document.getElementsByTagName('body')[0].removeChild(document.getElementById('label_form'));
       });
-      $('#save_button').on('click', function(event) {
-        new_label = document.getElementById('new_label').value.replace(/\s+/g, '');
-        if (new_label != '') {
-          _manualChangeLabel(rdg_details, new_label);
-        }
-      });
+      if (saveFunction !== undefined) {
+          $('#save_label_button').on('click', function(event) {
+            saveFunction();
+          });
+      } else {
+        $('#save_label_button').on('click', function(event) {
+          new_label = document.getElementById('new_label').value.replace(/\s+/g, '');
+          if (new_label != '') {
+            _manualChangeLabel(rdg_details, new_label);
+          }
+        });
+      }
     };
 
     _manualChangeLabel = function(rdg_details, new_label) {
@@ -1160,7 +1168,7 @@ OR = (function() {
           element = SimpleContextMenu._target_element;
           label_cell = CL.getSpecifiedAncestor(element, 'TD');
           rdg_details = CL.getUnitAppReading(label_cell.id);
-          _editLabel(rdg_details, {
+          editLabel(rdg_details, {
             'top': SimpleContextMenu._menuElement.style.top,
             'left': SimpleContextMenu._menuElement.style.left
           });
@@ -1759,6 +1767,7 @@ OR = (function() {
       mergeAllOms: mergeAllOms,
       redipsInitOrderReadings: redipsInitOrderReadings,
       reorderRows: reorderRows,
+      editLabel: editLabel,
 
 
       // private for testing
@@ -1787,6 +1796,7 @@ OR = (function() {
       mergeAllOms: mergeAllOms,
       redipsInitOrderReadings: redipsInitOrderReadings,
       reorderRows: reorderRows,
+      editLabel: editLabel,
 
     };
   }
