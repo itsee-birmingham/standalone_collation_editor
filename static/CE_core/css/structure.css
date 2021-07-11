@@ -159,7 +159,7 @@ div#footer select {
     padding: 0;
 }
 
-div#footer .pure-button {
+div#footer .pure-button, div#footer .btn {
 	margin-top: 8px;
 }
 
