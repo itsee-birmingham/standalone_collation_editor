@@ -1307,7 +1307,7 @@ Only one of the changes, the addition of the ```get_lemma_text()``` function, is
 ```python
 def get_lemma_text(self, overtext, start, end):
     if start == end and start % 2 == 1:
-        return ['', 'om']
+        return ['']
     real_start = int(start/2)-1
     real_end = int(end/2)-1
     word_list = [x['t'] for x in overtext['tokens']]
