@@ -8,28 +8,31 @@ import xml.etree.ElementTree as etree
 
 class Exporter(object):
 
-    def export_data(self,
-                    data,
-                    format='positive_xml',
-                    negative_apparatus=False,
-                    ignore_basetext=False,
-                    overlap_status_to_ignore=['overlapped', 'deleted'],
-                    consolidate_om_verse=True,
-                    consolidate_lac_verse=True,
-                    include_lemma_when_no_variants=False):
+    def __init__(self,
+                 format='positive_xml',
+                 include_punctuation=False,
+                 ignore_basetext=False,
+                 overlap_status_to_ignore=['overlapped', 'deleted'],
+                 consolidate_om_verse=True,
+                 consolidate_lac_verse=True,
+                 include_lemma_when_no_variants=False):
+
+        self.format = format
+        self.include_punctuation = include_punctuation
+        if 'negative' in self.format:
+            self.negative_apparatus = True
+        else:
+            self.negative_apparatus = False
+        self.ignore_basetext = ignore_basetext
+        self.overlap_status_to_ignore = overlap_status_to_ignore
+        self.consolidate_om_verse = consolidate_om_verse
+        self.consolidate_lac_verse = consolidate_lac_verse
+        self.include_lemma_when_no_variants = include_lemma_when_no_variants
+
+    def export_data(self, data):
         output = []
         for unit in data:
-            if format == 'negative_xml':
-                negative_apparatus = True
-            output.append(etree.tostring(self.get_unit_xml(unit,
-                                                           ignore_basetext=ignore_basetext,
-                                                           negative_apparatus=negative_apparatus,
-                                                           overlap_status_to_ignore=overlap_status_to_ignore,
-                                                           consolidate_om_verse=consolidate_om_verse,
-                                                           consolidate_lac_verse=consolidate_lac_verse,
-                                                           include_lemma_when_no_variants=include_lemma_when_no_variants
-                                                           ), 'utf-8').decode())
-
+            output.append(etree.tostring(self.get_unit_xml(unit), 'utf-8').decode())
         return '<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0">{}' \
                '</TEI>'.format('\n'.join(output).replace('<?xml version=\'1.0\' encoding=\'utf-8\'?>', ''))
 
@@ -41,7 +44,7 @@ class Exporter(object):
                 return [reading['text_string'].replace('&lt;', '<').replace('&gt;', '>')]
             return [' '.join(i['interface'] for i in reading['text'])]
         else:
-            if 'overlap_status' in reading.keys() and (reading['overlap_status'] in overlap_status_to_ignore):
+            if 'overlap_status' in reading.keys() and (reading['overlap_status'] in self.overlap_status_to_ignore):
                 text = ['', reading['overlap_status']]
             # TODO: make sure this works for special category readings
             elif 'type' in reading.keys() and reading['type'] in ['om_verse', 'om']:
@@ -94,14 +97,7 @@ class Exporter(object):
             rdg.append(wit)
         return rdg
 
-    def get_app_units(self,
-                      apparatus,
-                      overtext,
-                      context,
-                      missing,
-                      negative_apparatus=False,
-                      include_lemma_when_no_variants=False,
-                      overlap_status_to_ignore=['overlapped', 'deleted']):
+    def get_app_units(self, apparatus, overtext, context, missing):
         app_list = []
         for unit in apparatus:
             start = unit['start']
@@ -115,14 +111,14 @@ class Exporter(object):
                 lem.set('type', text[1])
             app.append(lem)
             readings = False
-            if include_lemma_when_no_variants:
+            if self.include_lemma_when_no_variants:
                 readings = True
             for i, reading in enumerate(unit['readings']):
                 wits = self.get_witnesses(reading, missing)
-                if negative_apparatus is True:
+                if self.negative_apparatus is True:
                     if ((len(wits) > 0 or reading['label'] == 'a')
                             and ('overlap_status' not in reading
-                                 or reading['overlap_status'] not in overlap_status_to_ignore)):
+                                 or reading['overlap_status'] not in self.overlap_status_to_ignore)):
                         if reading['label'] == 'a':
                             wits = []
                         if len(wits) > 0:
@@ -142,7 +138,7 @@ class Exporter(object):
                 else:
                     if ((len(wits) > 0 or reading['label'] == 'a')
                             and ('overlap_status' not in reading
-                                 or reading['overlap_status'] not in overlap_status_to_ignore)):
+                                 or reading['overlap_status'] not in self.overlap_status_to_ignore)):
                         if len(wits) > 0:
                             readings = True
                         app.append(self.make_reading(reading, i, reading['label'], wits))
@@ -161,14 +157,7 @@ class Exporter(object):
                 app_list.append(app)
         return app_list
 
-    def get_unit_xml(self,
-                     entry,
-                     ignore_basetext=False,
-                     negative_apparatus=False,
-                     overlap_status_to_ignore=['overlapped', 'deleted'],
-                     consolidate_om_verse=True,
-                     consolidate_lac_verse=True,
-                     include_lemma_when_no_variants=False):
+    def get_unit_xml(self, entry):
         context = entry['context']
         basetext_siglum = entry['structure']['overtext'][0]['id']
 
@@ -187,12 +176,12 @@ class Exporter(object):
         vtree = etree.fromstring('<ab xml:id="{}-APP"></ab>'.format(context))
         # here deal with the whole verse lac and om and only use witnesses elsewhere not in these lists
         missing = []
-        if consolidate_om_verse or consolidate_lac_verse:
+        if self.consolidate_om_verse or self.consolidate_lac_verse:
             app = etree.fromstring('<app type="lac" n="{}">'
                                    '<lem wit="editorial">Whole verse</lem>'
                                    '</app>'.format(context))
 
-            if consolidate_lac_verse:
+            if self.consolidate_lac_verse:
                 if len(entry['structure']['lac_readings']) > 0:
                     rdg = etree.Element('rdg')
 
@@ -209,7 +198,7 @@ class Exporter(object):
                     app.append(rdg)
                 missing.extend(entry['structure']['lac_readings'])
 
-            if consolidate_om_verse:
+            if self.consolidate_om_verse:
                 if len(entry['structure']['om_readings']) > 0:
                     rdg = etree.Element('rdg')
                     rdg.set('type', 'lac')
@@ -228,15 +217,12 @@ class Exporter(object):
             vtree.append(app)
 
         # if we are ignoring the basetext add it to our missing list so it isn't listed (except n lemma)
-        if ignore_basetext:
+        if self.ignore_basetext:
             missing.append(basetext_siglum)
         # this sort will change the order of the overlap units so longest starting at each index point comes first
         apparatus = sorted(apparatus, key=lambda d: (d['start'], -d['end']))
-        optns = {'include_lemma_when_no_variants': include_lemma_when_no_variants,
-                 'negative_apparatus': negative_apparatus,
-                 'overlap_status_to_ignore': overlap_status_to_ignore
-                 }
-        app_units = self.get_app_units(apparatus, entry['structure']['overtext'][0], context, missing, **optns)
+
+        app_units = self.get_app_units(apparatus, entry['structure']['overtext'][0], context, missing)
         for app in app_units:
             vtree.append(app)
 

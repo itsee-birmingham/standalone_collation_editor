@@ -694,7 +694,7 @@ If this variable is used then the following keys must be provided.
 - **class_name** *[string]* - The name of the exporter class to use
 - **function** *[string]* - The name of the exporter function to call to start the process.
 
-In addition to these keys an **options** key can be provided which should contain a JSON object. The contents of this object will be passed into the specified python function as keyword arguments. The example below shows all of the options supported by the default exporter provided with the collation editor code along with the default values. This object can contain any keys that are accepted as keyword arguments by the function and python class in the exporterSettings. If you want to pass options to the core function then you must also supply the three required keys above. In the example below the default exporter class details are used so can be copied into your code if needed.
+In addition to these keys an **options** key can be provided which should contain a JSON object. The contents of this object will be passed into the exporter constructor as keyword arguments. The example below shows all of the options supported by the default exporter provided with the collation editor code along with the default values. This object can contain any keys that are accepted as keyword arguments by the function and python class in the exporterSettings. If you want to pass options to the core function then you must also supply the three required keys above. In the example below the default exporter class details are used so can be copied into your code if needed.
 
 ```json
 "exporterSettings": {
@@ -1296,9 +1296,9 @@ Some of these changes are required to keep things working. Most are only require
 
 The following changes relate to the ExporterFactory class in the collation editor code.
 
-The ```export_data()``` function now takes an addition keyword argument *options* which is a dictionary of options or an empty dictionary. The previous second and third positional arguments *format* and *ignore_basetext* should now be contained in the options dictionary. This means that the export_data function accepts two arguments: the positional argument *data* and the keyword argument *options*. Any class inheriting from Exporter and implementing the ```export_data()``` function must change the expected arguments for the function accordingly. Some code may also need to change to handle *format* and *ignore_basetext* as an entries in the options rather than as a positional arguments.
+Rather than being provided to the ```export_data()``` any settings required by the exporter are now set in the constructor. All of the settings are then saved on the instance and can be access from any functions without having to be passed in the function call. If the __init__ function of the core exporter is overwritten then it should either call the parent constructor or set all of the required options on the instance. The settings required for the exporter constructor should be provided to the ExporterFactory as an options dictionary. They are passed to the constructor functions as keyword arguments. The previous second and third positional arguments in the ```export_data()``` function (*format* and *ignore_basetext*) should now be part of the settings dictionary provided to the exporter constructor. This means that ```export_data()``` now contains a single positional argument which is the data to be exported. Any class inheriting from Exporter and implementing the ```export_data()``` function must change the expected arguments for the function accordingly.
 
-The default behaviour has changed for the list of overlap status categories listed for top line readings which are ignored in the output. If you are using the Exporter class directly or inheriting from it but still using its ```export_data()``` function a small change is required to maintain existing behaviour. The options dictionary used by the ```export_data()``` should have an entry with the key *overlap_status_to_ignore* and the value ['overlapped', 'deleted']. This can be done in the ```exporterSettings``` variable or, if it is always required, in the python code in the export service which instantiates the Exporter class.
+The default behaviour has changed for the list of overlap status categories listed for top line readings which are ignored in the output. If you are using the Exporter class directly or inheriting from it a small change is required to maintain existing behaviour. The options dictionary used by the constructor should have an entry with the key *overlap_status_to_ignore* and the value ['overlapped', 'deleted']. This can be done in the ```exporterSettings``` variable in the Services file or, if it is always required, in the python code in the export service which instantiates the Exporter class.
 
 The functions in the exporter code have been made smaller where possible to allow easier customisation. In most cases this will not cause problems for any existing code. The important changes are listed below with guidance on how to maintain existing behaviour if applicable.
 
@@ -1307,7 +1307,7 @@ Only one of the changes, the addition of the ```get_lemma_text()``` function, is
 ```python
 def get_lemma_text(self, overtext, start, end):
     if start == end and start % 2 == 1:
-        return ['']
+        return ['', 'om']
     real_start = int(start/2)-1
     real_end = int(end/2)-1
     word_list = [x['t'] for x in overtext['tokens']]

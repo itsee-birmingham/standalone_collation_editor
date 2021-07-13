@@ -4,7 +4,7 @@ import importlib
 
 class ExporterFactory (object):
 
-    def __init__(self, exporter_settings=None):
+    def __init__(self, exporter_settings=None, options={}):
         if exporter_settings:
             module_name = exporter_settings['python_file']
             class_name = exporter_settings['class_name']
@@ -13,9 +13,9 @@ class ExporterFactory (object):
             module_name = 'collation.core.exporter'
             class_name = 'Exporter'
             self.exporter_function = 'export_data'
-
+        print(options)
         MyClass = getattr(importlib.import_module(module_name), class_name)
-        self.exporter = MyClass()
+        self.exporter = MyClass(**options)
 
-    def export_data(self, data, options={}):
-        return getattr(self.exporter, self.exporter_function)(data, **options)
+    def export_data(self, data):
+        return getattr(self.exporter, self.exporter_function)(data)
