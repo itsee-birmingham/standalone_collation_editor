@@ -544,7 +544,7 @@ OR = (function() {
   // Merges any shared readings in overlap units. Most, if not all, will have been created in the process of adding
   // witnesses but it is possible that they could happen in the course of editing depending on the editor.
   mergedSharedOverlapReadings = function () {
-    var match, overlapLineNumbers, unit;
+    var match, overlapLineNumbers;
     SV.prepareForOperation();
     overlapLineNumbers = [];
     for (let key in CL.data) {
@@ -557,10 +557,7 @@ OR = (function() {
     }
     for (let i = 0; i < overlapLineNumbers.length; i += 1) {
       for (let j = 0; j < CL.data['apparatus' + overlapLineNumbers[i]].length; j += 1) {
-        unit = CL.data['apparatus' + overlapLineNumbers[i]][j];
-        for (let k = 0; k < unit.readings.length; k += 1) {
-          SV.unsplitUnitWitnesses(k, 'apparatus' + overlapLineNumbers[i]);
-        }
+        SV.unsplitUnitWitnesses(j, 'apparatus' + overlapLineNumbers[i]);
       }
     }
     SV.unprepareForOperation();
