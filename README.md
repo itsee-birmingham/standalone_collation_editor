@@ -899,13 +899,26 @@ def apply_settings(request):
 
 ### Apparatus Exporter
 
-The apparatus exporter should be available at the URL specified in the ```apparatusServiceUrl``` variable or the ```getApparatusForContext()``` function depending on which is used.
+The apparatus exporter should be available at the URL specified in the ```apparatusServiceUrl``` variable or
+the ```getApparatusForContext()``` function depending on which is used.
 
-The service is required to pass the data and configuration from the javascript into the ExporterFactory which in turn passes everything onto the exporter specified in the configuration.  The configuration is explained in the documentation for the ```exporterSettings``` variable.
+The service is required to pass the data and configuration from the javascript into the ExporterFactory which in turn
+passes everything onto the exporter specified in the configuration.  The configuration is explained in the
+documentation for the ```exporterSettings``` variable.
 
-The service needs to accept the data to export and the settings for the exporter. It should instantiate the ExporterFactory class using the settings passed in and then call the export_data function of the ExporterFactory with the data and, if present, the **options** object from the configuration. The result should then be returned to the user in a suitable way. Single units are usually processed quickly enough to enable the service to return the file to the user using a standard file download in an HTTP response. When processing larger volumes of data some kind of asynchronous task manager will probably be required. The code below shows an example of how to instantiate the classes but does not give an example of how to return the data. If no settings are provided then the ExporterFactory can be created with no arguments. If there is no **options** key in the settings then no options argument passed to the export_data function.
+The service needs to accept the data to export and the settings for the exporter. It should instantiate the
+ExporterFactory class using the exporter settings passed in and, if present, the **options** object from the
+configuration. It should then call the export_data function of the ExporterFactory with the data. The result should
+then be returned to the user in a suitable way. Single units are usually processed quickly enough to enable the service
+to return the file to the user using a standard file download in an HTTP response. When processing larger volumes of
+data some kind of asynchronous task manager will probably be required. The code below shows an example of how to
+instantiate the classes but does not give an example of how to return the data. If no settings are provided then the
+ExporterFactory can be created with no arguments. If there is no **options** key in the settings then no options
+argument passed to the constructor.
 
-New exporters can be added by creating new classes from scratch or inheriting from the basic exporter class provided in the core code. Options are passed from the ExporterFactory to the exporter function as keyword arguments. Some exporter examples are provided in the contrib repository.
+New exporters can be added by creating new classes from scratch or inheriting from the basic exporter class provided in
+the core code. Options are passed from the ExporterFactory to the exporter function as keyword arguments. Some exporter
+examples are provided in the contrib repository.
 
 
 ```python
@@ -914,8 +927,8 @@ from collation.core.exporter_factory import ExporterFactory
 def get_apparatus(request):
     data = json.loads(request.POST.get('data'))
     exporter_settings = request.POST.get('settings', None)
-    exf = ExporterFactory(exporter_settings)
-    app = exf.export_data(data, options=exporter_settings['options'])
+    exf = ExporterFactory(exporter_settings, options=exporter_settings['options'])
+    app = exf.export_data(data)
 
 ```
 
