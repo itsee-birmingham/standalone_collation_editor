@@ -4750,16 +4750,18 @@ CL = (function() {
       });
     }
     special_witnesses = [];
-    for (let j=0; j<CL.data.special_categories.length; j+=1) {
-      for (let i=0; i<CL.data.apparatus.length; i+=1) {
-        new_unit.readings.push({
-          'text': [],
-          'type': 'lac_verse',
-          'details': CL.data.special_categories[j].label,
-          'witnesses': CL.data.special_categories[j].witnesses
-        });
+    if (CL.data.hasOwnProperty('special_categories')){
+      for (let j=0; j<CL.data.special_categories.length; j+=1) {
+        for (let i=0; i<CL.data.apparatus.length; i+=1) {
+          new_unit.readings.push({
+            'text': [],
+            'type': 'lac_verse',
+            'details': CL.data.special_categories[j].label,
+            'witnesses': CL.data.special_categories[j].witnesses
+          });
+        }
+        special_witnesses.push.apply(special_witnesses, CL.data.special_categories[j].witnesses);
       }
-      special_witnesses.push.apply(special_witnesses, CL.data.special_categories[j].witnesses);
     }
     lac_wits = removeSpecialWitnesses(lac_wits, special_witnesses);
     //now add your whole verse lac and om witnesses
