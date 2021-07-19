@@ -1201,7 +1201,6 @@ RG = (function() {
         }
       };
       $.get(staticUrl + 'CE_core/html_fragments/rule_menu.html', function(html) {
-        console.log(html);
         reg_menu = document.createElement('div');
         reg_menu.setAttribute('id', 'reg_form');
         reg_menu.setAttribute('class', 'dragdiv reg_form dialogue_form');
