@@ -533,7 +533,7 @@ CL = (function() {
     ruleClasses = CL.ruleClasses;
     for (let i = 0; i < ruleClasses.length; i += 1) {
       if (ruleClasses[i][testKey] === testValue || typeof testKey === 'undefined') {
-        if ($.type(data) === 'string') {
+        if (typeof(data) === 'string') {
           classes[ruleClasses[i][key]] = ruleClasses[i][data];
         } else {
           list = [];
@@ -549,7 +549,7 @@ CL = (function() {
 
   _extractWordsForHeader = function (data) {
     let words, word;
-    if ($.isArray(data.overtext)) {
+    if (Array.isArray(data.overtext)) {
       // words is a list of lists with the first being the word and the second being the class to add if any or a an empty string
       if (CL.project.hasOwnProperty('extractWordsForHeader')) {
         words = CL.project.extractWordsForHeader(data.overtext[0].tokens);
@@ -2895,7 +2895,7 @@ CL = (function() {
     CL.container = document.getElementById('container'); //can be overridden in services if needed
     //set the dynamic screen resize
     expandFillPageClients();
-    $(window).resize(function() {
+    $(window).on('resize', function() {
       expandFillPageClients();
     });
     if (!CL.services.hasOwnProperty('localJavascript')) {

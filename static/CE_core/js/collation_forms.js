@@ -214,7 +214,7 @@ cforms = (function () {
     text_keys = options.hasOwnProperty('text_keys') ? options.text_keys : undefined;
     for (i = 0; i < data.length; i += 1) {
       //sort out fall through to a key which does exist if text_keys is an array
-      if ($.isArray(text_keys)) {
+      if (Array.isArray(text_keys)) {
         for (j = 0; j < text_keys.length; j += 1) {
           if (data[i].hasOwnProperty(text_keys[j])) {
             text_key = text_keys[j];

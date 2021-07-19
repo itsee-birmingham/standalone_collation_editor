@@ -4068,7 +4068,7 @@ SV = (function () {
 	 * we should be okay here! */
 	_makeMainReading = function (id_string, details) {
 		var scroll_offset, i, unit_number, app_id, unit, parent_pos, subtype, subreading_pos, parent_reading, subreading, options;
-		if ($.isArray(id_string)) {
+		if (Array.isArray(id_string)) {
 			//this section deals with making things a main reading in the context of removing the offset marked subreadings from the
 			//field of play in prepareForOperation()
 			//sort by row then type then subrow always working from the bottom to the top
