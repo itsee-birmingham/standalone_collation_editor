@@ -345,7 +345,7 @@ OR = (function() {
         } else {
           html.push('<tr id="' + row_id + '">');
         }
-        html.push('<td class="rowhandler"><div class="redips-drag row">+</div></td>');
+        html.push('<td class="redips-rowhandler"><div class="redips-drag redips-row">+</div></td>');
       }
 
       html.push('<td id="' + row_id + '_label" class="reading_label redips-mark"><div class="spanlike">' + reading_label);
