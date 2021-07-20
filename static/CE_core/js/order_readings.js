@@ -189,8 +189,8 @@ OR = (function() {
   };
 
   showApprovedVersion = function(options) {
-    var html, i, highest_unit, header, triangles, row, label, key, overlaps, app_ids, footer_html,
-      num, temp, event_rows, scroll_offset, overlap_options, new_overlap_options, container;
+    var html, i, highest_unit, header, triangles, row, label, key, overlaps, app_ids, footer_html, num, temp,
+      event_rows, scroll_offset, overlap_options, new_overlap_options, container, show_hide_subreadings_button_text;
     if (typeof options === 'undefined') {
       options = {};
     }
@@ -236,10 +236,16 @@ OR = (function() {
       html.join('') + '</table></div><div id="single_witness_reading"></div>';
     CL.expandFillPageClients();
     //sort out footer stuff
+    if (CL.showSubreadings === true) {
+      show_hide_subreadings_button_text = 'hide non-edition subreadings';
+    } else {
+      show_hide_subreadings_button_text = 'show non-edition subreadings';
+    }
     footer_html = [];
     if (CL.project.hasOwnProperty('showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
       footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
     }
+    footer_html.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">' + show_hide_subreadings_button_text + '</button>');
     footer_html.push('<span id="extra_buttons"></span>');
     footer_html.push('<span id="stage_links"></span>');
     if (CL.project.showGetApparatusButton === true) {
@@ -261,6 +267,7 @@ OR = (function() {
     $('#highlighted').on('change', function(event) {
       _highlightWitness(event.target.value, 'approved');
     });
+    CL.addSubreadingEvents('approved', CL.getRuleClasses('subreading', true, 'value', ['identifier', 'subreading']));
     if (document.getElementById('get_apparatus')) {
       $('#get_apparatus').off('click.download_link');
       $('#get_apparatus').on('click.download_link', function() {
