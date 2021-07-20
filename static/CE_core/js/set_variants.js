@@ -1085,7 +1085,7 @@ SV = (function () {
 		$('#error_panel').addClass(type);
 		if (document.getElementById('error_panel').style.display === 'none') {
 			document.getElementById('error_panel').style.display = 'block';
-			DND.InitDragDrop('error_panel', true, false);
+			DND.InitDragDrop('error_panel', true, true);
 		}
 		if (_messageExpanded === true) {
 			document.getElementById('error_message_panel').style.display = 'block';
@@ -1097,8 +1097,12 @@ SV = (function () {
 		if (SV.messagePosLeft !== null) {
 			document.getElementById('error_panel').style.left = SV.messagePosLeft;
 		} else {
-			document.getElementById('error_panel').style.top = document.getElementById('scroller').offsetHeight + document.getElementById('header').offsetHeight - document.getElementById('error_panel').offsetHeight - 3 + 'px';
-			document.getElementById('error_panel').style.left = document.getElementById('scroller').offsetWidth - document.getElementById('error_panel').offsetWidth - 15 + 'px';
+			document.getElementById('error_panel').style.top = (document.getElementById('scroller').offsetHeight +
+																													document.getElementById('header').offsetHeight +
+																													document.getElementById('single_witness_reading').offsetHeight) -
+																													document.getElementById('error_panel').offsetHeight - 3 + 'px';
+			document.getElementById('error_panel').style.left = document.getElementById('scroller').offsetWidth -
+																													document.getElementById('error_panel').offsetWidth - 15 + 'px';
 		}
 		$('#error_coll_ex').on('click', function (event) {
 			if (document.getElementById('error_message_panel').style.display === 'block') {

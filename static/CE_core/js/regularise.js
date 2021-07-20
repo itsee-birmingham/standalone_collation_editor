@@ -1371,25 +1371,27 @@ RG = (function() {
   };
 
   _showGlobalExceptions = function(rules) {
-    var html, i;
+    var html;
     if (document.getElementById('global_exceptions').style.display === 'none') {
       document.getElementById('global_exceptions').style.display = 'block';
       document.getElementById('global_exceptions_list').style.display = 'block';
-      DND.InitDragDrop('global_exceptions', true, false);
+      DND.InitDragDrop('global_exceptions', true, true);
     }
     html = [];
     html.push('<form id="global_exceptions_form" class="pure-form">');
     html.push('<span>To remove an exception check the box<br/> and click the \'Remove exceptions\' button.</span><br/><ul>');
-    for (i = 0; i < rules.length; i += 1) {
+    for (let i = 0; i < rules.length; i += 1) {
       html.push('<li><input type="checkbox" name="' + rules[i].id + '" id="checkbox_' + rules[i].id + '"/>');
       html.push('<label class="checkbox-label" for="checkbox_' + rules[i].id + '">' + rules[i].t + ' &gt; ' + rules[i].n + '</label></li>');
     }
     html.push('</ul><input class="pure-button dialogue-form-button" type="button" value="Remove exceptions" id="remove_exception_button"/>');
     html.push('</form>');
     document.getElementById('global_exceptions_list').innerHTML = html.join('');
-    document.getElementById('global_exceptions').style.top = document.getElementById('header').offsetHeight +
-        document.getElementById('scroller').offsetHeight -
-        document.getElementById('global_exceptions').offsetHeight - 3 + 'px';
+    document.getElementById('global_exceptions').style.top = (document.getElementById('header').offsetHeight +
+        document.getElementById('scroller').offsetHeight + document.getElementById('single_witness_reading').offsetHeight) -
+        document.getElementById('global_exceptions').offsetHeight + 15 + 'px';
+    document.getElementById('global_exceptions').style.left = document.getElementById('scroller').offsetWidth -
+        document.getElementById('global_exceptions').offsetWidth - 15 + 'px';
 
     $('#remove_exception_button').off('click.rem_ge');
     $('#remove_exception_button').on('click.rem_ge', function(event) {
