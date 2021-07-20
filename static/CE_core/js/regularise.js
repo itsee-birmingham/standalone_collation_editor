@@ -176,7 +176,7 @@ RG = (function() {
                     if (deletableRules.hasOwnProperty(data[i].text[j][witness].decision_details[l].id)) {
                       deletableRules[data[i].text[j][witness].decision_details[l].id].witnesses.push(witness);
                     } else {
-                      if (data[i].text[j][witness].decision_details[l].scope !== 'always') {
+                      if (CL.witnessAddingMode === false || data[i].text[j][witness].decision_details[l].scope !== 'always') {
                         deletableRules[data[i].text[j][witness].decision_details[l].id] = {
                           'scope': data[i].text[j][witness].decision_details[l].scope,
                           't': data[i].text[j][witness].decision_details[l].t.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
