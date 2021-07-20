@@ -105,7 +105,7 @@ RG = (function() {
       row_id = 'variant_unit_' + id + '_row_' + i;
       row_list.push(row_id);
       if (i === 0) {
-        cells.push('<tr><td class="mark" colspan="MX_LN"><span id="toggle_variant_' + id + '" class="triangle">&#9650;</span></td></tr>');
+        cells.push('<tr><td class="redips-mark" colspan="MX_LN"><span id="toggle_variant_' + id + '" class="triangle">&#9650;</span></td></tr>');
       }
       classes = [];
       if (i === 0) {
@@ -119,15 +119,15 @@ RG = (function() {
 				classes.push('added_highlighted');
 			}
       cells.push('<tr id="' + row_id + '" class="' + classes.join(' ') + '">');
-      cells.push('<td class="mark"><div class="spanlike">' + CL.getAlphaId(i) + '. </div></td>');
+      cells.push('<td class="redips-mark"><div class="spanlike">' + CL.getAlphaId(i) + '. </div></td>');
       if (data[i].text.length === 0) {
         if (i === 0) {
-          cells.push('<td class="mark" colspan="MX_LN"><div class="spanlike">&nbsp;</div></td>');
+          cells.push('<td class="redips-mark" colspan="MX_LN"><div class="spanlike">&nbsp;</div></td>');
         } else {
           if (data[i].type === 'om') {
-            cells.push('<td class="mark gap" colspan="MX_LN"><div class="spanlike">om.</div></td>');
+            cells.push('<td class="redips-mark gap" colspan="MX_LN"><div class="spanlike">om.</div></td>');
           } else {
-            cells.push('<td class="mark gap" colspan="MX_LN"><div class="spanlike">&lt;' + data[i].details + '&gt;</div></td>');
+            cells.push('<td class="redips-mark gap" colspan="MX_LN"><div class="spanlike">&lt;' + data[i].details + '&gt;</div></td>');
           }
         }
       } else {
@@ -144,7 +144,7 @@ RG = (function() {
           if (i > 0 && (CL.witnessAddingMode === false ||
                 (CL.witnessAddingMode === true &&
                     data[i].witnesses.filter(x => CL.witnessesAdded.includes(x)).length > 0))) {
-            class_list = ['drag', 'clone', 'reg_word'];
+            class_list = ['redips-drag', 'redips-clone', 'reg_word'];
           }
 
           if (i > 0) {
@@ -251,10 +251,10 @@ RG = (function() {
       cells.push('</tr>');
       rows.push(cells.join(''));
     }
-    html.push('<td class="start_' + start + '" colspan="' + (end - start + 1) + '"><div class="drag_div" id="drag' + id + '">');
+    html.push('<td class="start_' + start + '" colspan="' + (end - start + 1) + '"><div class="drag_div" id="redips-drag' + id + '">');
     html.push('<table class="variant_unit" id="variant_unit_' + id + '">');
     html.push(rows.join('').replace(/MX_LN/g, String(max_length + 1)));
-    html.push('<tr><td class="mark" colspan="' + (max_length + 1) + '"><span id="add_reading_' + id + '">+</span></td></tr>');
+    html.push('<tr><td class="redips-mark" colspan="' + (max_length + 1) + '"><span id="add_reading_' + id + '">+</span></td></tr>');
     html.push('</table>');
     html.push('</div></td>');
     return [html, row_list, events];
@@ -482,8 +482,8 @@ RG = (function() {
     if (CL.witnessRemovingMode !== true) {
       i = 0;
       while (i <= temp[4]) {
-        if (document.getElementById('drag' + i) !== null) {
-          _redipsInitRegularise('drag' + i);
+        if (document.getElementById('redips-drag' + i) !== null) {
+          _redipsInitRegularise('redips-drag' + i);
         }
         if (document.getElementById('add_reading_' + i) !== null) {
           _addNewToken(document.getElementById('add_reading_' + i));
@@ -1179,7 +1179,7 @@ RG = (function() {
         document.getElementsByTagName('body')[0].removeChild(document.getElementById('reg_form'));
         rd.enableDrag(false, rd.objOld);
         $(original).addClass('regularisation_staged');
-        $(original.parentNode).addClass('mark');
+        $(original.parentNode).addClass('redips-mark');
         //add witnesses to normalised form in data structure
         new_unit_data = rd.td.target.firstChild.id;
         if (new_unit_data !== '') { //only try this if it is not a user added reading
@@ -1456,7 +1456,7 @@ RG = (function() {
     var element, rd;
     element = SimpleContextMenu._target_element;
     delete _rules[element.id];
-    $(element.parentNode).removeClass('mark');
+    $(element.parentNode).removeClass('redips-mark');
     $(element).removeClass('regularisation_staged');
     rd = REDIPS.drag;
     rd.enableDrag(true, element);

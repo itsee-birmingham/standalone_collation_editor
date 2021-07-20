@@ -302,9 +302,9 @@ OR = (function() {
       }
     }
     if (_areAllEmptyReadings(data) && !options.hasOwnProperty('created')) {
-      html.push('<td class="mark start_' + start + ' " colspan="' + colspan + '"><div class="drag_div deletable" id="drag_unit_' + id + '">');
+      html.push('<td class="redips-mark start_' + start + ' " colspan="' + colspan + '"><div class="drag_div deletable" id="drag_unit_' + id + '">');
     } else {
-      html.push('<td class="mark start_' + start + ' " colspan="' + colspan + '"><div class="drag_div" id="drag_unit_' + id + '">');
+      html.push('<td class="redips-mark start_' + start + ' " colspan="' + colspan + '"><div class="drag_div" id="drag_unit_' + id + '">');
     }
     if (!overlap) {
       html.push('<table class="variant_unit" id="variant_unit_' + id + '">');
@@ -332,35 +332,35 @@ OR = (function() {
       row_list.push(row_id);
 
       if (i === 0) {
-        html.push('<tr><td colspan="3" class="mark"><span id="toggle_variant_' + id + '" class="triangle">&#9650;</span></td></tr>');
+        html.push('<tr><td colspan="3" class="redips-mark"><span id="toggle_variant_' + id + '" class="triangle">&#9650;</span></td></tr>');
         if (data[i].witnesses.indexOf(hand) != -1) {
           html.push('<tr id="' + row_id + '" class="top highlighted">');
         } else {
           html.push('<tr id="' + row_id + '" class="top">');
         }
-        html.push('<td class="mark"></td>');
+        html.push('<td class="redips-mark"></td>');
       } else {
         if (data[i].witnesses.indexOf(hand) != -1) {
           html.push('<tr id="' + row_id + '" class="highlighted">');
         } else {
           html.push('<tr id="' + row_id + '">');
         }
-        html.push('<td class="rowhandler"><div class="drag row">+</div></td>');
+        html.push('<td class="redips-rowhandler"><div class="redips-drag redips-row">+</div></td>');
       }
 
-      html.push('<td id="' + row_id + '_label" class="reading_label mark"><div class="spanlike">' + reading_label);
+      html.push('<td id="' + row_id + '_label" class="reading_label redips-mark"><div class="spanlike">' + reading_label);
       html.push('</div></td>');
       if (!overlap) {
         if (has_context_menu) {
-          html.push('<td class="mark main_reading">');
+          html.push('<td class="redips-mark main_reading">');
         } else {
-          html.push('<td class="mark main_reading_ncm">');
+          html.push('<td class="redips-mark main_reading_ncm">');
         }
       } else {
         if (has_context_menu) {
-          html.push('<td class="mark overlap_main_reading">');
+          html.push('<td class="redips-mark overlap_main_reading">');
         } else {
-          html.push('<td class="mark overlap_main_reading_ncm">');
+          html.push('<td class="redips-mark overlap_main_reading_ncm">');
         }
       }
       html.push('<div class="spanlike">');

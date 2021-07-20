@@ -138,7 +138,7 @@ SV = (function () {
 		CL.addStageLinks();
 
 		//get the data itself
-		container.innerHTML = '<div id="drag"><div id="scroller" class="fillPage"></div><div id="single_witness_reading"></div></div>';
+		container.innerHTML = '<div id="redips-drag"><div id="scroller" class="fillPage"></div><div id="single_witness_reading"></div></div>';
 		document.getElementById('single_witness_reading').style.bottom = document.getElementById('footer').offsetHeight + 'px';
 		if (CL.witnessAddingMode === true) {
 			//this sets this a default so that when all is highlighted this will work - any data specified in options will override it
@@ -514,7 +514,7 @@ SV = (function () {
 			}
 			if (options.hasOwnProperty('split') && options.split === true) {
 				if (data[i].hasOwnProperty('overlap_status')) {
-					html.push('<div id="' + 'drag_unit_' + id + '_reading_' + i + '" class="drag split_' + data[i].overlap_status + '_unit">');
+					html.push('<div id="' + 'drag_unit_' + id + '_reading_' + i + '" class="redips-drag split_' + data[i].overlap_status + '_unit">');
 				} else {
 					if (options.hasOwnProperty('overlap') && options.overlap === true) {
 						if (i === 0) {
@@ -526,7 +526,7 @@ SV = (function () {
 						if (i === 0) {
 							split_class = 'split_unit_a';
 						} else {
-							split_class = 'drag split_unit';
+							split_class = 'redips-drag split_unit';
 						}
 					}
 					html.push('<div id="' + 'drag_unit_' + id + '_reading_' + i + '" class="' + split_class + '">');
@@ -544,11 +544,11 @@ SV = (function () {
 			} else {
 				if (i === 0) {
 					if (options.hasOwnProperty('overlap') && options.overlap === true) {
-						html.push('<div id="' + 'drag_unit_' + id + '" class="drag overlap_unit' + highlighted_unit + '">');
+						html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag overlap_unit' + highlighted_unit + '">');
 					} else if (options.hasOwnProperty('gap_unit') && options.gap_unit === true) {
-						html.push('<div id="' + 'drag_unit_' + id + '" class="drag gap_unit' + highlighted_unit + '">');
+						html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag gap_unit' + highlighted_unit + '">');
 					} else {
-						html.push('<div id="' + 'drag_unit_' + id + '" class="drag unit' + highlighted_unit + '">');
+						html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag unit' + highlighted_unit + '">');
 					}
 					if (data.length > 1) {
 						html.push('<ul class="variant_unit" id="variant_unit_' + id + '"><span id="toggle_variant_' + id + '" class="triangle">&#9660;</span><br/>');
@@ -582,17 +582,17 @@ SV = (function () {
 			colspan = end - start + 1;
 		}
 		if (id !== undefined) {
-			return '<td  class="mark"colspan="' + colspan + '"><div id="spacer_' + id + '" class="spacer"></div></td>';
+			return '<td  class="redips-mark"colspan="' + colspan + '"><div id="spacer_' + id + '" class="spacer"></div></td>';
 		} else {
-			return '<td  class="mark"colspan="' + colspan + '"><div class="spacer"></div></td>';
+			return '<td  class="redips-mark"colspan="' + colspan + '"><div class="spacer"></div></td>';
 		}
 	};
 
 	getEmptySpacerCell = function (start, end) {
 		if (typeof start === 'undefined' || typeof end === 'undefined') {
-			return '<td class="mark"></td>';
+			return '<td class="redips-mark"></td>';
 		} else {
-			return '<td class="mark" colspan="' + (end - start + 1) + '"></td>';
+			return '<td class="redips-mark" colspan="' + (end - start + 1) + '"></td>';
 		}
 	};
 
