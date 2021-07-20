@@ -958,6 +958,7 @@ CL = (function() {
 
   addSubreadingEvents = function(stage, base_subreading_rules) {
     var scroll_offset;
+    console.log(stage);
     if (CL.showSubreadings === true) {
       if (document.getElementById('show_hide_subreadings_button')) {
         $('#show_hide_subreadings_button').on('click.hide_subreadings', function(event) {
@@ -974,6 +975,10 @@ CL = (function() {
           }
           if (stage === 'reorder') {
             OR.showOrderReadings({
+              'container': CL.container
+            });
+          } else if (stage === 'approved') {
+            OR.showApprovedVersion({
               'container': CL.container
             });
           } else {
@@ -996,6 +1001,10 @@ CL = (function() {
           SR.findSubreadings();
           if (stage === 'reorder') {
             OR.showOrderReadings({
+              'container': CL.container
+            });
+          } else if (stage === 'approved') {
+            OR.showApprovedVersion({
               'container': CL.container
             });
           } else {
