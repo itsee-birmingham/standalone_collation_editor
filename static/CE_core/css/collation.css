@@ -517,6 +517,13 @@ div.highlighted_unit {
 
 div#global_exceptions {
   left: 20px;
+  background: #B0C4DE;
+  border: 0;
+}
+
+form#global_exceptions_form {
+  background: whitesmoke;
+  margin: 2px;
 }
 
 div#error_panel {
