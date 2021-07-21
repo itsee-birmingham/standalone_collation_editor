@@ -3,8 +3,30 @@
 * Simple Context Menu
 * http://www.webtoolkit.info/
 *
+* The website above links to the following license: Attribution 2.0 UK: England & Wales (CC BY 2.0 UK)
+*
+* On 21st July 2021 The license statement on the website says:
+*
+* As long as you leave the copyright notice of the original script, or link back to this website, you can use any of
+* the content published on this website free of charge for any use: commercial or noncommercial. However, under the
+* license they are released through there are limitations to what you may or may not do.
+*
+* You Can:
+* Use the resources in your personal work, in whole or part.
+* Use the resources in your commercial work, in whole or part.
+* Modify the work to your personal preference.
+* Share the resources with others, under the following terms:
+*   Link to the resource webpage, not the download file.
+*   Use an excerpt from the webpage if necessary (don’t copy the full article and display it on your site)
+*
+* You Can Not:
+* You can NOT sell the resources directly for profit (eg. Selling the items on stock resource websites)
+* You can NOT copy the full webpage and display it on your own website. (Use an excerpt by all means, but please
+* link to the original resource download page – not the actual file.)
 *
 *
+* The code has been adapted to allow more flexible use in this software.
+* The license terms requires that this adaptation is noted here.
 **/
 
 var SimpleContextMenu = {
