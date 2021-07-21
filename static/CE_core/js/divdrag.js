@@ -1,3 +1,5 @@
+
+//http:// based on luke.breuer.com/tutorial/javascript-drag-and-drop-tutorial.aspx
 var DND = (function () {
     "use strict";
     return {
@@ -120,7 +122,7 @@ var DND = (function () {
                   SV.messagePosLeft = DND._dragElement.style.left;
                   SV._message_pos_top = DND._dragElement.style.top;
                 } catch {
-                  
+
                 }
              // we're done with these events until the next OnMouseDown
                 document.onmousemove = null;
