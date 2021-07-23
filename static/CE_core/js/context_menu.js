@@ -25,7 +25,8 @@
 * link to the original resource download page – not the actual file.)
 *
 *
-* The code has been adapted to allow more flexible use in this software.
+* The code has been adapted to allow more flexible use in this software. Adaptations include generating menus and menu
+* functions on the fly, corrections of menu position.
 * The license terms requires that this adaptation is noted here.
 **/
 
