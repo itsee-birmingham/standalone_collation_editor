@@ -332,6 +332,7 @@ ul.SimpleContextMenu {
 	border-top: 1px solid #000000;
 	border-left: 1px solid #000000;
 	border-right: 1px solid #000000;
+  z-index: 3000;
 }
 
 ul.SimpleContextMenu li {

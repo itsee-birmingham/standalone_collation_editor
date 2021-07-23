@@ -17,7 +17,7 @@ RG = (function() {
 
   //private function declarations
   let _calculateLacWits, _hasRuleApplied, _getDisplayClasses, _getToken, _getWordTokenForWitness,
-  _hasDeletionScheduled, _getRegWitsAsString, _integrateLacOmReadings,
+  _hasDeletionScheduled, _getRegWitsAsString, _integrateLacOmReadings, _addMultiSelectionFunctions,
   _doRunCollation, _showSettings, _fetchRules, _removeUnrequiredData, _showRegularisations,
   _highlightWitness, _addNewToken, _getWordIndexForWitness, _createRule, _getDisplaySettingValue,
   _setUpRuleMenu, _getRuleScopes, _getSuffix, _makeMenu, _redipsInitRegularise,
@@ -218,7 +218,7 @@ RG = (function() {
             cells_dict = rule_cells[1];
             events = rule_cells[2];
             if (Object.keys(deletableRules).length > 1) {
-              cells.push('<table><tbody class="selectable">');
+              cells.push('<table><tbody id="' + rowIdBase + '_selectable' + '" class="selectable selectable-container">');
             } else {
               cells.push('<table><tbody>');
             }
@@ -271,7 +271,7 @@ RG = (function() {
           if (rules[key].scope === 'always') {
             reg_class = 'regularised_global ';
           } else {
-            reg_class = 'regularised ';
+            reg_class = 'ui-selectable regularised ';
           }
           if (_hasDeletionScheduled(key)) {
             reg_class += 'deleted ';
@@ -491,11 +491,8 @@ RG = (function() {
         i += 1;
       }
     }
-    $('.selectable').selectable({
-      'cancel': 'regularised_global',
-      selected: function(event, ui) {$(ui.selected).removeClass('regularised');},
-      unselected: function(event, ui) {$(ui.unselected).addClass('regularised');}
-    });
+    _addMultiSelectionFunctions();
+
     $('#highlighted').on('change', function(event) {
       _highlightWitness(event.target.value);
     });
@@ -521,6 +518,28 @@ RG = (function() {
           CL.addHoverEvents(row, unit_events[key]);
         }
       }
+    }
+  };
+
+  _addMultiSelectionFunctions = function () {
+    var selectableContainers, selectables;
+    selectableContainers = [];
+    selectables = [];
+    $('.selectable-container').each(function () {
+      selectableContainers.push(this);
+      selectables.push(new Selectable({
+        filter: this.querySelectorAll('.ui-selectable'),
+        appendTo: this,
+        toggle: true
+      }));
+    });
+    for (let i = 0; i < selectables.length; i += 1) {
+      selectables[i].on('selecteditem', function(item) {
+        $(item.node).removeClass('regularised');
+      });
+      selectables[i].on('deselecteditem', function(item) {
+        $(item.node).addClass('regularised');
+      });
     }
   };
 
@@ -1465,10 +1484,15 @@ RG = (function() {
   };
 
   _scheduleSelectedRulesDeletion = function () {
-    $('tr.ui-selected').each(function () { //if this is not limited to tr we also get the td and add rules twice which breaks everything
+    var element, row, tbody, selectableId;
+    element = SimpleContextMenu._target_element;
+    row = _getAncestorRow(element);
+    tbody = row.parentNode;
+    selectableId = tbody.id;
+    $('#' + selectableId + ' > tr.ui-selected').each(function () {
       _scheduleRuleDeletion(this);
       //remove the class so it is not selected again if we delete more
-      $(this.parentNode).removeClass('ui-selected');
+      $(this).removeClass('ui-selected');
     });
   };
 
