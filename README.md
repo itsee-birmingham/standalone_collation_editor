@@ -37,8 +37,7 @@ Dependencies
 ---
 
 - Python3
-- JQuery 3 (tested with 3.3.1)
-- JQuery-ui (tested with 1.12.1)
+- JQuery 3 (tested with 3.6.0)
 - Pure css
 - collateX (by default the Java web services are used but this is configurable)
 
@@ -63,8 +62,7 @@ An example of the initialisation code.
 
 ```html
 <link rel=stylesheet href="collation/pure-release-1.0.0/pure-min.css" type="text/css"/>
-<script type="text/javascript" src="collation/js/jquery-3.3.1.min.js"></script>
-<script type="text/javascript" src="collation/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="collation/js/jquery-3.6.0.min.js"></script>
 <script type="text/javascript" src="collation/CE_core/js/collation_editor.js"></script>
 <script type="text/javascript">
   let staticUrl = 'http://localhost:8080/collation/';
