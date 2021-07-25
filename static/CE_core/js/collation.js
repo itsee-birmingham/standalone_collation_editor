@@ -104,19 +104,6 @@ CL = (function() {
     $('.fillPage').each(function() {
       if (document.getElementById('footer')) {
         $(this).height(window.innerHeight - $(this).offset().top - 40 - document.getElementById('footer').offsetHeight);
-        //make sure the global exceptions div stays fixed to horizontal scroll bar when page is resized
-        if (document.getElementById('global_exceptions')) {
-          document.getElementById('global_exceptions').style.top = document.getElementById('header').offsetHeight +
-              document.getElementById('scroller').offsetHeight -
-              document.getElementById('global_exceptions').offsetHeight - 3 + 'px';
-        }
-        //do the same for errors in SV
-        if (document.getElementById('error_panel')) {
-          document.getElementById('error_panel').style.top = document.getElementById('scroller').offsetHeight +
-                                                             document.getElementById('header').offsetHeight -
-                                                             document.getElementById('error_panel').offsetHeight -
-                                                             3 + 'px';
-        }
       } else {
         $(this).height(window.innerHeight - $(this).offset().top - 40);
       }
@@ -609,11 +596,11 @@ CL = (function() {
         }
         //if i is even add a word; if not add a blank cell
         if (i % 2 === 0) {
-          html.push('<th colspan="' + colspan + '" class="NAword mark ' + words[j][1] +'" id="NA_' + (i) +
+          html.push('<th colspan="' + colspan + '" class="NAword redips-mark ' + words[j][1] +'" id="NA_' + (i) +
                     '"><div id="NA_' + (i) + '_div">' + words[j][0] + '</div></th>');
           j += 1;
         } else {
-          html.push('<th  colspan="' + colspan + '" id="NA_' + (i) + '" class="mark"><div id="NA_' + (i) +
+          html.push('<th  colspan="' + colspan + '" id="NA_' + (i) + '" class="redips-mark"><div id="NA_' + (i) +
                     '_div"></div></th>');
         }
       }
@@ -628,7 +615,7 @@ CL = (function() {
           colspan = 1;
         }
         if (i % 2 === 0) {
-          html.push('<td id="num_' + j + '" colspan="' + colspan + '" class="number mark">' + j + '</td>');
+          html.push('<td id="num_' + j + '" colspan="' + colspan + '" class="number redips-mark">' + j + '</td>');
           j += 1;
         } else {
           if (number_spaces === true) {
@@ -1717,7 +1704,7 @@ CL = (function() {
 
   //TODO: think about putting html in a html file and calling in
   showSplitWitnessMenu = function(reading, menu_pos, details) {
-    var wit_menu, witnesses, witness_html, window_height, menu_height, sub_types, id, left, top;
+    var wit_menu, witnesses, witness_html, window_height, menu_height, sub_types, id, left, top, wit_form_height;
     left = menu_pos.left;
     top = menu_pos.top;
     //if there is already an old menu hanging around remove it
@@ -1727,9 +1714,9 @@ CL = (function() {
     //show the select witnesses menu
     wit_menu = document.createElement('div');
     wit_menu.setAttribute('id', 'wit_form');
-    wit_menu.setAttribute('class', 'wit_form dragdiv dialogue_form');
+    wit_menu.setAttribute('class', 'wit_form dialogue_form');
     witnesses = sortWitnesses(getAllReadingWitnesses(reading));
-    witness_html = ['<div class="dialogue_form_header">' + details.header + '</div><form id="select_wit_form">'];
+    witness_html = ['<div class="dialogue_form_header drag-zone">' + details.header + '</div><form id="select_wit_form">'];
     witness_html.push('<label>Selected reading: </label><span>');
     witness_html.push(CL.extractWitnessText(reading));
     witness_html.push('</span>');
@@ -1746,10 +1733,9 @@ CL = (function() {
       for (let i = 0; i < witnesses.length; i += 1) {
         witness_html.push('<input type="hidden" name="' + witnesses[i] + '" value="true"/><br/>');
       }
-      //witness_html.push('<br/><br/>');
     }
     if (details.type === 'overlap') {
-      //witness_html.push('<label>Duplicate reading? <input type="checkbox" id="duplicate" name="duplicate"/></label><br/><br/>');
+      // squelch
     } else if (details.type === 'SVsubreading' || details.type === 'ORsubreading') {
       witness_html.push('<label class="inline-label">Parent reading:</label><select name="parent_reading" id="parent_reading"></select><br/><br/>');
       witness_html.push('<label class="inline-label">Details:</label><input disabled="disabled" type="text" name="reading_details" id="reading_details"/><br/></br/>');
@@ -1768,20 +1754,28 @@ CL = (function() {
     witness_html.push('<input class="pure-button dialogue-form-button" id="select_button" type="button" value="' + details.button + '"/></form>');
     wit_menu.innerHTML = witness_html.join('');
     document.getElementsByTagName('body')[0].appendChild(wit_menu);
-    window_height = window.innerHeight;
-    menu_height = window_height - 300;
-    if (menu_height < 50) {
-      menu_height = 50;
-    }
     left = parseInt(left) - document.getElementById('scroller').scrollLeft;
     if (left + document.getElementById('wit_form').offsetWidth > window.innerWidth) {
       left = left - document.getElementById('wit_form').offsetWidth;
     }
+    if (left < 0) {
+      left = 4;
+    }
+    document.getElementById('wit_form').style.left = left + 'px';
+    drag.initDraggable('wit_form', true, true);
+    window_height = window.innerHeight;
+    wit_form_height = document.getElementById('wit_form').offsetHeight - 43;
+    document.getElementById('select_wit_form').style.height = wit_form_height + 'px';
+    if (details.hasOwnProperty('form_size') && details.form_size === 'small') {
+      menu_height = Math.max(wit_form_height - 100, 50);
+    } else if (details.type === 'SVsubreading' || details.type === 'ORsubreading') {
+      menu_height = Math.max(wit_form_height - 235, 50);
+    } else {
+      menu_height = Math.max(wit_form_height - 173, 50);
+    }
     if (witnesses.length > 1 && (!details.hasOwnProperty('witness_select') || details.witness_select !== false)) {
       document.getElementById('wit_scroller').style.maxHeight = menu_height + 'px';
     }
-    document.getElementById('wit_form').style.left = left + 'px';
-    DND.InitDragDrop('wit_form', true, true);
     $('#close_button').on('click', function(event) {
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
     });
@@ -2493,7 +2487,8 @@ CL = (function() {
 
     }
     document.getElementById('witness_checkboxes').innerHTML = html.join('');
-    DND.InitDragDrop('remove_witnesses_div', true, true);
+    drag.initDraggable('remove_witnesses_div', true, true);
+    // DND.InitDragDrop('remove_witnesses_div', true, true);
     $('#select_all').on('click', function () {
       if ($(this).is(':checked')) {
         $('.witness_select').each(function() {

@@ -397,7 +397,7 @@ RG = (function() {
               remove_wits_form = document.getElementById('remove_witnesses_div');
             }
             remove_wits_form.setAttribute('id', 'remove_witnesses_div');
-            remove_wits_form.setAttribute('class', 'dragdiv remove_witnesses_div dialogue_form');
+            remove_wits_form.setAttribute('class', 'remove_witnesses_div dialogue_form');
             remove_wits_form.innerHTML = html;
             document.getElementsByTagName('body')[0].appendChild(remove_wits_form);
             CL.setUpRemoveWitnessesForm(wits[2], data, 'regularised');
@@ -417,7 +417,7 @@ RG = (function() {
       CL.services.showLoginStatus();
     }
     document.getElementById('header').className = 'regularisation_header';
-    global_exceptions_html = '<div class="dialogue_form dragdiv"  id="global_exceptions" style="display:none"><div class="dialogue_form_header" id="global_exceptions_header"><span>Global Exceptions</span><span id="global_exceptions_ex">&#9660;</span></div><div id="global_exceptions_list" style="display:none"></div></div>';
+    global_exceptions_html = '<div class="dialogue_form"  id="global_exceptions" style="display:none"><div class="dialogue_form_header drag-zone" id="global_exceptions_header"><span>Global Exceptions</span><span id="global_exceptions_ex">&#9660;</span></div><div id="global_exceptions_list" style="display:none"></div></div>';
     container.innerHTML = '<div id="scroller" class="fillPage"><table class="collation_overview">' +
       html.join('') + '</table>' + global_exceptions_html + '</div><div id="single_witness_reading"></div>';
     CL.expandFillPageClients();
@@ -1222,9 +1222,10 @@ RG = (function() {
       $.get(staticUrl + 'CE_core/html_fragments/rule_menu.html', function(html) {
         reg_menu = document.createElement('div');
         reg_menu.setAttribute('id', 'reg_form');
-        reg_menu.setAttribute('class', 'dragdiv reg_form dialogue_form');
+        reg_menu.setAttribute('class', 'reg_form dialogue_form');
         reg_menu.innerHTML = html.replace('{unit_data}', unit_data).replace('{original_text}', CL.project.prepareDisplayString(original_display_text)).replace('{normalised_text}', CL.project.prepareDisplayString(normalised_text).replace(/</g, '&lt;').replace(/>/g, '&gt;'));
         document.getElementsByTagName('body')[0].appendChild(reg_menu);
+
         reg_rules = CL.getRuleClasses('create_in_RG', true, 'value', ['identifier', 'name', 'RG_default']);
         new_reg_rules = [];
         selected = 'none';
@@ -1252,8 +1253,7 @@ RG = (function() {
   };
 
   _getDisplaySettingValue = function(id, key) {
-    var i;
-    for (i = 0; i < CL.displaySettingsDetails.configs.length; i += 1) {
+    for (let i = 0; i < CL.displaySettingsDetails.configs.length; i += 1) {
       if (CL.displaySettingsDetails.configs[i].id === id) {
         return CL.displaySettingsDetails.configs[i][key];
       }
@@ -1263,14 +1263,11 @@ RG = (function() {
 
   _setUpRuleMenu = function(rd, classes, selected, create_function) {
     var left_pos, window_width, rule_scopes, conditions_html, i, id, setting;
-    //document.getElementById('reg_form').style.width = '300px';
     window_width = window.innerWidth;
     left_pos = rd.td.current.offsetLeft + rd.obj.redips.container.offsetParent.offsetLeft - document.getElementById('scroller').scrollLeft;
-    if (left_pos + parseInt(document.getElementById('reg_form').style.width) >= window_width) {
-      left_pos = (window_width - parseInt(document.getElementById('reg_form').style.width) - 20);
+    if (left_pos + parseInt(document.getElementById('reg_form').offsetWidth) >= window_width) {
+      left_pos = (window_width - parseInt(document.getElementById('reg_form').offsetWidth) - 20);
     }
-    //hardcoded this now as a fail safe against overshooting the bottom of the page, extra tests could be added if you have time.
-    //document.getElementById('reg_form').style.top = (rd.td.current.offsetTop + rd.obj.redips.container.offsetParent.offsetTop - document.getElementById('scroller').scrollTop) + 'px';
     document.getElementById('reg_form').style.left = left_pos + 'px';
 
     if (CL.witnessAddingMode === true) {
@@ -1304,7 +1301,8 @@ RG = (function() {
     } else {
       document.getElementById('conditions').style.display = 'none';
     }
-    DND.InitDragDrop('reg_form', true, true);
+    drag.initDraggable('reg_form', true, true);
+    document.getElementById('regularisation_menu').style.height = document.getElementById('reg_form').offsetHeight - 43 + 'px';
     $('#cancel_button').on('click', function(event) {
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('reg_form'));
     });
@@ -1394,7 +1392,7 @@ RG = (function() {
     if (document.getElementById('global_exceptions').style.display === 'none') {
       document.getElementById('global_exceptions').style.display = 'block';
       document.getElementById('global_exceptions_list').style.display = 'block';
-      DND.InitDragDrop('global_exceptions', true, true);
+      drag.initDraggable('global_exceptions', true, true);
     }
     html = [];
     html.push('<form id="global_exceptions_form" class="pure-form">');
@@ -1406,11 +1404,11 @@ RG = (function() {
     html.push('</ul><input class="pure-button dialogue-form-button" type="button" value="Remove exceptions" id="remove_exception_button"/>');
     html.push('</form>');
     document.getElementById('global_exceptions_list').innerHTML = html.join('');
+    document.getElementById('global_exceptions_list').style.height = document.getElementById('global_exceptions').offsetHeight - 35 + 'px';
     document.getElementById('global_exceptions').style.top = (document.getElementById('header').offsetHeight +
         document.getElementById('scroller').offsetHeight + document.getElementById('single_witness_reading').offsetHeight) -
         document.getElementById('global_exceptions').offsetHeight + 15 + 'px';
-    document.getElementById('global_exceptions').style.left = document.getElementById('scroller').offsetWidth -
-        document.getElementById('global_exceptions').offsetWidth - 15 + 'px';
+    document.getElementById('global_exceptions').style.left = 15 + 'px';
 
     $('#remove_exception_button').off('click.rem_ge');
     $('#remove_exception_button').on('click.rem_ge', function(event) {
