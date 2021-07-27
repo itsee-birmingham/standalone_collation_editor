@@ -19,7 +19,7 @@ collation_editor = (function() {
         $.getScript( staticUrl + 'CE_core/js/context_menu.js' ),
         $.getScript( staticUrl + 'CE_core/js/redips-drag-5.3.min.js'),
         $.getScript( staticUrl + 'CE_core/js/md5.js' ),
-        $.getScript( staticUrl + 'CE_core/js/divdrag.js' ),
+        $.getScript( staticUrl + 'CE_core/js/draggable.js' ),
         $.getScript( staticUrl + 'CE_core/js/selectable.min.js' ),
         $.getScript( staticUrl + 'CE_core/js/subreadings.js' ),
         $.Deferred(function( deferred ){

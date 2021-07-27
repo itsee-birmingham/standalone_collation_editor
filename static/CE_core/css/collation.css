@@ -12,6 +12,10 @@ textarea {
     color: red;
 }
 
+.drag-zone {
+  cursor: move;
+}
+
 form {
     padding: 7px;
 }
@@ -127,8 +131,6 @@ td div.spacer {
 	border-radius:4px;
 }
 
-
-
 .label_form {
     position: fixed;
     background-color: whitesmoke;
@@ -146,11 +148,19 @@ td div.spacer {
 
 .wit_form {
  	top: 30px;
+  max-width: 75vw;
+  max-height: 75vh;
+  overflow: hidden;
+}
+
+.wit_form input[type=checkbox] {
+  display: inline-block;
+  margin-right: 4px;
 }
 
 .wit_form .inline-label {
   display: inline-block;
-  width: 80px;
+  width: 120px;
   margin-top: 5px;
 }
 
@@ -158,11 +168,16 @@ td div.spacer {
   margin-top: 5px;
 }
 
+#select_wit_form {
+  overflow: auto;
+}
+
 #wit_scroller {
 	margin-top: 15px;
 	margin-bottom: 15px;
 	overflow: auto;
 	border: 2px inset grey;
+  padding: 3px;
 }
 
 td.highlight {
@@ -302,21 +317,19 @@ table#raw_json td {
 	display: none;
 }
 
-
-
 /* settings */
 .settings_dialogue {
 	bottom:50px;
  	right:5px;
  	width:300px;
   font-size: 15px;
+  z-index: 10;
 }
 
 .settings_dialogue .inline-label {
   display: inline-block;
   width: 80px;
   margin-top: 5px;
-
 }
 
 
@@ -400,9 +413,6 @@ tr.added_highlighted > td > div.regularisation_staged {
 }
 
 
-
-
-
 td > div.spanlike {
     width: 95%;
 }
@@ -448,58 +458,90 @@ div.highlighted_unit {
 	border: 2px solid red;
 }
 
-
-#global_exceptions_list form {
-    padding: 6px;
-    margin: 0;
+div#global_exceptions {
+  left: 20px;
+  background: #B0C4DE;
+  border: 1px solid black;
+  z-index: 10;
+  max-height: 50vh;
+  overflow: hidden;
 }
 
-#global_exceptions_list form input[type='checkbox']{
+div#error_panel {
+  border: 1px solid black;
+  max-height: 50vh;
+  overflow: hidden;
+}
+
+div#global_exceptions_list {
+  /* The height of this div is set in javascript */
+  overflow: hidden;
+}
+
+form#global_exceptions_form {
+  background: whitesmoke;
+  padding: 6px;
+  margin: 0;
+  height: 100%;
+  overflow:scroll;
+}
+
+form#global_exceptions_form input[type='checkbox']{
   vertical-align: middle;
   margin-right: 5px;
 }
+
 
 .checkbox-label {
   display: inline-block;
   vertical-align: middle;
 }
 
-#remove_witnesses_div {
+div#remove_witnesses_div {
   top: 60px;
   font-size: 15px;
+  resize: both;
+  overflow: scroll;
 }
 
-.reg_form {
+#reg_form.reg_form {
  	top: 30px;
   font-size: 15px;
+  max-height: 75vh;
+  overflow: hidden;
 }
 
-.reg_form .inline-label {
+#reg_form.reg_form .inline-label {
   display: inline-block;
   width: 50px;
 }
 
-.reg_form .inline-select {
+#reg_form.reg_form .inline-select {
   margin-top: 2px;
   margin-bottom: 2px;
 }
 
-.reg_form fieldset {
+#reg_form.reg_form fieldset {
   margin-top: 3px;
 }
 
-.reg_form #rule_creation_warning {
+#reg_form.reg_form #rule_creation_warning {
   color: maroon;
 }
 
 #regularisation_menu {
   width: 300px;
+  overflow-y: scroll;
+}
+
+#regularisation_menu textarea {
+  resize: none;
 }
 
 .dialogue_form_header {
     background: #B0C4DE;
     padding: 5px;
-    margin-bottom: 3px;
+    height: 20px;
 }
 
 .dialogue_form {
@@ -516,16 +558,7 @@ div.highlighted_unit {
   margin-top: 10px;
 }
 
-div#global_exceptions {
-  left: 20px;
-  background: #B0C4DE;
-  border: 0;
-}
 
-form#global_exceptions_form {
-  background: whitesmoke;
-  margin: 2px;
-}
 
 div#error_panel {
 	position: fixed;
@@ -560,6 +593,7 @@ div#error_header {
 div#error_message_panel {
 	background: whitesmoke;
 	padding: 4px;
+  overflow-y: scroll;
 }
 
 span#error_coll_ex, span#global_exceptions_ex {

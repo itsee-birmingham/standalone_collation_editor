@@ -819,9 +819,9 @@ OR = (function() {
       reading = CL.data[rdg_details[1]][rdg_details[0]].readings[rdg_details[2]];
       current_label = reading.label;
       label_form.setAttribute('id', 'label_form');
-      label_form.setAttribute('class', 'label_form dragdiv');
+      label_form.setAttribute('class', 'label_form');
       html = [];
-      html.push('<div class="dialogue_form_header">Edit Label</div>')
+      html.push('<div class="dialogue_form_header drag-zone">Edit Label</div>')
       html.push('<form id="label_change_form">');
       html.push('<label for="new_label">new label:<br/><input type="text" id="new_label"/></label><br/><br/>');
       html.push('<input class="pure-button dialogue-form-button" id="close_label_button" type="button" value="Cancel"/>');
@@ -836,7 +836,7 @@ OR = (function() {
       document.getElementById('label_form').style.left = left + 'px';
       document.getElementById('label_form').style.top = top + 'px';
       document.getElementById('new_label').value = current_label; //populate field with current label value
-      DND.InitDragDrop('label_form', true, true);
+      drag.initDraggable('label_form', true, true);
       $('#close_label_button').on('click', function(event) {
         document.getElementsByTagName('body')[0].removeChild(document.getElementById('label_form'));
       });
