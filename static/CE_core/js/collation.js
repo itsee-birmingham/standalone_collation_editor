@@ -2906,6 +2906,7 @@ CL = (function() {
       CL.services.localJavascript = [];
     }
     _includeJavascript(CL.services.localJavascript, function() {
+      console.log('get current editing project in services about to be called')
       CL.services.getCurrentEditingProject(_initialiseProject);
     });
     if (document.getElementById('tool_tip') === null) {
