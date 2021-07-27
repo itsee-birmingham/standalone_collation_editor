@@ -2906,7 +2906,6 @@ CL = (function() {
       CL.services.localJavascript = [];
     }
     _includeJavascript(CL.services.localJavascript, function() {
-      console.log('get current editing project in services about to be called')
       CL.services.getCurrentEditingProject(_initialiseProject);
     });
     if (document.getElementById('tool_tip') === null) {
@@ -2916,7 +2915,6 @@ CL = (function() {
 
   _initialiseProject = function(project) {
     var local_js, i;
-    console.log('CL _initialiseProject')
     _setProjectConfig(project);
     local_js = [];
     //TODO: this is untested as we don't currently specify js in any projects
@@ -2927,7 +2925,6 @@ CL = (function() {
       }
     }
     _includeJavascript(local_js, function() {
-      console.log('services initialised called in next line')
       CL.services.initialiseEditor();
       //TODO: add standard event handlers
       //add standard event handlers?
