@@ -228,8 +228,8 @@ class PostProcessor(Regulariser, SettingsApplier):
         token_matches = []
         base_text = None
         # if we have at least two actual readings (not including empty readings)
-        if ((len(readings.keys()) > 1 and ('_' not in readings.keys())) or
-                (len(readings.keys()) > 2 and ('_' in readings.keys()))):
+        if ((len(readings.keys()) >= 1 and ('_' not in readings.keys())) or
+                (len(readings.keys()) >= 2 and ('_' in readings.keys()))):
             matrix = []  # a token matrix one row per reading one column per token
             readings_list = []  # the full reading data in same order as matrix
             for reading in readings.keys():
@@ -266,13 +266,14 @@ class PostProcessor(Regulariser, SettingsApplier):
                 # this is a single word unit so just return existing readings
                 return [readings]
         else:
+            print('we have a unit for splitting')
             # there is only one content reading in this unit (therefore all read a - a shared unit) or are om
             # so just return existing readings except when the setting tells us to
             # In particular this is always True when we are combining new witnesses
             # into existing collations when we always want the new reading in smallest chunks possible
-            if (len([x for x in readings.keys()]) == 1
-                    and self.split_single_reading_units is True):
-                for key in readings:
+            real_reading_keys = [x for x in readings.keys() if x != '_']
+            if (len(real_reading_keys) == 1 and self.split_single_reading_units is True):
+                for key in readings.keys():
                     if len(key.split(' ')) == len(readings[key]['text']):
                         token_list = key.split(' ')
                         witnesses = readings[key]['witnesses']
@@ -284,6 +285,7 @@ class PostProcessor(Regulariser, SettingsApplier):
                         return [readings]
             else:
                 return [readings]
+
 
     # may not ever need this actually
     def horizontal_combine(self, units):
