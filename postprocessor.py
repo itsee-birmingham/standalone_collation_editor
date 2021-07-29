@@ -223,6 +223,43 @@ class PostProcessor(Regulariser, SettingsApplier):
                 existing_tokens[i]['reading'].append(reading)
         return existing_tokens
 
+    def split_unit(self, readings):
+        matrix = []  # a token matrix one row per reading one column per token
+        readings_list = []  # the full reading data in same order as matrix
+        for reading in readings.keys():
+            if len(reading.split()) > 0 and reading != '_':
+                matrix.append(reading.split())
+            else:
+                matrix.append(None)
+            if self.overtext_name in readings[reading]['witnesses']:
+                base_text = matrix[-1]
+            readings_list.append(readings[reading])
+        highest = 0
+        lowest = 100000
+        for row in matrix:
+            if row is not None:
+                highest = max(len(row), highest)
+                # I don't know what is expected here - it used to test for 'None'. It might not be needed at all
+                if row[0] != '_' and row[0] is not None:
+                    lowest = min(len(row), lowest)
+        if highest > 1:  # if at least one reading has more than one word
+            lengths = []
+            # return self.split_unit_into_single_words(readings_list, matrix, highest)
+            # TODO: remove this condition once split unit into single words works with differing lengths
+            if lowest == highest:
+                # if all the readings are the same length
+                return self.split_unit_into_single_words(readings_list, matrix, highest)
+            else:
+                if base_text is not None:
+                    # if its not an addition
+                    return self.split_unit_into_single_words(readings_list, matrix, highest)
+                else:
+                    # this is an addition so doesn't need splitting
+                    return [readings]
+        else:
+            # this is a single word unit so just return existing readings
+            return [readings]
+
     def check_unit_splits(self, readings):
         """Works out whether any units need further splitting and sends them off to restructure_unit"""
         token_matches = []
@@ -230,60 +267,12 @@ class PostProcessor(Regulariser, SettingsApplier):
         # if we have at least two actual readings (not including empty readings)
         if ((len(readings.keys()) > 1 and ('_' not in readings.keys())) or
                 (len(readings.keys()) > 2 and ('_' in readings.keys()))):
-            matrix = []  # a token matrix one row per reading one column per token
-            readings_list = []  # the full reading data in same order as matrix
-            for reading in readings.keys():
-                if len(reading.split()) > 0 and reading != '_':
-                    matrix.append(reading.split())
-                else:
-                    matrix.append(None)
-                if self.overtext_name in readings[reading]['witnesses']:
-                    base_text = matrix[-1]
-                readings_list.append(readings[reading])
-            highest = 0
-            lowest = 100000
-            for row in matrix:
-                if row is not None:
-                    highest = max(len(row), highest)
-                    # I don't know what is expected here - it used to test for 'None'. It might not be needed at all
-                    if row[0] != '_' and row[0] is not None:
-                        lowest = min(len(row), lowest)
-            if highest > 1:  # if at least one reading has more than one word
-                lengths = []
-                # return self.split_unit_into_single_words(readings_list, matrix, highest)
-                # TODO: remove this condition once split unit into single words works with differing lengths
-                if lowest == highest:
-                    # if all the readings are the same length
-                    return self.split_unit_into_single_words(readings_list, matrix, highest)
-                else:
-                    if base_text is not None:
-                        # if its not an addition
-                        return self.split_unit_into_single_words(readings_list, matrix, highest)
-                    else:
-                        # this is an addition so doesn't need splitting
-                        return [readings]
-            else:
-                # this is a single word unit so just return existing readings
-                return [readings]
+            return self.split_unit(readings)
+        # we have at least one real reading and we have asked to split these
+        elif (len([x for x in readings.keys() if x != '_']) == 1 and self.split_single_reading_units is True):
+            return self.split_unit(readings)
         else:
-            # there is only one content reading in this unit (therefore all read a - a shared unit) or are om
-            # so just return existing readings except when the setting tells us to
-            # In particular this is always True when we are combining new witnesses
-            # into existing collations when we always want the new reading in smallest chunks possible
-            if (len([x for x in readings.keys()]) == 1
-                    and self.split_single_reading_units is True):
-                for key in readings:
-                    if len(key.split(' ')) == len(readings[key]['text']):
-                        token_list = key.split(' ')
-                        witnesses = readings[key]['witnesses']
-                        new_readings = [{token_list[i]: {'witnesses': witnesses,
-                                                         'text': [readings[key]['text'][i]]
-                                                         }} for i in range(0, len(token_list))]
-                        return new_readings
-                    else:
-                        return [readings]
-            else:
-                return [readings]
+            return [readings]
 
     # may not ever need this actually
     def horizontal_combine(self, units):

@@ -854,7 +854,7 @@ RG = (function() {
     }
 
     if (output === 'add_witnesses') {
-      options.config.split_single_reading_units = true;
+      options.configs.split_single_reading_units = true;
       result_callback = function(data) {
         callback(data);
       }

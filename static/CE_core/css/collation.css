@@ -500,7 +500,21 @@ form#global_exceptions_form input[type='checkbox']{
 div#remove_witnesses_div {
   top: 60px;
   font-size: 15px;
-  resize: both;
+  max-height: 60vh;
+  overflow: hidden;
+}
+
+form#remove_witnesses_form {
+  padding: 0;
+}
+
+form#remove_witnesses_form label {
+  margin-left: 3px;
+}
+
+div#remove_witnesses_content {
+  padding-left: 7px;
+  padding-top: 7px;
   overflow: scroll;
 }
 
