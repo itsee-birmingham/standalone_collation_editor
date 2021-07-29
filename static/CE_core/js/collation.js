@@ -2458,9 +2458,10 @@ CL = (function() {
 
   setUpRemoveWitnessesForm = function(wits, data, stage, removeFunction) {
     var html, transcriptionIds, sigla;
-    document.getElementById('remove_witnesses_div').style.left = document.getElementById('scroller').offsetWidth - document.getElementById('remove_witnesses_div').offsetWidth - 15 + 'px';
+    document.getElementById('remove_witnesses_div').style.left = document.getElementById('scroller').offsetWidth -
+                                            document.getElementById('remove_witnesses_div').offsetWidth - 15 + 'px';
     transcriptionIds = {};
-    for (let i=0; i<wits.length; i+=1) {
+    for (let i = 0; i < wits.length; i += 1) {
       for (let key in data.hand_id_map) {
         if (data.hand_id_map.hasOwnProperty(key) && data.hand_id_map[key] === wits[i]) {
           if (transcriptionIds.hasOwnProperty(wits[i])) {
@@ -2488,7 +2489,7 @@ CL = (function() {
     }
     document.getElementById('witness_checkboxes').innerHTML = html.join('');
     drag.initDraggable('remove_witnesses_div', true, true);
-    // DND.InitDragDrop('remove_witnesses_div', true, true);
+    document.getElementById('remove_witnesses_content').style.height = document.getElementById('remove_witnesses_div').offsetHeight - 35 + 'px';
     $('#select_all').on('click', function () {
       if ($(this).is(':checked')) {
         $('.witness_select').each(function() {
