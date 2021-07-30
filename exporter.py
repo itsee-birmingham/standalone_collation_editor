@@ -64,6 +64,8 @@ class Exporter(object):
             return ['', 'om']
         real_start = int(start/2)-1
         real_end = int(end/2)-1
+        if real_start < 0:
+            real_start = 0
         word_list = [x['original'] for x in overtext['tokens']]
         return [' '.join(word_list[real_start:real_end+1])]
 
@@ -106,6 +108,7 @@ class Exporter(object):
             lem = etree.Element('lem')
             lem.set('wit', overtext['id'])
             text = self.get_lemma_text(overtext, int(start), int(end))
+            print(text)
             lem.text = text[0]
             if len(text) > 1:
                 lem.set('type', text[1])
@@ -216,7 +219,7 @@ class Exporter(object):
 
             vtree.append(app)
 
-        # if we are ignoring the basetext add it to our missing list so it isn't listed (except n lemma)
+        # if we are ignoring the basetext add it to our missing list so it isn't listed (except in lemma)
         if self.ignore_basetext:
             missing.append(basetext_siglum)
         # this sort will change the order of the overlap units so longest starting at each index point comes first
