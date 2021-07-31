@@ -2392,12 +2392,14 @@ SV = (function () {
 	};
 
 	_specialCombineReadings = function (empty_unit, text_unit, text_unit_pos, gap_position, app_id, adjacent_unit) {
-		var target_witnesses, adjacent_witnesses, hit_witnesses, readings_to_add, i, j, k, new_reading_id, reading, gap_details, hit_witnesses_copy, subreadings;
+		var target_witnesses, adjacent_witnesses, hit_witnesses, readings_to_add, new_reading_id, reading, gap_details,
+		hit_witnesses_copy, subreadings;
+
 		target_witnesses = [];
 		adjacent_witnesses = [];
 		readings_to_add = [];
 		//find the witnesses might be interested in (any type lacs which are not lac verse) from special gap unit
-		for (i = 0; i < empty_unit.readings.length; i += 1) {
+		for (let i = 0; i < empty_unit.readings.length; i += 1) {
 			if (empty_unit.readings[i].type === 'lac') {
 				target_witnesses.push.apply(target_witnesses, empty_unit.readings[i].witnesses);
 			}
@@ -2405,7 +2407,7 @@ SV = (function () {
 		if (typeof adjacent_unit !== 'undefined') {
 			//Now get all the witness which are lac in the adjacent unit (this will either be the unit before or after the gap depending on direction of merge)
 			//because they will not need gaps combining
-			for (i = 0; i < adjacent_unit.readings.length; i += 1) {
+			for (let i = 0; i < adjacent_unit.readings.length; i += 1) {
 				if (adjacent_unit.readings[i].type === 'lac') {
 					adjacent_witnesses.push.apply(adjacent_witnesses, adjacent_unit.readings[i].witnesses);
 				}
@@ -2413,67 +2415,47 @@ SV = (function () {
 		}
 		//now loop through the witnesses we might be interested in and remove any that have gaps in the adjacent unit
 		//go backwards so you can splice
-		for (i = target_witnesses.length-1; i >= 0; i -= 1) {
+		for (let i = target_witnesses.length-1; i >= 0; i -= 1) {
 			if (adjacent_witnesses.indexOf(target_witnesses[i]) !== -1) {
 				target_witnesses.splice(i, 1);
 			}
 		}
 		//add special attribute to the readings of any remaining witnesses making new readings if necessary
-		for (i = 0; i < text_unit.readings.length; i += 1) {
+		for (let i = 0; i < text_unit.readings.length; i += 1) {
 			hit_witnesses = [];
-			for (j = 0; j < text_unit.readings[i].witnesses.length; j += 1) {
+			for (let j = 0; j < text_unit.readings[i].witnesses.length; j += 1) {
 				if (target_witnesses.indexOf(text_unit.readings[i].witnesses[j]) != -1) {
 					hit_witnesses.push(text_unit.readings[i].witnesses[j]);
 				}
 			}
-			if (text_unit.readings[i].text.length > 0 &&
-					_isSubsetOf(text_unit.readings[i].witnesses, hit_witnesses)) { //if the reading witnesses are a subset of hit_witnesses
-				//we are dealing with all witnesses in the reading
+			for (let j = 0; j < hit_witnesses.length; j += 1) {
+				//we need to remember these and add it later (when we are not looping through the readings)
+				readings_to_add.push([text_unit_pos, i, [hit_witnesses[j]], app_id]);
+			}
+		}
+		for (let i = readings_to_add.length - 1; i >= 0; i -= 1) { // go backwards so you don't screw up positions by adding readings
+			new_reading_id = doSplitReadingWitnesses(readings_to_add[i][0], readings_to_add[i][1], readings_to_add[i][2], readings_to_add[i][3], false);
+			reading = CL.findReadingById(CL.data[app_id][text_unit_pos], new_reading_id);
+			if (reading.text.length > 0) {
 				if (gap_position === 'before') {
-					if (text_unit.readings[i].text.length > 0) {
-						text_unit.readings[i].text[0].combined_gap_before = text_unit.readings[i].witnesses;
-						if (text_unit.readings[i].text[0][hit_witnesses[0]].hasOwnProperty('gap_before_details')) {
-							text_unit.readings[i].text[0].combined_gap_before_details = text_unit.readings[i].text[0][hit_witnesses[0]].gap_before_details;
-						}
-						if (typeof adjacent_unit !== 'undefined') {
-							gap_details = _getGapDetails(adjacent_unit, hit_witnesses);
-							if (gap_details !== null) {
-								text_unit.readings[i].text[0].combined_gap_before_details = gap_details;
-							}
+					reading.text[0].combined_gap_before = readings_to_add[i][2];
+					if (reading.text[0][readings_to_add[i][2][0]].hasOwnProperty('gap_before_details')) {
+						reading.text[0].combined_gap_before_details = reading.text[0][readings_to_add[i][2][0]].gap_before_details;
+					}
+					if (typeof adjacent_unit !== 'undefined') {
+						gap_details = _getGapDetails(adjacent_unit, readings_to_add[i][2]);
+						if (gap_details !== null) {
+							reading.text[0].combined_gap_before_details = gap_details;
 						}
 					}
 				} else {
-					//gap is after
-					text_unit.readings[i].text[text_unit.readings[i].text.length-1].combined_gap_after = text_unit.readings[i].witnesses;
+					reading.text[reading.text.length-1].combined_gap_after = readings_to_add[i][2];
 				}
-			} else if (text_unit.readings[i].text.length > 0 && hit_witnesses.length > 0) {
-				//we are only dealing with only some witnesses in the reading
-				for (j = 0; j < hit_witnesses.length; j += 1) {
-					//we need to remember these and add it later (when we are not looping through the readings)
-					readings_to_add.push([text_unit_pos, i, [hit_witnesses[j]], app_id]);
-				}
-			}
-		}
-		for (i = readings_to_add.length - 1; i >= 0; i -= 1) { //go backwards so you don't screw up positions by adding readings
-			new_reading_id = doSplitReadingWitnesses(readings_to_add[i][0], readings_to_add[i][1], readings_to_add[i][2], readings_to_add[i][3], false);
-			reading = CL.findReadingById(CL.data[app_id][text_unit_pos], new_reading_id);
-			if (gap_position === 'before') {
-				reading.text[0].combined_gap_before = readings_to_add[i][2];
-				if (reading.text[0][readings_to_add[i][2][0]].hasOwnProperty('gap_before_details')) {
-					reading.text[0].combined_gap_before_details = reading.text[0][readings_to_add[i][2][0]].gap_before_details;
-				}
-				if (typeof adjacent_unit !== 'undefined') {
-					gap_details = _getGapDetails(adjacent_unit, readings_to_add[i][2]);
-					if (gap_details !== null) {
-						reading.text[0].combined_gap_before_details = gap_details;
-					}
-				}
-			} else {
-				reading.text[reading.text.length-1].combined_gap_after = readings_to_add[i][2];
 			}
 		}
 		CL.addUnitId(text_unit);
 		CL.addReadingIds(text_unit);
+		unsplitUnitWitnesses(text_unit_pos, 'apparatus')
 	};
 
 	_doSpecialCombineUnits = function (units, app_id) {
@@ -2488,9 +2470,9 @@ SV = (function () {
 		unit1 = CL.data[app_id][unit1_pos];
 		unit2 = CL.data[app_id][unit2_pos];
 		witness_equality = _checkWitnessEquality(unit1, unit2, app_id);
-		overlap_boundaries = _checkOverlapBoundaries(unit1, unit2, app_id, true);
-		overlap_status_agreement = _checkOverlapStatusAgreement(unit1, unit2, app_id, true);
-		if (witness_equality) {// && overlap_boundaries) { //&& overlap_status_agreement) {
+		// overlap_boundaries = _checkOverlapBoundaries(unit1, unit2, app_id, true);
+		// overlap_status_agreement = _checkOverlapStatusAgreement(unit1, unit2, app_id, true);
+		if (witness_equality) { // && overlap_boundaries) { //&& overlap_status_agreement) {
 			if (!CL.unitHasText(unit1)) {
 				//we need the unit before to get data from it
 				if (unit1_pos !== 0) {
@@ -2524,11 +2506,12 @@ SV = (function () {
 			//redraw without making any changes and error messages
 			if (witness_equality === false) {
 				error_mess = 'ERROR: units with different witness sets cannot be combined';
-			} else if (overlap_boundaries === false) {
-				error_mess = 'ERROR: units cannot be combined across overlapping unit boundaries';
-			} else if (overlap_status_agreement === false) {
-				error_mess = 'ERROR: These units cannot be combined as some of the witnesses have different statuses (deleted, overlapped etc.)';
 			}
+			//  else if (overlap_boundaries === false) {
+			// 	error_mess = 'ERROR: units cannot be combined across overlapping unit boundaries';
+			// } else if (overlap_status_agreement === false) {
+			// 	error_mess = 'ERROR: These units cannot be combined as some of the witnesses have different statuses (deleted, overlapped etc.)';
+			// }
 			unprepareForOperation();
 			showSetVariantsData({'message': {'type': 'error', 'message': error_mess}});
 		}
