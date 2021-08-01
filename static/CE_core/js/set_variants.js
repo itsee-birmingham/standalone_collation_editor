@@ -314,7 +314,7 @@ SV = (function () {
     var html;
 		document.getElementById('remove_witnesses_div').style.left = document.getElementById('scroller').offsetWidth - document.getElementById('remove_witnesses_div').offsetWidth - 15 + 'px';
     html = [];
-    for (let i=0; i<wits.length; i+=1) {
+    for (let i = 0; i < wits.length; i +=1 ) {
       for (let key in data.hand_id_map) {
         if ( data.hand_id_map.hasOwnProperty(key) && data.hand_id_map[key] === wits[i]) {
           html.push('<input class="boolean" type="checkbox" id="' + key + '" name="' + key + '"/><label>' + key + '</label><br/>');
@@ -342,7 +342,7 @@ SV = (function () {
   };
 
 	calculateUnitLengths = function (app_id, options) {
-		var i, j, app, top_line, id, start, first_hit, gap_before, last_end, length, gap_counts, highest_gap, gap_after,
+		var j, app, top_line, id, start, first_hit, gap_before, last_end, length, gap_counts, highest_gap, gap_after,
 		previous_unit_gap_after, previous_unit_start, previous_unit_end, original_column_lengths;
 		if (options === undefined) {
 			options = {};
@@ -353,7 +353,7 @@ SV = (function () {
 		//copy the original_column_lengths data so we can use to calculate gap_after accurately
 		original_column_lengths = JSON.parse(JSON.stringify(options.column_lengths));
 
-		for (i = 0; i < app.length; i += 1) {
+		for (let i = 0; i < app.length; i += 1) {
 			id = app[i]._id;
 			//first find real start value
 			start = -1;
@@ -424,7 +424,7 @@ SV = (function () {
 			previous_unit_gap_after = gap_after;
 			previous_unit_end = last_end;
 			//adjust column length if necessary
-			if (last_end%2 === 1) {
+			if (last_end % 2 === 1) {
 				if (gap_counts.hasOwnProperty(highest_gap)) {
 					if (options.column_lengths.hasOwnProperty(highest_gap)) {
 						options.column_lengths[highest_gap] = options.column_lengths[highest_gap] - gap_counts[highest_gap];
@@ -2058,31 +2058,31 @@ SV = (function () {
 	};
 
 	_getLowestIndex = function (a, b) {
-		var a_main, b_main, a_sub, b_sub;
+		var aMain, bMain, aSub, bSub;
 		if (a.indexOf('.') !== -1) {
-			a_main = parseInt(a.split('.')[0]);
-			a_sub = parseInt(a.split('.')[1]);
+			aMain = parseInt(a.split('.')[0]);
+			aSub = parseInt(a.split('.')[1]);
 		} else {
-			a_main = parseInt(a);
-			a_sub = 0;
+			aMain = parseInt(a);
+			aSub = 0;
 		}
 		if (b.indexOf('.') !== -1) {
-			b_main = parseInt(b.split('.')[0]);
-			b_sub = parseInt(b.split('.')[1]);
+			bMain = parseInt(b.split('.')[0]);
+			bSub = parseInt(b.split('.')[1]);
 		} else {
-			b_main = parseInt(b);
-			b_sub = 0;
+			bMain = parseInt(b);
+			bSub = 0;
 		}
-		if (a_main < b_main) {
+		if (aMain < bMain) {
 			return a;
 		}
-		if (a_main > b_main) {
+		if (aMain > bMain) {
 			return b;
 		}
-		if (a_sub < b_sub) {
+		if (aSub < bSub) {
 			return a;
 		}
-		if (a_sub > b_sub) {
+		if (aSub > bSub) {
 			return b;
 		}
 		return a;
@@ -4635,99 +4635,99 @@ SV = (function () {
 	};
 
 	_compareIndexStrings = function(a, b) {
-		var a_main, b_main, a_sub, b_sub;
+		var aMain, bMain, aSub, bSub;
 		if (a.indexOf('.') !== -1) {
-			a_main = parseInt(a.split('.')[0]);
-			a_sub = parseInt(a.split('.')[1]);
+			aMain = parseInt(a.split('.')[0]);
+			aSub = parseInt(a.split('.')[1]);
 		} else {
-			a_main = parseInt(a);
-			a_sub = 0;
+			aMain = parseInt(a);
+			aSub = 0;
 		}
 		if (b.indexOf('.') !== -1) {
-			b_main = parseInt(b.split('.')[0]);
-			b_sub = parseInt(b.split('.')[1]);
+			bMain = parseInt(b.split('.')[0]);
+			bSub = parseInt(b.split('.')[1]);
 		} else {
-			b_main = parseInt(b);
-			b_sub = 0;
+			bMain = parseInt(b);
+			bSub = 0;
 		}
-		if (a_main < b_main) {
+		if (aMain < bMain) {
 			return -1;
 		}
-		if (a_main > b_main) {
+		if (aMain > bMain) {
 			return 1;
 		}
-		if (a_sub < b_sub) {
+		if (aSub < bSub) {
 			return -1;
 		}
-		if (a_sub > b_sub) {
+		if (aSub > bSub) {
 			return 1;
 		}
 		return 0;
 	};
 
 	_compareIndexes = function(a, b) {
-		var a_main, b_main, a_sub, b_sub;
+		var aMain, bMain, aSub, bSub;
 		if (typeof a.index === 'undefined' || typeof b.index === 'undefined') {
 			return 0;
 		}
 		if (a.index.indexOf('.') !== -1) {
-			a_main = parseInt(a.index.split('.')[0]);
-			a_sub = parseInt(a.index.split('.')[1]);
+			aMain = parseInt(a.index.split('.')[0]);
+			aSub = parseInt(a.index.split('.')[1]);
 		} else {
-			a_main = parseInt(a.index);
-			a_sub = 0;
+			aMain = parseInt(a.index);
+			aSub = 0;
 		}
 		if (b.index.indexOf('.') !== -1) {
-			b_main = parseInt(b.index.split('.')[0]);
-			b_sub = parseInt(b.index.split('.')[1]);
+			bMain = parseInt(b.index.split('.')[0]);
+			bSub = parseInt(b.index.split('.')[1]);
 		} else {
-			b_main = parseInt(b.index);
-			b_sub = 0;
+			bMain = parseInt(b.index);
+			bSub = 0;
 		}
-		if (a_main < b_main) {
+		if (aMain < bMain) {
 			return -1;
 		}
-		if (a_main > b_main) {
+		if (aMain > bMain) {
 			return 1;
 		}
-		if (a_sub < b_sub) {
+		if (aSub < bSub) {
 			return -1;
 		}
-		if (a_sub > b_sub) {
+		if (aSub > bSub) {
 			return 1;
 		}
 		return 0;
 	};
 
 	_compareFirstWordIndexes = function(a, b) {
-		var a_main, b_main, a_sub, b_sub;
+		var aMain, bMain, aSub, bSub;
 		if (typeof a.first_word_index === 'undefined' || typeof b.first_word_index === 'undefined') {
 			return 0;
 		}
 		if (a.first_word_index.indexOf('.') !== -1) {
-			a_main = parseInt(a.first_word_index.split('.')[0]);
-			a_sub = parseInt(a.first_word_index.split('.')[1]);
+			aMain = parseInt(a.first_word_index.split('.')[0]);
+			aSub = parseInt(a.first_word_index.split('.')[1]);
 		} else {
-			a_main = parseInt(a.first_word_index);
-			a_sub = 0;
+			aMain = parseInt(a.first_word_index);
+			aSub = 0;
 		}
 		if (b.first_word_index.indexOf('.') !== -1) {
-			b_main = parseInt(b.first_word_index.split('.')[0]);
-			b_sub = parseInt(b.first_word_index.split('.')[1]);
+			bMain = parseInt(b.first_word_index.split('.')[0]);
+			bSub = parseInt(b.first_word_index.split('.')[1]);
 		} else {
-			b_main = parseInt(b.first_word_index);
-			b_sub = 0;
+			bMain = parseInt(b.first_word_index);
+			bSub = 0;
 		}
-		if (a_main < b_main) {
+		if (aMain < bMain) {
 			return -1;
 		}
-		if (a_main > b_main) {
+		if (aMain > bMain) {
 			return 1;
 		}
-		if (a_sub < b_sub) {
+		if (aSub < bSub) {
 			return -1;
 		}
-		if (a_sub > b_sub) {
+		if (aSub > bSub) {
 			return 1;
 		}
 		return 0;
@@ -4903,121 +4903,3 @@ SV = (function () {
 		};
 	}
 }());
-
-// //TODO: no longer needed should be deleted plus all calls to it
-// do_private_check: function (details) {
-// 	var i, private_hands, published_hands, private_indexes;
-// 	private_hands = [];
-// 	published_hands = [];
-// 	private_indexes = [];
-// 	CL._remove_private_for = [];
-// 	for (i = 0; i < details.length; i += 1) {
-// 		if (details[i].hand.search('(private)') !== -1) {
-// 			private_hands.push(details[i].hand);
-// 			private_indexes.push(i);
-// 		} else {
-// 			published_hands.push(details[i].hand);
-// 		}
-// 	}
-// 	for (i = 0; i < private_hands.length; i += 1) {
-// 		if (published_hands.indexOf(private_hands[i].replace(' (private)', '')) === -1) {
-// 			details[private_indexes[i]].hand = private_hands[i].replace(' (private)', '');
-// 			CL._remove_private_for.push(private_hands[i]);
-// 		}
-// 	}
-// 	return details;
-// },
-
-// //TODO: does this do anything?
-// has_duplicate_reading: function (unit_id, app_id) {
-// 	var unit, i;
-// 	unit = CL.data[app_id][parseInt(unit_id, 10)];
-// 	for (i = 0; i < unit.readings.length; i += 1) {
-// 		if (unit.readings[i].hasOwnProperty('duplicate')) {
-// 			return true;
-// 		}
-// 	}
-// 	return false;
-// },
-
-// /** Given a reading (from a unit) and a witness
-//  * return true if witness is a subreading
-//  * false if witness is not in the reading or is a main reading */
-// is_subreading: function (reading, witness) {
-// 	var i;
-// 	if (reading.witnesses.indexOf(witness) === -1) {
-// 		return false;
-// 	}
-// 	for (i = 0; i < reading.text.length; i += 1) {
-// 		if (reading.text[i].hasOwnProperty(witness) &&
-// 				reading.text[i][witness].hasOwnProperty('decision_class') &&
-// 				reading.text[i][witness].decision_class.length > 0) {
-// 			return true;
-// 		}
-// 	}
-// 	return false;
-// },
-
-// has_unit: function(index) {
-// 	var i;
-// 	for (i = 0; i < CL.data.apparatus.length; i += 1) {
-// 		if (CL.data.apparatus[i].start === index && CL.data.apparatus[i].end === index) {
-// 			return true;
-// 		}
-// 	}
-// 	return false;
-// },
-
-// _has_regulariser_subreading: function (reading) {
-// 	var i, text;
-// 	text = reading.text;
-// 	for (i = 0; i < text.length; i += 1) {
-// 		if (text[i].hasOwnProperty('regularised')) {
-// 			return true;
-// 		}
-// 	}
-// 	return false;
-// },
-
-// _remove_from_subreading: function (reading, witness) {
-// 	var key, i, j;
-// 	if (reading.hasOwnProperty('subreadings')) {
-// 		for (key in reading.subreadings) {
-// 			if (reading.subreadings.hasOwnProperty(key)) {
-// 				for (i = 0; i < reading.subreadings[key].length; i += 1) {
-// 					if (reading.subreadings[key][i].witnesses.indexOf(witness) !== -1) {
-// 						reading.subreadings[key][i].witnesses.splice(reading.subreadings[key][i].witnesses.indexOf(witness), 1);
-// 						if (reading.subreadings[key][i].witnesses.length === 0) {
-// 							reading.subreadings[key][i] = null;
-// 						} else {
-// 							for (j = 0; j < reading.subreadings[key][i].length; j += 1) {
-// 								delete reading.subreadings[key][i].text[j][witness];
-// 								reading.subreadings[key][i].text[j].reading.splice(reading.subreadings[key][i].text[j].reading.indexOf(witnesses), 1);
-// 							}
-// 						}
-// 					}
-// 				}
-// 			}
-// 			CL.removeNullItems(reading.subreadings[key]);
-// 			if (reading.subreadings[key].length === 0) {
-// 				delete reading.subreadings[key];
-// 			}
-// 		}
-// 		if ($.isEmptyObject(reading.subreadings)) {
-// 			delete reading.subreadings;
-// 		}
-// 	}
-// },
-
-// has_combined_gap: function (subreading) {
-// 	var i;
-// 	if (subreading.text.length > 0) {
-// 		if (subreading.text[0].hasOwnProperty('combined_gap_before')) {
-// 			return true;
-// 		}
-// 		if (subreading.text[subreading.text.length-1].hasOwnProperty('combined_gap_after')) {
-// 			return true;
-// 		}
-// 	}
-// 	return false;
-// },
