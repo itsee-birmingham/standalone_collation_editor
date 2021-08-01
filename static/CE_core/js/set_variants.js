@@ -70,9 +70,7 @@ SV = (function() {
    *              	highlighted_wit - the witness to highlight in display
    *              	highlighted_unit - the unit which needs to be highlighted as an error*/
   showSetVariants = function(options) {
-    var html, i, unit_button, temp, header, event_rows, num, key, overlaps, appIds,
-      error_panel_html, row, hands, result, undo_button, footer_html, overlap_options, new_overlap_options,
-      preselected_added_highlight;
+    var footerHtml, preselectedAddedHighlight;
     console.log(CL.data);
     CL.stage = 'set';
     if (typeof options === 'undefined') {
@@ -131,28 +129,28 @@ SV = (function() {
 
     //sort out footer stuff
     CL.expandFillPageClients();
-    footer_html = [];
+    footerHtml = [];
     if (CL.project.hasOwnProperty('showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
       footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
     }
-    footer_html.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">show subreadings</button>');
+    footerHtml.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">show subreadings</button>');
     if (CL.witnessEditingMode === false) {
-      footer_html.push('<span id="extra_buttons"></span>');
-      footer_html.push('<span id="stage_links"></span>');
+      footerHtml.push('<span id="extra_buttons"></span>');
+      footerHtml.push('<span id="stage_links"></span>');
     }
     if (CL.witnessEditingMode === true) {
-      footer_html.push('<button class="pure-button right_foot" id="return_to_saved_table_button">Return to summary table</button>');
+      footerHtml.push('<button class="pure-button right_foot" id="return_to_saved_table_button">Return to summary table</button>');
     } else {
-      footer_html.push('<button class="pure-button right_foot" id="move_to_reorder_button">Move to Reorder Variants</button>');
+      footerHtml.push('<button class="pure-button right_foot" id="move_to_reorder_button">Move to Reorder Variants</button>');
     }
-    footer_html.push('<button class="pure-button right_foot" id="save">Save</button>');
-    footer_html.push('<select class="right_foot" id="highlighted" name="highlighted"></select>');
+    footerHtml.push('<button class="pure-button right_foot" id="save">Save</button>');
+    footerHtml.push('<select class="right_foot" id="highlighted" name="highlighted"></select>');
     if (CL.witnessAddingMode === true && CL.witnessesAdded.length > 0) {
-      footer_html.push('<select class="right_foot" id="added_highlight" name="added_highlight"></select>');
+      footerHtml.push('<select class="right_foot" id="added_highlight" name="added_highlight"></select>');
     }
-    footer_html.push('<button class="pure-button right_foot" id="undo_button" style="display:none">undo</button>');
+    footerHtml.push('<button class="pure-button right_foot" id="undo_button" style="display:none">undo</button>');
     $('#footer').addClass('pure-form'); //this does the styling of the select elements in the footer using pure (they cannot be styled individually)
-    document.getElementById('footer').innerHTML = footer_html.join('');
+    document.getElementById('footer').innerHTML = footerHtml.join('');
     CL.addExtraFooterButtons('set');
     CL.addStageLinks();
 
@@ -180,12 +178,12 @@ SV = (function() {
     });
     if (CL.witnessAddingMode === true && CL.witnessesAdded.length > 0) {
       if (options.highlighted_added_wits.length === 1) {
-        preselected_added_highlight = options.highlighted_added_wits[0];
+        preselectedAddedHighlight = options.highlighted_added_wits[0];
       } else {
-        preselected_added_highlight = 'all';
+        preselectedAddedHighlight = 'all';
       }
       cforms.populateSelect(CL.sortWitnesses(CL.witnessesAdded), document.getElementById('added_highlight'), {
-        'selected': preselected_added_highlight,
+        'selected': preselectedAddedHighlight,
         'add_select': true,
         'select_label_details': {
           'label': 'highlight all added witnesses',
@@ -231,9 +229,8 @@ SV = (function() {
   };
 
   showSetVariantsData = function(options) {
-    var temp, header, html, appIds, num, overlaps, overlap_options,
-      new_overlap_options, error_panel_html, event_rows, row, wits, remove_wits_form,
-      removeFunction;
+    var temp, header, html, appIds, num, overlaps, overlapOptions, newOverlapOptions, errorPanelHtml, eventRows,
+				row, wits, removeWitsForm, removeFunction;
     //sort out options and get layout
     if (typeof options === 'undefined') {
       options = {};
@@ -255,20 +252,20 @@ SV = (function() {
         if ((wits[1] === 'removed' || wits[1] === 'both') && CL.witnessRemovingMode === true) {
           $.get(staticUrl + 'CE_core/html_fragments/remove_witnesses_form.html', function(html) {
             if (!document.getElementById('remove_witnesses_div')) {
-              remove_wits_form = document.createElement('div');
+              removeWitsForm = document.createElement('div');
             } else {
-              remove_wits_form = document.getElementById('remove_witnesses_div');
+              removeWitsForm = document.getElementById('remove_witnesses_div');
             }
-            remove_wits_form.setAttribute('id', 'remove_witnesses_div');
-            remove_wits_form.setAttribute('class', 'divdrag remove_witnesses_div dialogue_form');
-            remove_wits_form.innerHTML = html;
-            document.getElementsByTagName('body')[0].appendChild(remove_wits_form);
+            removeWitsForm.setAttribute('id', 'remove_witnesses_div');
+            removeWitsForm.setAttribute('class', 'divdrag remove_witnesses_div dialogue_form');
+            removeWitsForm.innerHTML = html;
+            document.getElementsByTagName('body')[0].appendChild(removeWitsForm);
             removeFunction = function() {
               var handsToRemove;
               handsToRemove = CL.getRemoveWitnessDataFromForm('remove_witnesses_form');
               prepareForOperation();
               CL.removeWitnesses(handsToRemove, 'set');
-              //clear undo stack so you can't go back to a point with the witnesses still present.
+              // clear undo stack so you can't go back to a point with the witnesses still present.
               SV.undoStack = [];
               unprepareForOperation();
               CL.isDirty = true;
@@ -288,43 +285,43 @@ SV = (function() {
     html = header[0];
     html.push.apply(html, temp[0]);
 
-    overlap_options = {
+    overlapOptions = {
       'column_lengths': temp[1]
     };
     if (options.hasOwnProperty('highlighted_wit')) {
-      overlap_options.highlighted_wit = options.highlighted_wit;
+      overlapOptions.highlighted_wit = options.highlighted_wit;
     }
     if (options.hasOwnProperty('highlighted_added_wits')) {
-      overlap_options.highlighted_added_wits = options.highlighted_added_wits;
+      overlapOptions.highlighted_added_wits = options.highlighted_added_wits;
     }
     if (options.hasOwnProperty('highlighted_unit')) {
-      overlap_options.highlighted_unit = options.highlighted_unit;
+      overlapOptions.highlighted_unit = options.highlighted_unit;
     }
     appIds = CL.getOrderedAppLines();
     for (let i = 0; i < appIds.length; i += 1) {
       num = appIds[i].replace('apparatus', '');
-      new_overlap_options = calculateUnitLengths(appIds[i], overlap_options);
-      overlaps = CL.getOverlapLayout(CL.data[appIds[i]], num, 'set_variants', header[1], new_overlap_options);
+      newOverlapOptions = calculateUnitLengths(appIds[i], overlapOptions);
+      overlaps = CL.getOverlapLayout(CL.data[appIds[i]], num, 'set_variants', header[1], newOverlapOptions);
       html.push.apply(html, overlaps[0]);
       temp[2].push.apply(temp[2], overlaps[1]);
     }
     html.push('<ul id="context_menu" class="SimpleContextMenu"></ul>');
-    error_panel_html = '<div id="error_panel" class="warning dialogue_form" style="display:none">' +
+    errorPanelHtml = '<div id="error_panel" class="warning dialogue_form" style="display:none">' +
       '<div class="dialogue_form_header drag-zone"><span id="message_summary">Messages</span>' +
       '<span id="error_coll_ex">&#9660;</span></div><div id="error_message_panel">' +
       '<span id="error_message">message</span></div></div>';
     document.getElementById('scroller').innerHTML = '<table class="collation_overview">' + html.join('') +
-      '</table>' + error_panel_html;
+      '</table>' + errorPanelHtml;
 
-    event_rows = temp[2];
-    for (let i = 0; i < event_rows.length; i += 1) {
-      row = document.getElementById(event_rows[i]);
+    eventRows = temp[2];
+    for (let i = 0; i < eventRows.length; i += 1) {
+      row = document.getElementById(eventRows[i]);
       CL.addHoverEvents(row);
     }
     spinner.removeLoadingOverlay();
     if (CL.witnessRemovingMode !== true) {
       //initialise DnD
-      _redipsInitSV(CL.data.apparatus.length);
+      _redipsInitSV();
     }
 
     if (SV.undoStack.length > 0) {
@@ -341,26 +338,31 @@ SV = (function() {
       }
     }
     CL.removeNullItems(_watchList);
-    //TODO: something is off here when we get an info message and there is already a warning. Position is slightly off and warning disappears but it should stay
-    //test by getting something out of order and then trying to split witnesses on a single witness reading
+    // TODO: something is off here when we get an info message and there is already a warning. Position is slightly
+		// off and warning disappears but it should stay test by getting something out of order and then trying to split
+		// witnesses on a single witness reading
     if (options.hasOwnProperty('message') && _watchList.length > 0) {
-      _setupMessage('warning', options.message.message + '<br/><br/>WARNING: the following witnesses still have words out of order: ' + _watchList.join(', '));
+      _setupMessage('warning', options.message.message + '<br/><br/>WARNING: the following witnesses still have ' +
+										'words out of order: ' + _watchList.join(', '));
     } else if (options.hasOwnProperty('message')) {
       _setupMessage(options.message.type, options.message.message);
     } else if (_watchList.length > 0) {
-      _setupMessage('warning', 'WARNING: the following witnesses still have words out of order: ' + _watchList.join(', '));
+      _setupMessage('warning', 'WARNING: the following witnesses still have words out of order: ' +
+										_watchList.join(', '));
     }
     CL.expandFillPageClients();
   };
 
   _setUpSVRemoveWitnessesForm = function(wits, data) {
     var html;
-    document.getElementById('remove_witnesses_div').style.left = document.getElementById('scroller').offsetWidth - document.getElementById('remove_witnesses_div').offsetWidth - 15 + 'px';
+    document.getElementById('remove_witnesses_div').style.left = document.getElementById('scroller').offsetWidth -
+																							document.getElementById('remove_witnesses_div').offsetWidth - 15 + 'px';
     html = [];
     for (let i = 0; i < wits.length; i += 1) {
       for (let key in data.hand_id_map) {
         if (data.hand_id_map.hasOwnProperty(key) && data.hand_id_map[key] === wits[i]) {
-          html.push('<input class="boolean" type="checkbox" id="' + key + '" name="' + key + '"/><label>' + key + '</label><br/>');
+          html.push('<input class="boolean" type="checkbox" id="' + key + '" name="' + key + '"/><label>' +
+										key + '</label><br/>');
         }
       }
     }
@@ -385,99 +387,98 @@ SV = (function() {
   };
 
   calculateUnitLengths = function(appId, options) {
-    var j, app, top_line, id, start, first_hit, gap_before, last_end, length, gap_counts, highest_gap, gap_after,
-      previous_unit_gap_after, previous_unit_start, previous_unit_end, original_column_lengths;
+    var index, app, topLine, id, start, firstHit, gapBefore, lastEnd, length, gapCounts, highestGap, gapAfter,
+      	previousUnitGapAfter, previousUnitEnd, originalColumnLengths;
     if (options === undefined) {
       options = {};
     }
-    top_line = CL.data.apparatus;
+    topLine = CL.data.apparatus;
     app = CL.data[appId];
     options.overlap_details = {}; //get rid of the one from the last apparatus
-    //copy the original_column_lengths data so we can use to calculate gap_after accurately
-    original_column_lengths = JSON.parse(JSON.stringify(options.column_lengths));
+    //copy the originalColumnLengths data so we can use to calculate gapAfter accurately
+    originalColumnLengths = JSON.parse(JSON.stringify(options.column_lengths));
 
     for (let i = 0; i < app.length; i += 1) {
       id = app[i]._id;
       //first find real start value
       start = -1;
-      for (j = 0; j < top_line.length; j += 1) {
-        if (top_line[j].hasOwnProperty('overlap_units') &&
-          top_line[j].overlap_units.hasOwnProperty(id) && start === -1) {
-          start = top_line[j].start;
+      for (let j = 0; j < topLine.length; j += 1) {
+        if (topLine[j].hasOwnProperty('overlap_units') &&
+          topLine[j].overlap_units.hasOwnProperty(id) && start === -1) {
+          start = topLine[j].start;
           app[i].start = start;
         }
       }
       length = 0;
-      gap_before = 0;
+      gapBefore = 0;
       //find the first hit of this overlap_unit id in the top line
       //recoding the number of units in top line at this index which come before
-      first_hit = -1;
-      for (j = 0; j < top_line.length; j += 1) {
-        if (top_line[j].start === start) {
-          if (top_line[j].hasOwnProperty('overlap_units') &&
-            top_line[j].overlap_units.hasOwnProperty(id)) {
-            if (first_hit === -1) {
-              first_hit = j;
+      firstHit = -1;
+      for (let j = 0; j < topLine.length; j += 1) {
+        if (topLine[j].start === start) {
+          if (topLine[j].hasOwnProperty('overlap_units') &&
+            topLine[j].overlap_units.hasOwnProperty(id)) {
+            if (firstHit === -1) {
+              firstHit = j;
             }
           } else {
-            if (first_hit === -1) {
-              gap_before += 1;
+            if (firstHit === -1) {
+              gapBefore += 1;
             }
           }
         }
       }
       //if we might have a conflict with gaps here then adjust as necessary
-      if (start === previous_unit_end) {
-        gap_before = Math.max(gap_before - (original_column_lengths[previous_unit_end] - previous_unit_gap_after), 0);
+      if (start === previousUnitEnd) {
+        gapBefore = Math.max(gapBefore - (originalColumnLengths[previousUnitEnd] - previousUnitGapAfter), 0);
       }
-      j = first_hit;
-      last_end = null;
-      gap_counts = {};
-      highest_gap = 0;
-      gap_after = 0;
-      while (j < top_line.length) {
-        if (top_line[j].hasOwnProperty('overlap_units') &&
-          top_line[j].overlap_units.hasOwnProperty(id)) {
-          length += top_line[j].end - top_line[j].start + 1;
-          if (last_end !== null && last_end + 2 === top_line[j].start) {
+      index = firstHit;
+      lastEnd = null;
+      gapCounts = {};
+      highestGap = 0;
+      gapAfter = 0;
+      while (index < topLine.length) {
+        if (topLine[index].hasOwnProperty('overlap_units') &&
+          topLine[index].overlap_units.hasOwnProperty(id)) {
+          length += topLine[index].end - topLine[index].start + 1;
+          if (lastEnd !== null && lastEnd + 2 === topLine[index].start) {
             length += 1;
           }
           //now work out what we might need to take off the last position column length
-          if (top_line[j].start % 2 === 1) { //if we start with odd number
-            if (top_line[j].start > highest_gap) {
-              highest_gap = top_line[j].start;
+          if (topLine[index].start % 2 === 1) { //if we start with odd number
+            if (topLine[index].start > highestGap) {
+              highestGap = topLine[index].start;
             }
-            if (gap_counts.hasOwnProperty(top_line[j].start)) {
-              gap_counts[top_line[j].start] += 1;
+            if (gapCounts.hasOwnProperty(topLine[index].start)) {
+              gapCounts[topLine[index].start] += 1;
             } else {
-              gap_counts[top_line[j].start] = 1;
+              gapCounts[topLine[index].start] = 1;
             }
           }
-          last_end = top_line[j].end;
+          lastEnd = topLine[index].end;
         } else {
-          if (top_line[j].start === last_end) {
-            gap_after += 1;
+          if (topLine[index].start === lastEnd) {
+            gapAfter += 1;
           }
         }
-        j += 1;
+        index += 1;
       }
       //change the end value of the overlap
-      app[i].end = last_end;
-      previous_unit_start = start;
-      previous_unit_gap_after = gap_after;
-      previous_unit_end = last_end;
+      app[i].end = lastEnd;
+      previousUnitGapAfter = gapAfter;
+      previousUnitEnd = lastEnd;
       //adjust column length if necessary
-      if (last_end % 2 === 1) {
-        if (gap_counts.hasOwnProperty(highest_gap)) {
-          if (options.column_lengths.hasOwnProperty(highest_gap)) {
-            options.column_lengths[highest_gap] = options.column_lengths[highest_gap] - gap_counts[highest_gap];
+      if (lastEnd % 2 === 1) {
+        if (gapCounts.hasOwnProperty(highestGap)) {
+          if (options.column_lengths.hasOwnProperty(highestGap)) {
+            options.column_lengths[highestGap] = options.column_lengths[highestGap] - gapCounts[highestGap];
           }
         }
       }
       options.overlap_details[id] = {
         'col_length': length,
-        'gap_before': gap_before,
-        'gap_after': gap_after
+        'gap_before': gapBefore,
+        'gap_after': gapAfter
       };
     }
     return options;
@@ -500,17 +501,17 @@ SV = (function() {
    * 		overlapping_ids - a list of ids for any overlapping readings realted to this top line reading
    * 		td_id - the id for the cell (used in overlap rows to allow readings to be moved between rows))*/
   getUnitData = function(data, id, start, end, options) {
-    var i, j, html, decisions, rows, cells, row_list, temp, events, colspan, row_id, text, split_class,
-      highlighted_hand, highlighted_unit, highlighted_classes, svRules, key, label_suffix, reading_suffix, alpha_id, reading_label;
+    var html, decisions, rows, cells, rowList, temp, events, colspan, rowId, text, splitClass, highlightedHand,
+      	highlightedUnit, highlightedClasses, svRules, readingSuffix, readingLabel;
     html = [];
-    row_list = [];
+    rowList = [];
     if (typeof options === 'undefined') {
       options = {};
     }
     if (options.hasOwnProperty('highlighted_wit')) {
-      highlighted_hand = options.highlighted_wit.split('|')[1];
+      highlightedHand = options.highlighted_wit.split('|')[1];
     } else {
-      highlighted_hand = null;
+      highlightedHand = null;
     }
     if (options.hasOwnProperty('col_length')) {
       colspan = options.col_length;
@@ -519,7 +520,7 @@ SV = (function() {
     }
     //get all the subreading rules and delete any that stay as main reading
     svRules = CL.getRuleClasses(undefined, undefined, 'value', ['identifier', 'keep_as_main_reading', 'suffixed_label', 'suffixed_reading']);
-    for (key in svRules) {
+    for (let key in svRules) {
       if (svRules.hasOwnProperty(key) && svRules[key][1] === false) {
         delete svRules[key];
       }
@@ -532,12 +533,12 @@ SV = (function() {
 
     //is the unit highlighted? used for showing errors
     if (options.hasOwnProperty('highlighted_unit') && parseInt(id) === options.highlighted_unit[1]) {
-      highlighted_unit = ' highlighted_unit';
+      highlightedUnit = ' highlighted_unit';
     } else {
-      highlighted_unit = '';
+      highlightedUnit = '';
     }
 
-    for (i = 0; i < data.length; i += 1) {
+    for (let i = 0; i < data.length; i += 1) {
       //what is the reading text?
       text = CL.extractDisplayText(data[i], i, data.length, options.unit_id, options.app_id);
 
@@ -545,20 +546,20 @@ SV = (function() {
         text = text.replace('system_gen_', '');
       }
       //what labels need to be used?
-      reading_label = CL.getReadingLabel(i, data[i], svRules);
-      reading_suffix = CL.getReadingSuffix(data[i], svRules);
+      readingLabel = CL.getReadingLabel(i, data[i], svRules);
+      readingSuffix = CL.getReadingSuffix(data[i], svRules);
       //what is the row id? (and add it to the list for adding events)
-      row_id = 'variant_unit_' + id + '_row_' + i;
-      row_list.push(row_id);
+      rowId = 'variant_unit_' + id + '_row_' + i;
+      rowList.push(rowId);
 
       //Work out what reading highlighting classes we need
-      highlighted_classes = [];
-      if (data[i].witnesses.indexOf(highlighted_hand) != -1) {
+      highlightedClasses = [];
+      if (data[i].witnesses.indexOf(highlightedHand) != -1) {
         //this is the regular highlighting of any selected witness
-        highlighted_classes.push('highlighted');
+        highlightedClasses.push('highlighted');
       }
       if (options.hasOwnProperty('highlighted_added_wits') && data[i].witnesses.filter(x => options.highlighted_added_wits.includes(x)).length > 0) {
-        highlighted_classes.push('added_highlighted');
+        highlightedClasses.push('added_highlighted');
       }
       if (options.hasOwnProperty('split') && options.split === true) {
         if (data[i].hasOwnProperty('overlap_status')) {
@@ -566,66 +567,66 @@ SV = (function() {
         } else {
           if (options.hasOwnProperty('overlap') && options.overlap === true) {
             if (i === 0) {
-              split_class = 'overlap_split_unit_a';
+              splitClass = 'overlap_split_unit_a';
             } else {
-              split_class = 'overlap_split_unit';
+              splitClass = 'overlap_split_unit';
             }
           } else {
             if (i === 0) {
-              split_class = 'split_unit_a';
+              splitClass = 'split_unit_a';
             } else {
-              split_class = 'redips-drag split_unit';
+              splitClass = 'redips-drag split_unit';
             }
           }
-          html.push('<div id="' + 'drag_unit_' + id + '_reading_' + i + '" class="' + split_class + '">');
+          html.push('<div id="' + 'drag_unit_' + id + '_reading_' + i + '" class="' + splitClass + '">');
         }
         html.push('<ul class="variant_unit" id="variant_unit_' + id + '_reading_' + i + '">');
 
-        html.push('<li id="' + row_id + '" class="' + highlighted_classes.join(' ') + '">');
-        html.push('<div class="spanlike">' + reading_label + ' ' + text + reading_suffix + '  </div>');
-        temp = _showSubreadings(data[i], id, i, highlighted_hand, options.highlighted_added_wits);
+        html.push('<li id="' + rowId + '" class="' + highlightedClasses.join(' ') + '">');
+        html.push('<div class="spanlike">' + readingLabel + ' ' + text + readingSuffix + '  </div>');
+        temp = _showSubreadings(data[i], id, i, highlightedHand, options.highlighted_added_wits);
         html.push.apply(html, temp[0]);
-        row_list.push.apply(row_list, temp[1]);
+        rowList.push.apply(rowList, temp[1]);
         html.push('</li>');
         html.push('</ul>');
         html.push('</div>');
       } else {
         if (i === 0) {
           if (options.hasOwnProperty('overlap') && options.overlap === true) {
-            html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag overlap_unit' + highlighted_unit + '">');
+            html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag overlap_unit' + highlightedUnit + '">');
           } else if (options.hasOwnProperty('gap_unit') && options.gap_unit === true) {
-            html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag gap_unit' + highlighted_unit + '">');
+            html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag gap_unit' + highlightedUnit + '">');
           } else {
-            html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag unit' + highlighted_unit + '">');
+            html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag unit' + highlightedUnit + '">');
           }
           if (data.length > 1) {
             html.push('<ul class="variant_unit" id="variant_unit_' + id + '"><span id="toggle_variant_' + id + '" class="triangle">&#9660;</span><br/>');
           } else {
             html.push('<ul class="variant_unit" id="variant_unit_' + id + '"><br/>');
           }
-          html.push('<li id="' + row_id + '" class="top ' + highlighted_classes.join(' ') + '">');
+          html.push('<li id="' + rowId + '" class="top ' + highlightedClasses.join(' ') + '">');
         } else {
-          html.push('<li id="' + row_id + '" class="' + highlighted_classes.join(' ') + '">');
+          html.push('<li id="' + rowId + '" class="' + highlightedClasses.join(' ') + '">');
         }
-        html.push('<div class="spanlike">' + reading_label + ' ' + text + reading_suffix + '  </div>');
-        temp = _showSubreadings(data[i], id, i, highlighted_hand, options.highlighted_added_wits);
+        html.push('<div class="spanlike">' + readingLabel + ' ' + text + readingSuffix + '  </div>');
+        temp = _showSubreadings(data[i], id, i, highlightedHand, options.highlighted_added_wits);
         html.push.apply(html, temp[0]);
-        row_list.push.apply(row_list, temp[1]);
+        rowList.push.apply(rowList, temp[1]);
         html.push('</li>');
       }
     }
     html.push('</ul>');
     html.push('</div>');
     html.push('</td>');
-    return [html, row_list];
+    return [html, rowList];
   };
 
   /** next two functions deal with creation of 'spacer cells'. These cells maintain the width of all table cells
    * during dragging of units. Without them the table collapses when a unit is dragged */
-  getSpacerUnitData = function(id, start, end, col_length) {
+  getSpacerUnitData = function(id, start, end, colLength) {
     var colspan;
-    if (col_length !== undefined) {
-      colspan = col_length + (end - start);
+    if (colLength !== undefined) {
+      colspan = colLength + (end - start);
     } else {
       colspan = end - start + 1;
     }
@@ -648,12 +649,12 @@ SV = (function() {
    * This is used when we are relocating units or relocating readings so that split words doesn't return
    * them back to their original locations but they are properly rooted to the location they have been moved to*/
   reindexUnit = function(location) {
-    var i, first_word_index;
-    first_word_index = 1;
-    for (i = 0; i < CL.data.apparatus.length; i += 1) {
+    var firstWordIndex;
+    firstWordIndex = 1;
+    for (let i = 0; i < CL.data.apparatus.length; i += 1) {
       if (CL.data.apparatus[i].start === location) {
-        CL.data.apparatus[i].first_word_index = location + '.' + first_word_index;
-        first_word_index = _reindexReadings(CL.data.apparatus[i].readings, location, first_word_index);
+        CL.data.apparatus[i].first_word_index = location + '.' + firstWordIndex;
+        firstWordIndex = _reindexReadings(CL.data.apparatus[i].readings, location, firstWordIndex);
       }
     }
   };
@@ -679,56 +680,57 @@ SV = (function() {
   };
 
   /** split supplied witnesses away from others in the reading */
-  doSplitReadingWitnesses = function(unitNum, readingPos, witness_list, apparatus, log, id_for_new_reading) {
-    var i, original_unit, aReading, reading, new_reading, new_witness_list, original_removed;
+  doSplitReadingWitnesses = function(unitNum, readingPos, witnessList, apparatus, log, idForNewReading) {
+    var originalUnit, aReading, reading, newReading, newWitnessList, originalRemoved;
     if (apparatus === undefined) {
       apparatus = 'apparatus';
     }
-    original_unit = CL.data[apparatus][unitNum];
-    aReading = original_unit.readings[0];
-    reading = original_unit.readings[readingPos];
+    originalUnit = CL.data[apparatus][unitNum];
+    aReading = originalUnit.readings[0];
+    reading = originalUnit.readings[readingPos];
     //copy the original reading to make a the new one
-    new_reading = JSON.parse(JSON.stringify(reading));
-    //remove readings on witness_list from the original reading
-    for (i = 0; i < witness_list.length; i += 1) {
-      _removeWitnessFromReading(reading, witness_list[i]);
+    newReading = JSON.parse(JSON.stringify(reading));
+    //remove readings on witnessList from the original reading
+    for (let i = 0; i < witnessList.length; i += 1) {
+      _removeWitnessFromReading(reading, witnessList[i]);
     }
     //if no witnesses left at all and there are no subreadings then delete the original reading
     if (reading.witnesses.length === 0 && !reading.hasOwnProperty('subreadings')) {
-      original_unit.readings.splice(readingPos, 1);
-      original_removed = true;
+      originalUnit.readings.splice(readingPos, 1);
+      originalRemoved = true;
     } else {
       checkCombinedGapFlags(reading);
-      original_removed = false;
+      originalRemoved = false;
     }
-    //remove all not on witness_list from new_reading
-    new_witness_list = CL.getAllReadingWitnesses(new_reading); //a copy so we aren't manipulating what we are looping!
-    for (i = 0; i < new_witness_list.length; i += 1) {
-      if (witness_list.indexOf(new_witness_list[i]) === -1) {
-        _removeWitnessFromReading(new_reading, new_witness_list[i]);
+    //remove all not on witnessList from newReading
+    newWitnessList = CL.getAllReadingWitnesses(newReading); //a copy so we aren't manipulating what we are looping!
+    for (let i = 0; i < newWitnessList.length; i += 1) {
+      if (witnessList.indexOf(newWitnessList[i]) === -1) {
+        _removeWitnessFromReading(newReading, newWitnessList[i]);
       }
     }
-    checkCombinedGapFlags(new_reading);
-    if (typeof id_for_new_reading !== 'undefined') {
-      new_reading._id = id_for_new_reading;
-      original_unit.readings.splice(readingPos + 1, 0, new_reading); //add the new reading into the unit, we know this is an addition because it has a supplied id
-      return new_reading._id;
-    } else if (original_removed === true) {
-      if (!new_reading.hasOwnProperty('_id')) {
-        CL.addReadingId(new_reading, original_unit.start, original_unit.end);
+    checkCombinedGapFlags(newReading);
+    if (typeof idForNewReading !== 'undefined') {
+      newReading._id = idForNewReading;
+			//add the new reading into the unit, we know this is an addition because it has a supplied id
+      originalUnit.readings.splice(readingPos + 1, 0, newReading);
+      return newReading._id;
+    } else if (originalRemoved === true) {
+      if (!newReading.hasOwnProperty('_id')) {
+        CL.addReadingId(newReading, originalUnit.start, originalUnit.end);
       }
-      original_unit.readings.splice(readingPos, 0, new_reading); //add the new reading into the unit
-      return new_reading._id;
+      originalUnit.readings.splice(readingPos, 0, newReading); //add the new reading into the unit
+      return newReading._id;
     } else {
       //change id of new reading so it is distinct from the original one
       //in the if loop we deleted the original so id can stay!
-      CL.addReadingId(new_reading, original_unit.start, original_unit.end);
-      original_unit.readings.splice(readingPos + 1, 0, new_reading); //add the new reading into the unit
-      //		console.log(JSON.parse(JSON.stringify(original_unit.readings)));
-      return new_reading._id;
+      CL.addReadingId(newReading, originalUnit.start, originalUnit.end);
+      originalUnit.readings.splice(readingPos + 1, 0, newReading); //add the new reading into the unit
+      return newReading._id;
     }
     if (log) {
-      checkBugStatus('split witnesses', 'in ' + apparatus + ' unit ' + unitNum + ' reading ' + readingPos + ' witnesses ' + witness_list.join(',') + '.');
+      checkBugStatus('split witnesses', 'in ' + apparatus + ' unit ' + unitNum + ' reading ' + readingPos +
+										 ' witnesses ' + witnessList.join(',') + '.');
     }
   };
 
@@ -741,12 +743,12 @@ SV = (function() {
    * we only need to combined readings that are not marked as standoff
    * */
   unsplitUnitWitnesses = function(unitNum, appId) {
-    var i, j, k, text, unit, reading, reading_list, index, witness, current, standoff_record, is_standoff;
-    reading_list = [];
+    var text, unit, reading, readingList, index, witness, standoffRecord, isStandoff;
+    readingList = [];
     unit = CL.data[appId][unitNum];
     _removeSeparatedWitnessData(appId, unit._id);
 
-    for (i = 0; i < unit.readings.length; i += 1) {
+    for (let i = 0; i < unit.readings.length; i += 1) {
       reading = unit.readings[i];
       //get the text and add '_a' if it is the first reading of an overlapped unit (although I don't think we ever call this on overlapped units anymore)
       text = CL.extractWitnessText(reading, {
@@ -768,27 +770,27 @@ SV = (function() {
       }
       //find out if this is a standoff reading
       //at this point all witnesses to the reading should be standoff if it is a standoff reading made into a main reading so just check first witness (and keep fingers crossed!)
-      is_standoff = true;
-      standoff_record = CL.findStandoffRegularisation(unit, reading.witnesses[0], appId);
-      if (standoff_record === null) {
-        is_standoff = false;
+      isStandoff = true;
+      standoffRecord = CL.findStandoffRegularisation(unit, reading.witnesses[0], appId);
+      if (standoffRecord === null) {
+        isStandoff = false;
       }
       //ignore standoff readings
-      if (is_standoff === true) {
-        reading_list.push(null);
+      if (isStandoff === true) {
+        readingList.push(null);
       } else {
-        index = reading_list.indexOf(text);
+        index = readingList.indexOf(text);
         if (index !== -1 && text.length > 0) { //if we have text and the reading is already in the list of readings
-          reading_list.push(null); //needed so our list indexes stay alligned with the readings in the unit
-          for (j = 0; j < reading.witnesses.length; j += 1) {
+          readingList.push(null); //needed so our list indexes stay alligned with the readings in the unit
+          for (let j = 0; j < reading.witnesses.length; j += 1) {
             if (unit.readings[index].witnesses.indexOf(reading.witnesses[j]) === -1) {
               unit.readings[index].witnesses.push(reading.witnesses[j]);
             }
           }
           //put individual details for each witness in the new reading
-          for (j = 0; j < reading.witnesses.length; j += 1) {
+          for (let j = 0; j < reading.witnesses.length; j += 1) {
             witness = reading.witnesses[j];
-            for (k = 0; k < reading.text.length; k += 1) {
+            for (let k = 0; k < reading.text.length; k += 1) {
               if (reading.text[k].hasOwnProperty(witness)) {
                 unit.readings[index].text[k][witness] = reading.text[k][witness];
               }
@@ -799,8 +801,8 @@ SV = (function() {
             }
           }
           //append the new witnesses to reading and doc_id inside text
-          for (j = 0; j < unit.readings[index].text.length; j += 1) {
-            for (k = 0; k < reading.text[j].reading.length; k += 1) {
+          for (let j = 0; j < unit.readings[index].text.length; j += 1) {
+            for (let k = 0; k < reading.text[j].reading.length; k += 1) {
               if (unit.readings[index].text[j].reading.indexOf(reading.text[j].reading[k]) === -1) {
                 unit.readings[index].text[j].reading.push(reading.text[j].reading[k]);
               }
@@ -808,13 +810,13 @@ SV = (function() {
           }
           unit.readings[i] = null;
         } else if (index !== -1 && text.length === 0 && reading.type === 'om') {
-          reading_list.push(null); //needed so our list indexes stay alligned with the readings in the unit
+          readingList.push(null); //needed so our list indexes stay alligned with the readings in the unit
           if (unit.readings[index].type === 'om') {
             unit.readings[index].witnesses.push.apply(unit.readings[index].witnesses, reading.witnesses);
             reading = null;
           }
         } else {
-          reading_list.push(text);
+          readingList.push(text);
         }
       }
     }
@@ -822,12 +824,12 @@ SV = (function() {
   };
 
   /** displays menu for splitting witnesses of a reading */
-  splitReadingWitnesses = function(rdg_details, stage, menuPos) {
-    var i, reading, scrollOffset, witness_list, data, key, duplicate, unit, id;
+  splitReadingWitnesses = function(rdgDetails, stage, menuPos) {
+    var reading, scrollOffset, witnessList, data, unit;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      document.getElementById('scroller').scrollTop
-    ];
-    reading = CL.data[rdg_details[1]][rdg_details[0]].readings[rdg_details[2]];
+      							document.getElementById('scroller').scrollTop
+    								];
+    reading = CL.data[rdgDetails[1]][rdgDetails[0]].readings[rdgDetails[2]];
     if (CL.getAllReadingWitnesses(reading).length > 1) {
       CL.showSplitWitnessMenu(reading, menuPos, {
         'type': 'duplicate',
@@ -836,14 +838,14 @@ SV = (function() {
         'form_size': 'small'
       });
       $('#select_button').on('click', function(event) {
-        witness_list = [];
+        witnessList = [];
         data = cforms.serialiseForm('select_wit_form');
         if (!$.isEmptyObject(data)) {
-          witness_list = [];
-          for (key in data) {
+          witnessList = [];
+          for (let key in data) {
             if (data.hasOwnProperty(key)) {
               if (data[key] !== null) {
-                witness_list.push(key);
+                witnessList.push(key);
               }
             }
           }
@@ -851,25 +853,27 @@ SV = (function() {
         if (stage === 'order_readings') {
           OR.addToUndoStack(CL.data);
         }
-        //Do not need to prepare for this operation as we just manipulate all the data directly and we need everything to stay as subreadings etc.
-        //make the data structure to remember this split
+        // Do not need to prepare for this operation as we just manipulate all the data directly and we need
+        // everything to stay as subreadings etc.
+				// make the data structure to remember this split
         if (!CL.data.hasOwnProperty('separated_witnesses')) {
           CL.data.separated_witnesses = [];
         }
-        unit = CL.data[rdg_details[1]][rdg_details[0]];
+        unit = CL.data[rdgDetails[1]][rdgDetails[0]];
         CL.data.separated_witnesses.push({
-          'app_id': rdg_details[1],
+          'app_id': rdgDetails[1],
           'unit_id': unit._id,
-          'witnesses': witness_list
+          'witnesses': witnessList
         });
-        doSplitReadingWitnesses(rdg_details[0], rdg_details[2], witness_list, rdg_details[1], true);
+        doSplitReadingWitnesses(rdgDetails[0], rdgDetails[2], witnessList, rdgDetails[1], true);
         document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
         if (stage === 'set_variants') {
-          checkBugStatus('move', 'split witnesses ' + witness_list.join(', ') + ' out of reading ' + rdg_details[2] + ' in unit ' + rdg_details[0] + ' in apparatus.');
+          checkBugStatus('move', 'split witnesses ' + witnessList.join(', ') + ' out of reading ' + rdgDetails[2] +
+												 ' in unit ' + rdgDetails[0] + ' in apparatus.');
           showSetVariantsData();
         }
         if (stage === 'order_readings') {
-          OR.relabelReadings(CL.data[rdg_details[1]][rdg_details[0]].readings);
+          OR.relabelReadings(CL.data[rdgDetails[1]][rdgDetails[0]].readings);
           OR.showOrderReadings({
             'container': CL.container
           });
@@ -907,14 +911,15 @@ SV = (function() {
     }
   };
 
-  makeStandoffReading = function(type, readingDetails, parent_reading, outerCallback) {
+  makeStandoffReading = function(type, readingDetails, parentReading, outerCallback) {
     var scrollOffset, callback;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
       document.getElementById('scroller').scrollTop
     ];
     _addToUndoStack(CL.data);
     callback = function() {
-      checkBugStatus('make offset reading', 'of type ' + type + ' in apparatus unit ' + readingDetails.unit_pos + ' of reading ' + readingDetails.reading_pos + ' as a subreading of ' + parent_reading + '.');
+      checkBugStatus('make offset reading', 'of type ' + type + ' in apparatus unit ' + readingDetails.unit_pos +
+										 ' of reading ' + readingDetails.reading_pos + ' as a subreading of ' + parentReading + '.');
       showSetVariantsData();
       document.getElementById('scroller').scrollLeft = scrollOffset[0];
       document.getElementById('scroller').scrollTop = scrollOffset[1];
@@ -922,7 +927,7 @@ SV = (function() {
         outerCallback();
       }
     };
-    CL.makeStandoffReading(type, readingDetails, parent_reading, callback);
+    CL.makeStandoffReading(type, readingDetails, parentReading, callback);
   };
 
   checkIds = function() {
@@ -945,63 +950,62 @@ SV = (function() {
 
   /** My bug self reporting system attempt! */
   checkBugStatus = function(action, details) {
-    var index_problem, witness_problem, bug_report, i, newwindow1, tmp, sigla_problem, standoff_problem,
-      tn_check, id_problem;
+    var indexProblem, witnessProblem, bugReport, newWindow1, tmp, siglaProblem, standoffProblem, tnCheck, idProblem;
     if (!CL.data.hasOwnProperty('event_list')) {
       CL.data.event_list = [];
     }
     //first log the event in the list
     CL.data.event_list.push(action + ' ' + details);
     //then check the event didn't cause a recognised data issue
-    index_problem = _checkIndexesPresent();
-    witness_problem = _checkUniqueWitnesses();
-    sigla_problem = _checkSiglaProblems();
-    standoff_problem = checkStandoffReadingProblems();
-    tn_check = _checkTAndNPresence();
-    id_problem = checkIds();
+    indexProblem = _checkIndexesPresent();
+    witnessProblem = _checkUniqueWitnesses();
+    siglaProblem = _checkSiglaProblems();
+    standoffProblem = checkStandoffReadingProblems();
+    tnCheck = _checkTAndNPresence();
+    idProblem = checkIds();
     //if it does then prepare a bug report
-    if (index_problem[0] || witness_problem[0] || sigla_problem[0] || standoff_problem[0] || tn_check[0] || id_problem[0]) {
-      bug_report = [];
-      bug_report.push(CL.context + '\n');
-      for (i = 0; i < CL.data.event_list.length; i += 1) {
-        bug_report.push(CL.data.event_list[i]);
+    if (indexProblem[0] || witnessProblem[0] || siglaProblem[0] || standoffProblem[0] || tnCheck[0] || idProblem[0]) {
+      bugReport = [];
+      bugReport.push(CL.context + '\n');
+      for (let i = 0; i < CL.data.event_list.length; i += 1) {
+        bugReport.push(CL.data.event_list[i]);
       }
-      if (index_problem[0]) {
-        bug_report.push(index_problem[1]);
+      if (indexProblem[0]) {
+        bugReport.push(indexProblem[1]);
       }
-      if (witness_problem[0]) {
-        bug_report.push(witness_problem[1]);
+      if (witnessProblem[0]) {
+        bugReport.push(witnessProblem[1]);
       }
-      if (sigla_problem[0]) {
-        bug_report.push(sigla_problem[1]);
+      if (siglaProblem[0]) {
+        bugReport.push(siglaProblem[1]);
       }
-      if (standoff_problem[0]) {
-        bug_report.push(standoff_problem[1]);
+      if (standoffProblem[0]) {
+        bugReport.push(standoffProblem[1]);
       }
-      if (tn_check[0]) {
-        bug_report.push(tn_check[1]);
+      if (tnCheck[0]) {
+        bugReport.push(tnCheck[1]);
       }
-      if (id_problem[0]) {
-        bug_report.push(id_problem[1]);
+      if (idProblem[0]) {
+        bugReport.push(idProblem[1]);
       }
       alert('A problem has occurred.\nA bug report will open in a new window.\nYou will need to start again.');
-      newwindow1 = open('', 'name', 'height=400,width=400,scrollbars=yes');
-      newwindow1.focus();
-      tmp = newwindow1.document.body;
-      tmp.innerHTML = bug_report.join('<br/>');
+      newWindow1 = open('', 'name', 'height=400,width=400,scrollbars=yes');
+      newWindow1.focus();
+      tmp = newWindow1.document.body;
+      tmp.innerHTML = bugReport.join('<br/>');
     }
   };
 
   //this function checks that each instance of SR_text or standoff_subreadings
   //has a corresponding entry in the marked_readings object
   checkStandoffReadingProblems = function() {
-    var key, i, j, k, unit, reading, witness, result;
-    for (key in CL.data) {
+    var unit, reading, witness, result;
+    for (let key in CL.data) {
       if (CL.data.hasOwnProperty(key)) {
         if (key.match(/apparatus\d*/g) !== null) {
-          for (i = 0; i < CL.data[key].length; i += 1) {
+          for (let i = 0; i < CL.data[key].length; i += 1) {
             unit = CL.data[key][i];
-            for (j = 0; j < unit.readings.length; j += 1) {
+            for (let j = 0; j < unit.readings.length; j += 1) {
               reading = unit.readings[j];
               if (reading.hasOwnProperty('SR_text') || reading.hasOwnProperty('standoff_subreadings')) {
                 if (reading.hasOwnProperty('SR_text')) {
@@ -1009,16 +1013,19 @@ SV = (function() {
                     if (reading.SR_text.hasOwnProperty(witness)) {
                       result = _checkForStandoffReading(witness, unit);
                       if (result === false) {
-                        return [true, witness + ' has SR_text in the unit starting at ' + unit.start + ' and ending at ' + unit.end + ' and there is no corresponding marked reading entry.'];
+                        return [true, witness + ' has SR_text in the unit starting at ' + unit.start +
+																' and ending at ' + unit.end + ' and there is no corresponding marked reading entry.'];
                       }
                     }
                   }
                 }
                 if (reading.hasOwnProperty('standoff_subreadings')) {
-                  for (k = 0; k < reading.standoff_subreadings.length; k += 1) {
+                  for (let k = 0; k < reading.standoff_subreadings.length; k += 1) {
                     result = _checkForStandoffReading(reading.standoff_subreadings[k], unit);
                     if (result === false) {
-                      return [true, reading.standoff_subreadings[k] + ' has standoff_subreadings in the unit starting at ' + unit.start + ' and ending at ' + unit.end + ' and there is no corresponding marked reading entry.'];
+                      return [true, reading.standoff_subreadings[k] + ' has standoff_subreadings in the unit ' +
+															'starting at ' + unit.start + ' and ending at ' + unit.end + ' and there is no ' +
+															'corresponding marked reading entry.'];
                     }
                   }
                 }
@@ -1032,23 +1039,23 @@ SV = (function() {
   };
 
   areAllUnitsComplete = function() {
-    var i, key, total_required, witnesses, j, total_sigla;
-    total_required = 0;
-    total_sigla = [];
-    for (key in CL.data.hand_id_map) {
+    var totalRequired, witnesses, totalSigla;
+    totalRequired = 0;
+    totalSigla = [];
+    for (let key in CL.data.hand_id_map) {
       if (CL.data.hand_id_map.hasOwnProperty(key)) {
-        total_required += 1;
-        total_sigla.push(key);
+        totalRequired += 1;
+        totalSigla.push(key);
       }
     }
-    for (i = 0; i < CL.data.apparatus.length; i += 1) {
+    for (let i = 0; i < CL.data.apparatus.length; i += 1) {
       witnesses = _getAllUnitWitnesses(CL.data.apparatus[i]);
-      if (witnesses.length !== total_required) {
-        for (j = 0; j < witnesses.length; j += 1) {
-          if (total_sigla.indexOf(witnesses[j]) === -1) {
+      if (witnesses.length !== totalRequired) {
+        for (let j = 0; j < witnesses.length; j += 1) {
+          if (totalSigla.indexOf(witnesses[j]) === -1) {
             console.log('extra witness ' + witnesses[j]);
           } else {
-            total_sigla[total_sigla.indexOf(witnesses[j])] = null;
+            totalSigla[totalSigla.indexOf(witnesses[j])] = null;
           }
         }
         console.log('witnesses missing in unit ' + i);
@@ -1059,24 +1066,21 @@ SV = (function() {
   };
 
 
-
-  //pub-e
-
   //*********  private functions *********
 
   _moveToReorder = function() {
-    var i, all_complete, all_in_order, standoff_problems, extra_results;
+    var allComplete, allInOrder, standoffProblems, extraResults;
     //we are keeping any empty units from the last state of SV
     //we need to combined overlaps with identical index points
     spinner.showLoadingOverlay();
     SR.loseSubreadings(); //for preparation and is needed
-    all_complete = areAllUnitsComplete();
-    all_in_order = _checkAllWitnessesIntegrity();
-    standoff_problems = checkStandoffReadingProblems();
+    allComplete = areAllUnitsComplete();
+    allInOrder = _checkAllWitnessesIntegrity();
+    standoffProblems = checkStandoffReadingProblems();
 
-    if (all_complete && all_in_order && !standoff_problems[0]) {
-      extra_results = CL.applyPreStageChecks('order_readings');
-      if (extra_results[0] === true) {
+    if (allComplete && allInOrder && !standoffProblems[0]) {
+      extraResults = CL.applyPreStageChecks('order_readings');
+      if (extraResults[0] === true) {
         CL.showSubreadings = false;
         //we have some legacy data which has not had all of the matching readings in each unit combined
         //so to ensure they are fixed now we need to call the following 3 functions
@@ -1117,27 +1121,27 @@ SV = (function() {
         if (CL.showSubreadings === true) {
           SR.findSubreadings();
         }
-        alert(extra_results[1]);
+        alert(extraResults[1]);
         spinner.removeLoadingOverlay();
       }
-    } else if (!all_complete) {
+    } else if (!allComplete) {
       if (CL.showSubreadings === true) {
         SR.findSubreadings();
       }
       alert('You cannot move to order readings because one of the units does not have all of its required witnesses');
       spinner.removeLoadingOverlay();
-    } else if (!all_in_order) {
+    } else if (!allInOrder) {
       if (CL.showSubreadings === true) {
         SR.findSubreadings();
       }
       alert('You cannot move to order readings because one of the witnesses has words out of order');
       spinner.removeLoadingOverlay();
       //TODO: more informative errors for the above including highlighting the problems on the screen
-    } else if (standoff_problems[0]) {
+    } else if (standoffProblems[0]) {
       if (CL.showSubreadings === true) {
         SR.findSubreadings();
       }
-      alert('You cannot move to order readings because ' + standoff_problems[1]);
+      alert('You cannot move to order readings because ' + standoffProblems[1]);
       spinner.removeLoadingOverlay();
     }
   };
@@ -1201,8 +1205,8 @@ SV = (function() {
   _highlightWitness = function(witness) {
     var scrollOffset;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      document.getElementById('scroller').scrollTop
-    ];
+      							document.getElementById('scroller').scrollTop
+    								];
     CL.highlighted = witness;
     showSetVariantsData({
       'highlighted_wit': CL.highlighted
@@ -1212,12 +1216,13 @@ SV = (function() {
     document.getElementById('scroller').scrollTop = scrollOffset[1];
   };
 
-  /** highlight a witness that has been added or highlight all added witnesses with 'all' (only in CL.witnessAddingMode), called from select box in page footer */
+  /** highlight a witness that has been added or highlight all added witnesses with 'all'
+	* (only in CL.witnessAddingMode), called from select box in page footer */
   _highlightAddedWitness = function(witness) {
     var scrollOffset, witnesses;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      document.getElementById('scroller').scrollTop
-    ];
+      							document.getElementById('scroller').scrollTop
+    								];
 
     if (witness === 'all') {
       witnesses = CL.witnessesAdded;
@@ -1235,19 +1240,19 @@ SV = (function() {
 
   /** the code for displaying subreadings present in the object model */
   _showSubreadings = function(reading, id, i, hand, highlightedAdded) {
-    var html, j, subrow_id, row_list, type, suffixed, suffix, highlighted, text_string, highlightedClasses;
+    var html, subrowId, rowList, type, suffixed, suffix, highlighted, textString, highlightedClasses;
     html = [];
-    row_list = [];
-    text_string = '';
+    rowList = [];
+    textString = '';
     if (reading.hasOwnProperty('subreadings')) {
       html.push('<ul class="subreading_unit" id="subreading_unit_' + id + '_row_' + i + '">');
       for (type in reading.subreadings) {
         if (reading.subreadings.hasOwnProperty(type)) {
           suffix = reading.subreadings[type][0].suffix;
-          for (j = 0; j < reading.subreadings[type].length; j += 1) {
+          for (let j = 0; j < reading.subreadings[type].length; j += 1) {
             highlightedClasses = [];
-            subrow_id = 'subreading_unit_' + id + '_row_' + i + '_type_' + type + '_subrow_' + j;
-            row_list.push(subrow_id);
+            subrowId = 'subreading_unit_' + id + '_row_' + i + '_type_' + type + '_subrow_' + j;
+            rowList.push(subrowId);
             if (reading.subreadings[type][j].witnesses.indexOf(hand) !== -1) {
               highlightedClasses.push('highlighted');
             }
@@ -1256,26 +1261,27 @@ SV = (function() {
               highlightedClasses.push('added_highlighted');
             }
             if (reading.subreadings[type][j].type === 'lac') {
-              text_string = '&lt;' + reading.subreadings[type][j].text_string + '&gt;';
+              textString = '&lt;' + reading.subreadings[type][j].text_string + '&gt;';
             } else {
-              text_string = reading.subreadings[type][j].text_string;
+              textString = reading.subreadings[type][j].text_string;
             }
-            html.push('<li class="subreading ' + highlightedClasses.join(' ') + '" id="' + subrow_id +
+            html.push('<li class="subreading ' + highlightedClasses.join(' ') + '" id="' + subrowId +
               '"><div class="spanlike"><div class="spanlike">' +
-              CL.getAlphaId(i) + suffix + '. ' + text_string + '</div></div></li>');
+              CL.getAlphaId(i) + suffix + '. ' + textString + '</div></div></li>');
           }
         }
       }
       html.push('</ul>');
     }
-    return [html, row_list];
+    return [html, rowList];
   };
 
   /** initiate the drag and drop
-   * also some functions and tests for behaviours are included in here*/
-  _redipsInitSV = function(app_length) {
-    var rd, i, unitNum, apparatus_number, source_col, target_col, source_row, target_row, error_mess, triangles,
-      unit1, unit2, unit, scrollOffset, width, is_space;
+   * also some functions and tests for behaviours are included in here
+	 **/
+  _redipsInitSV = function() {
+    var rd, i, unitNum, sourceCol, targetCol, sourceRow, targetRow, errorMess, triangles, unit1, unit2,
+				unit, scrollOffset, width, isSpace;
     rd = REDIPS.drag;
     rd.init();
     rd.event.clicked = function() {
@@ -1288,19 +1294,21 @@ SV = (function() {
       scrollOffset = [document.getElementById('scroller').scrollLeft,
         document.getElementById('scroller').scrollTop
       ];
-      if (rd.td.target.parentElement.id === 'number_row') { //if you drag onto a number
+      if (rd.td.target.parentElement.id === 'number_row') {  // if you drag onto a number
         _moveUnit(rd);
       } else {
         _selectedVariantUnits = [];
-        //get children of target cell (TD) and push to selected list for combining
-        for (i = 0; i < rd.td.target.childNodes.length; i += 1) {
+        // get children of target cell (TD) and push to selected list for combining
+        for (let i = 0; i < rd.td.target.childNodes.length; i += 1) {
           _selectedVariantUnits.push(CL.getUnitAppReading(rd.td.target.childNodes[i].childNodes[0].id));
         }
-        if (_selectedVariantUnits.length === 2) { // if there are 2
-          //if they are from the same line of apparatus
+        if (_selectedVariantUnits.length === 2) {  // if there are 2
+          // if they are from the same line of apparatus
           if (_selectedVariantUnits[0][1] === _selectedVariantUnits[1][1]) {
-            //if they are both full units (test if the third item is undefined in which case both are full units would be reading pos if single reading)
-            if (typeof _selectedVariantUnits[0][2] === 'undefined' && typeof _selectedVariantUnits[1][2] === 'undefined') {
+            // if they are both full units (test if the third item is undefined in which case both are full units
+						// would be reading pos if single reading)
+            if (typeof _selectedVariantUnits[0][2] === 'undefined' &&
+										typeof _selectedVariantUnits[1][2] === 'undefined') {
               _combineUnits(_selectedVariantUnits, rd);
             } else {
               //at least one is a reading
@@ -1308,11 +1316,11 @@ SV = (function() {
             }
           } else {
             //we are not currently allowing merging between different lines so display a message and do nothing else
-            error_mess = 'ERROR: units from different lines cannot be combined';
+            errorMess = 'ERROR: units from different lines cannot be combined';
             showSetVariantsData({
               'message': {
                 'type': 'error',
-                'message': error_mess
+                'message': errorMess
               }
             });
             document.getElementById('scroller').scrollLeft = scrollOffset[0];
@@ -1320,21 +1328,22 @@ SV = (function() {
           }
         } else {
           if (_selectedVariantUnits[0][1] !== 'apparatus') {
-            source_col = parseInt(rd.td.source.id.substring(rd.td.source.id.indexOf('_') + 1));
-            target_col = parseInt(rd.td.target.id.substring(rd.td.target.id.indexOf('_') + 1));
-            if (source_col === target_col) {
-              source_row = rd.td.source.id.substring(0, rd.td.source.id.indexOf('_'));
-              target_row = rd.td.target.id.substring(0, rd.td.target.id.indexOf('_'));
-              is_space = OR.canUnitMoveTo(CL.data[_selectedVariantUnits[0][1]][_selectedVariantUnits[0][0]]._id, source_row, target_row);
-              if (is_space) {
+            sourceCol = parseInt(rd.td.source.id.substring(rd.td.source.id.indexOf('_') + 1));
+            targetCol = parseInt(rd.td.target.id.substring(rd.td.target.id.indexOf('_') + 1));
+            if (sourceCol === targetCol) {
+              sourceRow = rd.td.source.id.substring(0, rd.td.source.id.indexOf('_'));
+              targetRow = rd.td.target.id.substring(0, rd.td.target.id.indexOf('_'));
+              isSpace = OR.canUnitMoveTo(CL.data[_selectedVariantUnits[0][1]][_selectedVariantUnits[0][0]]._id,
+																				 sourceRow, targetRow);
+              if (isSpace) {
                 //move it to the target row or combine if there are two
-                _moveOverlapping(_selectedVariantUnits[0], target_row);
+                _moveOverlapping(_selectedVariantUnits[0], targetRow);
               } else {
-                error_mess = 'ERROR: There is not enough space to relocate this unit to that position.';
+                errorMess = 'ERROR: There is not enough space to relocate this unit to that position.';
                 showSetVariantsData({
                   'message': {
                     'type': 'error',
-                    'message': error_mess
+                    'message': errorMess
                   }
                 });
                 document.getElementById('scroller').scrollLeft = scrollOffset[0];
@@ -1343,11 +1352,11 @@ SV = (function() {
             } else {
               //illegal move
               //nothing to do
-              error_mess = 'ERROR: This unit cannot be moved to that position';
+              errorMess = 'ERROR: This unit cannot be moved to that position';
               showSetVariantsData({
                 'message': {
                   'type': 'error',
-                  'message': error_mess
+                  'message': errorMess
                 }
               });
               document.getElementById('scroller').scrollLeft = scrollOffset[0];
@@ -1366,37 +1375,40 @@ SV = (function() {
   };
 
   /**This will only ever be used for moving a single reading which will never happen in overlapping variants.
-   * It is also only called if the resulting unit doesn't have the same start and end number which in the main apparatus will only
-   * happen with an even start and an even end as units are not allowed to start or end on an odd number if the next even number
-   * is part of the unit so we can assume that we will always start and end on a even number
-   * the reading that is moved has no index numbers (they are stripped as part of the move) so we just need to ensure any moved words get their ids back
-   * we also need to make sure we are always incrementing left to right (problems sometimes caused by readings being moved into the unit out of sequence)
-   * so we check that too*/
+   * It is also only called if the resulting unit doesn't have the same start and end number which in the main
+   * apparatus will only happen with an even start and an even end as units are not allowed to start or end on an odd
+   * number if the next even number is part of the unit so we can assume that we will always start and end on a even
+   * number the reading that is moved has no index numbers (they are stripped as part of the move) so we just need to
+	 * ensure any moved words get their ids back we also need to make sure we are always incrementing left to right
+   * (problems sometimes caused by readings being moved into the unit out of sequence) so we check that too
+   **/
   _reindexMovedReading = function(location, witnesses) {
-    var first_word_index, i, j, k, l, index, start, end, unit, reading, found;
-    first_word_index = 1;
-    //find the unit
-    for (i = 0; i < CL.data.apparatus.length; i += 1) {
+    var firstWordIndex, k, index, start, end, unit, reading, found;
+    firstWordIndex = 1;
+    // find the unit
+    for (let i = 0; i < CL.data.apparatus.length; i += 1) {
       if (CL.data.apparatus[i].start === location) {
         unit = CL.data.apparatus[i];
         start = unit.start;
         end = unit.end;
-        unit.first_word_index = location + '.' + first_word_index; //set the first word index for the unit
-        //for each witness in the list
-        for (j = 0; j < witnesses.length; j += 1) {
+        unit.first_word_index = location + '.' + firstWordIndex;  // set the first word index for the unit
+        // for each witness in the list
+        for (let j = 0; j < witnesses.length; j += 1) {
           found = false;
           k = 0;
           while (!found && k < unit.readings.length) {
             if (unit.readings[k].witnesses.indexOf(witnesses[j]) !== -1) {
               found = true;
-              for (l = 0; l < unit.readings[k].text.length; l += 1) {
+              for (let l = 0; l < unit.readings[k].text.length; l += 1) {
                 if (!unit.readings[k].text[l].hasOwnProperty('index') ||
                   typeof unit.readings[k].text[l].index === 'undefined' ||
-                  (l > 0 && _indexLessThanOrEqualTo(unit.readings[k].text[l].index, unit.readings[k].text[l - 1].index))) {
+                  (l > 0 && _indexLessThanOrEqualTo(unit.readings[k].text[l].index,
+																										unit.readings[k].text[l - 1].index))) {
                   if (l === 0) {
-                    unit.readings[k].text[l].index = location + '.' + first_word_index;
+                    unit.readings[k].text[l].index = location + '.' + firstWordIndex;
                   } else {
-                    unit.readings[k].text[l].index = _incrementSubIndex(unit.readings[k].text[l - 1].index, first_word_index);
+                    unit.readings[k].text[l].index = _incrementSubIndex(unit.readings[k].text[l - 1].index,
+																																				firstWordIndex);
                   }
                 }
               }
@@ -1410,134 +1422,133 @@ SV = (function() {
 
   //TODO: this could do with a better name
   _indexLessThan = function(index1, index2) {
-    var index1_main, index1_sub, index2_main, index2_sub;
+    var index1Main, index1Sub, index2Main, index2Sub;
     if (typeof index1 === 'undefined' || typeof index2 === 'undefined') {
       return false;
     }
     if (index1.indexOf('.') !== -1) {
-      index1_main = parseInt(index1.split('.')[0]);
-      index1_sub = parseInt(index1.split('.')[1]);
+      index1Main = parseInt(index1.split('.')[0]);
+      index1Sub = parseInt(index1.split('.')[1]);
     } else {
-      index1_main = parseInt(index1);
-      index1_sub = 0;
+      index1Main = parseInt(index1);
+      index1Sub = 0;
     }
     if (index2.indexOf('.') !== -1) {
-      index2_main = parseInt(index2.split('.')[0]);
-      index2_sub = parseInt(index2.split('.')[1]);
+      index2Main = parseInt(index2.split('.')[0]);
+      index2Sub = parseInt(index2.split('.')[1]);
     } else {
-      index2_main = parseInt(index2);
-      index2_sub = 0;
+      index2Main = parseInt(index2);
+      index2Sub = 0;
     }
-    if (index1_main === index2_main) {
-      if (index1_sub < index2_sub) {
+    if (index1Main === index2Main) {
+      if (index1Sub < index2Sub) {
         return true;
       }
-    } else if (index1_main < index2_main) {
+    } else if (index1Main < index2Main) {
       return true;
     }
     return false;
   };
 
   _indexLessThanOrEqualTo = function(index1, index2) {
-    var index1_main, index1_sub, index2_main, index2_sub;
+    var index1Main, index1Sub, index2Main, index2Sub;
     if (index1.indexOf('.') !== -1) {
-      index1_main = parseInt(index1.split('.')[0]);
-      index1_sub = parseInt(index1.split('.')[1]);
+      index1Main = parseInt(index1.split('.')[0]);
+      index1Sub = parseInt(index1.split('.')[1]);
     } else {
-      index1_main = parseInt(index1);
-      index1_sub = 0;
+      index1Main = parseInt(index1);
+      index1Sub = 0;
     }
     if (index2.indexOf('.') !== -1) {
-      index2_main = parseInt(index2.split('.')[0]);
-      index2_sub = parseInt(index2.split('.')[1]);
+      index2Main = parseInt(index2.split('.')[0]);
+      index2Sub = parseInt(index2.split('.')[1]);
     } else {
-      index2_main = parseInt(index2);
-      index2_sub = 0;
+      index2Main = parseInt(index2);
+      index2Sub = 0;
     }
-    if (index1_main === index2_main) {
-      if (index1_sub <= index2_sub) {
+    if (index1Main === index2Main) {
+      if (index1Sub <= index2Sub) {
         return true;
       }
-    } else if (index1_main <= index2_main) {
+    } else if (index1Main <= index2Main) {
       return true;
     }
     return false;
   };
 
   _incrementSubIndex = function(current, increment) {
-    var main_index, sub_index;
-    main_index = parseInt(current.split('.')[0]);
-    sub_index = parseInt(current.split('.')[1]);
-    if (isNaN(sub_index)) {
-      sub_index = 1;
+    var mainIndex, subIndex;
+    mainIndex = parseInt(current.split('.')[0]);
+    subIndex = parseInt(current.split('.')[1]);
+    if (isNaN(subIndex)) {
+      subIndex = 1;
     }
-    sub_index = sub_index + increment;
-    return main_index + '.' + sub_index;
+    subIndex = subIndex + increment;
+    return mainIndex + '.' + subIndex;
   };
 
   _decrementSubIndex = function(current, decrement) {
-    var main_index, sub_index;
-    main_index = parseInt(current.split('.')[0]);
-    sub_index = parseInt(current.split('.')[1]);
-    sub_index = sub_index - decrement;
-    return main_index + '.' + sub_index;
+    var mainIndex, subIndex;
+    mainIndex = parseInt(current.split('.')[0]);
+    subIndex = parseInt(current.split('.')[1]);
+    subIndex = subIndex - decrement;
+    return mainIndex + '.' + subIndex;
   };
 
   _incrementMainIndex = function(current, increment) {
-    var main_index, sub_index;
+    var mainIndex, subIndex;
     if (current.indexOf('.') !== -1) {
-      main_index = parseInt(current.split('.')[0]);
-      sub_index = parseInt(current.split('.')[1]);
-      main_index = main_index + increment;
-      return main_index + '.' + sub_index;
+      mainIndex = parseInt(current.split('.')[0]);
+      subIndex = parseInt(current.split('.')[1]);
+      mainIndex = mainIndex + increment;
+      return mainIndex + '.' + subIndex;
     }
-    main_index = parseInt(current);
-    return main_index + increment;
+    mainIndex = parseInt(current);
+    return mainIndex + increment;
   };
 
   _decrementMainIndex = function(current, decrement) {
-    var main_index, sub_index;
+    var mainIndex, subIndex;
     if (current.indexOf('.') !== -1) {
-      main_index = parseInt(current.split('.')[0]);
-      sub_index = parseInt(current.split('.')[1]);
-      main_index = main_index - decrement;
-      return main_index + '.' + sub_index;
+      mainIndex = parseInt(current.split('.')[0]);
+      subIndex = parseInt(current.split('.')[1]);
+      mainIndex = mainIndex - decrement;
+      return mainIndex + '.' + subIndex;
     }
-    main_index = parseInt(current);
-    return main_index - decrement;
+    mainIndex = parseInt(current);
+    return mainIndex - decrement;
   };
 
   /** reindex all the readings in the unit (called by reindex_unit)*/
-  _reindexReadings = function(readings, location, first_word_index) {
-    var i, j, next_allocation, counter;
-    next_allocation = first_word_index;
-    for (i = 0; i < readings.length; i += 1) {
-      counter = first_word_index;
+  _reindexReadings = function(readings, location, firstWordIndex) {
+    var nextAllocation, counter;
+    nextAllocation = firstWordIndex;
+    for (let i = 0; i < readings.length; i += 1) {
+      counter = firstWordIndex;
       if (readings[i].text.length === 0) {
         //remove the index key from any om readings
         if (readings[i].hasOwnProperty('index')) {
           delete readings[i].index;
         }
       }
-      for (j = 0; j < readings[i].text.length; j += 1) {
+      for (let j = 0; j < readings[i].text.length; j += 1) {
         readings[i].text[j].index = location + '.' + counter;
         counter += 1;
       }
-      if (counter > next_allocation) {
-        next_allocation = counter;
+      if (counter > nextAllocation) {
+        nextAllocation = counter;
       }
     }
-    if (counter === next_allocation) {
-      next_allocation += 1;
+    if (counter === nextAllocation) {
+      nextAllocation += 1;
     }
-    return next_allocation;
+    return nextAllocation;
   };
 
   _checkAndFixIndexOrder = function(location) {
-    var i, j;
-    for (i = 0; i < CL.data.apparatus.length; i += 1) {
+    for (let i = 0; i < CL.data.apparatus.length; i += 1) {
       if (CL.data.apparatus[i].start === location) {
-        for (j = 0; j < CL.data.apparatus[i].readings.length; j += 1) {
+        for (let j = 0; j < CL.data.apparatus[i].readings.length; j += 1) {
           _checkAndFixReadingIndexes(CL.data.apparatus[i].readings[j]);
         }
       }
@@ -1545,8 +1556,7 @@ SV = (function() {
   };
 
   _checkAndFixReadingIndexes = function(reading) {
-    var i;
-    for (i = 0; i < reading.text.length; i += 1) {
+    for (let i = 0; i < reading.text.length; i += 1) {
       if (i + 1 < reading.text.length) {
         if (!_indexLessThan(reading.text[i].index, reading.text[i + 1].index)) {
           reading.text[i + 1].index = _incrementSubIndex(reading.text[i].index, 1);
@@ -1598,18 +1608,19 @@ SV = (function() {
     }
   };
 
-  /** remove references to the given witness from the given reading (deleting entries as necessary (will not delete reading itself even if no witnesses remain)*/
+  /** remove references to the given witness from the given reading (deleting entries as necessary
+	* (will not delete reading itself even if no witnesses remain)
+	*/
   _removeWitnessFromReading = function(reading, witness) {
-    var i, j, key;
     if (reading.witnesses.indexOf(witness) !== -1) {
       reading.witnesses.splice(reading.witnesses.indexOf(witness), 1);
       _removeWitnessFromTokens(reading.text, witness);
     }
     //now check subreadings
     if (reading.hasOwnProperty('subreadings')) {
-      for (key in reading.subreadings) {
+      for (let key in reading.subreadings) {
         if (reading.subreadings.hasOwnProperty(key)) {
-          for (i = 0; i < reading.subreadings[key].length; i += 1) {
+          for (let i = 0; i < reading.subreadings[key].length; i += 1) {
             if (reading.subreadings[key][i].witnesses.indexOf(witness) !== -1) {
               reading.subreadings[key][i].witnesses.splice(reading.subreadings[key][i].witnesses.indexOf(witness), 1);
               if (reading.subreadings[key][i].witnesses.length === 0) {
@@ -1632,7 +1643,7 @@ SV = (function() {
     }
     //now check all the other places we could be hiding references to a witness
     if (reading.hasOwnProperty('SR_text')) {
-      for (key in reading.SR_text) {
+      for (let key in reading.SR_text) {
         if (reading.SR_text.hasOwnProperty(key)) {
           if (key === witness) {
             delete reading.SR_text[key];
@@ -1679,7 +1690,6 @@ SV = (function() {
   };
 
   /** Combine/Move stuff */
-
   _getOverlappedWitnessesForUnit = function(unitPos) {
     var witnesses, unit;
     witnesses = [];
@@ -1699,42 +1709,42 @@ SV = (function() {
     return witnesses;
   };
 
-  _separateOverlapWitnesses = function(unitNum, gap_location) {
-    var overlapped_witnesses, to_add, unit, i, j, to_split, new_reading_id, new_reading;
+  _separateOverlapWitnesses = function(unitNum, gapLocation) {
+    var overlappedWitnesses, toAdd, unit, toSplit, newReadingId, newReading;
     //get the overlapped witnesses for this point
-    if (typeof gap_location !== 'undefined') {
-      overlapped_witnesses = _getOverlappedWitnessesForGap(gap_location);
+    if (typeof gapLocation !== 'undefined') {
+      overlappedWitnesses = _getOverlappedWitnessesForGap(gapLocation);
     } else {
-      overlapped_witnesses = _getOverlappedWitnessesForUnit(unitNum);
+      overlappedWitnesses = _getOverlappedWitnessesForUnit(unitNum);
     }
-    if (overlapped_witnesses.length > 0) {
+    if (overlappedWitnesses.length > 0) {
       unit = CL.data.apparatus[unitNum];
-      for (i = unit.readings.length - 1; i >= 0; i -= 1) {
+      for (let i = unit.readings.length - 1; i >= 0; i -= 1) {
         if (!unit.readings[i].hasOwnProperty('overlap_status') ||
           (unit.readings[i].hasOwnProperty('overlap_status') &&
             unit.readings[i].overlap_status === 'duplicate')) {
-          to_split = [];
-          for (j = 0; j < unit.readings[i].witnesses.length; j += 1) {
-            if (overlapped_witnesses.indexOf(unit.readings[i].witnesses[j]) !== -1) {
-              to_split.push(unit.readings[i].witnesses[j]);
+          toSplit = [];
+          for (let j = 0; j < unit.readings[i].witnesses.length; j += 1) {
+            if (overlappedWitnesses.indexOf(unit.readings[i].witnesses[j]) !== -1) {
+              toSplit.push(unit.readings[i].witnesses[j]);
             }
           }
-          if (to_split.length > 0) {
-            to_add = _separateIndividualOverlapWitnesses(to_split, unit.overlap_units);
-            for (j = 0; j < to_add.length; j += 1) {
-              new_reading_id = doSplitReadingWitnesses(unitNum, i, to_add[j][0], 'apparatus', false);
-              new_reading = CL.findReadingById(unit, new_reading_id);
-              if (to_add[j][1].hasOwnProperty('type')) {
-                new_reading.type = to_add[j][1].type;
+          if (toSplit.length > 0) {
+            toAdd = _separateIndividualOverlapWitnesses(toSplit, unit.overlap_units);
+            for (let j = 0; j < toAdd.length; j += 1) {
+              newReadingId = doSplitReadingWitnesses(unitNum, i, toAdd[j][0], 'apparatus', false);
+              newReading = CL.findReadingById(unit, newReadingId);
+              if (toAdd[j][1].hasOwnProperty('type')) {
+                newReading.type = toAdd[j][1].type;
               } else {
-                new_reading.type = 'om';
+                newReading.type = 'om';
               }
-              if (to_add[j][1].hasOwnProperty('details')) {
-                new_reading.details = to_add[j][1].details;
+              if (toAdd[j][1].hasOwnProperty('details')) {
+                newReading.details = toAdd[j][1].details;
               } else {
-                delete new_reading.details; //for some readon doSplitReadingWitnesses adds incorrect details so for now we are overwriting them because that code is used in many other places and I don't want to break them!
+                delete newReading.details; //for some readon doSplitReadingWitnesses adds incorrect details so for now we are overwriting them because that code is used in many other places and I don't want to break them!
               }
-              new_reading.overlap_status = 'duplicate';
+              newReading.overlap_status = 'duplicate';
             }
           }
         }
@@ -1801,24 +1811,25 @@ SV = (function() {
   };
 
   /* find out if the index point recieving the new unit is part of an overlap*/
-  _targetHasOverlapConflict = function(gap_location, unitNum, reading) {
-    var overlapped_witnesses, i, unit, j;
-    overlapped_witnesses = _getOverlappedWitnessesForGap(gap_location);
-    if (overlapped_witnesses.length > 0) {
+  _targetHasOverlapConflict = function(gapLocation, unitNum, reading) {
+    var overlappedWitnesses, unit;
+    overlappedWitnesses = _getOverlappedWitnessesForGap(gapLocation);
+    if (overlappedWitnesses.length > 0) {
       if (typeof reading !== 'undefined') { //the test for moving a single reading
-        for (j = 0; j < reading.witnesses.length; j += 1) {
-          if (overlapped_witnesses.indexOf(reading.witnesses[j]) !== -1) {
-            //if any of the witnesses to the reading being moved are overlapped then return true
+        for (let i = 0; i < reading.witnesses.length; i += 1) {
+          if (overlappedWitnesses.indexOf(reading.witnesses[i]) !== -1) {
+            // if any of the witnesses to the reading being moved are overlapped then return true
             return true;
           }
         }
-      } else { //the test for moving a whole unit
+      } else { // the test for moving a whole unit
         unit = CL.data.apparatus[unitNum];
-        for (i = 0; i < unit.readings.length; i += 1) {
+        for (let i = 0; i < unit.readings.length; i += 1) {
           if (unit.readings[i].text.length > 0) {
-            for (j = 0; j < unit.readings[i].witnesses.length; j += 1) {
-              if (overlapped_witnesses.indexOf(unit.readings[i].witnesses[j]) !== -1) {
-                //if any of the witnesses with text (i.e. not lac or om) in the unit being moved are overlapped then return true
+            for (let j = 0; j < unit.readings[i].witnesses.length; j += 1) {
+              if (overlappedWitnesses.indexOf(unit.readings[i].witnesses[j]) !== -1) {
+                // if any of the witnesses with text (i.e. not lac or om) in the unit being moved are overlapped
+								// then return true
                 return true;
               }
             }
@@ -1832,38 +1843,38 @@ SV = (function() {
   /* only used when moving a single reading to a new odd numered index point
   /* checks to see if the reading being moved has any overlapped witnesses at its current location */
   _sourceHasOverlapConflict = function(unitNum, reading) {
-    var overlapped_witnesses, i, unit, key;
+    var overlappedWitnesses, unit;
     unit = CL.data.apparatus[unitNum];
     if (!unit.hasOwnProperty('overlap_units')) {
       return false;
     }
-    overlapped_witnesses = [];
-    for (key in unit.overlap_units) {
+    overlappedWitnesses = [];
+    for (let key in unit.overlap_units) {
       if (unit.overlap_units.hasOwnProperty(key)) {
-        overlapped_witnesses.push.apply(overlapped_witnesses, unit.overlap_units[key]);
+        overlappedWitnesses.push.apply(overlappedWitnesses, unit.overlap_units[key]);
       }
     }
-    for (i = 0; i < reading.witnesses.length; i += 1) {
-      if (overlapped_witnesses.indexOf(reading.witnesses[i]) !== -1) {
+    for (let i = 0; i < reading.witnesses.length; i += 1) {
+      if (overlappedWitnesses.indexOf(reading.witnesses[i]) !== -1) {
         return true;
       }
     }
     return false;
   };
 
-  _allOverlapsMatch = function(gap_location, unitNum) {
-    var key, i, unit, gap_overlapped_witnesses, unit_overlapped_witnesses;
+  _allOverlapsMatch = function(gapLocation, unitNum) {
+    var unit, gapOverlappedWitnesses, unitOverlappedWitnesses;
     unit = CL.data.apparatus[unitNum];
     if (!unit.hasOwnProperty('overlap_units')) {
       return false;
     }
-    gap_overlapped_witnesses = _getOverlapDetailsForGap(gap_location);
-    unit_overlapped_witnesses = unit.overlap_units;
-    for (key in unit_overlapped_witnesses) {
-      if (unit_overlapped_witnesses.hasOwnProperty(key) && gap_overlapped_witnesses.hasOwnProperty(key)) {
-        if (unit_overlapped_witnesses[key].length === gap_overlapped_witnesses[key].length) {
-          for (i = 0; i < unit_overlapped_witnesses[key].length; i += 1) {
-            if (gap_overlapped_witnesses[key].indexOf(unit_overlapped_witnesses[key][i]) === -1) {
+    gapOverlappedWitnesses = _getOverlapDetailsForGap(gapLocation);
+    unitOverlappedWitnesses = unit.overlap_units;
+    for (let key in unitOverlappedWitnesses) {
+      if (unitOverlappedWitnesses.hasOwnProperty(key) && gapOverlappedWitnesses.hasOwnProperty(key)) {
+        if (unitOverlappedWitnesses[key].length === gapOverlappedWitnesses[key].length) {
+          for (let i = 0; i < unitOverlappedWitnesses[key].length; i += 1) {
+            if (gapOverlappedWitnesses[key].indexOf(unitOverlappedWitnesses[key][i]) === -1) {
               return false;
             }
           }
@@ -5100,7 +5111,7 @@ SV = (function() {
 	//TODO: we don't actually use this now but it might form the basis of being able to recombined overlapped readings with the top row
 	/** merge two overlapping readings from the same column or merge an overlapped back into the main reading*/
 	_mergeOverlaps = function(units, rd) {
-		var i, j, k, unit1, unit2, text_string, target, counter, error_mess, scrollOffset;
+		var i, j, k, unit1, unit2, text_string, target, counter, errorMess, scrollOffset;
 		scrollOffset = [document.getElementById('scroller').scrollLeft,
 			document.getElementById('scroller').scrollTop
 		];
