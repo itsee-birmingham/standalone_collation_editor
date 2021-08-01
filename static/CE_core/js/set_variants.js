@@ -3588,7 +3588,7 @@ SV = (function() {
                 'details': CL.data.special_categories[i].label
               });
             }
-            if (lac_readings_copy.length > 0) {
+            if (lacReadingsCopy.length > 0) {
               newunit.readings.push({
                 'witnesses': lacReadingsCopy,
                 'text': [],
@@ -4320,7 +4320,7 @@ SV = (function() {
             if (!$.isEmptyObject(makeMainIds)) {
               makeMainIdsList = [];
               for (idKey in makeMainIds) {
-                makeMainIdsList.push(id_key);
+                makeMainIdsList.push(idKey);
               }
               _makeMainReading(makeMainIdsList, makeMainIds);
             }
