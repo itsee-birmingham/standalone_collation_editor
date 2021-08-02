@@ -255,7 +255,7 @@ SV = (function() {
               removeWitsForm = document.getElementById('remove_witnesses_div');
             }
             removeWitsForm.setAttribute('id', 'remove_witnesses_div');
-            removeWitsForm.setAttribute('class', 'divdrag remove_witnesses_div dialogue_form');
+            removeWitsForm.setAttribute('class', 'remove_witnesses_div dialogue_form');
             removeWitsForm.innerHTML = html;
             document.getElementsByTagName('body')[0].appendChild(removeWitsForm);
             removeFunction = function() {
@@ -366,7 +366,6 @@ SV = (function() {
     }
     document.getElementById('witness_checkboxes').innerHTML = html.join('');
     drag.initDraggable('remove_witnesses_div', true, true);
-    // DND.InitDragDrop('remove_witnesses_div', true, true);
     $('#remove_selected_button').on('click', function() {
       var data, handsToRemove;
       handsToRemove = [];
