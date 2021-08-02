@@ -1,94 +1,94 @@
-/*jshint esversion: 6 */
+newReading/*jshint esversion: 6 */
 var testing;
 CL = (function() {
   "use strict";
 
   //public variable declarations
   let services = null,
-    container = null,
-    displaySettings = {},
-    displaySettingsDetails = [],
-    ruleClasses = null,
-    ruleConditions = [],
-    localPythonFunctions = {},
-    overlappedOptions = [],
-    dataSettings = {
-      'witness_list': [],
-      'base_text': '',
-      'language': ''
-    },
-    collationAlgorithmSettings = {},
-    highlighted = 'none',
-    highlightedAdded = [],
-    showSubreadings = false,
-    managingEditor = false,
-    project = {},
-    collateData = {},
-    context = '',
-    debug = false,
-    stage = null,
-    data = {},
-    isDirty = false, // this is currently only used for witnessEditingMode but could be expanded maybe on a
-    // project setting. It also only works for modifications to witnesses (adding/removing) not any other action
-    // while in edit mode. That should perhaps be changed for adding as more editing is allowed (when removing all
-    // you can do is remove so the dirty flag is fine)
-    witnessEditingMode = false,
-    witnessAddingMode = false,
-    witnessRemovingMode = false,
-    witnessesAdded = [],
-    savedDisplaySettings = null,
-    savedAlgorithmSettings = null,
-    savedDataSettings = null,
-    existingCollation = null;
+      container = null,
+      displaySettings = {},
+      displaySettingsDetails = [],
+      ruleClasses = null,
+      ruleConditions = [],
+      localPythonFunctions = {},
+      overlappedOptions = [],
+      dataSettings = {
+        'witness_list': [],
+        'base_text': '',
+        'language': ''
+      },
+      collationAlgorithmSettings = {},
+      highlighted = 'none',
+      highlightedAdded = [],
+      showSubreadings = false,
+      managingEditor = false,
+      project = {},
+      collateData = {},
+      context = '',
+      debug = false,
+      stage = null,
+      data = {},
+      isDirty = false, // this is currently only used for witnessEditingMode but could be expanded maybe on a
+      // project setting. It also only works for modifications to witnesses (adding/removing) not any other action
+      // while in edit mode. That should perhaps be changed for adding as more editing is allowed (when removing all
+      // you can do is remove so the dirty flag is fine)
+      witnessEditingMode = false,
+      witnessAddingMode = false,
+      witnessRemovingMode = false,
+      witnessesAdded = [],
+      savedDisplaySettings = null,
+      savedAlgorithmSettings = null,
+      savedDataSettings = null,
+      existingCollation = null;
 
   //private variable declarations
   let _contextInput = null,
-    _defaultDisplaySettings = {},
-    _collapsed = false,
-    _alpha = 'abcdefghijklmnopqrstuvwxyz',
-    _displayMode = 'editor'; //there used to be support for 'table' for a straight collation table view but it does not work;;
+      _defaultDisplaySettings = {},
+      _collapsed = false,
+      _alpha = 'abcdefghijklmnopqrstuvwxyz',
+      _displayMode = 'editor'; //there used to be support for 'table' for a straight collation table view but it does not work;;
 
   //public function declarations
   let setServiceProvider, expandFillPageClients, getHeaderHtml, addUnitAndReadingIds,
-    addReadingIds, addReadingId, addUnitId, extractWitnessText, getAllReadingWitnesses,
-    findUnitById, findStandoffRegularisation, getRuleClasses, getCollationHeader,
-    addTriangleFunctions, getOverlapLayout, sortReadings, extractDisplayText,
-    getReadingLabel, getAlphaId, getReadingSuffix, addSubreadingEvents, getUnitLayout,
-    unitHasText, isBlank, getHighlightedText, findOverlapUnitById,
-    getReading, lacOmFix, getSubreadingOfWitness, overlapHasEmptyReading, removeNullItems,
-    addStageLinks, addExtraFooterButtons, makeVerseLinks, getUnitAppReading, setList,
-    getActiveUnitWitnesses, getExporterSettings, saveCollation, sortWitnesses,
-    getSpecifiedAncestor, hideTooltip, addHoverEvents, markReading, showSplitWitnessMenu,
-    markStandoffReading, findUnitPosById, findReadingById, findReadingPosById, applyPreStageChecks,
-    makeStandoffReading, doMakeStandoffReading, makeMainReading, getOrderedAppLines,
-    loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses,
-    calculatePosition, removeWitness, checkWitnessesAgainstProject, setUpRemoveWitnessesForm,
-    removeWitnesses, getRemoveWitnessDataFromForm, returnToSummaryTable, prepareAdditionalCollation,
-    removeSpecialWitnesses, runFunction, setOverlappedOptions, setRuleClasses;
+      addReadingIds, addReadingId, addUnitId, extractWitnessText, getAllReadingWitnesses,
+      findUnitById, findStandoffRegularisation, getRuleClasses, getCollationHeader,
+      addTriangleFunctions, getOverlapLayout, sortReadings, extractDisplayText,
+      getReadingLabel, getAlphaId, getReadingSuffix, addSubreadingEvents, getUnitLayout,
+      unitHasText, isBlank, getHighlightedText, findOverlapUnitById,
+      getReading, lacOmFix, getSubreadingOfWitness, overlapHasEmptyReading, removeNullItems,
+      addStageLinks, addExtraFooterButtons, makeVerseLinks, getUnitAppReading, setList,
+      getActiveUnitWitnesses, getExporterSettings, saveCollation, sortWitnesses,
+      getSpecifiedAncestor, hideTooltip, addHoverEvents, markReading, showSplitWitnessMenu,
+      markStandoffReading, findUnitPosById, findReadingById, findReadingPosById, applyPreStageChecks,
+      makeStandoffReading, doMakeStandoffReading, makeMainReading, getOrderedAppLines,
+      loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses,
+      calculatePosition, removeWitness, checkWitnessesAgainstProject, setUpRemoveWitnessesForm,
+      removeWitnesses, getRemoveWitnessDataFromForm, returnToSummaryTable, prepareAdditionalCollation,
+      removeSpecialWitnesses, runFunction, setOverlappedOptions, setRuleClasses;
 
   //private function declarations
   let _initialiseEditor, _initialiseProject, _setProjectConfig, _setDisplaySettings,
-    _setLocalPythonFunctions, _setRuleConditions,
-    _includeJavascript, _prepareCollation, _findSaved, _getContextFromInputForm,
-    _getWitnessesFromInputForm, _getDebugSetting, _showSavedVersions, _getSavedRadio, _makeSavedCollationTable,
-    _loadSavedCollation, _getSubreadingWitnessData, _findStandoffRegularisationText,
-    _collapseUnit, _expandUnit, _expandAll, _collapseAll, _getEmptyCell, _mergeDicts,
-    _getUnitData, _hasGapBefore, _hasGapAfter, _getAllEmptyReadingWitnesses, _containsEmptyReading,
-    _isOverlapped, _removeLacOmVerseWitnesses, _cleanExtraGaps, _getOverlapUnitReadings,
-    _checkExtraGapRequiredBefore, _extraGapRequiredBefore, _extraGapRequiredAfter,
-    _combinedGapInNextUnit, _getNewGapRdgDetails, _addExtraGapReadings, _extraGapIsWithinAnOverlap,
-    _getInclusiveOverlapReadings, _getExtraGapLocation, _createExtraGaps, _addLacReading,
-    _addNavEvent, _findLatestStageVerse, _loadLatestStageVerse, _removeOverlappedReadings,
-    _applySettings, _getApprovalSettings, _compareReadings,
-    _disableEventPropagation, _showCollationSettings, _checkWitnesses, _getScrollPosition,
-    _getMousePosition, _displayWitnessesHover, _getWitnessesForReading,
-    _findStandoffWitness, _getPreStageChecks, _makeRegDecisionsStandoff,
-    _contextInputOnload, _removeWitnessFromUnit, _addToSavedCollation,
-    _displaySavedCollation, _mergeCollationObjects,
-    _getUnitsByStartIndex, _mergeNewLacOmVerseReadings, _mergeNewReading,
-    _getReadingHistory, _getNextTargetRuleInfo, _removeAppliedRules,
-    _getHistoricalReading, _extractAllTValuesForRGAppliedRules,
-    _makeStandoffReading2, _extractWordsForHeader, _getFunctionFromString;
+      _setLocalPythonFunctions, _setRuleConditions,
+      _includeJavascript, _prepareCollation, _findSaved, _getContextFromInputForm,
+      _getWitnessesFromInputForm, _getDebugSetting, _showSavedVersions, _getSavedRadio, _makeSavedCollationTable,
+      _loadSavedCollation, _getSubreadingWitnessData, _findStandoffRegularisationText,
+      _collapseUnit, _expandUnit, _expandAll, _collapseAll, _getEmptyCell, _mergeDicts,
+      _getUnitData, _hasGapBefore, _hasGapAfter, _getAllEmptyReadingWitnesses, _containsEmptyReading,
+      _isOverlapped, _removeLacOmVerseWitnesses, _cleanExtraGaps, _getOverlapUnitReadings,
+      _checkExtraGapRequiredBefore, _extraGapRequiredBefore, _extraGapRequiredAfter,
+      _combinedGapInNextUnit, _getNewGapRdgDetails, _addExtraGapReadings, _extraGapIsWithinAnOverlap,
+      _getInclusiveOverlapReadings, _getExtraGapLocation, _createExtraGaps, _addLacReading,
+      _addNavEvent, _findLatestStageVerse, _loadLatestStageVerse, _removeOverlappedReadings,
+      _applySettings, _getApprovalSettings, _compareReadings,
+      _disableEventPropagation, _showCollationSettings, _checkWitnesses, _getScrollPosition,
+      _getMousePosition, _displayWitnessesHover, _getWitnessesForReading,
+      _findStandoffWitness, _getPreStageChecks, _makeRegDecisionsStandoff,
+      _contextInputOnload, _removeWitnessFromUnit, _addToSavedCollation,
+      _displaySavedCollation, _mergeCollationObjects,
+      _getUnitsByStartIndex, _mergeNewLacOmVerseReadings, _mergeNewReading,
+      _getReadingHistory, _getNextTargetRuleInfo, _removeAppliedRules,
+      _getHistoricalReading, _extractAllTValuesForRGAppliedRules,
+      _makeStandoffReading2, _extractWordsForHeader, _getFunctionFromString;
 
 
   //*********  public functions *********
@@ -183,7 +183,7 @@ CL = (function() {
 
   /** */
   extractWitnessText = function(reading, options, test) {
-    var text, witness_text, witness, reading_type, unit_id, app_id, required_rules, found_word;
+    var text, witnessText, witness, readingType, unitId, appId, requiredRules, foundWord;
 
     if (test === true) {
       console.log(JSON.parse(JSON.stringify(reading)));
@@ -193,7 +193,7 @@ CL = (function() {
     }
 
     text = [];
-    witness_text = [];
+    witnessText = [];
     //first fix the display of overlapped statuses
     if (reading.hasOwnProperty('overlap_status') && reading.overlap_status !== 'duplicate') {
       if (test === true) {
@@ -209,27 +209,27 @@ CL = (function() {
       }
     }
     if (options.hasOwnProperty('reading_type')) {
-      reading_type = options.reading_type;
+      readingType = options.reading_type;
       if (test === true) {
-        console.log('I was asked to look for a ' + reading_type);
+        console.log('I was asked to look for a ' + readingType);
       }
     }
     if (options.hasOwnProperty('unit_id')) {
-      unit_id = options.unit_id; //unit_id and app_id needed to recover standoff regularised readings accurately
+      unitId = options.unit_id;  // unitId and appId needed to recover standoff regularised readings accurately
       if (test === true) {
-        console.log('I am from unit ' + unit_id);
+        console.log('I am from unit ' + unitId);
       }
     }
     if (options.hasOwnProperty('app_id')) {
-      app_id = options.app_id; //unit_id and app_id needed to recover standoff regularised readings accurately
+      appId = options.app_id;  // unitId and appId needed to recover standoff regularised readings accurately
     }
     if (options.hasOwnProperty('required_rules')) {
-      required_rules = options.required_rules;
+      requiredRules = options.required_rules;
     }
 
     //set default positions it we don't have a witness
     if (typeof witness === 'undefined') {
-      reading_type = 'mainreading'; //can't extract subreading without witness
+      readingType = 'mainreading'; //can't extract subreading without witness
       if (test === true) {
         console.log('I got no reading type so I\'m assuming mainreading');
       }
@@ -240,7 +240,8 @@ CL = (function() {
         if (reading.text.length > 0 && reading.text[0].hasOwnProperty(reading.witnesses[i])) {
           witness = reading.witnesses[i];
           if (test === true) {
-            console.log('I found the witness ' + witness + ' by looping the readings and checking it has a direct entry in the reading');
+            console.log('I found the witness ' + witness + ' by looping the readings and ' +
+                        'checking it has a direct entry in the reading');
           }
           break;
         }
@@ -287,17 +288,17 @@ CL = (function() {
     }
     //get the text list for the reading and witness combo
     if (reading.text.length > 0 && reading.text[0].hasOwnProperty(witness)) {
-      witness_text = reading.text;
+      witnessText = reading.text;
       if (test === true) {
         console.log('my witness is a main reading so here is the reading text');
-        console.log(JSON.parse(JSON.stringify(witness_text)));
+        console.log(JSON.parse(JSON.stringify(witnessText)));
       }
     } else if (reading.hasOwnProperty('SR_text') && reading.SR_text.hasOwnProperty(witness)) {
       if (reading.SR_text[witness].text.length > 0) {
-        witness_text = reading.SR_text[witness].text;
+        witnessText = reading.SR_text[witness].text;
         if (test === true) {
           console.log('My witnesses is in SR_text with text so here is the SR_text');
-          console.log(witness_text);
+          console.log(witnessText);
         }
       } else {
         if (reading.SR_text[witness].hasOwnProperty('details')) {
@@ -318,10 +319,10 @@ CL = (function() {
         return '';
       }
     } else if (reading.text.length > 0) {
-      witness_text = _getSubreadingWitnessData(reading, witness);
+      witnessText = _getSubreadingWitnessData(reading, witness);
       if (test === true) {
         console.log('my witness is a subreading here is the subreading text');
-        console.log(witness_text);
+        console.log(witnessText);
       }
     } else { //if its om or lac return reading (they can never have combined gaps) - we've already checked for main reading and subreadings
       if (reading.hasOwnProperty('details')) {
@@ -341,106 +342,118 @@ CL = (function() {
       }
       return '';
     }
-    if (reading_type === 'mainreading' && typeof app_id !== 'undefined' && typeof unit_id !== 'undefined' && typeof witness !== 'undefined') {
+    if (readingType === 'mainreading' && typeof appId !== 'undefined'
+              && typeof unitId !== 'undefined' && typeof witness !== 'undefined') {
       //if we have a standoff regularisation return its parent text
-      text = _findStandoffRegularisationText(app_id, unit_id, witness, test);
+      text = _findStandoffRegularisationText(appId, unitId, witness, test);
       if (text !== null) {
         if (test === true) {
-          console.log(app_id);
-          console.log(unit_id);
+          console.log(appId);
+          console.log(unitId);
           console.log('This reading has been regularised using standoff so here it what it should read');
         }
         return text;
       }
     }
-    //at this point we have returned anything that isn't a case that needs to be extracted word by word from witness_text
+    //at this point we have returned anything that isn't a case that needs to be extracted word by word from witnessText
     text = [];
     if (test === true) {
       console.log(text);
     }
     //deal with combined gap before
     if (reading.hasOwnProperty('combined_gap_before_subreadings') &&
-      reading.combined_gap_before_subreadings.indexOf(witness) !== -1 &&
-      reading.hasOwnProperty('combined_gap_before_subreadings_details') &&
-      reading.combined_gap_before_subreadings_details.hasOwnProperty(witness)) {
+              reading.combined_gap_before_subreadings.indexOf(witness) !== -1 &&
+                reading.hasOwnProperty('combined_gap_before_subreadings_details') &&
+                  reading.combined_gap_before_subreadings_details.hasOwnProperty(witness)) {
       text.push('&lt;' + reading.combined_gap_before_subreadings_details[witness] + '&gt;');
       if (test === true) {
         console.log('There was a combined gap before a subreading of the first token in this reading');
       }
-    } else if (reading.text.length > 0 && reading.text[0].hasOwnProperty('combined_gap_before') && (!reading.hasOwnProperty('SR_text') || !reading.SR_text.hasOwnProperty(witness))) {
+    } else if (reading.text.length > 0 &&
+                    reading.text[0].hasOwnProperty('combined_gap_before') &&
+                      (!reading.hasOwnProperty('SR_text') || !reading.SR_text.hasOwnProperty(witness))) {
       if (reading.text[0].hasOwnProperty(witness) && reading.text[0][witness].hasOwnProperty('gap_before')) { //first unit in verse this might actually work like the others now
         text.push('&lt;' + reading.text[0][witness].gap_before_details + '&gt;');
         if (test === true) {
           console.log('There was a combined gap before this first token in this reading and this token is also the first word in the verse');
         }
-      } else if (reading.text[0].hasOwnProperty('combined_gap_before') && reading.text[0].combined_gap_before.length > 0 && reading.text[0].hasOwnProperty('combined_gap_before_details')) { //subsequent units in verse
+      } else if (reading.text[0].hasOwnProperty('combined_gap_before') &&
+                        reading.text[0].combined_gap_before.length > 0 &&
+                          reading.text[0].hasOwnProperty('combined_gap_before_details')) { //subsequent units in verse
         text.push('&lt;' + reading.text[0].combined_gap_before_details + '&gt;');
         if (test === true) {
           console.log('There was a combined gap before this first token in this reading');
         }
       }
     }
-    //deal with text and internal gaps
-    for (let i = 0; i < witness_text.length; i += 1) {
-      found_word = undefined;
-      if (reading_type === 'subreading' && witness_text[i][witness].hasOwnProperty('decision_details')) {
-        //loop backwards and only use t of rules that match your list of supplied types
-        if (typeof required_rules === 'undefined') {
-          text.push(witness_text[i][witness].decision_details[0].t); //this gets the first t from the decision details so effectively undoing all regularisations
+    // deal with text and internal gaps
+    for (let i = 0; i < witnessText.length; i += 1) {
+      foundWord = undefined;
+      if (readingType === 'subreading' && witnessText[i][witness].hasOwnProperty('decision_details')) {
+        // loop backwards and only use t of rules that match your list of supplied types
+        if (typeof requiredRules === 'undefined') {
+          // this gets the first t from the decision details so effectively undoing all regularisations
+          text.push(witnessText[i][witness].decision_details[0].t);
           if (test === true) {
             console.log('I am a subreading but have not been given specific rules to apply');
           }
         } else {
-          for (let j = witness_text[i][witness].decision_details.length - 1; j >= 0; j -= 1) {
-            if (required_rules.indexOf(witness_text[i][witness].decision_details[j]['class']) !== -1) {
-              found_word = witness_text[i][witness].decision_details[j].t;
+          for (let j = witnessText[i][witness].decision_details.length - 1; j >= 0; j -= 1) {
+            if (requiredRules.indexOf(witnessText[i][witness].decision_details[j]['class']) !== -1) {
+              foundWord = witnessText[i][witness].decision_details[j].t;
             }
           }
-          if (typeof found_word !== 'undefined') {
-            text.push(found_word);
+          if (typeof foundWord !== 'undefined') {
+            text.push(foundWord);
             if (test === true) {
               console.log('I am a subreading and have applied the given rules');
             }
           } else {
             //else just do the interface because we don't want to apply any of the rules at all
-            text.push(witness_text[i]['interface']);
+            text.push(witnessText[i]['interface']);
             if (test === true) {
-              console.log('I am a subreading but do not have any of the rules specified applied to me so I am returning the interface value');
+              console.log('I am a subreading but do not have any of the rules specified applied to me so I ' +
+                          'am returning the interface value');
             }
           }
         }
-      } else if (reading_type === 'mainreading' && witness_text[i][witness].hasOwnProperty('decision_details')) {
+      } else if (readingType === 'mainreading' && witnessText[i][witness].hasOwnProperty('decision_details')) {
         //TODO: restrict this to list of supplied types as well??
-        text.push(witness_text[i][witness].decision_details[witness_text[i][witness].decision_details.length - 1].n); //this gets the final n from the decision details
+        // this gets the final n from the decision details
+        text.push(witnessText[i][witness].decision_details[witnessText[i][witness].decision_details.length - 1].n);
         if (test === true) {
           console.log('I am a mainreading with a rule applied');
         }
       } else {
-        text.push(witness_text[i]['interface']);
+        text.push(witnessText[i]['interface']);
         if (test === true) {
           console.log('I am just the same as the interface value');
         }
       }
-      if (i === witness_text.length - 1 && reading.text.length > 0 && reading.text[reading.text.length - 1].hasOwnProperty('combined_gap_after')) {
+      if (i === witnessText.length - 1 &&
+                reading.text.length > 0 &&
+                  reading.text[reading.text.length - 1].hasOwnProperty('combined_gap_after')) {
         //this is the last word in our witness so deal with combined_gap_after
         //are we sure this works for all witnesses - what if a subreading does not need combining such as P66 in 16:23
 
-        if (witness_text[i][witness].hasOwnProperty('gap_after')) {
-          text.push('&lt;' + witness_text[i][witness].gap_details + '&gt;');
+        if (witnessText[i][witness].hasOwnProperty('gap_after')) {
+          text.push('&lt;' + witnessText[i][witness].gap_details + '&gt;');
           if (test === true) {
             console.log('I am the last word in the unit and have a combined gap after me');
           }
         }
-      } else if (i === witness_text.length - 1 && reading.hasOwnProperty('combined_gap_after_subreadings') && reading.combined_gap_after_subreadings.indexOf(witness) !== -1) {
-        if (witness_text[i][witness].hasOwnProperty('gap_after')) {
-          text.push('&lt;' + witness_text[i][witness].gap_details + '&gt;');
+      } else if (i === witnessText.length - 1 &&
+                        reading.hasOwnProperty('combined_gap_after_subreadings') &&
+                          reading.combined_gap_after_subreadings.indexOf(witness) !== -1) {
+        if (witnessText[i][witness].hasOwnProperty('gap_after')) {
+          text.push('&lt;' + witnessText[i][witness].gap_details + '&gt;');
           if (test === true) {
             console.log('I am the last word in the unit and have a combined gap after a subreading');
           }
         }
-      } else if (i !== witness_text.length - 1) {
-        if (witness_text[i][witness].hasOwnProperty('gap_after')) {
-          text.push('&lt;' + witness_text[i][witness].gap_details + '&gt;');
+      } else if (i !== witnessText.length - 1) {
+        if (witnessText[i][witness].hasOwnProperty('gap_after')) {
+          text.push('&lt;' + witnessText[i][witness].gap_details + '&gt;');
           if (test === true) {
             console.log('I am internal to the reading and have a gap after me so here are the details');
           }
@@ -496,9 +509,9 @@ CL = (function() {
         if (CL.data.marked_readings.hasOwnProperty(key)) {
           for (let i = 0; i < CL.data.marked_readings[key].length; i += 1) {
             if (CL.data.marked_readings[key][i].apparatus === appId &&
-              CL.data.marked_readings[key][i].start === unit.start &&
-              CL.data.marked_readings[key][i].end === unit.end &&
-              CL.data.marked_readings[key][i].witness === witness) {
+                      CL.data.marked_readings[key][i].start === unit.start &&
+                        CL.data.marked_readings[key][i].end === unit.end &&
+                          CL.data.marked_readings[key][i].witness === witness) {
               if (CL.data.marked_readings[key][i].hasOwnProperty('first_word_index')) {
                 if (CL.data.marked_readings[key][i].first_word_index === unit.first_word_index) {
                   return CL.data.marked_readings[key][i];
@@ -597,11 +610,11 @@ CL = (function() {
         //if i is even add a word; if not add a blank cell
         if (i % 2 === 0) {
           html.push('<th colspan="' + colspan + '" class="NAword redips-mark ' + words[j][1] + '" id="NA_' + (i) +
-            '"><div id="NA_' + (i) + '_div">' + words[j][0] + '</div></th>');
+                    '"><div id="NA_' + (i) + '_div">' + words[j][0] + '</div></th>');
           j += 1;
         } else {
           html.push('<th  colspan="' + colspan + '" id="NA_' + (i) + '" class="redips-mark"><div id="NA_' + (i) +
-            '_div"></div></th>');
+                    '_div"></div></th>');
         }
       }
       html.push(nextLinkHtml + '</tr>');
@@ -657,7 +670,7 @@ CL = (function() {
   /**apparatus - the list of units
    * app - a number showing which row of apparatus
    * format - which stage of the editor are we at
-   * overtext_length - the number of words and spaces (columns) in overtext
+   * overtextLength - the number of words and spaces (columns) in overtext
    * options - a dictionary of possible options
    * 		possibilities are:
    * 			sort - boolean - do the readings need sorting (default = false)
@@ -669,64 +682,56 @@ CL = (function() {
    *      getUnitDataFunction - a function to be used for getUnitData when the hard coded ones are not good enough
    *      getUnitDataOptions - this allows options to be passed into the getUnitData function
    * */
-  getOverlapLayout = function(apparatus, app, format, overtext_length, options) {
-    var j, i, k, id, rows, unit, row_list, extra_rows, events,
-      new_row, previous_index, id_string, expected, td_id, unit_index, spacer_rows,
-      unit_data, empty_cell_options, unit_data_options, next_start;
+  getOverlapLayout = function(apparatus, app, format, overtextLength, options) {
+    var j, i, id, rows, unit, rowList, events, idString, tdId, unitIndex, spacerRows,
+      unitData, emptyCellOptions, unitDataOptions, nextStart;
     if (typeof options === 'undefined') {
       options = {};
     }
     j = 0;
     i = 1;
     rows = [];
-    row_list = [];
-    extra_rows = {};
+    rowList = [];
     events = {};
     if (format === 'set_variants') {
-      spacer_rows = [];
-      spacer_rows.push('<tr><td></td>');
+      spacerRows = [];
+      spacerRows.push('<tr><td></td>');
     }
     rows.push('<tr><td></td>'); //the extra ones for navigation arrows
     //only care about highlighted unit if we are in the right apparatus
     if (options.hasOwnProperty('highlighted_unit') &&
-      options.highlighted_unit !== undefined &&
-      options.highlighted_unit[0] !== 'apparatus' + app) {
+              options.highlighted_unit !== undefined &&
+                options.highlighted_unit[0] !== 'apparatus' + app) {
       delete options.highlighted_unit;
     }
-    while (i <= overtext_length) {
-      td_id = app + '_' + i;
-      unit_index = null;
+    while (i <= overtextLength) {
+      tdId = app + '_' + i;
+      unitIndex = null;
 
       unit = apparatus[j];
       if (unit !== undefined) {
         if (unit.hasOwnProperty('extra_start')) {
-          unit_index = unit.start + unit.extra_start;
+          unitIndex = unit.start + unit.extra_start;
         } else {
-          unit_index = unit.start;
+          unitIndex = unit.start;
         }
       }
-      if (unit_index === null || i < unit_index) { //we don't have a variant for this word
+      if (unitIndex === null || i < unitIndex) { //we don't have a variant for this word
         if (options.hasOwnProperty('column_lengths') && options.column_lengths.hasOwnProperty(i)) {
-          for (k = 0; k < options.column_lengths[i]; k += 1) {
-            rows.push(_getEmptyCell(format, {
-              'dropable': true,
-              'id': td_id
-            }));
+          for (let k = 0; k < options.column_lengths[i]; k += 1) {
+            rows.push(_getEmptyCell(format, {'dropable': true, 'id': tdId}));
             if (format === 'set_variants') {
-              spacer_rows.push(SV.getEmptySpacerCell());
+              spacerRows.push(SV.getEmptySpacerCell());
             }
           }
         } else {
-          rows.push(_getEmptyCell(format, {
-            'dropable': true,
-            'id': td_id
-          }));
+          rows.push(_getEmptyCell(format, {'dropable': true, 'id': tdId}));
           if (format === 'set_variants') {
-            spacer_rows.push(SV.getEmptySpacerCell());
+            spacerRows.push(SV.getEmptySpacerCell());
           }
         }
         i += 1;
-      } else if (i === unit_index) { //we do have a variant for this word
+      } else if (i === unitIndex) { //we do have a variant for this word
         if (unit.readings.length > 0 ||
           //this is now set to always show units regardless of whether they have variation
           //the unused logic is left in incase we want to revert to the old way sometime
@@ -747,93 +752,88 @@ CL = (function() {
             unit.readings = sortReadings(unit.readings);
           }
           if (app > 1) {
-            id_string = j + '_app_' + app;
+            idString = j + '_app_' + app;
           } else {
-            id_string = String(j);
+            idString = String(j);
           }
           if (options.hasOwnProperty('getUnitDataOptions')) {
-            unit_data_options = options.getUnitDataOptions;
-            unit_data_options.overlap = true;
-            unit_data_options.col_length = options.overlap_details[unit._id].col_length;
-            unit_data_options.unit_id = unit._id;
+            unitDataOptions = options.getUnitDataOptions;
+            unitDataOptions.overlap = true;
+            unitDataOptions.col_length = options.overlap_details[unit._id].col_length;
+            unitDataOptions.unit_id = unit._id;
           } else {
-            unit_data_options = {
+            unitDataOptions = {
               'overlap': true,
               'col_length': options.overlap_details[unit._id].col_length,
               'unit_id': unit._id
             };
           }
           if (app > 1) {
-            unit_data_options.app_id = 'apparatus' + app;
+            unitDataOptions.app_id = 'apparatus' + app;
           } else {
-            unit_data_options.app_id = 'apparatus';
+            unitDataOptions.app_id = 'apparatus';
           }
           if (options.hasOwnProperty('highlighted_wit')) {
-            unit_data_options.highlighted_wit = options.highlighted_wit;
+            unitDataOptions.highlighted_wit = options.highlighted_wit;
           }
           if (options.hasOwnProperty('highlighted_added_wits')) {
-            unit_data_options.highlighted_added_wits = options.highlighted_added_wits;
+            unitDataOptions.highlighted_added_wits = options.highlighted_added_wits;
           }
           if (options.hasOwnProperty('highlighted_version')) {
-            unit_data_options.highlighted_version = options.highlighted_version;
+            unitDataOptions.highlighted_version = options.highlighted_version;
           }
           if (options.hasOwnProperty('highlighted_unit')) {
-            unit_data_options.highlighted_unit = options.highlighted_unit;
+            unitDataOptions.highlighted_unit = options.highlighted_unit;
           }
           if (unit.hasOwnProperty('split_readings') && unit.split_readings === true) {
-            unit_data_options.split = true;
+            unitDataOptions.split = true;
           }
           if (unit.hasOwnProperty('created') && unit.created === true) {
-            unit_data_options.created = true;
+            unitDataOptions.created = true;
           }
           if (options.hasOwnProperty('getUnitDataFunction')) {
-            unit_data_options.format = format;
-            unit_data = options.getUnitDataFunction(unit.readings, id_string, unit.start, unit.end, unit_data_options);
+            unitDataOptions.format = format;
+            unitData = options.getUnitDataFunction(unit.readings, idString, unit.start, unit.end, unitDataOptions);
           } else if (format === 'regularise') {
-            unit_data = RG.getUnitData(unit.readings, id_string, unit.start, unit.end, unit_data_options);
+            unitData = RG.getUnitData(unit.readings, idString, unit.start, unit.end, unitDataOptions);
           } else if (format === 'set_variants') {
-            unit_data_options.td_id = td_id;
-            unit_data = SV.getUnitData(unit.readings, id_string, unit.start, unit.end, unit_data_options);
-            spacer_rows.push(SV.getSpacerUnitData(id_string, unit.start, unit.end));
+            unitDataOptions.td_id = tdId;
+            unitData = SV.getUnitData(unit.readings, idString, unit.start, unit.end, unitDataOptions);
+            spacerRows.push(SV.getSpacerUnitData(idString, unit.start, unit.end));
           } else if (format === 'reorder') {
-            unit_data = OR.getUnitData(unit.readings, id_string, unit.start, unit.end, unit_data_options);
+            unitData = OR.getUnitData(unit.readings, idString, unit.start, unit.end, unitDataOptions);
           } else {
-            unit_data = _getUnitData(unit.readings, id_string, unit.start, unit.end, unit_data_options);
+            unitData = _getUnitData(unit.readings, idString, unit.start, unit.end, unitDataOptions);
           }
-          rows.push(unit_data[0].join(''));
-          row_list.push.apply(row_list, unit_data[1]);
-          events = _mergeDicts(events, unit_data[2]);
+          rows.push(unitData[0].join(''));
+          rowList.push.apply(rowList, unitData[1]);
+          events = _mergeDicts(events, unitData[2]);
         } else {
-          empty_cell_options = {
-            'start': unit.start,
-            'end': unit.end,
-            'dropable': true,
-            'id': td_id
-          };
+          emptyCellOptions = {'start': unit.start, 'end': unit.end, 'dropable': true, 'id': tdId};
           if (options.hasOwnProperty('column_lengths') && options.column_lengths.hasOwnProperty(i)) {
-            for (k = 0; k < options.column_lengths[i]; k += 1) {
-              rows.push(_getEmptyCell(format, empty_cell_options));
+            for (let k = 0; k < options.column_lengths[i]; k += 1) {
+              rows.push(_getEmptyCell(format, emptyCellOptions));
               if (format === 'set_variants') {
-                spacer_rows.push(SV.getEmptySpacerCell());
+                spacerRows.push(SV.getEmptySpacerCell());
               }
             }
           } else {
-            rows.push(_getEmptyCell(format, empty_cell_options));
+            rows.push(_getEmptyCell(format, emptyCellOptions));
             if (format === 'set_variants') {
-              spacer_rows.push(SV.getEmptySpacerCell());
+              spacerRows.push(SV.getEmptySpacerCell());
             }
           }
-          rows.push(_getEmptyCell(format, empty_cell_options));
+          rows.push(_getEmptyCell(format, emptyCellOptions));
           if (format === 'set_variants') {
-            spacer_rows.push(SV.getEmptySpacerCell());
+            spacerRows.push(SV.getEmptySpacerCell());
           }
         }
         if (j + 1 < apparatus.length) {
-          next_start = apparatus[j + 1].start;
+          nextStart = apparatus[j + 1].start;
           if (apparatus[j + 1].hasOwnProperty('extra_start')) {
-            next_start = apparatus[j + 1].start + apparatus[j + 1].extra_start;
+            nextStart = apparatus[j + 1].start + apparatus[j + 1].extra_start;
           }
-          if (next_start !== unit_index) {
+          if (nextStart !== unitIndex) {
             if (unit.hasOwnProperty('extra_start')) {
               i += (unit.end - (unit.start + unit.extra_start) + 1);
             } else {
@@ -854,10 +854,10 @@ CL = (function() {
     }
     rows.push('<td></td></tr>'); //the extra ones for navigation arrows
     if (format === 'set_variants') {
-      spacer_rows.push('<td></td></tr>');
-      rows.push(spacer_rows.join(''));
+      spacerRows.push('<td></td></tr>');
+      rows.push(spacerRows.join(''));
     }
-    return [rows, row_list, events];
+    return [rows, rowList, events];
   };
 
   sortReadings = function(readings) {
@@ -866,56 +866,53 @@ CL = (function() {
   };
 
   //TODO: fix with &nbsp; is temporary need better solution for entire cell hover over
-  extractDisplayText = function(reading, reading_pos, total_readings, unit_id, app_id) {
-    if (reading.text.length === 0 && reading_pos === 0 && total_readings > 1) {
+  extractDisplayText = function(reading, readingPos, totalReadings, unitId, appId) {
+    if (reading.text.length === 0 && readingPos === 0 && totalReadings > 1) {
       return '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     } else {
-      return extractWitnessText(reading, {
-        'app_id': app_id,
-        'unit_id': unit_id
-      });
+      return extractWitnessText(reading, {'app_id': appId,'unit_id': unitId});
     }
   };
 
-  getReadingLabel = function(reading_pos, reading, rules) {
-    var alpha_id, label_suffix, reading_label;
-    reading_label = '';
-    label_suffix = '';
-    alpha_id = getAlphaId(reading_pos);
+  getReadingLabel = function(readingPos, reading, rules) {
+    var alphaId, labelSuffix, readingLabel;
+    readingLabel = '';
+    labelSuffix = '';
+    alphaId = getAlphaId(readingPos);
     if (reading.hasOwnProperty('reading_classes')) {
       for (let i = 0; i < reading.reading_classes.length; i += 1) {
         if (rules[reading.reading_classes[i]][2] === true) {
           if (typeof rules[reading.reading_classes[i]][0] !== 'undefined') {
-            label_suffix += rules[reading.reading_classes[i]][0];
+            labelSuffix += rules[reading.reading_classes[i]][0];
           }
         }
       }
     }
     if (reading.hasOwnProperty('label') && typeof reading.label !== 'undefined') {
       if (reading.label === 'zz') {
-        reading_label = '—';
+        readingLabel = '—';
       }
     }
     if (reading.hasOwnProperty('overlap_status')) {
-      reading_label = ''; //this will be the default if it doesn't get replaced
+      readingLabel = '';  // this will be the default if it doesn't get replaced
       if (reading.overlap_status === 'duplicate') {
-        reading_label = '↓';
+        readingLabel = '↓';
       } else {
         for (let i = 0; i < CL.overlappedOptions.length; i += 1) {
           if (CL.overlappedOptions[i].reading_flag === reading.overlap_status &&
             CL.overlappedOptions[i].hasOwnProperty('reading_label_display')) {
-            reading_label = CL.overlappedOptions[i].reading_label_display;
+            readingLabel = CL.overlappedOptions[i].reading_label_display;
           }
         }
       }
     } else if (reading.label !== 'zz') {
       if (reading.hasOwnProperty('label')) {
-        reading_label = reading.label + label_suffix + '.';
+        readingLabel = reading.label + labelSuffix + '.';
       } else {
-        reading_label = alpha_id + label_suffix + '.';
+        readingLabel = alphaId + labelSuffix + '.';
       }
     }
-    return reading_label;
+    return readingLabel;
   };
 
   getAlphaId = function(n) {
@@ -926,38 +923,38 @@ CL = (function() {
   };
 
   getReadingSuffix = function(reading, rules) {
-    var reading_suffix;
-    reading_suffix = '';
+    var readingSuffix;
+    readingSuffix = '';
     if (reading.hasOwnProperty('reading_classes')) {
       for (let i = 0; i < reading.reading_classes.length; i += 1) {
         if (rules[reading.reading_classes[i]][3] === true) {
           if (typeof rules[reading.reading_classes[i]][0] !== 'undefined') {
-            reading_suffix += rules[reading.reading_classes[i]][0];
+            readingSuffix += rules[reading.reading_classes[i]][0];
           }
         }
       }
     }
-    if (reading_suffix !== '') {
-      reading_suffix = '(' + reading_suffix + ')';
+    if (readingSuffix !== '') {
+      readingSuffix = '(' + readingSuffix + ')';
     }
-    return reading_suffix;
+    return readingSuffix;
   };
 
-  addSubreadingEvents = function(stage, base_subreading_rules) {
-    var scroll_offset;
+  addSubreadingEvents = function(stage, baseSubreadingRules) {
+    var scrollOffset;
     console.log(stage);
     if (CL.showSubreadings === true) {
       if (document.getElementById('show_hide_subreadings_button')) {
         $('#show_hide_subreadings_button').on('click.hide_subreadings', function(event) {
-          scroll_offset = [document.getElementById('scroller').scrollLeft,
+          scrollOffset = [document.getElementById('scroller').scrollLeft,
             document.getElementById('scroller').scrollTop
           ];
           $(this).text($(this).text().replace('hide', 'show'));
           CL.showSubreadings = false;
           SR.loseSubreadings();
-          if (typeof base_subreading_rules !== 'undefined') {
+          if (typeof baseSubreadingRules !== 'undefined') {
             SR.findSubreadings({
-              'rule_classes': base_subreading_rules
+              'rule_classes': baseSubreadingRules
             });
           }
           if (stage === 'reorder') {
@@ -970,16 +967,16 @@ CL = (function() {
             });
           } else {
             SV.showSetVariantsData();
-            addSubreadingEvents(stage, base_subreading_rules);
+            addSubreadingEvents(stage, baseSubreadingRules);
           }
-          document.getElementById('scroller').scrollLeft = scroll_offset[0];
-          document.getElementById('scroller').scrollTop = scroll_offset[1];
+          document.getElementById('scroller').scrollLeft = scrollOffset[0];
+          document.getElementById('scroller').scrollTop = scrollOffset[1];
         });
       }
     } else {
       if (document.getElementById('show_hide_subreadings_button')) {
         $('#show_hide_subreadings_button').on('click.show_subreadings', function(event) {
-          scroll_offset = [document.getElementById('scroller').scrollLeft,
+          scrollOffset = [document.getElementById('scroller').scrollLeft,
             document.getElementById('scroller').scrollTop
           ];
           $(this).text($(this).text().replace('show', 'hide'));
@@ -996,10 +993,10 @@ CL = (function() {
             });
           } else {
             SV.showSetVariantsData();
-            addSubreadingEvents(stage, base_subreading_rules);
+            addSubreadingEvents(stage, baseSubreadingRules);
           }
-          document.getElementById('scroller').scrollLeft = scroll_offset[0];
-          document.getElementById('scroller').scrollTop = scroll_offset[1];
+          document.getElementById('scroller').scrollLeft = scrollOffset[0];
+          document.getElementById('scroller').scrollTop = scrollOffset[1];
         });
       }
     }
@@ -1017,41 +1014,39 @@ CL = (function() {
    *      getUnitDataFunction - a function to be used for getUnitData when the hard coded ones are not good enough
    *      getUnitDataOptions - this allows options to be passed into the getUnitData function*/
   getUnitLayout = function(apparatus, app, format, options) {
-    var j, i, k, rows, unit, col_len_dict, row_list, extra_rows, new_row, unit_data_options,
-      previous_index, id_string, events, unit_data, unit_index, split, spacer_rows, key;
+    var j, i, rows, unit, colLenDict, rowList, unitDataOptions, idString, events,
+        unitData, unitIndex, spacerRows;
 
     if (typeof options === 'undefined') {
       options = {};
     }
-    j = 0;
-    i = 1;
     rows = [];
-    col_len_dict = {};
-    row_list = [];
-    extra_rows = {};
+    colLenDict = {};
+    rowList = [];
     events = {};
     if (format === 'set_variants') {
-      spacer_rows = [];
-      spacer_rows.push('<tr><td></td>');
+      spacerRows = [];
+      spacerRows.push('<tr><td></td>');
     }
     rows.push('<tr><td></td>');
     // only care about highlighted unit if we are in the right apparatus
     if (options.hasOwnProperty('highlighted_unit') &&
-      options.highlighted_unit !== undefined &&
-      options.highlighted_unit[0] !== 'apparatus' + app) {
+              options.highlighted_unit !== undefined &&
+                options.highlighted_unit[0] !== 'apparatus' + app) {
       delete options.highlighted_unit;
     }
+    j = 0;
+    i = 1;
     while (j < apparatus.length) {
       unit = apparatus[j];
-
-      unit_index = unit.start;
-      if (i < unit_index) { // we don't have a variant for this word
+      unitIndex = unit.start;
+      if (i < unitIndex) { // we don't have a variant for this word
         rows.push(_getEmptyCell(format));
         if (format === 'set_variants') {
-          spacer_rows.push(SV.getEmptySpacerCell());
+          spacerRows.push(SV.getEmptySpacerCell());
         }
         i += 1;
-      } else if (i === unit_index) { // we do have a variant for this word
+      } else if (i === unitIndex) { // we do have a variant for this word
         if (unit.readings.length > 1 ||
           // this is now set to always show units regardless of whether they have variation
           // the unused logic is left in incase we want to revert to the old way sometime
@@ -1068,85 +1063,80 @@ CL = (function() {
           }
 
           if (app > 1) {
-            id_string = j + '_app_' + app;
+            idString = j + '_app_' + app;
           } else {
-            id_string = String(j);
+            idString = String(j);
           }
           if (options.hasOwnProperty('getUnitDataOptions')) {
-            unit_data_options = options.getUnitDataOptions;
-            unit_data_options.unit_id = unit._id;
+            unitDataOptions = options.getUnitDataOptions;
+            unitDataOptions.unit_id = unit._id;
           } else {
-            unit_data_options = {
-              'unit_id': unit._id
-            };
+            unitDataOptions = {'unit_id': unit._id};
           }
           if (app > 1) {
-            unit_data_options.app_id = 'apparatus' + app;
+            unitDataOptions.app_id = 'apparatus' + app;
           } else {
-            unit_data_options.app_id = 'apparatus';
+            unitDataOptions.app_id = 'apparatus';
           }
           if (options.hasOwnProperty('highlighted_wit')) {
-            unit_data_options.highlighted_wit = options.highlighted_wit;
+            unitDataOptions.highlighted_wit = options.highlighted_wit;
           }
           if (options.hasOwnProperty('highlighted_added_wits')) {
-            unit_data_options.highlighted_added_wits = options.highlighted_added_wits;
+            unitDataOptions.highlighted_added_wits = options.highlighted_added_wits;
           }
           if (options.hasOwnProperty('highlighted_version')) {
-            unit_data_options.highlighted_version = options.highlighted_version;
+            unitDataOptions.highlighted_version = options.highlighted_version;
           }
           if (options.hasOwnProperty('highlighted_unit')) {
-            unit_data_options.highlighted_unit = options.highlighted_unit;
+            unitDataOptions.highlighted_unit = options.highlighted_unit;
           }
           if (unit.hasOwnProperty('split_readings') && unit.split_readings === true) {
-            unit_data_options.split = true;
+            unitDataOptions.split = true;
           }
           if (unit.hasOwnProperty('created') && unit.created === true) {
-            unit_data_options.created = true;
+            unitDataOptions.created = true;
           }
           if (unit.hasOwnProperty('overlap_units')) {
-            unit_data_options.overlapping_ids = [];
-            for (key in unit.overlap_units) {
+            unitDataOptions.overlapping_ids = [];
+            for (let key in unit.overlap_units) {
               if (unit.overlap_units.hasOwnProperty(key)) {
-                unit_data_options.overlapping_ids.push(key);
+                unitDataOptions.overlapping_ids.push(key);
               }
             }
           }
           if (!unitHasText(unit)) {
-            unit_data_options.gap_unit = true;
+            unitDataOptions.gap_unit = true;
           }
 
           if (options.hasOwnProperty('getUnitDataFunction')) {
-            unit_data_options.format = format;
-            unit_data = options.getUnitDataFunction(unit.readings, id_string, unit.start, unit.end, unit_data_options);
+            unitDataOptions.format = format;
+            unitData = options.getUnitDataFunction(unit.readings, idString, unit.start, unit.end, unitDataOptions);
           } else if (format === 'regularise') {
-            unit_data = RG.getUnitData(unit.readings, id_string, unit.start, unit.end, unit_data_options);
+            unitData = RG.getUnitData(unit.readings, idString, unit.start, unit.end, unitDataOptions);
           } else if (format === 'set_variants') {
-            unit_data = SV.getUnitData(unit.readings, id_string, unit.start, unit.end, unit_data_options);
-            spacer_rows.push(SV.getSpacerUnitData(id_string, unit.start, unit.end));
+            unitData = SV.getUnitData(unit.readings, idString, unit.start, unit.end, unitDataOptions);
+            spacerRows.push(SV.getSpacerUnitData(idString, unit.start, unit.end));
           } else if (format === 'reorder') {
-            unit_data = OR.getUnitData(unit.readings, id_string, unit.start, unit.end, unit_data_options);
+            unitData = OR.getUnitData(unit.readings, idString, unit.start, unit.end, unitDataOptions);
           } else {
-            unit_data = OR.getUnitData(unit.readings, id_string, unit.start, unit.end, unit_data_options);
+            unitData = OR.getUnitData(unit.readings, idString, unit.start, unit.end, unitDataOptions);
           }
-          rows.push(unit_data[0].join(''));
-          row_list.push.apply(row_list, unit_data[1]);
-          events = _mergeDicts(events, unit_data[2]);
+          rows.push(unitData[0].join(''));
+          rowList.push.apply(rowList, unitData[1]);
+          events = _mergeDicts(events, unitData[2]);
         } else {
-          rows.push(_getEmptyCell(format, {
-            'start': unit.start,
-            'end': unit.end
-          }));
+          rows.push(_getEmptyCell(format, {'start': unit.start, 'end': unit.end}));
           if (format === 'set_variants') {
-            spacer_rows.push(SV.getEmptySpacerCell(unit.start, unit.end));
+            spacerRows.push(SV.getEmptySpacerCell(unit.start, unit.end));
           }
         }
-        if (j + 1 < apparatus.length && apparatus[j + 1].start !== unit_index) {
+        if (j + 1 < apparatus.length && apparatus[j + 1].start !== unitIndex) {
           i += (unit.end - unit.start + 1);
         } else if (j + 1 < apparatus.length) {
-          if (col_len_dict.hasOwnProperty(i)) {
-            col_len_dict[i] += 1;
+          if (colLenDict.hasOwnProperty(i)) {
+            colLenDict[i] += 1;
           } else {
-            col_len_dict[i] = 2;
+            colLenDict[i] = 2;
           }
         }
         j += 1;
@@ -1156,10 +1146,10 @@ CL = (function() {
     }
     rows.push('<td></td></tr>');
     if (format === 'set_variants') {
-      spacer_rows.push('<td></td></tr>');
-      rows.push(spacer_rows.join(''));
+      spacerRows.push('<td></td></tr>');
+      rows.push(spacerRows.join(''));
     }
-    return [rows, col_len_dict, row_list, events, j];
+    return [rows, colLenDict, rowList, events, j];
   };
 
   /**
@@ -1198,21 +1188,19 @@ CL = (function() {
     return false;
   };
 
-
-
   isBlank = function(str) {
     return (!str || /^\s*$/.test(str));
   };
 
   getHighlightedText = function(witness) {
-    var temp, transcription_id, hand, text, unit;
+    var temp, transcriptionId, hand, text, unit;
     temp = witness.split('|');
-    transcription_id = temp[0];
+    transcriptionId = temp[0];
     hand = temp[1];
     text = [];
-
-    document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + hand + ':</b><img id="loadingbar" src="' + staticUrl + 'CE_core/images/loadingbar.gif"/></span>';
-    CL.services.getUnitData(CL.context, [transcription_id], function(response) {
+    document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + hand +
+                ':</b><img id="loadingbar" src="' + staticUrl + 'CE_core/images/loadingbar.gif"/></span>';
+    CL.services.getUnitData(CL.context, [transcriptionId], function(response) {
       var transcriptions;
       transcriptions = response.results;
       if (transcriptions.length > 0) {
@@ -1236,21 +1224,24 @@ CL = (function() {
                     text.push('&lt;' + unit.witnesses[j].tokens[k].gap_details + '&gt;');
                   }
                 }
-                document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + hand + ':</b> ' + CL.project.prepareDisplayString(text.join(' ')) + '</span>';
+                document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' +
+                              hand + ':</b> ' + CL.project.prepareDisplayString(text.join(' ')) + '</span>';
                 break;
               }
             }
           } else {
             //om unit
-            document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + hand + ':</b> no text</span>';
+            document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' +
+                                                                          hand + ':</b> no text</span>';
           }
         }
       } else {
-        if (transcription_id === 'none') {
+        if (transcriptionId === 'none') {
           document.getElementById('single_witness_reading').innerHTML = '';
         } else {
           //lac unit
-          document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' + hand + ':</b> no text</span>';
+          document.getElementById('single_witness_reading').innerHTML = '<span class="highlighted_reading"><b>' +
+                                                                        hand + ':</b> no text</span>';
         }
       }
     });
@@ -1297,24 +1288,24 @@ CL = (function() {
    *
    *  */
   lacOmFix = function() {
-    var apparatus, witnesses, empty_witnesses, token, extra_readings, overlap, key, subreading_data, text, overlap_status;
+    var apparatus, witnesses, emptyWitnesses, token, extraReadings, overlap, overlapStatus;
     //first strip all the empty units displaying gaps and then recreate the ones we still need
     _cleanExtraGaps();
     _createExtraGaps();
     apparatus = CL.data.apparatus;
     for (let i = 0; i < apparatus.length; i += 1) { // loop through units
-      extra_readings = [];
+      extraReadings = [];
       for (let j = 0; j < apparatus[i].readings.length; j += 1) { // loop through readings
         //if this is reading contains an empty reading and if this isn't a whole verse lac or whole verse om
         if (_containsEmptyReading(apparatus[i].readings[j]) && //includes subreadings and SR_text
-          apparatus[i].readings[j].type !== 'lac_verse' &&
-          apparatus[i].readings[j].type !== 'om_verse') {
-          overlap_status = undefined;
+                  apparatus[i].readings[j].type !== 'lac_verse' &&
+                    apparatus[i].readings[j].type !== 'om_verse') {
+          overlapStatus = undefined;
           if (apparatus[i].readings[j].hasOwnProperty('overlap_status')) {
-            overlap_status = apparatus[i].readings[j].overlap_status;
+            overlapStatus = apparatus[i].readings[j].overlap_status;
           }
           // gets all witnesses that have an empty reading including those in subreadings
-          empty_witnesses = _getAllEmptyReadingWitnesses(apparatus[i].readings[j]);
+          emptyWitnesses = _getAllEmptyReadingWitnesses(apparatus[i].readings[j]);
           //get all the witnesses for the reading
           witnesses = getAllReadingWitnesses(apparatus[i].readings[j]);
           //now work out from context if it should be lac or om
@@ -1327,13 +1318,14 @@ CL = (function() {
               } else {
                 token = _hasGapAfter(apparatus, witnesses[k], i);
               }
-              if (token[0] === true && empty_witnesses.indexOf(witnesses[k]) !== -1) {
+              if (token[0] === true && emptyWitnesses.indexOf(witnesses[k]) !== -1) {
                 //set up a new reading for the lac version
-                extra_readings = _addLacReading(extra_readings, witnesses[k], token[1], overlap_status);
+                extraReadings = _addLacReading(extraReadings, witnesses[k], token[1], overlapStatus);
                 witnesses[k] = null; // just make it null and delete later so you don't change size mid loop
               } else if (apparatus[i].readings[j].witnesses.indexOf(witnesses[k]) !== -1 &&
-                ((apparatus[i].readings[j].hasOwnProperty('SR_text') && !apparatus[i].readings[j].SR_text.hasOwnProperty(witnesses[k])) ||
-                  !apparatus[i].readings[j].hasOwnProperty('SR_text'))) {
+                                ((apparatus[i].readings[j].hasOwnProperty('SR_text') &&
+                                  !apparatus[i].readings[j].SR_text.hasOwnProperty(witnesses[k])) ||
+                                    !apparatus[i].readings[j].hasOwnProperty('SR_text'))) {
                 //if this witness is a genuine main reading
                 //then leave the witness alone and if its text length is 0 ensure it is om not lac (it may have changed when moving readings about)
                 if (apparatus[i].readings[j].text.length === 0) {
@@ -1341,9 +1333,9 @@ CL = (function() {
                   delete apparatus[i].readings[j].details;
                 }
               } else if (apparatus[i].readings[j].witnesses.indexOf(witnesses[k]) !== -1 &&
-                apparatus[i].readings[j].hasOwnProperty('SR_text') &&
-                apparatus[i].readings[j].SR_text.hasOwnProperty(witnesses[k]) &&
-                apparatus[i].readings[j].SR_text[witnesses[k]].text.length === 0) {
+                            apparatus[i].readings[j].hasOwnProperty('SR_text') &&
+                              apparatus[i].readings[j].SR_text.hasOwnProperty(witnesses[k]) &&
+                                apparatus[i].readings[j].SR_text[witnesses[k]].text.length === 0) {
                 //squelch if this is an om reading which is a subreading of another reading
 
               } else {
@@ -1359,14 +1351,14 @@ CL = (function() {
         }
       }
       apparatus[i].readings = removeNullItems(apparatus[i].readings);
-      for (let j = 0; j < extra_readings.length; j += 1) {
-        addReadingId(extra_readings[j], apparatus[i].start, apparatus[i].end);
-        apparatus[i].readings.push(extra_readings[j]);
+      for (let j = 0; j < extraReadings.length; j += 1) {
+        addReadingId(extraReadings[j], apparatus[i].start, apparatus[i].end);
+        apparatus[i].readings.push(extraReadings[j]);
       }
     }
   };
 
-  getSubreadingOfWitness = function(reading, witness, inc_SR_text) {
+  getSubreadingOfWitness = function(reading, witness, includeSrTextData) {
     if (reading.hasOwnProperty('subreadings')) {
       for (let key in reading.subreadings) {
         if (reading.subreadings.hasOwnProperty(key)) {
@@ -1378,7 +1370,7 @@ CL = (function() {
         }
       }
     }
-    if (inc_SR_text === true && reading.hasOwnProperty('SR_text')) {
+    if (includeSrTextData === true && reading.hasOwnProperty('SR_text')) {
       for (let key in reading.SR_text) {
         if (key === witness) {
           return reading.SR_text[key];
@@ -1389,10 +1381,10 @@ CL = (function() {
   };
 
   //if any of the provided ovlerap_units object have an empty reading
-  overlapHasEmptyReading = function(overlap_units) {
-    var empty_reading, key, overlappingUnit;
-    for (key in overlap_units) {
-      if (overlap_units.hasOwnProperty(key)) {
+  overlapHasEmptyReading = function(overlapUnits) {
+    var overlappingUnit;
+    for (let key in overlapUnits) {
+      if (overlapUnits.hasOwnProperty(key)) {
         overlappingUnit = findOverlapUnitById(key);
         //the 1 in the next line can be hard coded because overlapped readings only ever have a single reading
         //after the a reading at this point
@@ -1415,28 +1407,28 @@ CL = (function() {
 
   addStageLinks = function() {
     if (document.getElementById('stage_links') && CL.services.hasOwnProperty('getSavedStageIds')) {
-      document.getElementById('stage_links').innerHTML = '<span id="R">Reg</span><span id="S">Set</span><span id="O">Ord</span><span id="A">App</span>';
-      CL.services.getSavedStageIds(CL.context, function(r, s, o, a) {
-        if (r) {
+      document.getElementById('stage_links').innerHTML = '<span id="R">Reg</span><span id="S">Set</span>' +
+                                                         '<span id="O">Ord</span><span id="A">App</span>';
+      CL.services.getSavedStageIds(CL.context, function(reg, set, ord, app) {
+        if (reg) {
           $('#R').addClass('saved_version');
-          _addNavEvent('R', r);
+          _addNavEvent('R', reg);
         }
-        if (s) {
+        if (set) {
           $('#S').addClass('saved_version');
-          _addNavEvent('S', s);
+          _addNavEvent('S', set);
         }
-        if (o) {
+        if (ord) {
           $('#O').addClass('saved_version');
-          _addNavEvent('O', o);
+          _addNavEvent('O', ord);
         }
-        if (a) {
+        if (app) {
           $('#A').addClass('saved_version');
-          _addNavEvent('A', a);
+          _addNavEvent('A', app);
         }
       });
     }
   };
-
 
   addExtraFooterButtons = function(stage) {
     var html;
@@ -1444,7 +1436,8 @@ CL = (function() {
     if (CL.project.hasOwnProperty('extraFooterButtons') && CL.project.extraFooterButtons.hasOwnProperty(stage)) {
       for (let i = 0; i < CL.project.extraFooterButtons[stage].length; i += 1) {
         if (CL.project.extraFooterButtons[stage][i].hasOwnProperty('id')) {
-          html.push('<input class="pure-button left_foot" type="button" id="' + CL.project.extraFooterButtons[stage][i].id + '" value="');
+          html.push('<input class="pure-button left_foot" type="button" id="' +
+                    CL.project.extraFooterButtons[stage][i].id + '" value="');
           if (CL.project.extraFooterButtons[stage][i].hasOwnProperty('label')) {
             html.push(CL.project.extraFooterButtons[stage][i].label);
           } else {
@@ -1453,10 +1446,12 @@ CL = (function() {
           html.push('"/>');
         }
       }
-    } else if (CL.services.hasOwnProperty('extraFooterButtons') && CL.services.extraFooterButtons.hasOwnProperty(stage)) {
+    } else if (CL.services.hasOwnProperty('extraFooterButtons') &&
+                    CL.services.extraFooterButtons.hasOwnProperty(stage)) {
       for (let i = 0; i < CL.services.extraFooterButtons[stage].length; i += 1) {
         if (CL.services.extraFooterButtons[stage][i].hasOwnProperty('id')) {
-          html.push('<input class="pure-button left_foot" type="button" id="' + CL.services.extraFooterButtons[stage][i].id + '" value="');
+          html.push('<input class="pure-button left_foot" type="button" id="' +
+                    CL.services.extraFooterButtons[stage][i].id + '" value="');
           if (CL.services.extraFooterButtons[stage][i].hasOwnProperty('label')) {
             html.push(CL.services.extraFooterButtons[stage][i].label);
           } else {
@@ -1484,7 +1479,8 @@ CL = (function() {
             if (!RG.hasOwnProperty('_rules') || (RG.hasOwnProperty('_rules') && RG.allRuleStacksEmpty())) {
               _findLatestStageVerse(verse);
             } else {
-              ok = confirm('You have unapplied rule changes in this verse. They will be lost if you navigate away.\nAre you sure you want to continue?');
+              ok = confirm('You have unapplied rule changes in this verse. They will be lost if you navigate away.' +
+                           '\nAre you sure you want to continue?');
               if (ok) {
                 _findLatestStageVerse(verse);
               } else {
@@ -1504,7 +1500,8 @@ CL = (function() {
             if (!RG.hasOwnProperty('_rules') || (RG.hasOwnProperty('_rules') && RG.allRuleStacksEmpty())) {
               _findLatestStageVerse(verse);
             } else {
-              ok = confirm('You have unapplied rule changes in this verse. They will be lost if you navigate away.\nAre you sure you want to continue?');
+              ok = confirm('You have unapplied rule changes in this verse. They will be lost if you navigate away.' +
+                           '\nAre you sure you want to continue?');
               if (ok) {
                 _findLatestStageVerse(verse);
               } else {
@@ -1520,11 +1517,11 @@ CL = (function() {
   };
 
   getUnitAppReading = function(id) {
-    var unit_details_regex, m, details;
-    unit_details_regex = /(variant|drag)_unit_(\d+)(_app_)?(\d+)?(_reading_|_row_)?(\d+)?/;
-    m = id.match(unit_details_regex);
+    var unitDetailsRegex, m, details;
+    unitDetailsRegex = /(variant|drag)_unit_(\d+)(_app_)?(\d+)?(_reading_|_row_)?(\d+)?/;
+    m = id.match(unitDetailsRegex);
     if (m === null) {
-      console.log(unit_details_regex);
+      console.log(unitDetailsRegex);
     }
     details = [parseInt(m[2], 10)];
     if (typeof m[4] !== 'undefined') {
@@ -1587,8 +1584,8 @@ CL = (function() {
     return;
   };
 
-  saveCollation = function(status, success_callback) {
-    var collation, confirmed, confirm_message, success_message, approval_settings;
+  saveCollation = function(status, successCallback) {
+    var collation, confirmed, confirmMessage, successMessage, approvalSettings;
     spinner.showLoadingOverlay();
     CL.services.getUserInfo(function(user) {
       if (user) {
@@ -1609,19 +1606,19 @@ CL = (function() {
         }
         //approved has different rules than others.
         if (status === 'approved') {
-          approval_settings = _getApprovalSettings();
+          approvalSettings = _getApprovalSettings();
           collation.id = CL.context + '_' + status;
-          confirm_message = 'This project already has an approved version of this verse.\nAre you sure you want ' +
+          confirmMessage = 'This project already has an approved version of this verse.\nAre you sure you want ' +
             'to overwrite the currently saved version with this one?';
-          success_message = 'Approve successful';
+          successMessage = 'Approve successful';
         } else {
-          approval_settings = [true, undefined];
+          approvalSettings = [true, undefined];
           collation.id = CL.context + '_' + status + '_' + user.id;
           if (CL.witnessEditingMode === false) {
-            confirm_message = 'You already have this verse saved at this stage in this environment.\n' +
+            confirmMessage = 'You already have this verse saved at this stage in this environment.\n' +
               'Are you sure you want to overwrite the currently saved version with this one?';
           }
-          success_message = 'Save successful';
+          successMessage = 'Save successful';
         }
         if (CL.project.hasOwnProperty('id')) {
           collation.project = CL.project.id;
@@ -1630,12 +1627,13 @@ CL = (function() {
           // should never happen but just in case stick in the user id.
           collation.id += '_' + user.id;
         }
-        CL.services.saveCollation(CL.context, collation, confirm_message, approval_settings[0], approval_settings[1], function(saved_successful) {
-          document.getElementById('message_panel').innerHTML = saved_successful ? success_message : '';
-          if (saved_successful) { //only run success callback if successful!
+        CL.services.saveCollation(CL.context, collation, confirmMessage, approvalSettings[0],
+                                  approvalSettings[1], function(savedSuccessful) {
+          document.getElementById('message_panel').innerHTML = savedSuccessful ? successMessage : '';
+          if (savedSuccessful) { //only run success callback if successful!
             CL.isDirty = false;
-            if (typeof success_callback !== 'undefined') {
-              success_callback();
+            if (typeof successCallback !== 'undefined') {
+              successCallback();
             }
           }
           spinner.removeLoadingOverlay();
@@ -1658,16 +1656,19 @@ CL = (function() {
     return witnesses;
   };
 
-  getSpecifiedAncestor = function(element, ancestor, condition_test) {
-    if (typeof condition_test === 'undefined') {
-      condition_test = function(e) {
+  getSpecifiedAncestor = function(element, ancestor, conditionTest) {
+    if (typeof conditionTest === 'undefined') {
+      conditionTest = function(e) {
         return true;
       };
     }
-    if (element.tagName === ancestor && condition_test(element)) {
+    if (element.tagName === ancestor && conditionTest(element)) {
       return element;
     } else {
-      while (element.tagName !== 'BODY' && (element.tagName !== ancestor || (element.tagName === ancestor && condition_test(element) === false))) {
+      while (element.tagName !== 'BODY' &&
+                (element.tagName !== ancestor ||
+                  (element.tagName === ancestor &&
+                    conditionTest(element) === false))) {
         element = element.parentNode;
       }
       return element;
@@ -1703,57 +1704,57 @@ CL = (function() {
   };
 
   //TODO: think about putting html in a html file and calling in
-  showSplitWitnessMenu = function(reading, menu_pos, details) {
-    var wit_menu, witnesses, witness_html, window_height, menu_height, sub_types, id, left, top, wit_form_height;
-    left = menu_pos.left;
-    top = menu_pos.top;
+  showSplitWitnessMenu = function(reading, menuPos, details) {
+    var witMenu, witnesses, witnessHtml, windowHeight, menuHeight, subTypes, id, left, top, witFormHeight;
+    left = menuPos.left;
+    top = menuPos.top;
     //if there is already an old menu hanging around remove it
     if (document.getElementById('wit_form')) {
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
     }
     //show the select witnesses menu
-    wit_menu = document.createElement('div');
-    wit_menu.setAttribute('id', 'wit_form');
-    wit_menu.setAttribute('class', 'wit_form dialogue_form');
+    witMenu = document.createElement('div');
+    witMenu.setAttribute('id', 'wit_form');
+    witMenu.setAttribute('class', 'wit_form dialogue_form');
     witnesses = sortWitnesses(getAllReadingWitnesses(reading));
-    witness_html = ['<div class="dialogue_form_header drag-zone">' + details.header + '</div><form id="select_wit_form">'];
-    witness_html.push('<label>Selected reading: </label><span>');
-    witness_html.push(CL.extractWitnessText(reading));
-    witness_html.push('</span>');
+    witnessHtml = ['<div class="dialogue_form_header drag-zone">' + details.header + '</div><form id="select_wit_form">'];
+    witnessHtml.push('<label>Selected reading: </label><span>');
+    witnessHtml.push(CL.extractWitnessText(reading));
+    witnessHtml.push('</span>');
     if (witnesses.length > 1 && (!details.hasOwnProperty('witness_select') || details.witness_select !== false)) {
-      witness_html.push('<div id="wit_scroller"><input type="checkbox" id="wit_select_all">Select All</input><br/>');
+      witnessHtml.push('<div id="wit_scroller"><input type="checkbox" id="wit_select_all">Select All</input><br/>');
       for (let i = 0; i < witnesses.length; i += 1) {
         if (witnesses[i] !== CL.dataSettings.base_text_siglum) {
-          witness_html.push('<input type="checkbox" id="' + witnesses[i] + '" name="' + witnesses[i] + '" value="' +
+          witnessHtml.push('<input type="checkbox" id="' + witnesses[i] + '" name="' + witnesses[i] + '" value="' +
             witnesses[i] + '">' + witnesses[i] + '</input><br/>');
         }
       }
-      witness_html.push('</div>');
+      witnessHtml.push('</div>');
     } else {
       for (let i = 0; i < witnesses.length; i += 1) {
-        witness_html.push('<input type="hidden" name="' + witnesses[i] + '" value="true"/><br/>');
+        witnessHtml.push('<input type="hidden" name="' + witnesses[i] + '" value="true"/><br/>');
       }
     }
     if (details.type === 'overlap') {
       // squelch
     } else if (details.type === 'SVsubreading' || details.type === 'ORsubreading') {
-      witness_html.push('<label class="inline-label">Parent reading:</label><select name="parent_reading" id="parent_reading"></select><br/><br/>');
-      witness_html.push('<label class="inline-label">Details:</label><input disabled="disabled" type="text" name="reading_details" id="reading_details"/><br/></br/>');
-      sub_types = getRuleClasses('subreading', true, 'value', 'identifier');
-      if (Object.keys(sub_types).length > 1) {
-        witness_html.push('<label>Subreading type: <select name="subreading_type" id="subreading_select"></select></label><br/><br/>');
+      witnessHtml.push('<label class="inline-label">Parent reading:</label><select name="parent_reading" id="parent_reading"></select><br/><br/>');
+      witnessHtml.push('<label class="inline-label">Details:</label><input disabled="disabled" type="text" name="reading_details" id="reading_details"/><br/></br/>');
+      subTypes = getRuleClasses('subreading', true, 'value', 'identifier');
+      if (Object.keys(subTypes).length > 1) {
+        witnessHtml.push('<label>Subreading type: <select name="subreading_type" id="subreading_select"></select></label><br/><br/>');
       } else {
-        id = error_types[Object.keys(sub_types)];
-        witness_html.push('<input type="hidden" id="subreading_type" name="subreading_type" value="' + id + '"/>');
+        id = error_types[Object.keys(subTypes)];
+        witnessHtml.push('<input type="hidden" id="subreading_type" name="subreading_type" value="' + id + '"/>');
       }
     } else if (details.type !== 'duplicate') {
-      witness_html.push('<label class="inline-label">Parent reading:</label><select name="parent_reading" id="parent_reading"></select><br/>');
-      witness_html.push('<label class="inline-label">Details:</label><input disabled="disabled" type="text" name="reading_details" id="reading_details"/><br/></br/>');
+      witnessHtml.push('<label class="inline-label">Parent reading:</label><select name="parent_reading" id="parent_reading"></select><br/>');
+      witnessHtml.push('<label class="inline-label">Details:</label><input disabled="disabled" type="text" name="reading_details" id="reading_details"/><br/></br/>');
     }
-    witness_html.push('<input class="pure-button dialogue-form-button" id="close_button" type="button" value="Cancel"/>');
-    witness_html.push('<input class="pure-button dialogue-form-button" id="select_button" type="button" value="' + details.button + '"/></form>');
-    wit_menu.innerHTML = witness_html.join('');
-    document.getElementsByTagName('body')[0].appendChild(wit_menu);
+    witnessHtml.push('<input class="pure-button dialogue-form-button" id="close_button" type="button" value="Cancel"/>');
+    witnessHtml.push('<input class="pure-button dialogue-form-button" id="select_button" type="button" value="' + details.button + '"/></form>');
+    witMenu.innerHTML = witnessHtml.join('');
+    document.getElementsByTagName('body')[0].appendChild(witMenu);
     left = parseInt(left) - document.getElementById('scroller').scrollLeft;
     if (left + document.getElementById('wit_form').offsetWidth > window.innerWidth) {
       left = left - document.getElementById('wit_form').offsetWidth;
@@ -1763,18 +1764,18 @@ CL = (function() {
     }
     document.getElementById('wit_form').style.left = left + 'px';
     drag.initDraggable('wit_form', true, true);
-    window_height = window.innerHeight;
-    wit_form_height = document.getElementById('wit_form').offsetHeight - 43;
-    document.getElementById('select_wit_form').style.height = wit_form_height + 'px';
+    windowHeight = window.innerHeight;
+    witFormHeight = document.getElementById('wit_form').offsetHeight - 43;
+    document.getElementById('select_wit_form').style.height = witFormHeight + 'px';
     if (details.hasOwnProperty('form_size') && details.form_size === 'small') {
-      menu_height = Math.max(wit_form_height - 100, 50);
+      menuHeight = Math.max(witFormHeight - 100, 50);
     } else if (details.type === 'SVsubreading' || details.type === 'ORsubreading') {
-      menu_height = Math.max(wit_form_height - 235, 50);
+      menuHeight = Math.max(witFormHeight - 235, 50);
     } else {
-      menu_height = Math.max(wit_form_height - 173, 50);
+      menuHeight = Math.max(witFormHeight - 173, 50);
     }
     if (witnesses.length > 1 && (!details.hasOwnProperty('witness_select') || details.witness_select !== false)) {
-      document.getElementById('wit_scroller').style.maxHeight = menu_height + 'px';
+      document.getElementById('wit_scroller').style.maxHeight = menuHeight + 'px';
     }
     $('#close_button').on('click', function(event) {
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
@@ -1787,19 +1788,20 @@ CL = (function() {
   };
 
   //mark readings using standoff model
-  markStandoffReading = function(type, name, reading_details, format, menu_pos) {
-    var i, reading, parents, unit, new_reading_id, subreading_classes, total_reading_witnesses, callback;
-    reading = CL.data[reading_details.app_id][reading_details.unit_pos].readings[reading_details.reading_pos];
-    total_reading_witnesses = reading.witnesses.length;
+  //TODO: can this be made simpler by at least assigning the unit to a variable?
+  markStandoffReading = function(type, name, readingDetails, format, menuPos) {
+    var reading, parents, unit, newReadingId, subreadingClasses, totalReadingWitnesses, callback;
+    reading = CL.data[readingDetails.app_id][readingDetails.unit_pos].readings[readingDetails.reading_pos];
+    totalReadingWitnesses = reading.witnesses.length;
     //show the menu to identify the parent reading and split the witnesses if necessary
     if (reading.witnesses.length > 1 || reading.hasOwnProperty('subreadings')) {
-      showSplitWitnessMenu(reading, menu_pos, {
+      showSplitWitnessMenu(reading, menuPos, {
         'type': type,
         'header': 'Select witnesses to mark as ' + name,
         'button': 'Mark ' + name
       });
     } else {
-      showSplitWitnessMenu(reading, menu_pos, {
+      showSplitWitnessMenu(reading, menuPos, {
         'type': type,
         'header': 'Select parent reading',
         'button': 'Mark ' + name
@@ -1807,37 +1809,28 @@ CL = (function() {
     }
     //populate the parent drop down
     parents = [];
-    for (i = 0; i < CL.data[reading_details.app_id][reading_details.unit_pos].readings.length; i += 1) {
+    for (let i = 0; i < CL.data[readingDetails.app_id][readingDetails.unit_pos].readings.length; i += 1) {
       //if the reading is
       //	not the reading being made a subreading
       //	its not an empty reading (doesn't have a type attribute)
       //	it is an empty reading but isn't lac verse or om verse (probably should change this and deal with them differently)
       //	the unit is an overlap and i != 0 (which means this is the a reading)
-      if (i !== reading_details.reading_pos &&
-        (!CL.data[reading_details.app_id][reading_details.unit_pos].readings[i].hasOwnProperty('type') ||
-          (CL.data[reading_details.app_id][reading_details.unit_pos].readings[i].hasOwnProperty('type') &&
-            CL.data[reading_details.app_id][reading_details.unit_pos].readings[i].type !== 'om_verse' &&
-            CL.data[reading_details.app_id][reading_details.unit_pos].readings[i].type !== 'lac_verse')) &&
-        (reading_details.app_id === 'apparatus' || (
-          reading_details.app_id !== 'apparatus' && i !== 0))) {
+      if (i !== readingDetails.reading_pos &&
+        (!CL.data[readingDetails.app_id][readingDetails.unit_pos].readings[i].hasOwnProperty('type') ||
+          (CL.data[readingDetails.app_id][readingDetails.unit_pos].readings[i].hasOwnProperty('type') &&
+            CL.data[readingDetails.app_id][readingDetails.unit_pos].readings[i].type !== 'om_verse' &&
+            CL.data[readingDetails.app_id][readingDetails.unit_pos].readings[i].type !== 'lac_verse')) &&
+        (readingDetails.app_id === 'apparatus' || (
+          readingDetails.app_id !== 'apparatus' && i !== 0))) {
         parents.push({
           'label': getAlphaId(i),
-          'value': CL.data[reading_details.app_id][reading_details.unit_pos].readings[i]._id
+          'value': CL.data[readingDetails.app_id][readingDetails.unit_pos].readings[i]._id
         });
       }
     }
-    parents.push({
-      'label': 'om',
-      'value': 'om'
-    });
-    parents.push({
-      'label': 'gap',
-      'value': 'gap'
-    });
-    parents.push({
-      'label': 'other',
-      'value': 'other'
-    });
+    parents.push({'label': 'om', 'value': 'om'});
+    parents.push({'label': 'gap', 'value': 'gap'});
+    parents.push({'label': 'other', 'value': 'other'});
 
     cforms.populateSelect(parents, document.getElementById('parent_reading'), {
       'value_key': 'value',
@@ -1845,13 +1838,13 @@ CL = (function() {
     });
     //Populate the subreading type dropdown
     if (document.getElementById('subreading_select')) {
-      subreading_classes = [];
-      for (i = 0; i < CL.ruleClasses.length; i += 1) {
+      subreadingClasses = [];
+      for (let i = 0; i < CL.ruleClasses.length; i += 1) {
         if (CL.ruleClasses[i].create_in_SV === true && CL.ruleClasses[i].subreading === true) {
-          subreading_classes.push(CL.ruleClasses[i]);
+          subreadingClasses.push(CL.ruleClasses[i]);
         }
       }
-      cforms.populateSelect(subreading_classes, document.getElementById('subreading_select'), {
+      cforms.populateSelect(subreadingClasses, document.getElementById('subreading_select'), {
         'value_key': 'value',
         'text_keys': 'name',
         'add_select': false
@@ -1872,17 +1865,17 @@ CL = (function() {
     });
     //Add event handler to do the job
     $('#select_button').on('click', function(event) {
-      var extra_details, data, witness_list, key, uni, callbackt;
+      var extraDetails, data, witness_list, uni, callbackt;
       data = cforms.serialiseForm('select_wit_form');
       if (data.parent_reading !== 'none') {
         witness_list = [];
-        for (key in data) {
+        for (let key in data) {
           if (key === 'duplicate') {
             duplicate = true;
           } else if (key === 'subreading_type') {
             type = data[key];
           } else if (key === 'reading_details') {
-            extra_details = data[key].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            extraDetails = data[key].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
           } else if (key !== 'parent_reading' && data.hasOwnProperty(key) && data[key] !== null) {
             witness_list.push(key);
           }
@@ -1890,54 +1883,58 @@ CL = (function() {
         //					console.log(witness_list)
         if (data.parent_reading === 'other') {
           //if the reading that is being created is not the same as the a reading when we are in an overlapped reading
-          if (reading_details.app_id === 'apparatus' || (reading_details.app_id !== 'apparatus' && extra_details.trim() !== extractWitnessText(CL.data[reading_details.app_id][reading_details.unit_pos].readings[0]))) {
-            data.parent_reading = createNewReading(CL.data[reading_details.app_id][reading_details.unit_pos], data.parent_reading, extra_details);
+          if (readingDetails.app_id === 'apparatus' ||
+                    (readingDetails.app_id !== 'apparatus' &&
+                      extraDetails.trim() !== extractWitnessText(CL.data[readingDetails.app_id][readingDetails.unit_pos].readings[0]))) {
+            data.parent_reading = createNewReading(CL.data[readingDetails.app_id][readingDetails.unit_pos],
+                                                   data.parent_reading, extraDetails);
           } else {
             alert('The reading you have entered is the same as the a reading. This is not allowed in overlapped units.');
             return;
           }
         } else if (data.parent_reading === 'gap') {
-          data.parent_reading = createNewReading(CL.data[reading_details.app_id][reading_details.unit_pos], data.parent_reading, extra_details);
+          data.parent_reading = createNewReading(CL.data[readingDetails.app_id][readingDetails.unit_pos],
+                                                 data.parent_reading, extraDetails);
         } else if (data.parent_reading === 'om') {
-          data.parent_reading = createNewReading(CL.data[reading_details.app_id][reading_details.unit_pos], data.parent_reading);
+          data.parent_reading = createNewReading(CL.data[readingDetails.app_id][readingDetails.unit_pos],
+                                                 data.parent_reading);
         }
 
-        new_reading_id = SV.doSplitReadingWitnesses(reading_details.unit_pos, reading_details.reading_pos, witness_list, reading_details.app_id, true);
-        //					console.log(new_reading_id)
-        reading_details.reading_id = new_reading_id;
-        //					console.log(reading_details)
+        newReadingId = SV.doSplitReadingWitnesses(readingDetails.unit_pos, readingDetails.reading_pos,
+                                                  witness_list, readingDetails.app_id, true);
+        readingDetails.reading_id = newReadingId;
         //record it in the separated_witnesses structure if we didn't select all witnesses in the reading
-        if (witness_list.length < total_reading_witnesses) {
+        if (witness_list.length < totalReadingWitnesses) {
           if (!CL.data.hasOwnProperty('separated_witnesses')) {
             CL.data.separated_witnesses = [];
           }
-          unit = CL.data[reading_details.app_id][reading_details.unit_pos];
+          unit = CL.data[readingDetails.app_id][readingDetails.unit_pos];
           CL.data.separated_witnesses.push({
-            'app_id': reading_details.app_id,
+            'app_id': readingDetails.app_id,
             'unit_id': unit._id,
             'witnesses': witness_list,
-            'reading_id': reading_details.reading_id
+            'reading_id': readingDetails.reading_id
           });
         }
         callback = function() {
           document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
         };
         if (format === 'set_variants') {
-          SV.makeStandoffReading(type, reading_details, data.parent_reading, callback);
+          SV.makeStandoffReading(type, readingDetails, data.parent_reading, callback);
         } else if (format === 'order_readings') {
-          OR.makeStandoffReading(type, reading_details, data.parent_reading, callback);
+          OR.makeStandoffReading(type, readingDetails, data.parent_reading, callback);
         }
       }
     });
   };
 
-  findUnitPosById = function(app_id, unit_id, data) {
+  findUnitPosById = function(appId, unitId, data) {
     if (data === undefined) {
       data = CL.data;
     }
-    if (data.hasOwnProperty(app_id)) {
-      for (let i = 0; i < CL.data[app_id].length; i += 1) {
-        if (data[app_id][i]._id === unit_id) {
+    if (data.hasOwnProperty(appId)) {
+      for (let i = 0; i < CL.data[appId].length; i += 1) {
+        if (data[appId][i]._id === unitId) {
           return i;
         }
       }
@@ -2001,19 +1998,17 @@ CL = (function() {
     return structuredTokens;
   };
 
-  makeStandoffReading = function(type, reading_details, parent_id, outerCallback) {
-    var apparatus, unit, parent, reading, fosilised_reading, tValuesForSettings, options, displaySettings,
+  makeStandoffReading = function(type, readingDetails, parentId, outerCallback) {
+    var apparatus, unit, parent, reading, fosilisedReading, tValuesForSettings, options, displaySettings,
       resultCallback, data;
     data = {};
-    apparatus = reading_details.app_id;
-    unit = findUnitById(apparatus, reading_details.unit_id);
-    parent = findReadingById(unit, parent_id);
+    apparatus = readingDetails.app_id;
+    unit = findUnitById(apparatus, readingDetails.unit_id);
+    parent = findReadingById(unit, parentId);
     SR.loseSubreadings(); //must always lose subreadings first or find subreadings doesn't find them all!
-    SR.findSubreadings({
-      'unit_id': unit._id
-    }); //we need this to see if we have any!
-    reading = findReadingById(unit, reading_details.reading_id);
-    fosilised_reading = JSON.parse(JSON.stringify(reading));
+    SR.findSubreadings({'unit_id': unit._id}); //we need this to see if we have any!
+    reading = findReadingById(unit, readingDetails.reading_id);
+    fosilisedReading = JSON.parse(JSON.stringify(reading));
     tValuesForSettings = _extractAllTValuesForRGAppliedRules(reading, unit, apparatus);
     options = {};
     displaySettings = {};
@@ -2033,7 +2028,8 @@ CL = (function() {
       for (let i = 0; i < data.tokens.length; i += 1) {
         baseReadingsWithSettingsApplied[data.tokens[i].t] = data.tokens[i]['interface'];
       }
-      _makeStandoffReading2(reading, fosilised_reading, parent, baseReadingsWithSettingsApplied, type, unit, apparatus, reading_details);
+      _makeStandoffReading2(reading, fosilisedReading, parent, baseReadingsWithSettingsApplied,
+                            type, unit, apparatus, readingDetails);
       if (outerCallback !== undefined) {
         outerCallback();
       }
@@ -2043,9 +2039,9 @@ CL = (function() {
     CL.services.applySettings(data, resultCallback);
   };
 
-  _makeStandoffReading2 = function(reading, fosilised_reading, parent, baseReadingsWithSettingsApplied, type, unit,
-    apparatus, reading_details) {
-    var ids, new_reading, witness;
+  _makeStandoffReading2 = function(reading, fosilisedReading, parent, baseReadingsWithSettingsApplied,
+                                    type, unit, apparatus, readingDetails) {
+    var ids, newReading, witness;
     //do any existing subreadings
     if (reading.hasOwnProperty('subreadings')) {
       // now here is the tricky bit - if this subreading is a subreading because of work done in the regulariser we
@@ -2057,20 +2053,18 @@ CL = (function() {
           for (let i = reading.subreadings[key].length - 1; i >= 0; i -= 1) {
             let k = reading.subreadings[key][i].witnesses.length - 1;
             //TODO: what is this doing and why is it so complicated! i is going backwards anyway so why check i here?
-            while (reading.hasOwnProperty('subreadings') && reading.subreadings.hasOwnProperty(key) && i < reading.subreadings[key].length && k >= 0) {
+            while (reading.hasOwnProperty('subreadings') && reading.subreadings.hasOwnProperty(key) &&
+                        i < reading.subreadings[key].length && k >= 0) {
               witness = reading.subreadings[key][i].witnesses[k];
               if (findStandoffRegularisation(unit, witness, apparatus) === null) {
-                _makeRegDecisionsStandoff(type, apparatus, unit, reading, parent, reading.subreadings[key][i], witness, baseReadingsWithSettingsApplied);
-                makeMainReading(unit, reading, key, i, {
-                  'witnesses': [witness]
-                });
+                _makeRegDecisionsStandoff(type, apparatus, unit, reading, parent,
+                                          reading.subreadings[key][i], witness, baseReadingsWithSettingsApplied);
+                makeMainReading(unit, reading, key, i, {'witnesses': [witness]});
               } else { //if we get here we must already have dealt with any regulaisations made in RG for this reading
-                ids = makeMainReading(unit, reading, key, i, {
-                  'witnesses': [witness]
-                });
+                ids = makeMainReading(unit, reading, key, i, {'witnesses': [witness]});
                 for (let j = 0; j < ids.length; j += 1) {
-                  new_reading = findReadingById(unit, ids[j]);
-                  doMakeStandoffReading(type, apparatus, unit, new_reading, parent);
+                  newReading = findReadingById(unit, ids[j]);
+                  doMakeStandoffReading(type, apparatus, unit, newReading, parent);
                 }
               }
               SR.loseSubreadings();
@@ -2084,7 +2078,7 @@ CL = (function() {
       }
     }
     //then do the parent reading itself if it has genuine readings
-    if (fosilised_reading.witnesses.length > 0) {
+    if (fosilisedReading.witnesses.length > 0) {
       doMakeStandoffReading(type, apparatus, unit, reading, parent); //this includes call to lose_subreadings
     } else {
       SR.loseSubreadings();
@@ -2094,9 +2088,7 @@ CL = (function() {
      * NB: running SR.findSubreadings actually makes the standoff marked reading a real subreading in
      * the display and is a required step even if it is to be hidden again immediately afterwards
      */
-    SR.findSubreadings({
-      'unit_id': unit._id
-    });
+    SR.findSubreadings({'unit_id': unit._id});
     //			console.log('RESULT OF _FIND_SUBREADINGS BELOW')
     //			console.log(JSON.parse(JSON.stringify(CL.data)))
     //			console.log('++++++++++++++++++++++++ about to lose subreadings')
@@ -2107,35 +2099,37 @@ CL = (function() {
     SV.prepareForOperation();
     //			console.log('now we have prepared')
     //			console.log(JSON.parse(JSON.stringify(CL.data)))
-    SV.unsplitUnitWitnesses(reading_details.unit_pos, 'apparatus');
+    SV.unsplitUnitWitnesses(readingDetails.unit_pos, 'apparatus');
     //			console.log('now we have unsplit')
     //			console.log(JSON.parse(JSON.stringify(CL.data)))
     SV.unprepareForOperation();
     //			console.log('now we have sorted out shared readings')
     //			console.log(JSON.parse(JSON.stringify(CL.data)))
-
   };
 
   //at this point the reading is *always* a main reading never a subreading
   doMakeStandoffReading = function(type, apparatus, unit, reading, parent) {
-    var key, ruleDetails, reading_text, details, existing_standoff, position, total, temp, type_string;
-    SR.loseSubreadings(); //needs to be done so the main reading we are dealing with contains *all* witnesses including those of subreadings
-    ruleDetails = getRuleClasses('value', type, 'value', ['suffixed_sigla', 'identifier', 'name', 'subreading', 'suffixed_label']);
+    var ruleDetails, readingText, details, existingStandoff, typeString;
+    // must lose subreadings so the main reading we are dealing with contains *all* witnesses
+    // including those of subreadings
+    SR.loseSubreadings();
+    ruleDetails = getRuleClasses('value', type, 'value', ['suffixed_sigla', 'identifier', 'name',
+                                                          'subreading', 'suffixed_label']);
     //mark it as a standoff reading
     for (let i = 0; i < reading.witnesses.length; i += 1) {
-      //we must find reading_text value in this loop as we need witness for extracting any regulariser created subreading text
-      reading_text = extractWitnessText(reading, {
+      //we must find readingText value in this loop as we need witness for extracting any regulariser created subreading text
+      readingText = extractWitnessText(reading, {
         'witness': reading.witnesses[i],
         'reading_type': 'subreading'
-      }); //adding true to extract_witness_text call will print debugging to console
+      }); //adding true to extractWitnessText call will print debugging to console
       /* subreadings accumulate decision classes so...
        *  if we already have this witness in our marked with the same type label and unit start and end then replace the stored data
        *  if we have it with a different type label but the same start and end then merge the data
        *  */
-      existing_standoff = _findStandoffWitness(reading.witnesses[i], unit.start, unit.end, unit.first_word_index);
-      if (existing_standoff !== null) {
+      existingStandoff = _findStandoffWitness(reading.witnesses[i], unit.start, unit.end, unit.first_word_index);
+      if (existingStandoff !== null) {
         //then we need to merge the data this will occur if we have applied a standoff to a parent that already has standoff children!
-        details = existing_standoff[0];
+        details = existingStandoff[0];
         //Now check if we have already recorded the first_word_index and if not record it now
         if (!details.hasOwnProperty('first_word_index')) {
           details.first_word_index = unit.first_word_index;
@@ -2146,17 +2140,14 @@ CL = (function() {
         } else { // if we don't have a reading history (this will be for legacy data only) we will need to hash one together!
           details.reading_history = [details.reading_text, details.parent_text];
         }
-        type_string = existing_standoff[1] + '|' + type;
-        details.parent_text = extractWitnessText(parent, {
-          'app_id': apparatus,
-          'unit_id': unit._id
-        });
+        typeString = existingStandoff[1] + '|' + type;
+        details.parent_text = extractWitnessText(parent, {'app_id': apparatus, 'unit_id': unit._id});
         details.identifier.push(ruleDetails[Object.keys(ruleDetails)[0]][1]);
         details.suffixed_sigla.push(ruleDetails[Object.keys(ruleDetails)[0]][0]);
         details.suffixed_label.push(ruleDetails[Object.keys(ruleDetails)[0]][4]);
         details.subreading.push(ruleDetails[Object.keys(ruleDetails)[0]][3]);
         details.name.push(ruleDetails[Object.keys(ruleDetails)[0]][2]);
-        details.value = type_string;
+        details.value = typeString;
         if (parent.text.length === 0 && parent.hasOwnProperty('details')) {
           details.om_details = parent.details;
         }
@@ -2169,10 +2160,10 @@ CL = (function() {
             details.combined_gap_before_details = reading.text[0].combined_gap_before_details;
           }
         }
-        if (!CL.data.marked_readings.hasOwnProperty(type_string)) {
-          CL.data.marked_readings[type_string] = [];
+        if (!CL.data.marked_readings.hasOwnProperty(typeString)) {
+          CL.data.marked_readings[typeString] = [];
         }
-        CL.data.marked_readings[type_string].push(details);
+        CL.data.marked_readings[typeString].push(details);
         //					}
       } else {
         //this is a completely new subreading so make a new one
@@ -2187,7 +2178,7 @@ CL = (function() {
           'first_word_index': unit.first_word_index,
           'witness': reading.witnesses[i],
           'apparatus': apparatus,
-          'reading_text': reading_text,
+          'reading_text': readingText,
           'parent_text': extractWitnessText(parent, {
             'app_id': apparatus,
             'unit_id': unit._id
@@ -2195,7 +2186,7 @@ CL = (function() {
           'identifier': [ruleDetails[Object.keys(ruleDetails)[0]][1]],
           'suffixed_sigla': [ruleDetails[Object.keys(ruleDetails)[0]][0]],
           'suffixed_label': [ruleDetails[Object.keys(ruleDetails)[0]][4]],
-          'reading_history': [reading_text],
+          'reading_history': [readingText],
           'value': type,
           'subreading': [ruleDetails[Object.keys(ruleDetails)[0]][3]],
           'name': [ruleDetails[Object.keys(ruleDetails)[0]][2]],
@@ -2223,15 +2214,13 @@ CL = (function() {
     }
   };
 
-  makeMainReading = function(unit, parent, subtype, subreading_pos, options) {
-    var unit_number, parent_reading, parent_pos, app_id, subreading, text, witnesses,
-      i, j, k, interface_word_list, key, new_reading, parent_id, delete_subreading,
-      new_readings, ids;
+  makeMainReading = function(unit, parent, subtype, subreadingPos, options) {
+    var parentPos, subreading, text, witnesses, newReading, deleteSubreading, newReadings, ids;
     if (typeof options === 'undefined') {
       options = {};
     }
-    parent_pos = findReadingPosById(unit, parent._id);
-    subreading = parent.subreadings[subtype][subreading_pos];
+    parentPos = findReadingPosById(unit, parent._id);
+    subreading = parent.subreadings[subtype][subreadingPos];
 
     if (typeof options.witnesses !== 'undefined') {
       witnesses = options.witnesses;
@@ -2243,10 +2232,10 @@ CL = (function() {
       //we are now working on the subreading we are leaving behind
       //we are making fewer witnesses into a main reading than there are witnesses (if they are the same we can leave them)
       //so we need to remove witnesses from subreading.text (and not delete the subreading at the end)
-      delete_subreading = false;
-      for (i = 0; i < witnesses.length; i += 1) {
+      deleteSubreading = false;
+      for (let i = 0; i < witnesses.length; i += 1) {
         subreading.witnesses.splice(subreading.witnesses.indexOf(witnesses[i]), 1);
-        for (j = 0; j < subreading.text.length; j += 1) {
+        for (let j = 0; j < subreading.text.length; j += 1) {
           subreading.text[j].reading.splice(subreading.text[j].reading.indexOf(witnesses[i]), 1);
           if (subreading.text[j].hasOwnProperty(witnesses[i])) {
             delete subreading.text[j][witnesses[i]];
@@ -2256,77 +2245,90 @@ CL = (function() {
     } else {
       //we are dealing with all witnesses to this subreading so we want to delete the subreading when
       //we get to the end
-      delete_subreading = true;
+      deleteSubreading = true;
     }
 
     //now we need to remove all not selected witnesses from the text info for the new reading we are creating
     //this needs to be done per witness just for safety
     //TODO: make this more efficient by combining entries as you go?
-    new_readings = [];
-    for (j = 0; j < witnesses.length; j += 1) {
-      new_reading = {
+    newReadings = [];
+    for (let j = 0; j < witnesses.length; j += 1) {
+      newReading = {
         'witnesses': [witnesses[j]],
         'text': JSON.parse(JSON.stringify(text))
       };
       if (subreading.hasOwnProperty('type')) {
-        new_reading.type = subreading.type;
+        newReading.type = subreading.type;
       }
       if (subreading.hasOwnProperty('details')) {
-        new_reading.details = subreading.details;
+        newReading.details = subreading.details;
       }
-      for (i = 0; i < new_reading.text.length; i += 1) {
-        if (new_reading.text[i].hasOwnProperty(witnesses[j]) && new_reading.text[i][witnesses[j]].hasOwnProperty('decision_details')) { //all witness selected will have the same subreading by now even if they have been created via different routes because they are showing as subreadings
-          new_reading.text[i]['interface'] = new_reading.text[i][witnesses[j]].decision_details[0].t;
-        } else if (new_reading.text[i].hasOwnProperty('t')) {
-          new_reading.text[i]['interface'] = new_reading.text[i].t;
+      for (let i = 0; i < newReading.text.length; i += 1) {
+        // all witness selected will have the same subreading by now even if they have been created via different
+        // routes because they are showing as subreadings
+        if (newReading.text[i].hasOwnProperty(witnesses[j]) &&
+                  newReading.text[i][witnesses[j]].hasOwnProperty('decision_details')) {
+          newReading.text[i]['interface'] = newReading.text[i][witnesses[j]].decision_details[0].t;
+        } else if (newReading.text[i].hasOwnProperty('t')) {
+          newReading.text[i]['interface'] = newReading.text[i].t;
         } else {
-          if (new_reading.text[i].hasOwnProperty([witnesses[j]]) && typeof(new_reading.text[i][witnesses[j]]['interface']) !== 'undefined') { //ALERT: this line used to say witnesses.legnth === 1 need to be sure that  multiple witnesses always have the same value????
-            new_reading.text[i]['interface'] = new_reading.text[i][witnesses[j]]['interface'];
+          //ALERT: this line used to say witnesses.length === 1 need to be sure that multiple witnesses always have the same value????
+          if (newReading.text[i].hasOwnProperty([witnesses[j]]) &&
+                  typeof(newReading.text[i][witnesses[j]]['interface']) !== 'undefined') {
+            newReading.text[i]['interface'] = newReading.text[i][witnesses[j]]['interface'];
           } else {
-            new_reading.text[i]['interface'] = new_reading.text[i]['interface'];
+            newReading.text[i]['interface'] = newReading.text[i]['interface'];
           }
         }
-        //delete decisions if there are any
-        if (new_reading.text[i].hasOwnProperty(witnesses[j])) {
-          delete new_reading.text[i][witnesses[j]].decision_class;
-          delete new_reading.text[i][witnesses[j]].decision_details;
+        // delete decisions if there are any
+        if (newReading.text[i].hasOwnProperty(witnesses[j])) {
+          delete newReading.text[i][witnesses[j]].decision_class;
+          delete newReading.text[i][witnesses[j]].decision_details;
         }
-        for (k = 0; k < new_reading.text[i].reading.length; k += 1) {
-          if (new_reading.text[i].reading[k] !== witnesses[j]) {
-            if (new_reading.text[i].hasOwnProperty(new_reading.text[i].reading[k])) {
-              delete new_reading.text[i][new_reading.text[i].reading[k]];
+        for (let k = 0; k < newReading.text[i].reading.length; k += 1) {
+          if (newReading.text[i].reading[k] !== witnesses[j]) {
+            if (newReading.text[i].hasOwnProperty(newReading.text[i].reading[k])) {
+              delete newReading.text[i][newReading.text[i].reading[k]];
             }
-            new_reading.text[i].reading[k] = null;
+            newReading.text[i].reading[k] = null;
           }
         }
-        removeNullItems(new_reading.text[i].reading);
+        removeNullItems(newReading.text[i].reading);
       }
-      //TODO
-      //note that the information is stored in different places depending on whether this is a standoff subreading or one created in the regulariser (this is not
-      //especially sensible but it is how it is at present and working with it is easier and less dangerous than trying to change it!) In version 2 I would fix this!
-      if (parent.text.length > 0 && parent.text[0].hasOwnProperty('combined_gap_before') && parent.text[0].combined_gap_before.indexOf(witnesses[j]) !== -1) {
-        new_reading.text[0].combined_gap_before = [witnesses[j]];
-        new_reading.text[0].combined_gap_before_details = parent.text[0].combined_gap_before_details;
-        //now remove the details for this witness from the parent
+      // TODO
+      // note that the information is stored in different places depending on whether this is a standoff subreading or
+      // one created in the regulariser (this is not especially sensible but it is how it is at present and working
+      // with it is easier and less dangerous than trying to change it!) In version 2 I would fix this!
+      if (parent.text.length > 0 && parent.text[0].hasOwnProperty('combined_gap_before') &&
+                  parent.text[0].combined_gap_before.indexOf(witnesses[j]) !== -1) {
+        newReading.text[0].combined_gap_before = [witnesses[j]];
+        newReading.text[0].combined_gap_before_details = parent.text[0].combined_gap_before_details;
+        // now remove the details for this witness from the parent
         parent.text[0].combined_gap_before.splice(parent.text[0].combined_gap_before.indexOf(witnesses[j]), 1);
-        //we do not need to remove the details here because it is a simple string (because this only happens when they all read the same)
+        // we do not need to remove the details here because it is a simple string (because this only happens when
+        // they all read the same)
       }
-      if (parent.hasOwnProperty('combined_gap_before_subreadings') && parent.combined_gap_before_subreadings.indexOf(witnesses[j]) !== -1) {
-        new_reading.text[0].combined_gap_before = [witnesses[j]];
-        new_reading.text[0].combined_gap_before_details = parent.combined_gap_before_subreadings_details[witnesses[j]];
+      if (parent.hasOwnProperty('combined_gap_before_subreadings') &&
+                    parent.combined_gap_before_subreadings.indexOf(witnesses[j]) !== -1) {
+        newReading.text[0].combined_gap_before = [witnesses[j]];
+        newReading.text[0].combined_gap_before_details = parent.combined_gap_before_subreadings_details[witnesses[j]];
         //now remove the details for this witness from the parent
         parent.combined_gap_before_subreadings.splice(parent.combined_gap_before_subreadings.indexOf(witnesses[j]), 1);
         delete parent.combined_gap_before_subreadings_details[witnesses[j]];
       }
-      //repeat for combined gap after - note that there are not details stored for this because they are always available from the reading details of the particular MS
-      //also note that the information is stored in different places depending on whether this is a standoff subreading or one created in the regulariser (this is not
-      //especially sensible but it is how it is at present and working with it is easier and less dangerous than trying to change it!) In version 2 I would fix this!
-      if (parent.text.length > 0 && parent.text[parent.text.length - 1].hasOwnProperty('combined_gap_after') && parent.text[parent.text.length - 1].combined_gap_after.indexOf(witnesses[j]) !== -1) {
-        new_reading.text[text.length - 1].combined_gap_after = [witnesses[j]];
+      // repeat for combined gap after - note that there are not details stored for this because they are always
+      // available from the reading details of the particular MS also note that the information is stored in different
+      // places depending on whether this is a standoff subreading or one created in the regulariser (this is not
+      //especially sensible but it is how it is at present and working with it is easier and less dangerous than
+      // trying to change it!) In version 2 I would fix this!
+      if (parent.text.length > 0 && parent.text[parent.text.length - 1].hasOwnProperty('combined_gap_after') &&
+                  parent.text[parent.text.length - 1].combined_gap_after.indexOf(witnesses[j]) !== -1) {
+        newReading.text[text.length - 1].combined_gap_after = [witnesses[j]];
         parent.text[parent.text.length - 1].combined_gap_after.splice(parent.text[parent.text.length - 1].combined_gap_after.indexOf(witnesses[j]), 1);
       }
-      if (parent.hasOwnProperty('combined_gap_after_subreadings') && parent.combined_gap_after_subreadings.indexOf(witnesses[j]) !== -1) {
-        new_reading.text[text.length - 1].combined_gap_after = [witnesses[j]];
+      if (parent.hasOwnProperty('combined_gap_after_subreadings') &&
+                  parent.combined_gap_after_subreadings.indexOf(witnesses[j]) !== -1) {
+        newReading.text[text.length - 1].combined_gap_after = [witnesses[j]];
         //now remove the details for this witness from the parent
         parent.combined_gap_after_subreadings.splice(parent.combined_gap_after_subreadings.indexOf(witnesses[j]), 1);
       }
@@ -2338,21 +2340,25 @@ CL = (function() {
       if (parent.hasOwnProperty('standoff_subreadings') && parent.standoff_subreadings.indexOf(witnesses[j]) !== -1) {
         parent.standoff_subreadings.splice(parent.standoff_subreadings.indexOf(witnesses[j]), 1);
       }
-      new_readings.push(new_reading);
+      newReadings.push(newReading);
     }
     //check whether the parent has any empty combined gap infomation which needs removing
-    if (parent.hasOwnProperty('combined_gap_before_subreadings') && parent.combined_gap_before_subreadings.length === 0) {
+    if (parent.hasOwnProperty('combined_gap_before_subreadings') &&
+                parent.combined_gap_before_subreadings.length === 0) {
       delete parent.combined_gap_before_subreadings;
       delete parent.combined_gap_before_subreadings_details;
     }
-    if (parent.text.length > 0 && parent.text[0].hasOwnProperty('combined_gap_before') && parent.text[0].combined_gap_before.length === 0) {
+    if (parent.text.length > 0 && parent.text[0].hasOwnProperty('combined_gap_before') &&
+              parent.text[0].combined_gap_before.length === 0) {
       delete parent.text[0].combined_gap_before;
       delete parent.text[0].combined_gap_before_details;
     }
-    if (parent.hasOwnProperty('combined_gap_after_subreadings') && parent.combined_gap_after_subreadings.length === 0) {
+    if (parent.hasOwnProperty('combined_gap_after_subreadings') &&
+                parent.combined_gap_after_subreadings.length === 0) {
       delete parent.combined_gap_after_subreadings;
     }
-    if (parent.text.length > 0 && parent.text[parent.text.length - 1].hasOwnProperty('combined_gap_after') && parent.text[parent.text.length - 1].combined_gap_after.length === 0) {
+    if (parent.text.length > 0 && parent.text[parent.text.length - 1].hasOwnProperty('combined_gap_after') &&
+                parent.text[parent.text.length - 1].combined_gap_after.length === 0) {
       delete parent.text[parent.text.length - 1].combined_gap_after;
     }
     if (parent.hasOwnProperty('SR_text') && $.isEmptyObject(parent.SR_text)) {
@@ -2364,12 +2370,12 @@ CL = (function() {
     //check here to see if parent still needs its combined gap before.
     SV.checkCombinedGapFlags(parent);
     ids = [];
-    for (i = 0; i < new_readings.length; i += 1) {
-      unit.readings.splice(parent_pos + 1, 0, new_readings[i]);
-      ids.push(addReadingId(unit.readings[parent_pos + 1], unit.start, unit.end));
+    for (let i = 0; i < newReadings.length; i += 1) {
+      unit.readings.splice(parentPos + 1, 0, newReadings[i]);
+      ids.push(addReadingId(unit.readings[parentPos + 1], unit.start, unit.end));
     }
-    if (delete_subreading) {
-      parent.subreadings[subtype].splice(subreading_pos, 1);
+    if (deleteSubreading) {
+      parent.subreadings[subtype].splice(subreadingPos, 1);
     }
 
     if (parent.subreadings[subtype].length === 0) {
@@ -2381,15 +2387,15 @@ CL = (function() {
 
     //now check the parent is still required and if not remove it
     if (parent.witnesses.length === 0 && !parent.hasOwnProperty('subreadings')) {
-      unit.readings.splice(parent_pos, 1);
+      unit.readings.splice(parentPos, 1);
     }
     //now if this was a standoff marked reading delete the entry in marked_readings unless this is part of prepare_for_operation
     if (options.hasOwnProperty('delete_offset') && options.delete_offset === true) {
-      for (key in CL.data.marked_readings) {
+      for (let key in CL.data.marked_readings) {
         if (CL.data.marked_readings.hasOwnProperty(key)) {
-          for (i = 0; i < CL.data.marked_readings[key].length; i += 1) {
+          for (let i = 0; i < CL.data.marked_readings[key].length; i += 1) {
             if (CL.data.marked_readings[key][i].start === unit.start && //needs to use unit id
-              CL.data.marked_readings[key][i].end === unit.end) { //if this is the right unit
+                    CL.data.marked_readings[key][i].end === unit.end) { //if this is the right unit
               if (witnesses.indexOf(CL.data.marked_readings[key][i].witness) !== -1) { //and we have the right witness
                 CL.data.marked_readings[key][i] = null;
               }
@@ -2406,9 +2412,9 @@ CL = (function() {
   };
 
   getOrderedAppLines = function() {
-    var numbers, app_ids;
+    var numbers, appIds;
     numbers = [];
-    app_ids = [];
+    appIds = [];
     for (let key in CL.data) {
       if (CL.data.hasOwnProperty(key)) {
         if (key.match(/apparatus\d/g) !== null) {
@@ -2418,9 +2424,9 @@ CL = (function() {
     }
     numbers.sort((a, b) => a - b);
     for (let i = 0; i < numbers.length; i += 1) {
-      app_ids.push('apparatus' + numbers[i]);
+      appIds.push('apparatus' + numbers[i]);
     }
-    return app_ids;
+    return appIds;
   };
 
 
@@ -2751,138 +2757,137 @@ CL = (function() {
     return details;
   };
 
-  createNewReading = function(unit, reading_type, extra_details) {
-    var i, new_reading, text, orig_reading_details, reading_details, index, id, timestamp, joining_mode, joined;
-    //check it's not already a reading and if it is just return the id of that reading
-    for (i = 0; i < unit.readings.length; i += 1) {
-      if (reading_type === 'om' && extractWitnessText(unit.readings[i]) === 'om.') {
+  createNewReading = function(unit, readingType, extraDetails) {
+    var newReading, text, origReadingDetails, readingDetails, index, id, timeStamp, joiningMode, joined;
+    // check it's not already a reading and if it is just return the id of that reading
+    for (let i = 0; i < unit.readings.length; i += 1) {
+      if (readingType === 'om' && extractWitnessText(unit.readings[i]) === 'om.') {
         return unit.readings[i]._id;
       }
-      if (extractWitnessText(unit.readings[i]) === extra_details) {
+      if (extractWitnessText(unit.readings[i]) === extraDetails) {
         return unit.readings[i]._id;
       }
-      if (extractWitnessText(unit.readings[i]) === '&lt;' + extra_details + '&gt;') {
+      if (extractWitnessText(unit.readings[i]) === '&lt;' + extraDetails + '&gt;') {
         return unit.readings[i]._id;
       }
     }
     //if its not already a reading you can add one
-    timestamp = new Date().getTime(); //timestamp ensures the MD5 is unique (but is probably overkill)
-    if (reading_type === 'om') {
-      id = MD5(unit.start + unit.end + 'om.' + timestamp);
-      new_reading = {
+    timeStamp = new Date().getTime(); //timeStamp ensures the MD5 is unique (but is probably overkill)
+    if (readingType === 'om') {
+      id = MD5(unit.start + unit.end + 'om.' + timeStamp);
+      newReading = {
         '_id': id,
         'created': true,
         'text': [],
         'witnesses': [],
         'type': 'om'
       };
-    } else if (reading_type === 'gap') {
-      id = MD5(unit.start + unit.end + extra_details + timestamp);
-      new_reading = {
+    } else if (readingType === 'gap') {
+      id = MD5(unit.start + unit.end + extraDetails + timeStamp);
+      newReading = {
         '_id': id,
         'created': true,
         'text': [],
         'witnesses': [],
         'type': 'lac',
-        'details': extra_details
+        'details': extraDetails
       };
-    } else if (reading_type === 'other') {
+    } else if (readingType === 'other') {
       //readings created here will always be fake (i.e. not be the reading of any witness.
       //we cannot deal with gaps using gap_after because we have no 'witness' to this reading before the current unit as we are making the reading up
       //even so it is probably best that the gap counts as a single token so we will rejoin anything between < and > into a single token.
       //I think that is the best we can do with these fake readings
       text = [];
-      orig_reading_details = extra_details.split(' ');
-      reading_details = [];
+      origReadingDetails = extraDetails.split(' ');
+      readingDetails = [];
       joined = [];
-      joining_mode = false;
+      joiningMode = false;
       //because someone might have legitimitely types spaces inside <> to do something like <lac 1 char> we need to reunify these
-      for (i = 0; i < orig_reading_details.length; i += 1) {
-        if (!joining_mode && orig_reading_details[i].indexOf('&lt;') !== -1 && orig_reading_details[i].indexOf('&gt;') === -1) {
-          joining_mode = true;
-          joined.push(orig_reading_details[i]);
-        } else if (joining_mode) {
-          joined.push(orig_reading_details[i]);
-          if (orig_reading_details[i].indexOf('&gt;') !== -1) {
-            reading_details.push(joined.join(' '));
-            joining_mode = false;
+      for (let i = 0; i < origReadingDetails.length; i += 1) {
+        if (!joiningMode && origReadingDetails[i].indexOf('&lt;') !== -1 && origReadingDetails[i].indexOf('&gt;') === -1) {
+          joiningMode = true;
+          joined.push(origReadingDetails[i]);
+        } else if (joiningMode) {
+          joined.push(origReadingDetails[i]);
+          if (origReadingDetails[i].indexOf('&gt;') !== -1) {
+            readingDetails.push(joined.join(' '));
+            joiningMode = false;
             joined = [];
           }
         } else {
-          reading_details.push(orig_reading_details[i]);
+          readingDetails.push(origReadingDetails[i]);
         }
       }
       //just check we don't still have any in the joined stack
       if (joined.length > 0) {
-        reading_details.push(joined.join(' '));
+        readingDetails.push(joined.join(' '));
       }
-      //reading_details = orig_reading_details;
-      id = MD5(unit.start + unit.end + extra_details + timestamp);
-      for (i = 0; i < reading_details.length; i += 1) {
+      id = MD5(unit.start + unit.end + extraDetails + timeStamp);
+      for (let i = 0; i < readingDetails.length; i += 1) {
         index = i * 2;
         text.push({
           'index': index.toString(),
-          'interface': reading_details[i],
+          'interface': readingDetails[i],
           'reading': []
         });
       }
-      new_reading = {
+      newReading = {
         '_id': id,
         'created': true,
         'text': text,
         'witnesses': []
       };
     }
-    unit.readings.push(new_reading);
-    return new_reading._id;
+    unit.readings.push(newReading);
+    return newReading._id;
   };
 
-  //data is a reading object
-  getReadingWitnesses = function(data, app_id, start, end, first_word_index, with_suffixes) {
-    var i, j, k, witness, suffix, witnesses, key, suffix_types, has_versions;
+  // data is a reading object
+  getReadingWitnesses = function(data, appId, start, end, firstWordIndex, withSuffixes) {
+    var witness, suffix, witnesses, key, suffixTypes;
     witnesses = [];
-    for (i = 0; i < data.witnesses.length; i += 1) {
+    for (let i = 0; i < data.witnesses.length; i += 1) {
       witness = data.witnesses[i];
       suffix = '';
-      if (with_suffixes !== false) {
+      if (withSuffixes !== false) {
         //then we do want to have the rule suffixes not just the hands
         //get all the rules that require a suffixed_sigla
-        suffix_types = getRuleClasses('suffixed_sigla', true, 'value', 'identifier');
+        suffixTypes = getRuleClasses('suffixed_sigla', true, 'value', 'identifier');
         //I don't think this if statement is ever used - but I'm not confident enough to delete it
         //TODO: comment this out and see if anything breaks!
         if (data.hasOwnProperty('reading_classes')) {
-          for (key in suffix_types) {
-            if (suffix_types.hasOwnProperty(key)) {
-              if (data.reading_classes.indexOf(key) !== -1 && suffix.indexOf(suffix_types[key]) === -1) {
-                suffix += suffix_types[key];
+          for (let key in suffixTypes) {
+            if (suffixTypes.hasOwnProperty(key)) {
+              if (data.reading_classes.indexOf(key) !== -1 && suffix.indexOf(suffixTypes[key]) === -1) {
+                suffix += suffixTypes[key];
               }
             }
           }
         }
-        for (j = 0; j < data.text.length; j += 1) {
-          for (key in suffix_types) {
-            if (suffix_types.hasOwnProperty(key)) {
+        for (let j = 0; j < data.text.length; j += 1) {
+          for (let key in suffixTypes) {
+            if (suffixTypes.hasOwnProperty(key)) {
               if (data.text[j][witness] && data.text[j][witness].hasOwnProperty('decision_class') &&
-                data.text[j][witness].decision_class.indexOf(key) !== -1) {
-                if (suffix.indexOf(suffix_types[key]) === -1) {
-                  suffix += suffix_types[key];
+                        data.text[j][witness].decision_class.indexOf(key) !== -1) {
+                if (suffix.indexOf(suffixTypes[key]) === -1) {
+                  suffix += suffixTypes[key];
                 }
               }
             }
           }
         }
-        //now check offset marked readings (i.e created in SV or OR)
-        //this needs to check the id of the unit (which we don't have at this point) is the same as the marked reading unit_id property
-        if (typeof start !== 'undefined' && typeof end !== 'undefined' && typeof app_id !== 'undefined') {
-          for (key in CL.data.marked_readings) {
-            for (j = 0; j < CL.data.marked_readings[key].length; j += 1) {
+        // now check offset marked readings (i.e created in SV or OR) this needs to check the id
+        // of the unit (which we don't have at this point) is the same as the marked reading unit_id property
+        if (typeof start !== 'undefined' && typeof end !== 'undefined' && typeof appId !== 'undefined') {
+          for (let key in CL.data.marked_readings) {
+            for (let j = 0; j < CL.data.marked_readings[key].length; j += 1) {
               if (CL.data.marked_readings[key][j].start === start &&
-                CL.data.marked_readings[key][j].end === end &&
-                CL.data.marked_readings[key][j].apparatus === app_id &&
-                CL.data.marked_readings[key][j].witness === witness) {
+                        CL.data.marked_readings[key][j].end === end &&
+                          CL.data.marked_readings[key][j].apparatus === appId &&
+                            CL.data.marked_readings[key][j].witness === witness) {
                 if (CL.data.marked_readings[key][j].hasOwnProperty('first_word_index')) {
-                  if (CL.data.marked_readings[key][j].first_word_index === first_word_index) {
-                    for (k = 0; k < CL.data.marked_readings[key][j].suffixed_sigla.length; k += 1) {
+                  if (CL.data.marked_readings[key][j].first_word_index === firstWordIndex) {
+                    for (let k = 0; k < CL.data.marked_readings[key][j].suffixed_sigla.length; k += 1) {
                       if (CL.data.marked_readings[key][j].suffixed_sigla[k] === true) {
                         if (suffix.indexOf(CL.data.marked_readings[key][j].identifier[k]) === -1) {
                           suffix += CL.data.marked_readings[key][j].identifier[k];
@@ -2891,7 +2896,7 @@ CL = (function() {
                     }
                   }
                 } else {
-                  for (k = 0; k < CL.data.marked_readings[key][j].suffixed_sigla.length; k += 1) {
+                  for (let k = 0; k < CL.data.marked_readings[key][j].suffixed_sigla.length; k += 1) {
                     if (CL.data.marked_readings[key][j].suffixed_sigla[k] === true) {
                       if (suffix.indexOf(CL.data.marked_readings[key][j].identifier[k]) === -1) {
                         suffix += CL.data.marked_readings[key][j].identifier[k];
@@ -2905,7 +2910,7 @@ CL = (function() {
         }
         //now if we have an auto V rule for supplied text on the project add those
         if (CL.project.hasOwnProperty('useVForSupplied') && CL.project.useVForSupplied === true) {
-          for (j = 0; j < data.text.length; j += 1) {
+          for (let j = 0; j < data.text.length; j += 1) {
             //check the main reading
             if (data.text[j][witness] && data.text[j][witness].hasOwnProperty('supplied')) {
               if (suffix.indexOf('V') === -1) {
@@ -2914,8 +2919,9 @@ CL = (function() {
             }
           }
           if (data.hasOwnProperty('SR_text') && data.SR_text.hasOwnProperty(witness)) {
-            for (j = 0; j < data.SR_text[witness].text.length; j += 1) {
-              if (data.SR_text[witness].text[j][witness] && data.SR_text[witness].text[j][witness].hasOwnProperty('supplied')) {
+            for (let j = 0; j < data.SR_text[witness].text.length; j += 1) {
+              if (data.SR_text[witness].text[j][witness] &&
+                      data.SR_text[witness].text[j][witness].hasOwnProperty('supplied')) {
                 if (suffix.indexOf('V') === -1) {
                   suffix += 'V';
                 }
@@ -2951,17 +2957,17 @@ CL = (function() {
   };
 
   _initialiseProject = function(project) {
-    var local_js, i;
+    var localJs;
     _setProjectConfig(project);
-    local_js = [];
+    localJs = [];
     //TODO: this is untested as we don't currently specify js in any projects
     //TOTEST: this
     if (project.hasOwnProperty('local_js_file')) {
-      for (i = 0; i < project.local_js_file.length; i += 1) {
-        local_js.push(staticUrl + project.local_js_file[i]);
+      for (let i = 0; i < project.local_js_file.length; i += 1) {
+        localJs.push(staticUrl + project.local_js_file[i]);
       }
     }
-    _includeJavascript(local_js, function() {
+    _includeJavascript(localJs, function() {
       CL.services.initialiseEditor();
       //TODO: add standard event handlers
       //add standard event handlers?
@@ -3055,8 +3061,8 @@ CL = (function() {
     }
 
     if (CL.project.showGetApparatusButton === true &&
-      !CL.services.hasOwnProperty('getApparatusForContext') &&
-      !CL.services.hasOwnProperty('apparatusServiceUrl')) {
+            !CL.services.hasOwnProperty('getApparatusForContext') &&
+              !CL.services.hasOwnProperty('apparatusServiceUrl')) {
       //then we don't have enough info to use get apparatus so override settings and do not show the button
       console.log('The get apparatus button will not be shown as the required data for running the service was not ' +
         'available. Either getApparatusForContext or apparatusServiceUrl must be provided in the services ' +
@@ -3341,8 +3347,8 @@ CL = (function() {
   };
 
   _showSavedVersions = function(data, projectWitnesses, context) {
-    var by_user, users, user, i, status, date, minutes, datestring, approved;
-    by_user = {};
+    var byUser, users, user, date, minutes, dateString, approved;
+    byUser = {};
     users = [];
     //reset default settings just for safety - shouldn't really be needed
     CL.witnessEditingMode = false;
@@ -3350,7 +3356,7 @@ CL = (function() {
     CL.witnessRemovingMode = false;
 
     if (data.length > 0) {
-      for (i = 0; i < data.length; i += 1) {
+      for (let i = 0; i < data.length; i += 1) {
         if (data[i].hasOwnProperty('_id')) {
           console.warn('\'_id\' is deprecated. Use \'id\' instead.');
           data[i].id = data[i]._id;
@@ -3368,61 +3374,63 @@ CL = (function() {
         } else {
           minutes = String(date.getMinutes());
         }
-        datestring = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + minutes;
+        dateString = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + minutes;
         if (data[i].hasOwnProperty('user')) {
           user = data[i].user;
         } else {
           console.warn('In future versions collation objects will be required to have a \'user\' key');
           user = 'unknown';
         }
-        if (!by_user.hasOwnProperty(user)) {
-          by_user[user] = {};
+        if (!byUser.hasOwnProperty(user)) {
+          byUser[user] = {};
           users.push(user);
         }
         if (data[i].status === 'regularised') {
-          by_user[user].regularised = {};
-          by_user[user].regularised.witness_comparison = checkWitnessesAgainstProject(data[i].data_settings.witness_list, projectWitnesses);
-          by_user[user].regularised.radio_button = _getSavedRadio(data[i].id, by_user[user].regularised.witness_comparison[1], datestring);
+          byUser[user].regularised = {};
+          byUser[user].regularised.witness_comparison = checkWitnessesAgainstProject(data[i].data_settings.witness_list, projectWitnesses);
+          byUser[user].regularised.radio_button = _getSavedRadio(data[i].id, byUser[user].regularised.witness_comparison[1], dateString);
         } else if (data[i].status === 'set') {
-          by_user[user].set = {};
-          by_user[user].set.witness_comparison = checkWitnessesAgainstProject(data[i].data_settings.witness_list, projectWitnesses);
-          by_user[user].set.radio_button = _getSavedRadio(data[i].id, by_user[user].set.witness_comparison[1], datestring);
+          byUser[user].set = {};
+          byUser[user].set.witness_comparison = checkWitnessesAgainstProject(data[i].data_settings.witness_list, projectWitnesses);
+          byUser[user].set.radio_button = _getSavedRadio(data[i].id, byUser[user].set.witness_comparison[1], dateString);
         } else if (data[i].status === 'ordered') {
-          by_user[user].ordered = {};
-          by_user[user].ordered.witness_comparison = checkWitnessesAgainstProject(data[i].data_settings.witness_list, projectWitnesses);
-          by_user[user].ordered.radio_button = _getSavedRadio(data[i].id, by_user[user].ordered.witness_comparison[1], datestring);
+          byUser[user].ordered = {};
+          byUser[user].ordered.witness_comparison = checkWitnessesAgainstProject(data[i].data_settings.witness_list, projectWitnesses);
+          byUser[user].ordered.radio_button = _getSavedRadio(data[i].id, byUser[user].ordered.witness_comparison[1], dateString);
         } else if (data[i].status === 'approved') {
           approved = {};
           approved.witness_comparison = checkWitnessesAgainstProject(data[i].data_settings.witness_list, projectWitnesses);
-          approved.radio_button = _getSavedRadio(data[i].id, approved.witness_comparison[1], datestring);
+          approved.radio_button = _getSavedRadio(data[i].id, approved.witness_comparison[1], dateString);
         }
       }
     } else {
       document.getElementById('witnesses').innerHTML = '<p>There are no saved collations of this verse</p>';
       spinner.removeLoadingOverlay();
     }
-    CL.services.getUserInfoByIds(users, function(user_info) {
-      if (user_info) {
-        var user_names = {};
-        for (var k in user_info) {
-          if (user_info[k].hasOwnProperty('name')) {
-            user_names[user_info[k].id] = user_info[k].name;
+    CL.services.getUserInfoByIds(users, function(userInfo) {
+      var userNames;
+      if (userInfo) {
+        userNames = {};
+        for (let k in userInfo) {
+          if (userInfo[k].hasOwnProperty('name')) {
+            userNames[userInfo[k].id] = userInfo[k].name;
           } else {
-            user_names[user_info[k].id] = user_info[k].id;
+            userNames[userInfo[k].id] = userInfo[k].id;
           }
         }
-        _makeSavedCollationTable(by_user, approved, user_names, context);
+        _makeSavedCollationTable(byUser, approved, userNames, context);
       } else {
-        _makeSavedCollationTable(by_user, approved, undefined, context);
+        _makeSavedCollationTable(byUser, approved, undefined, context);
       }
       spinner.removeLoadingOverlay();
     });
   };
 
   checkWitnessesAgainstProject = function(dataWitnesses, projectWitnesses) {
-    var dataWits = dataWitnesses.slice();
-    var projectWits = projectWitnesses.slice();
-    var extraWits = [];
+    var dataWits, projectWits, extraWits;
+    dataWits = dataWitnesses.slice();
+    projectWits = projectWitnesses.slice();
+    extraWits = [];
     for (let i = 0; i < dataWits.length; i += 1) {
       if (projectWits.indexOf(dataWits[i]) !== -1) {
         projectWits.splice(projectWits.indexOf(dataWits[i]), 1);
@@ -3444,13 +3452,14 @@ CL = (function() {
     }
   };
 
-  _getSavedRadio = function(id, witnessComparison, datestring) {
-    return '<input class="' + witnessComparison + '" type="radio" name="saved_collation" value="' + id + '">' + datestring + '</input>';
+  _getSavedRadio = function(id, witnessComparison, dateString) {
+    return '<input class="' + witnessComparison + '" type="radio" name="saved_collation" value="' + id + '">' +
+           dateString + '</input>';
   };
 
-  _makeSavedCollationTable = function(by_user, approved, users, context) {
-    var html, i, user_map, user, userCount, firstRow, witnessComparisonClass, hoveroverText, footerHtml,
-      hasCollationsWithWitsToAdd, hasCollationsWithWitsToRemove;
+  _makeSavedCollationTable = function(byUser, approved, users, context) {
+    var html, user_map, userCount, firstRow, witnessComparisonClass, hoveroverText, footerHtml,
+        hasCollationsWithWitsToAdd, hasCollationsWithWitsToRemove;
     hasCollationsWithWitsToRemove = false;
     hasCollationsWithWitsToAdd = false;
     html = [];
@@ -3460,10 +3469,10 @@ CL = (function() {
     html.push('<form id="saved_collation_form">');
     html.push('<table id="saved_collations">');
     html.push('<th>User</th><th>Regularised</th><th>Variants Set</th><th>Ordered</th><th>Approved</th>');
-    userCount = Object.keys(by_user).length;
+    userCount = Object.keys(byUser).length;
     firstRow = true;
-    for (user in by_user) {
-      if (by_user.hasOwnProperty(user)) {
+    for (let user in byUser) {
+      if (byUser.hasOwnProperty(user)) {
         if (users !== undefined) {
           if (users.hasOwnProperty(user)) {
             html.push('<tr><td>' + users[user] + '</td>');
@@ -3475,78 +3484,96 @@ CL = (function() {
         } else {
           html.push('<tr><td>' + user + '</td>');
         }
-        if (by_user[user].hasOwnProperty('regularised')) {
+        if (byUser[user].hasOwnProperty('regularised')) {
           if (CL.project.allowWitnessChangesInSavedCollations === true) {
-            if (by_user[user].regularised.witness_comparison[0] === false) {
-              witnessComparisonClass = by_user[user].regularised.witness_comparison[1];
+            if (byUser[user].regularised.witness_comparison[0] === false) {
+              witnessComparisonClass = byUser[user].regularised.witness_comparison[1];
               if (witnessComparisonClass === 'added') {
                 hasCollationsWithWitsToAdd = true;
-                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added.';
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. ' +
+                                'Project witnesses have been added.';
               } else if (witnessComparisonClass === 'removed') {
                 hasCollationsWithWitsToRemove = true;
-                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed.';
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. ' +
+                                'Project witnesses have been removed.';
               } else if (witnessComparisonClass === 'both') {
                 hasCollationsWithWitsToRemove = true;
                 hasCollationsWithWitsToAdd = true;
-                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added.';
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. ' +
+                                'Project witnesses have been both removed and added.';
               }
             } else {
               witnessComparisonClass = 'same';
               hoveroverText = '';
             }
-            html.push('<td title="' + hoveroverText + '" class="regularised ' + witnessComparisonClass + '">' + by_user[user].regularised.radio_button + '</td>');
+            html.push('<td title="' + hoveroverText + '" class="regularised ' + witnessComparisonClass + '">' +
+                      byUser[user].regularised.radio_button + '</td>');
           } else {
-            html.push('<td>' + by_user[user].regularised.radio_button + '</td>');
+            html.push('<td>' + byUser[user].regularised.radio_button + '</td>');
           }
         } else {
           html.push('<td></td>');
         }
-        if (by_user[user].hasOwnProperty('set')) {
+        if (byUser[user].hasOwnProperty('set')) {
           if (CL.project.allowWitnessChangesInSavedCollations === true) {
-            if (by_user[user].set.witness_comparison[0] === false) {
-              witnessComparisonClass = by_user[user].set.witness_comparison[1];
+            if (byUser[user].set.witness_comparison[0] === false) {
+              witnessComparisonClass = byUser[user].set.witness_comparison[1];
               if (witnessComparisonClass === 'added') {
                 hasCollationsWithWitsToAdd = true;
-                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added.';
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. ' +
+                                'Project witnesses have been added.';
               } else if (witnessComparisonClass === 'removed') {
                 hasCollationsWithWitsToRemove = true;
-                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed.';
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. ' +
+                                'Project witnesses have been removed.';
               } else if (witnessComparisonClass === 'both') {
                 hasCollationsWithWitsToRemove = true;
                 hasCollationsWithWitsToAdd = true;
-                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added.';
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. ' +
+                                'Project witnesses have been both removed and added.';
               }
             } else {
               witnessComparisonClass = 'same';
               hoveroverText = '';
             }
-            html.push('<td title="' + hoveroverText + '" class="set ' + witnessComparisonClass + '">' + by_user[user].set.radio_button + '</td>');
+            html.push('<td title="' + hoveroverText + '" class="set ' + witnessComparisonClass + '">' +
+                      byUser[user].set.radio_button + '</td>');
           } else {
-            html.push('<td>' + by_user[user].set.radio_button + '</td>');
+            html.push('<td>' + byUser[user].set.radio_button + '</td>');
           }
         } else {
           html.push('<td></td>');
         }
-        if (by_user[user].hasOwnProperty('ordered')) {
+        if (byUser[user].hasOwnProperty('ordered')) {
           if (CL.project.allowWitnessChangesInSavedCollations === true) {
-            if (by_user[user].ordered.witness_comparison[0] === false) {
-              witnessComparisonClass = by_user[user].ordered.witness_comparison[1];
+            if (byUser[user].ordered.witness_comparison[0] === false) {
+              witnessComparisonClass = byUser[user].ordered.witness_comparison[1];
               if (witnessComparisonClass === 'added') {
-                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added. This cannot be fixed at the order readings stage. The witnesses must be added at a previous stage and this stage must be completed again.';
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. ' +
+                                'Project witnesses have been added. This cannot be fixed at the order readings ' +
+                                'stage. The witnesses must be added at a previous stage and this stage must be ' +
+                                'completed again.';
               } else if (witnessComparisonClass === 'removed') {
                 //hasCollationsWithWitsToRemove = true;
-                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed. This cannot be fixed at the order readings stage. The witnesses must be removed at a previous stage and this stage must be completed again.';
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. ' +
+                                'Project witnesses have been removed. This cannot be fixed at the order readings ' +
+                                'stage. The witnesses must be removed at a previous stage and this stage must be ' +
+                                'completed again.';
               } else if (witnessComparisonClass === 'both') {
                 //hasCollationsWithWitsToRemove = true;
-                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added. This cannot be fixed at the order readings stage. The witnesses must be removed at a previous stage and this stage must be completed again.';
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. ' +
+                                'Project witnesses have been both removed and added. This cannot be fixed at the ' +
+                                'order readings stage. The witnesses must be removed at a previous stage and this ' +
+                                'stage must be completed again.';
               }
             } else {
               witnessComparisonClass = 'same';
               hoveroverText = '';
             }
-            html.push('<td title="' + hoveroverText + '" class="ordered ' + witnessComparisonClass + '">' + by_user[user].ordered.radio_button + '</td>');
+            html.push('<td title="' + hoveroverText + '" class="ordered ' + witnessComparisonClass + '">' +
+                      byUser[user].ordered.radio_button + '</td>');
           } else {
-            html.push('<td>' + by_user[user].ordered.radio_button + '</td>');
+            html.push('<td>' + byUser[user].ordered.radio_button + '</td>');
           }
         } else {
           html.push('<td></td>');
@@ -3556,19 +3583,29 @@ CL = (function() {
             if (approved.witness_comparison[0] === false) {
               witnessComparisonClass = approved.witness_comparison[1];
               if (witnessComparisonClass === 'added') {
-                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been added. This cannot be fixed in an approved collation. The witnesses must be added at a previous stage, order readings redone and then the new version must be approved.';
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. ' +
+                                'Project witnesses have been added. This cannot be fixed in an approved collation. ' +
+                                'The witnesses must be added at a previous stage, order readings redone and then ' +
+                                'the new version must be approved.';
               } else if (witnessComparisonClass === 'removed') {
                 //hasCollationsWithWitsToRemove = true;
-                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been removed. This cannot be fixed in an approved collation. The witnesses must be removed at a previous stage, order readings redone and then the new version must be approved.';
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. ' +
+                                'Project witnesses have been removed. This cannot be fixed in an approved ' +
+                                'collation. The witnesses must be removed at a previous stage, order readings ' +
+                                'redone and then the new version must be approved.';
               } else if (witnessComparisonClass === 'both') {
                 //hasCollationsWithWitsToRemove = true;
-                hoveroverText = 'The witnesses in the project do not agree with those in this collation. Project witnesses have been both removed and added. This cannot be fixed in an approved collation. The witnesses must be removed and added at a previous stage, order readings redone and then the new version must be approved.';
+                hoveroverText = 'The witnesses in the project do not agree with those in this collation. ' +
+                                'Project witnesses have been both removed and added. This cannot be fixed in an ' +
+                                'approved collation. The witnesses must be removed and added at a previous stage, ' +
+                                'order readings redone and then the new version must be approved.';
               }
             } else {
               witnessComparisonClass = 'same';
               hoveroverText = '';
             }
-            html.push('<td title="' + hoveroverText + '" class="approved ' + witnessComparisonClass + '" rowspan="' + userCount + '">' + approved.radio_button + '</td>');
+            html.push('<td title="' + hoveroverText + '" class="approved ' + witnessComparisonClass + '" rowspan="' +
+                      userCount + '">' + approved.radio_button + '</td>');
           } else {
             html.push('<td rowspan="' + userCount + '">' + approved.radio_button + '</td>');
           }
@@ -3591,12 +3628,18 @@ CL = (function() {
     }
     $(':radio').on('click', function() {
       if ($(this).is(':checked')) {
-        if (($(this).parent().hasClass('regularised') || $(this).parent().hasClass('set')) && ($(this).hasClass('added') || $(this).hasClass('both'))) {
+        if (($(this).parent().hasClass('regularised') ||
+                $(this).parent().hasClass('set')) &&
+                  ($(this).hasClass('added') ||
+                    $(this).hasClass('both'))) {
           $('#load_saved_add_button').removeClass('pure-button-disabled');
         } else {
           $('#load_saved_add_button').addClass('pure-button-disabled');
         }
-        if (($(this).parent().hasClass('regularised') || $(this).parent().hasClass('set')) && ($(this).hasClass('removed') || $(this).hasClass('both'))) {
+        if (($(this).parent().hasClass('regularised') ||
+                  $(this).parent().hasClass('set')) &&
+                    ($(this).hasClass('removed') ||
+                      $(this).hasClass('both'))) {
           $('#load_saved_remove_button').removeClass('pure-button-disabled');
         } else {
           $('#load_saved_remove_button').addClass('pure-button-disabled');
@@ -3606,10 +3649,12 @@ CL = (function() {
     footerHtml = [];
     footerHtml.push('<input class="pure-button right_foot" id="load_saved_button" type="button" value="Load collation"/>');
     if (hasCollationsWithWitsToAdd === true && CL.project.allowWitnessChangesInSavedCollations === true) {
-      footerHtml.push('<input class="pure-button pure-button-disabled right_foot" id="load_saved_add_button" type="button" value="Load collation and add witnesses"/>');
+      footerHtml.push('<input class="pure-button pure-button-disabled right_foot" id="load_saved_add_button" ' +
+                      'type="button" value="Load collation and add witnesses"/>');
     }
     if (hasCollationsWithWitsToRemove === true && CL.project.allowWitnessChangesInSavedCollations === true) {
-      footerHtml.push('<input class="pure-button pure-button-disabled right_foot" id="load_saved_remove_button" type="button" value="Load collation and remove witnesses"/>');
+      footerHtml.push('<input class="pure-button pure-button-disabled right_foot" id="load_saved_remove_button" ' +
+                      'type="button" value="Load collation and remove witnesses"/>');
     }
     document.getElementById('footer').innerHTML = footerHtml.join('');
     $('#load_saved_button').on('click', function(event) {
@@ -3633,14 +3678,14 @@ CL = (function() {
   };
 
   _addToSavedCollation = function(id) {
-    var data, coll_id;
+    var data, collId;
     if (id === undefined) {
       data = cforms.serialiseForm('saved_collation_form');
-      coll_id = data.saved_collation;
+      collId = data.saved_collation;
     } else {
-      coll_id = id;
+      collId = id;
     }
-    CL.services.loadSavedCollation(coll_id, function(collation) {
+    CL.services.loadSavedCollation(collId, function(collation) {
       CL.services.getCurrentEditingProject(function(project) {
         var temp, witsToAdd;
         if (collation) {
@@ -3659,7 +3704,7 @@ CL = (function() {
     });
   };
 
-  prepareAdditionalCollation = function(existing_collation, witsToAdd) {
+  prepareAdditionalCollation = function(existingCollation, witsToAdd) {
     var context;
     spinner.showLoadingOverlay();
 
@@ -3668,7 +3713,7 @@ CL = (function() {
     }
     if (document.getElementById('base_text')) {
       // if a base text is given, check that the base_text is the same as the one in the saved collation
-      if (document.getElementById('base_text').value === existing_collation.data_settings.base_text) {
+      if (document.getElementById('base_text').value === existingCollation.data_settings.base_text) {
         CL.dataSettings.base_text = document.getElementById('base_text').value;
       } else {
         alert('You can only add witnesses if the project base text is currently the same as the one used for the ' +
@@ -3678,15 +3723,15 @@ CL = (function() {
         return;
       }
     }
-    if (existing_collation.data_settings.hasOwnProperty('base_text_siglum')) {
-      CL.dataSettings.base_text_siglum = existing_collation.data_settings.base_text_siglum;
+    if (existingCollation.data_settings.hasOwnProperty('base_text_siglum')) {
+      CL.dataSettings.base_text_siglum = existingCollation.data_settings.base_text_siglum;
     }
-    if (existing_collation.status !== 'regularised') {
+    if (existingCollation.status !== 'regularised') {
       //ensure we use the display settings that were used for the existing collation in SV (they are read from here at collation time)
       //we do not use these for RG as the user can change and we use default ones so we don't hide anything they would want to see
-      CL.displaySettings = existing_collation.display_settings;
+      CL.displaySettings = existingCollation.display_settings;
     }
-    context = existing_collation.context;
+    context = existingCollation.context;
     if (context && CL.dataSettings.base_text !== 'none') {
       CL.context = context;
       CL.dataSettings.witness_list = witsToAdd;
@@ -3694,20 +3739,6 @@ CL = (function() {
         CL.dataSettings.witness_list.push(CL.dataSettings.base_text);
       }
       RG.getCollationData('add_witnesses', 0, function() {
-        // //TODO: remove - this manipulates the data to create an addition in the new unit so we can test making a new unit
-        // for (let i=0; i<CL.collateData.data.length; i+=1) {
-        //   if (CL.collateData.data[i].siglum === 'P66') {
-        //     //add a unit which should end up at index 11 in the basetext
-        //     CL.collateData.data[i].witnesses[0].tokens.splice(5, 0, {"index": 12, "reading": 'P66', "siglum": 'P66', "verse": 'B04K1V2', "original": 'Test', "rule_match": ['test'], "t": 'test'});
-        //     //adjust following indexes
-        //     CL.collateData.data[i].witnesses[0].tokens[6].index = 14;
-        //     CL.collateData.data[i].witnesses[0].tokens[7].index = 16;
-        //     //add 2 units at the end
-        //     CL.collateData.data[i].witnesses[0].tokens.push({"index": 18, "reading": 'P66', "siglum": 'P66', "verse": 'B04K1V2', "original": 'Test', "rule_match": ['test'], "t": 'test'});
-        //     CL.collateData.data[i].witnesses[0].tokens.push({"index": 20, "reading": 'P66', "siglum": 'P66', "verse": 'B04K1V2', "original": 'Test2', "rule_match": ['test2'], "t": 'test2'});
-        //   }
-        // }
-        // //TODO: end of stuff to remove
         RG.runCollation(CL.collateData, 'add_witnesses', 0, function(data) {
           var mergedCollation;
           CL.data = data; // temporary assignment to allow all the cleaning functions to work
@@ -3716,9 +3747,9 @@ CL = (function() {
           data = JSON.parse(JSON.stringify(CL.data));
           console.log(JSON.parse(JSON.stringify(data)))
           // assume CL.context agrees with the new data since it was used to fetch it
-          if (CL.context === existing_collation.context) {
+          if (CL.context === existingCollation.context) {
             // check we have basetext agreement
-            if (data.overtext_name === existing_collation.structure.overtext_name) {
+            if (data.overtext_name === existingCollation.structure.overtext_name) {
 
               CL.witnessesAdded = [];
               for (let key in data.hand_id_map) {
@@ -3726,15 +3757,15 @@ CL = (function() {
                   CL.witnessesAdded.push(key);
                 }
               }
-              if (existing_collation.status === 'regularised') {
+              if (existingCollation.status === 'regularised') {
                 //merge the existing and new collations
-                mergedCollation = _mergeCollationObjects(JSON.parse(JSON.stringify(existing_collation)), data, witsToAdd);
+                mergedCollation = _mergeCollationObjects(JSON.parse(JSON.stringify(existingCollation)), data, witsToAdd);
                 //display the pre-merged data
                 _displaySavedCollation(mergedCollation);
 
-              } else if (existing_collation.status === 'set') {
+              } else if (existingCollation.status === 'set') {
                 //merge the existing and new collations
-                mergedCollation = _mergeCollationObjects(JSON.parse(JSON.stringify(existing_collation)), data, witsToAdd);
+                mergedCollation = _mergeCollationObjects(JSON.parse(JSON.stringify(existingCollation)), data, witsToAdd);
                 //display the pre-merged data
                 _displaySavedCollation(mergedCollation);
               }
@@ -4044,16 +4075,16 @@ CL = (function() {
   };
 
   _loadSavedCollation = function(id) {
-    var i, value, bk, data, coll_id, temp, witnessStatus;
+    var data, collId;
     CL.isDirty = false;
     spinner.showLoadingOverlay();
     if (id === undefined) {
       data = cforms.serialiseForm('saved_collation_form');
-      coll_id = data.saved_collation;
+      collId = data.saved_collation;
     } else {
-      coll_id = id;
+      collId = id;
     }
-    CL.services.loadSavedCollation(coll_id, function(collation) {
+    CL.services.loadSavedCollation(collId, function(collation) {
       _displaySavedCollation(collation);
     });
   };
@@ -4126,17 +4157,17 @@ CL = (function() {
     return null;
   };
 
-  _findStandoffRegularisationText = function(app_id, unit_id, witness, test) {
-    var standoff_record, unit;
-    unit = findUnitById(app_id, unit_id);
+  _findStandoffRegularisationText = function(appId, unitId, witness, test) {
+    var standoffRecord, unit;
+    unit = findUnitById(appId, unitId);
     if (test) {
       console.log(unit);
     }
-    standoff_record = findStandoffRegularisation(unit, witness, app_id, test);
-    if (standoff_record === null) {
+    standoffRecord = findStandoffRegularisation(unit, witness, appId, test);
+    if (standoffRecord === null) {
       return null;
     }
-    return standoff_record.parent_text;
+    return standoffRecord.parent_text;
   };
 
   _collapseUnit = function(id, format) {
