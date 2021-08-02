@@ -1,4 +1,4 @@
-spinner = (function () {
+spinner = (function() {
 
   showLoadingOverlay = function(message) {
     if (!document.getElementById('overlay')) {
@@ -19,7 +19,7 @@ spinner = (function () {
     }
   };
 
-  removeLoadingOverlay =function(message) {
+  removeLoadingOverlay = function(message) {
     if (document.getElementById('overlay')) {
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('overlay'));
     }
@@ -33,4 +33,4 @@ spinner = (function () {
     removeLoadingOverlay: removeLoadingOverlay
   };
 
-}  () );
+}());

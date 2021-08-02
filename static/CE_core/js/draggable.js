@@ -1,3 +1,4 @@
+/*jshint esversion: 6 */
 var drag = (function () {
     "use strict";
 
@@ -29,17 +30,17 @@ var drag = (function () {
       // set permitted behaviour booleans
       _behaviours[elemId] = {};
       if (typeof x !== 'undefined') {
-        _behaviours[elemId]['horizontal'] = x;
+        _behaviours[elemId].horizontal = x;
       } else {
-        _behaviours[elemId]['horizontal'] = false;
+        _behaviours[elemId].horizontal = false;
       }
       if (typeof y !== 'undefined') {
-        _behaviours[elemId]['vertical'] = y;
+        _behaviours[elemId].vertical = y;
       } else {
-        _behaviours[elemId]['vertical'] = false;
+        _behaviours[elemId].vertical = false;
       }
       if (typeof onDrop !== 'undefined') {
-        _behaviours[elemId]['drop_function'] = onDrop;
+        _behaviours[elemId].drop_function = onDrop;
       }
     };
 
@@ -65,7 +66,7 @@ var drag = (function () {
       e = e || window.event;
       e.preventDefault();
       // calculate the new cursor position for the enabled axis
-      if (_behaviours[_dragElement.id]['horizontal'] === true) {
+      if (_behaviours[_dragElement.id].horizontal === true) {
         newLeft = _dragElement.offsetLeft +  e.clientX - _startX;
         newRight = newLeft + _dragElement.offsetWidth;
         _startX = e.clientX;
@@ -73,7 +74,7 @@ var drag = (function () {
           _dragElement.style.left = newLeft + "px";
         }
       }
-      if (_behaviours[_dragElement.id]['vertical'] === true) {
+      if (_behaviours[_dragElement.id].vertical === true) {
         newTop = _dragElement.offsetTop + e.clientY - _startY;
         newBase = newTop + _dragElement.offsetHeight;
         _startY = e.clientY;
