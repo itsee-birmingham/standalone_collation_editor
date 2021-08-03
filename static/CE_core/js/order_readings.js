@@ -36,9 +36,8 @@ OR = (function() {
    * 		 possibilities are:
    *              	highlighted_wit - the witness to highlight in display*/
   showOrderReadings = function(options) {
-    var html, i, highest_unit, header, triangles, row, label, key, overlaps, app_ids, footer_html,
-      num, temp, event_rows, scrollOffset, overlap_options, new_overlap_options, container,
-      undo_button, show_hide_subreadings_button_text;
+    var html, highestUnit, header, row, overlaps, appIds, footerHtml, num, temp, eventRows,
+        overlapOptions, newOverlapOptions, container, undoButton, showHideSubreadingsButtonText;
     //console.log(CL.data);
     CL.stage = 'ordered';
     addLabels(false);
@@ -82,20 +81,20 @@ OR = (function() {
     temp = CL.getUnitLayout(CL.data.apparatus, 1, 'reorder', options);
     header = CL.getCollationHeader(CL.data, temp[1], false);
     html = header[0];
-    highest_unit = header[1];
+    highestUnit = header[1];
     html.push.apply(html, temp[0]);
-    overlap_options = {'column_lengths': temp[1]};
+    overlapOptions = {'column_lengths': temp[1]};
     if (options.hasOwnProperty('highlighted_wit')) {
-      overlap_options.highlighted_wit = options.highlighted_wit;
+      overlapOptions.highlighted_wit = options.highlighted_wit;
     }
     if (options.hasOwnProperty('highlighted_unit')) {
-      overlap_options.highlighted_unit = options.highlighted_unit;
+      overlapOptions.highlighted_unit = options.highlighted_unit;
     }
-    app_ids = CL.getOrderedAppLines();
-    for (let i = 0; i < app_ids.length; i += 1) {
-      num = app_ids[i].replace('apparatus', '');
-      new_overlap_options = SV.calculateUnitLengths(app_ids[i], overlap_options);
-      overlaps = CL.getOverlapLayout(CL.data[app_ids[i]], num, 'reorder', header[1], new_overlap_options);
+    appIds = CL.getOrderedAppLines();
+    for (let i = 0; i < appIds.length; i += 1) {
+      num = appIds[i].replace('apparatus', '');
+      newOverlapOptions = SV.calculateUnitLengths(appIds[i], overlapOptions);
+      overlaps = CL.getOverlapLayout(CL.data[appIds[i]], num, 'reorder', header[1], newOverlapOptions);
       html.push.apply(html, overlaps[0]);
       temp[2].push.apply(temp[2], overlaps[1]);
     }
@@ -109,32 +108,34 @@ OR = (function() {
       html.join('') + '</table></div><div id="single_witness_reading"></div>';
     CL.expandFillPageClients();
     if (OR.undoStack.length > 0) {
-      undo_button = '<button class="pure-button right_foot" id="undo_button">undo</button>';
+      undoButton = '<button class="pure-button right_foot" id="undo_button">undo</button>';
     } else {
-      undo_button = '';
+      undoButton = '';
     }
     //sort out footer stuff
     if (CL.showSubreadings === true) {
-      show_hide_subreadings_button_text = 'hide non-edition subreadings';
+      showHideSubreadingsButtonText = 'hide non-edition subreadings';
     } else {
-      show_hide_subreadings_button_text = 'show non-edition subreadings';
+      showHideSubreadingsButtonText = 'show non-edition subreadings';
     }
-    footer_html = [];
+    footerHtml = [];
     if (CL.project.hasOwnProperty('showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
       footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
     }
-    footer_html.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">' + show_hide_subreadings_button_text + '</button>');
-    footer_html.push('<span id="extra_buttons"></span>');
-    footer_html.push('<span id="stage_links"></span>');
+    footerHtml.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">' +
+                    showHideSubreadingsButtonText + '</button>');
+    footerHtml.push('<span id="extra_buttons"></span>');
+    footerHtml.push('<span id="stage_links"></span>');
 
     if (CL.managingEditor === true) {
-      footer_html.push('<button class="pure-button right_foot" id="approve">Approve</button>');
+      footerHtml.push('<button class="pure-button right_foot" id="approve">Approve</button>');
     }
-    footer_html.push('<button class="pure-button right_foot" id="save">Save</button>');
-    footer_html.push('<select class="right_foot" id="highlighted" name="highlighted"></select>');
-    footer_html.push(undo_button);
-    $('#footer').addClass('pure-form'); //this does the styling of the select elements in the footer using pure (they cannot be styled individually)
-    document.getElementById('footer').innerHTML = footer_html.join('');
+    footerHtml.push('<button class="pure-button right_foot" id="save">Save</button>');
+    footerHtml.push('<select class="right_foot" id="highlighted" name="highlighted"></select>');
+    footerHtml.push(undoButton);
+    // this does the styling of the select elements in the footer using pure (they cannot be styled individually)
+    $('#footer').addClass('pure-form');
+    document.getElementById('footer').innerHTML = footerHtml.join('');
     CL.addExtraFooterButtons('ordered');
     CL.addStageLinks();
     spinner.removeLoadingOverlay();
@@ -163,7 +164,7 @@ OR = (function() {
         _approveVerse();
       });
     }
-    for (let i = 0; i < highest_unit; i += 1) {
+    for (let i = 0; i < highestUnit; i += 1) {
       if (document.getElementById('drag_unit_' + i) !== null) {
         redipsInitOrderReadings('drag_unit_' + i);
       }
@@ -186,9 +187,9 @@ OR = (function() {
       });
     }
     CL.makeVerseLinks();
-    event_rows = temp[2];
-    for (let i = 0; i < event_rows.length; i += 1) {
-      row = document.getElementById(event_rows[i]);
+    eventRows = temp[2];
+    for (let i = 0; i < eventRows.length; i += 1) {
+      row = document.getElementById(eventRows[i]);
       if (row !== null) {
         CL.addHoverEvents(row);
       }
@@ -196,8 +197,8 @@ OR = (function() {
   };
 
   showApprovedVersion = function(options) {
-    var html, i, highest_unit, header, triangles, row, label, key, overlaps, app_ids, footer_html, num, temp,
-      event_rows, scrollOffset, overlap_options, new_overlap_options, container, show_hide_subreadings_button_text;
+    var html, highestUnit, header, row, overlaps, appIds, footerHtml, num, temp, eventRows,
+        overlapOptions, newOverlapOptions, container, showHideSubreadingsButtonText;
     if (typeof options === 'undefined') {
       options = {};
     }
@@ -215,22 +216,22 @@ OR = (function() {
     temp = CL.getUnitLayout(CL.data.apparatus, 1, 'approved', options);
     header = CL.getCollationHeader(CL.data, temp[1], false);
     html = header[0];
-    highest_unit = header[1];
+    highestUnit = header[1];
     html.push.apply(html, temp[0]);
-    overlap_options = {
+    overlapOptions = {
       'column_lengths': temp[1]
     };
     if (options.hasOwnProperty('highlighted_wit')) {
-      overlap_options.highlighted_wit = options.highlighted_wit;
+      overlapOptions.highlighted_wit = options.highlighted_wit;
     }
     if (options.hasOwnProperty('highlighted_unit')) {
-      overlap_options.highlighted_unit = options.highlighted_unit;
+      overlapOptions.highlighted_unit = options.highlighted_unit;
     }
-    app_ids = CL.getOrderedAppLines();
-    for (i = 0; i < app_ids.length; i += 1) {
-      num = app_ids[i].replace('apparatus', '');
-      new_overlap_options = SV.calculateUnitLengths(app_ids[i], overlap_options);
-      overlaps = CL.getOverlapLayout(CL.data[app_ids[i]], num, 'reorder', header[1], new_overlap_options);
+    appIds = CL.getOrderedAppLines();
+    for (let i = 0; i < appIds.length; i += 1) {
+      num = appIds[i].replace('apparatus', '');
+      newOverlapOptions = SV.calculateUnitLengths(appIds[i], overlapOptions);
+      overlaps = CL.getOverlapLayout(CL.data[appIds[i]], num, 'reorder', header[1], newOverlapOptions);
       html.push.apply(html, overlaps[0]);
       temp[2].push.apply(temp[2], overlaps[1]);
     }
@@ -242,24 +243,25 @@ OR = (function() {
     container.innerHTML = '<div id="scroller" class="fillPage"><table class="collation_overview">' +
       html.join('') + '</table></div><div id="single_witness_reading"></div>';
     CL.expandFillPageClients();
-    //sort out footer stuff
+    // sort out footer stuff
     if (CL.showSubreadings === true) {
-      show_hide_subreadings_button_text = 'hide non-edition subreadings';
+      showHideSubreadingsButtonText = 'hide non-edition subreadings';
     } else {
-      show_hide_subreadings_button_text = 'show non-edition subreadings';
+      showHideSubreadingsButtonText = 'show non-edition subreadings';
     }
-    footer_html = [];
+    footerHtml = [];
     if (CL.project.hasOwnProperty('showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
       footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
     }
-    footer_html.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">' + show_hide_subreadings_button_text + '</button>');
-    footer_html.push('<span id="extra_buttons"></span>');
-    footer_html.push('<span id="stage_links"></span>');
+    footerHtml.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">' +
+                    showHideSubreadingsButtonText + '</button>');
+    footerHtml.push('<span id="extra_buttons"></span>');
+    footerHtml.push('<span id="stage_links"></span>');
     if (CL.project.showGetApparatusButton === true) {
-      footer_html.push('<button class="pure-button right_foot" id="get_apparatus">Get apparatus</button>');
+      footerHtml.push('<button class="pure-button right_foot" id="get_apparatus">Get apparatus</button>');
     }
-    footer_html.push('<select class="right_foot" id="highlighted" name="highlighted"></select>');
-    document.getElementById('footer').innerHTML = footer_html.join('');
+    footerHtml.push('<select class="right_foot" id="highlighted" name="highlighted"></select>');
+    document.getElementById('footer').innerHTML = footerHtml.join('');
     CL.addExtraFooterButtons('approved');
     CL.addStageLinks();
     spinner.removeLoadingOverlay();
@@ -286,19 +288,19 @@ OR = (function() {
       });
     }
     CL.makeVerseLinks();
-    event_rows = temp[2];
-    for (i = 0; i < event_rows.length; i += 1) {
-      row = document.getElementById(event_rows[i]);
+    eventRows = temp[2];
+    for (let i = 0; i < eventRows.length; i += 1) {
+      row = document.getElementById(eventRows[i]);
       CL.addHoverEvents(row);
     }
   };
 
   getUnitData = function(data, id, start, end, options) {
-    var html, j, decisions, rows, cells, row_list, temp, events, max_length, row_id, type, overlapped, has_context_menu,
-      colspan, hand, orRules, key, reading_label, label_suffix, reading_suffix, text, label, overlap;
+    var html, rows, cells, rowList, temp, events, rowId, type, overlapped, hasContextMenu,
+        colspan, hand, orRules, readingLabel, readingSuffix, text, overlap;
     html = [];
-    row_list = [];
-    has_context_menu = true;
+    rowList = [];
+    hasContextMenu = true;
     overlap = false;
     if (id.indexOf('_app_') !== -1) {
       overlap = true;
@@ -313,16 +315,19 @@ OR = (function() {
     } else {
       colspan = end - start + 1;
     }
-    orRules = CL.getRuleClasses(undefined, undefined, 'value', ['identifier', 'keep_as_main_reading', 'suffixed_label', 'suffixed_reading']);
-    for (key in orRules) {
+    orRules = CL.getRuleClasses(undefined, undefined, 'value', ['identifier', 'keep_as_main_reading',
+                                                                'suffixed_label', 'suffixed_reading']);
+    for (let key in orRules) {
       if (orRules.hasOwnProperty(key) && orRules[key][1] === false) {
         delete orRules[key];
       }
     }
     if (_areAllEmptyReadings(data) && !options.hasOwnProperty('created')) {
-      html.push('<td class="redips-mark start_' + start + ' " colspan="' + colspan + '"><div class="drag_div deletable" id="drag_unit_' + id + '">');
+      html.push('<td class="redips-mark start_' + start + ' " colspan="' + colspan + '">' +
+                '<div class="drag_div deletable" id="drag_unit_' + id + '">');
     } else {
-      html.push('<td class="redips-mark start_' + start + ' " colspan="' + colspan + '"><div class="drag_div" id="drag_unit_' + id + '">');
+      html.push('<td class="redips-mark start_' + start + ' " colspan="' + colspan + '">' +
+                '<div class="drag_div" id="drag_unit_' + id + '">');
     }
     if (!overlap) {
       html.push('<table class="variant_unit" id="variant_unit_' + id + '">');
@@ -332,50 +337,52 @@ OR = (function() {
     for (let i = 0; i < data.length; i += 1) {
       //what is the reading text?
       if (data[i].type === 'lac') {
-        has_context_menu = false;
+        hasContextMenu = false;
       } else {
-        has_context_menu = true;
+        hasContextMenu = true;
       }
       text = CL.extractDisplayText(data[i], i, data.length, options.unit_id, options.app_id);
       if (text.indexOf('system_gen_') !== -1) {
-        has_context_menu = false;
+        hasContextMenu = false;
         text = text.replace('system_gen_', '');
       }
       data[i].text_string = text;
       //what labels need to be used?
-      reading_label = CL.getReadingLabel(i, data[i], orRules);
-      reading_suffix = CL.getReadingSuffix(data[i], orRules);
+      readingLabel = CL.getReadingLabel(i, data[i], orRules);
+      readingSuffix = CL.getReadingSuffix(data[i], orRules);
       //what is the row id? (and add it to the list for adding events)
-      row_id = 'variant_unit_' + id + '_row_' + i;
-      row_list.push(row_id);
+      rowId = 'variant_unit_' + id + '_row_' + i;
+      rowList.push(rowId);
 
       if (i === 0) {
-        html.push('<tr><td colspan="3" class="redips-mark"><span id="toggle_variant_' + id + '" class="triangle">&#9650;</span></td></tr>');
+        html.push('<tr><td colspan="3" class="redips-mark"><span id="toggle_variant_' + id +
+                  '" class="triangle">&#9650;</span></td></tr>');
         if (data[i].witnesses.indexOf(hand) != -1) {
-          html.push('<tr id="' + row_id + '" class="top highlighted">');
+          html.push('<tr id="' + rowId + '" class="top highlighted">');
         } else {
-          html.push('<tr id="' + row_id + '" class="top">');
+          html.push('<tr id="' + rowId + '" class="top">');
         }
         html.push('<td class="redips-mark"></td>');
       } else {
         if (data[i].witnesses.indexOf(hand) != -1) {
-          html.push('<tr id="' + row_id + '" class="highlighted">');
+          html.push('<tr id="' + rowId + '" class="highlighted">');
         } else {
-          html.push('<tr id="' + row_id + '">');
+          html.push('<tr id="' + rowId + '">');
         }
         html.push('<td class="redips-rowhandler"><div class="redips-drag redips-row">+</div></td>');
       }
 
-      html.push('<td id="' + row_id + '_label" class="reading_label redips-mark"><div class="spanlike">' + reading_label);
+      html.push('<td id="' + rowId + '_label" class="reading_label redips-mark"><div class="spanlike">' +
+                readingLabel);
       html.push('</div></td>');
       if (!overlap) {
-        if (has_context_menu) {
+        if (hasContextMenu) {
           html.push('<td class="redips-mark main_reading">');
         } else {
           html.push('<td class="redips-mark main_reading_ncm">');
         }
       } else {
-        if (has_context_menu) {
+        if (hasContextMenu) {
           html.push('<td class="redips-mark overlap_main_reading">');
         } else {
           html.push('<td class="redips-mark overlap_main_reading_ncm">');
@@ -383,8 +390,8 @@ OR = (function() {
       }
       html.push('<div class="spanlike">');
       html.push(text);
-      if (reading_suffix !== '') {
-        html.push(' ' + reading_suffix);
+      if (readingSuffix !== '') {
+        html.push(' ' + readingSuffix);
       }
       html.push('</div>');
       if (data[i].hasOwnProperty('subreadings')) {
@@ -395,7 +402,7 @@ OR = (function() {
         }
         temp = _getSubunitData(data[i].subreadings, i, id, data[i].label, 'subreading', hand, overlapped);
         html.push.apply(html, temp[0]);
-        row_list.push.apply(row_list, temp[1]);
+        rowList.push.apply(rowList, temp[1]);
         html.push('</table>');
       }
       html.push('</td>');
@@ -403,7 +410,7 @@ OR = (function() {
     }
     html.push('</table>');
     html.push('</div></td>');
-    return [html, row_list];
+    return [html, rowList];
   };
 
   relabelReadings = function(readings, overwrite) {

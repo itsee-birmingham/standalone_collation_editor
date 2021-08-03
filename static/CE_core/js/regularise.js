@@ -17,57 +17,32 @@ RG = (function() {
 
   //private function declarations
   let _calculateLacWits, _hasRuleApplied, _getDisplayClasses, _getToken, _getWordTokenForWitness,
-  _hasDeletionScheduled, _getRegWitsAsString, _integrateLacOmReadings, _addMultiSelectionFunctions,
-  _doRunCollation, _showSettings, _fetchRules, _removeUnrequiredData, _showRegularisations,
-  _highlightWitness, _addNewToken, _getWordIndexForWitness, _createRule, _getDisplaySettingValue,
-  _setUpRuleMenu, _getRuleScopes, _getSuffix, _makeMenu, _redipsInitRegularise,
-  _getAncestorRow, _showGlobalExceptions, _removeGlobalExceptions, _scheduleAddGlobalException,
-  _scheduleRuleDeletion, _deleteUnappliedRule, _addContextMenuHandlers, _showCollationTable,
-  _scheduleSelectedRulesDeletion, _addFooterFunctions, _highlightAddedWitness, _getRulesForDisplay;
+      _hasDeletionScheduled, _getRegWitsAsString, _integrateLacOmReadings, _addMultiSelectionFunctions,
+      _doRunCollation, _showSettings, _fetchRules, _removeUnrequiredData, _showRegularisations,
+      _highlightWitness, _addNewToken, _getWordIndexForWitness, _createRule, _getDisplaySettingValue,
+      _setUpRuleMenu, _getRuleScopes, _getSuffix, _makeMenu, _redipsInitRegularise,
+      _getAncestorRow, _showGlobalExceptions, _removeGlobalExceptions, _scheduleAddGlobalException,
+      _scheduleRuleDeletion, _deleteUnappliedRule, _addContextMenuHandlers, _showCollationTable,
+      _scheduleSelectedRulesDeletion, _addFooterFunctions, _highlightAddedWitness, _getRulesForDisplay;
 
   //*********  public functions *********
 
-  // getCollationData = function(output, scroll_offset, callback) {
-  //   CL.container = document.getElementById('container');
-  //   CL.services.getVerseData(CL.context, CL.dataSettings.witness_list, false, function(verse_data) {
-  //     var collation_data;
-  //     collation_data = verse_data;
-  //     //TODO: remove this call since we don't have separate private transcriptions now
-  //     CL.services.getVerseData(CL.context, CL.dataSettings.witness_list, true, function(verse_data, lac_wits_function) {
-  //       collation_data.push.apply(collation_data, verse_data);
-  //       _calculateLacWits(collation_data, function(lac_witness_list) {
-  //         CL.services.getSiglumMap(lac_witness_list, function(lac_witnesses) {
-  //           CL.collateData = {
-  //             'data': collation_data,
-  //             'lac_witnesses': lac_witnesses
-  //           };
-  //           if (typeof callback !== 'undefined') {
-  //             callback();
-  //           } else {
-  //             runCollation(CL.collateData, output, scroll_offset);
-  //           }
-  //         });
-  //       });
-  //     });
-  //   });
-  // };
-
-  getCollationData = function(output, scroll_offset, callback) {
+  getCollationData = function(output, scrollOffset, callback) {
     CL.container = document.getElementById('container');
-    CL.services.getUnitData(CL.context, CL.dataSettings.witness_list, function(collation_data) {
-      _calculateLacWits(collation_data, function(lac_witness_list) {
-        CL.services.getSiglumMap(lac_witness_list, function(lac_witnesses) {
+    CL.services.getUnitData(CL.context, CL.dataSettings.witness_list, function(collationData) {
+      _calculateLacWits(collationData, function(lacWitnessList) {
+        CL.services.getSiglumMap(lacWitnessList, function(lacWitnesses) {
           CL.collateData = {
-            'data': collation_data.results,
-            'lac_witnesses': lac_witnesses
+            'data': collationData.results,
+            'lac_witnesses': lacWitnesses
           };
-          if (collation_data.hasOwnProperty('special_categories')) {
-            CL.collateData.special_categories = collation_data.special_categories;
+          if (collationData.hasOwnProperty('special_categories')) {
+            CL.collateData.special_categories = collationData.special_categories;
           }
           if (typeof callback !== 'undefined') {
             callback();
           } else {
-            runCollation(CL.collateData, output, scroll_offset);
+            runCollation(CL.collateData, output, scrollOffset);
           }
         });
       });
@@ -83,27 +58,26 @@ RG = (function() {
    *
    * */
   getUnitData = function(data, id, start, end, options) {
-    var html, decisions, rows, cells, row_list, temp, events, max_length, row_id, type, rowIdBase,
-      subrow_id, colspan, highlighted_hand, classes, div_class_string, witness, words, reg_class, highlighted,
-      cells_dict, rule_cells, keys_to_sort, class_list, variant_unit_id, deletableRules, nonDeletableRules;
+    var html, rows, cells, rowList, temp, events, maxLength, rowId, rowIdBase, colspan, highlightedHand,
+        classes, divClassString, witness, words, cellsDict, ruleCells, keysToSort, classList,
+        variantUnitId, deletableRules, nonDeletableRules;
     if (options === undefined) {
       options = {};
     }
     if (options.hasOwnProperty('highlighted_wit')) {
-      highlighted_hand = options.highlighted_wit.split('|')[1];
+      highlightedHand = options.highlighted_wit.split('|')[1];
     } else {
-      highlighted_hand = null;
+      highlightedHand = null;
     }
     html = [];
-    row_list = [];
+    rowList = [];
     events = {};
-    decisions = [];
-    max_length = ((end - start) / 2) + 1;
+    maxLength = ((end - start) / 2) + 1;
     rows = [];
     for (let i = 0; i < data.length; i += 1) {
       cells = [];
-      row_id = 'variant_unit_' + id + '_row_' + i;
-      row_list.push(row_id);
+      rowId = 'variant_unit_' + id + '_row_' + i;
+      rowList.push(rowId);
       if (i === 0) {
         cells.push('<tr><td class="redips-mark" colspan="MX_LN"><span id="toggle_variant_' + id + '" class="triangle">&#9650;</span></td></tr>');
       }
@@ -111,14 +85,14 @@ RG = (function() {
       if (i === 0) {
         classes.push('top');
       }
-      if (data[i].witnesses.indexOf(highlighted_hand) != -1) {
+      if (data[i].witnesses.indexOf(highlightedHand) != -1) {
         classes.push('highlighted');
       }
       if (options.hasOwnProperty('highlighted_added_wits') &&
           data[i].witnesses.filter(x => options.highlighted_added_wits.includes(x)).length > 0) {
 				classes.push('added_highlighted');
 			}
-      cells.push('<tr id="' + row_id + '" class="' + classes.join(' ') + '">');
+      cells.push('<tr id="' + rowId + '" class="' + classes.join(' ') + '">');
       cells.push('<td class="redips-mark"><div class="spanlike">' + CL.getAlphaId(i) + '. </div></td>');
       if (data[i].text.length === 0) {
         if (i === 0) {
@@ -131,35 +105,35 @@ RG = (function() {
           }
         }
       } else {
-        if (data[i].text.length > max_length) {
-          max_length = data[i].text.length;
+        if (data[i].text.length > maxLength) {
+          maxLength = data[i].text.length;
         }
         for (let j = 0; j < data[i].text.length; j += 1) {
-          variant_unit_id = 'variant_unit_' + id + '_r' + i + '_w' + j;
-          div_class_string = '';
+          variantUnitId = 'variant_unit_' + id + '_r' + i + '_w' + j;
+          divClassString = '';
 
-          class_list = [];
+          classList = [];
           // if we are in witnessAdding mode only allow regularisation of readings that have added witnesses
           // (the rules will only be made with the added ones not the full set)
           if (i > 0 && (CL.witnessAddingMode === false ||
-                (CL.witnessAddingMode === true &&
-                    data[i].witnesses.filter(x => CL.witnessesAdded.includes(x)).length > 0))) {
-            class_list = ['redips-drag', 'redips-clone', 'reg_word'];
+                  (CL.witnessAddingMode === true &&
+                      data[i].witnesses.filter(x => CL.witnessesAdded.includes(x)).length > 0))) {
+            classList = ['redips-drag', 'redips-clone', 'reg_word'];
           }
 
           if (i > 0) {
-            if (_hasRuleApplied(variant_unit_id)) {
-              class_list.push('regularisation_staged');
+            if (_hasRuleApplied(variantUnitId)) {
+              classList.push('regularisation_staged');
             }
-            class_list.push(_getDisplayClasses(data[i].text[j]));
-            div_class_string = ' class="' + class_list.join(' ') + '" ';
+            classList.push(_getDisplayClasses(data[i].text[j]));
+            divClassString = ' class="' + classList.join(' ') + '" ';
           }
           cells.push('<td>');
           words = data[i].text;
           if (words[j][words[j].reading[0]].hasOwnProperty('gap_before') && words[j].hasOwnProperty('combined_gap_before')) {
             cells.push('<div class="gap spanlike"> &lt;' + words[j][words[j].reading[0]].gap_details + '&gt; </div>');
           }
-          cells.push('<div ' + div_class_string + 'id="' + variant_unit_id + '">' + _getToken(words[j]) + '</div>');
+          cells.push('<div ' + divClassString + 'id="' + variantUnitId + '">' + _getToken(words[j]) + '</div>');
           if (words[j][words[j].reading[0]].hasOwnProperty('gap_after') && (j < words.length - 1 || words[j].hasOwnProperty('combined_gap_after'))) {
             cells.push('<div class="gap spanlike"> &lt;' + words[j][words[j].reading[0]].gap_details + '&gt; </div>');
           }
@@ -212,34 +186,34 @@ RG = (function() {
                 }
               }
             }
-            rowIdBase = row_id + '_word_' + j;
-            rule_cells = _getRulesForDisplay(deletableRules, events, true, highlighted_hand, rowIdBase);
-            keys_to_sort = rule_cells[0];
-            cells_dict = rule_cells[1];
-            events = rule_cells[2];
+            rowIdBase = rowId + '_word_' + j;
+            ruleCells = _getRulesForDisplay(deletableRules, events, true, highlightedHand, rowIdBase);
+            keysToSort = ruleCells[0];
+            cellsDict = ruleCells[1];
+            events = ruleCells[2];
             if (Object.keys(deletableRules).length > 1) {
               cells.push('<table><tbody id="' + rowIdBase + '_selectable' + '" class="selectable selectable-container">');
             } else {
               cells.push('<table><tbody>');
             }
-            keys_to_sort = CL.sortWitnesses(keys_to_sort);
-            for (let k = 0; k < keys_to_sort.length; k += 1) {
-              if (cells_dict.hasOwnProperty(keys_to_sort[k])) {
-                cells.push(cells_dict[keys_to_sort[k]].join(' '));
+            keysToSort = CL.sortWitnesses(keysToSort);
+            for (let k = 0; k < keysToSort.length; k += 1) {
+              if (cellsDict.hasOwnProperty(keysToSort[k])) {
+                cells.push(cellsDict[keysToSort[k]].join(' '));
               }
             }
             cells.push('</tbody></table>');
             if (Object.keys(nonDeletableRules).length > 1) {
               cells.push('<table class="unselectable"><tbody>');
-              rule_cells = _getRulesForDisplay(nonDeletableRules, events, false, highlighted_hand, rowIdBase);
-              keys_to_sort = rule_cells[0];
-              cells_dict = rule_cells[1];
-              events = rule_cells[2];
+              ruleCells = _getRulesForDisplay(nonDeletableRules, events, false, highlightedHand, rowIdBase);
+              keysToSort = ruleCells[0];
+              cellsDict = ruleCells[1];
+              events = ruleCells[2];
 
-              keys_to_sort = CL.sortWitnesses(keys_to_sort);
-              for (let k = 0; k < keys_to_sort.length; k += 1) {
-                if (cells_dict.hasOwnProperty(keys_to_sort[k])) {
-                  cells.push(cells_dict[keys_to_sort[k]].join(' '));
+              keysToSort = CL.sortWitnesses(keysToSort);
+              for (let k = 0; k < keysToSort.length; k += 1) {
+                if (cellsDict.hasOwnProperty(keysToSort[k])) {
+                  cells.push(cellsDict[keysToSort[k]].join(' '));
                 }
               }
               cells.push('</tbody></table>');
@@ -253,89 +227,86 @@ RG = (function() {
     }
     html.push('<td class="start_' + start + '" colspan="' + (end - start + 1) + '"><div class="drag_div" id="redips-drag' + id + '">');
     html.push('<table class="variant_unit" id="variant_unit_' + id + '">');
-    html.push(rows.join('').replace(/MX_LN/g, String(max_length + 1)));
-    html.push('<tr><td class="redips-mark" colspan="' + (max_length + 1) + '"><span id="add_reading_' + id + '">+</span></td></tr>');
+    html.push(rows.join('').replace(/MX_LN/g, String(maxLength + 1)));
+    html.push('<tr><td class="redips-mark" colspan="' + (maxLength + 1) + '"><span id="add_reading_' + id + '">+</span></td></tr>');
     html.push('</table>');
     html.push('</div></td>');
-    return [html, row_list, events];
+    return [html, rowList, events];
   };
 
-  _getRulesForDisplay = function(rules, events, deletable, highlighted_hand, rowIdBase) {
-    var keys_to_sort, cells_dict, reg_class, highlighted, rule_cells, subrow_id;
-    keys_to_sort = [];
-    cells_dict = {};
+  _getRulesForDisplay = function(rules, events, deletable, highlightedHand, rowIdBase) {
+    var keysToSort, cellsDict, regClass, highlighted, ruleCells, subrowId;
+    keysToSort = [];
+    cellsDict = {};
     for (let key in rules) {
       if (rules.hasOwnProperty(key)) {
-        rule_cells = [];
+        ruleCells = [];
         if (deletable === true) {
           if (rules[key].scope === 'always') {
-            reg_class = 'regularised_global ';
+            regClass = 'regularised_global ';
           } else {
-            reg_class = 'ui-selectable regularised ';
+            regClass = 'ui-selectable regularised ';
           }
           if (_hasDeletionScheduled(key)) {
-            reg_class += 'deleted ';
+            regClass += 'deleted ';
           }
         } else {
-          reg_class = 'non_deletable_rule ';
+          regClass = 'non_deletable_rule ';
         }
-        reg_class += 'regclass_' + rules[key].class + ' ';
+        regClass += 'regclass_' + rules[key].class + ' ';
         highlighted = '';
         if (rules[key].witnesses.length > 1) {
           rules[key].witnesses = CL.sortWitnesses(rules[key].witnesses);
         }
-        if (keys_to_sort.indexOf(rules[key].witnesses[0]) === -1) {
-          keys_to_sort.push(rules[key].witnesses[0]);
+        if (keysToSort.indexOf(rules[key].witnesses[0]) === -1) {
+          keysToSort.push(rules[key].witnesses[0]);
         }
-        if (rules[key].witnesses.indexOf(highlighted_hand) !== -1) {
+        if (rules[key].witnesses.indexOf(highlightedHand) !== -1) {
           highlighted = 'highlighted ';
         }
-        subrow_id = rowIdBase + '_rule_' + key;
-        rule_cells.push('<tr class="' + reg_class + highlighted + '" id="' + subrow_id + '"><td>');
-        if (rules[key].witnesses.indexOf(highlighted_hand) !== -1) {
-          rule_cells.push('<div class="spanlike">');
+        subrowId = rowIdBase + '_rule_' + key;
+        ruleCells.push('<tr class="' + regClass + highlighted + '" id="' + subrowId + '"><td>');
+        if (rules[key].witnesses.indexOf(highlightedHand) !== -1) {
+          ruleCells.push('<div class="spanlike">');
         }
-        rule_cells.push(CL.project.prepareDisplayString(rules[key].t));
-        rule_cells.push(' &#9654; ');
-        rule_cells.push(CL.project.prepareDisplayString(rules[key].n));
-        if (rules[key].witnesses.indexOf(highlighted_hand) !== -1) {
-          rule_cells.push('</div>');
+        ruleCells.push(CL.project.prepareDisplayString(rules[key].t));
+        ruleCells.push(' &#9654; ');
+        ruleCells.push(CL.project.prepareDisplayString(rules[key].n));
+        if (rules[key].witnesses.indexOf(highlightedHand) !== -1) {
+          ruleCells.push('</div>');
         }
-        rule_cells.push('</td></tr>');
-        if (cells_dict.hasOwnProperty(rules[key].witnesses[0])) {
-          cells_dict[rules[key].witnesses[0]].push(rule_cells.join(' '));
+        ruleCells.push('</td></tr>');
+        if (cellsDict.hasOwnProperty(rules[key].witnesses[0])) {
+          cellsDict[rules[key].witnesses[0]].push(ruleCells.join(' '));
         } else {
-          cells_dict[rules[key].witnesses[0]] = [rule_cells.join(' ')];
+          cellsDict[rules[key].witnesses[0]] = [ruleCells.join(' ')];
         }
-        // if (deletable === true) {
-          events[subrow_id] = rules[key].scope + ': ' +
-                              _getRegWitsAsString(rules[key].witnesses) + ' (' +
-                              rules[key].class + ')';
-        // }
+        events[subrowId] = rules[key].scope + ': ' +
+                            _getRegWitsAsString(rules[key].witnesses) + ' (' +
+                            rules[key].class + ')';
       }
     }
-    return [keys_to_sort, cells_dict, events];
+    return [keysToSort, cellsDict, events];
   };
 
-  recollate = function(reset_scroll) {
-    var options, scroll_offset;
+  recollate = function(resetScroll) {
+    var options, scrollOffset;
     spinner.showLoadingOverlay();
-    if (reset_scroll === undefined) {
-      reset_scroll = false;
+    if (resetScroll === undefined) {
+      resetScroll = false;
     }
-    scroll_offset = 0;
-    if (!reset_scroll) {
-      scroll_offset = [document.getElementById('scroller').scrollLeft,
-        document.getElementById('scroller').scrollTop
-      ];
+    scrollOffset = 0;
+    if (!resetScroll) {
+      scrollOffset = [document.getElementById('scroller').scrollLeft,
+                      document.getElementById('scroller').scrollTop];
     }
     if (CL.witnessAddingMode !== true) {
       if ($.isEmptyObject(CL.collateData)) {
-        getCollationData('units', scroll_offset, function() {
-          runCollation(CL.collateData, 'units', scroll_offset);
+        getCollationData('units', scrollOffset, function() {
+          runCollation(CL.collateData, 'units', scrollOffset);
         });
       } else {
-        runCollation(CL.collateData, 'units', scroll_offset);
+        runCollation(CL.collateData, 'units', scrollOffset);
       }
     } else {
       CL.prepareAdditionalCollation(CL.existingCollation, CL.dataSettings.witness_list);
@@ -343,7 +314,7 @@ RG = (function() {
   };
 
   showVerseCollation = function(data, context, container, options) {
-    var html, i, last_row, tr, temp, event_rows, row, triangles, bk, ch, v, nextCh, nextV, prevCh, prevV,
+    var html, i, tr, temp, event_rows, row, triangles, bk, ch, v, nextCh, nextV, prevCh, prevV,
       header, unit_events, key, global_exceptions_html, show_hide_regularisations_button_text,
       remove_wits_form, wits, footerHtml, preselected_added_highlight;
     console.log(JSON.parse(JSON.stringify(data)));
@@ -364,10 +335,7 @@ RG = (function() {
     }
 
     options.sort = true;
-    SimpleContextMenu.setup({
-      'preventDefault': true,
-      'preventForms': false
-    });
+    SimpleContextMenu.setup({'preventDefault': true, 'preventForms': false});
     if (CL.witnessEditingMode === false || CL.witnessAddingMode === true) {
       SimpleContextMenu.attach('ui-selected', function() {
         return _makeMenu('group_delete');
@@ -545,8 +513,8 @@ RG = (function() {
 
   /** highlight a witness that has been added or highlight all added witnesses with 'all' (only in CL.witnessAddingMode), called from select box in page footer */
   _highlightAddedWitness = function (witness) {
-    var scroll_offset, witnesses;
-    scroll_offset = [document.getElementById('scroller').scrollLeft,
+    var scrollOffset, witnesses;
+    scrollOffset = [document.getElementById('scroller').scrollLeft,
                      document.getElementById('scroller').scrollTop];
 
     if (witness === 'all') {
@@ -557,8 +525,8 @@ RG = (function() {
     CL.highlightedAdded = witnesses;
     showVerseCollation(CL.data, CL.context, CL.container, {'highlighted_added_wits': witnesses});
 
-    document.getElementById('scroller').scrollLeft = scroll_offset[0];
-    document.getElementById('scroller').scrollTop = scroll_offset[1];
+    document.getElementById('scroller').scrollLeft = scrollOffset[0];
+    document.getElementById('scroller').scrollTop = scrollOffset[1];
   };
 
   _addFooterFunctions = function () {
@@ -721,7 +689,7 @@ RG = (function() {
     return new_wits.join(', ');
   };
 
-  runCollation = function(collation_data, output, scroll_offset, callback) {
+  runCollation = function(collation_data, output, scrollOffset, callback) {
     var rule_list;
     //put all the rules in a single list
     rule_list = [];
@@ -735,7 +703,7 @@ RG = (function() {
       _forGlobalExceptions = [];
       _rules = {};
       _fetchRules(collation_data, function(rules) {
-        _doRunCollation(collation_data, rules, output, scroll_offset, callback);
+        _doRunCollation(collation_data, rules, output, scrollOffset, callback);
       });
     });
   };
@@ -801,7 +769,7 @@ RG = (function() {
     return data;
   };
 
-  _doRunCollation = function(collation_data, rules, output, scroll_offset, callback) {
+  _doRunCollation = function(collation_data, rules, output, scrollOffset, callback) {
     var options, setting, result_callback, data_settings,
       algorithm_settings, displaySettings;
 
@@ -870,9 +838,9 @@ RG = (function() {
         CL.data = _integrateLacOmReadings(CL.data);
         CL.dataSettings.base_text_siglum = data.overtext_name;
         showVerseCollation(CL.data, CL.context, document.getElementById('container'));
-        if (scroll_offset !== undefined) {
-          document.getElementById('scroller').scrollLeft = scroll_offset[0];
-          document.getElementById('scroller').scrollTop = scroll_offset[1];
+        if (scrollOffset !== undefined) {
+          document.getElementById('scroller').scrollLeft = scrollOffset[0];
+          document.getElementById('scroller').scrollTop = scrollOffset[1];
         }
       };
     }
@@ -960,58 +928,57 @@ RG = (function() {
       if (document.getElementById('show_hide_regularisations_button')) {
         document.getElementById('show_hide_regularisations_button').value = document.getElementById('show_hide_regularisations_button').value.replace('show', 'hide');
         $('#show_hide_regularisations_button').on('click.hide_regularisations', function(event) {
-          var scroll_offset;
+          var scrollOffset;
           spinner.showLoadingOverlay();
-          scroll_offset = [document.getElementById('scroller').scrollLeft,
+          scrollOffset = [document.getElementById('scroller').scrollLeft,
             document.getElementById('scroller').scrollTop
           ];
           RG.showRegularisations = false;
           showVerseCollation(CL.data, CL.context, CL.container);
-          document.getElementById('scroller').scrollLeft = scroll_offset[0];
-          document.getElementById('scroller').scrollTop = scroll_offset[1];
+          document.getElementById('scroller').scrollLeft = scrollOffset[0];
+          document.getElementById('scroller').scrollTop = scrollOffset[1];
         });
       }
     } else {
       if (document.getElementById('show_hide_regularisations_button')) {
         document.getElementById('show_hide_regularisations_button').value = document.getElementById('show_hide_regularisations_button').value.replace('hide', 'show');
         $('#show_hide_regularisations_button').on('click.show_regularisations', function(event) {
-          var scroll_offset;
+          var scrollOffset;
           spinner.showLoadingOverlay();
-          scroll_offset = [document.getElementById('scroller').scrollLeft,
+          scrollOffset = [document.getElementById('scroller').scrollLeft,
             document.getElementById('scroller').scrollTop
           ];
           RG.showRegularisations = true;
           showVerseCollation(CL.data, CL.context, CL.container);
-          document.getElementById('scroller').scrollLeft = scroll_offset[0];
-          document.getElementById('scroller').scrollTop = scroll_offset[1];
+          document.getElementById('scroller').scrollLeft = scrollOffset[0];
+          document.getElementById('scroller').scrollTop = scrollOffset[1];
         });
       }
     }
   };
 
   _highlightWitness = function(witness) {
-    var scroll_offset;
-    scroll_offset = [document.getElementById('scroller').scrollLeft,
-      document.getElementById('scroller').scrollTop
-    ];
+    var scrollOffset;
+    scrollOffset = [document.getElementById('scroller').scrollLeft,
+                    document.getElementById('scroller').scrollTop];
     CL.highlighted = witness;
     showVerseCollation(CL.data, CL.context, CL.container, {
       'highlighted_wit': witness
     });
-    document.getElementById('scroller').scrollLeft = scroll_offset[0];
-    document.getElementById('scroller').scrollTop = scroll_offset[1];
+    document.getElementById('scroller').scrollLeft = scrollOffset[0];
+    document.getElementById('scroller').scrollTop = scrollOffset[1];
     if (witness !== 'none') {
       CL.getHighlightedText(witness);
     }
   };
 
   _addNewToken = function(element) {
-    var last_row, event, tr;
+    var lastRow, event, tr;
     $(element).on('click', function(event) {
-      last_row = event.target.parentNode.parentNode;
+      lastRow = event.target.parentNode.parentNode;
       tr = document.createElement('tr');
       tr.innerHTML = '<td colspan="' + event.target.parentNode.getAttribute('colspan') + '"><input type="text" size="10"/></td>';
-      last_row.parentNode.insertBefore(tr, last_row);
+      lastRow.parentNode.insertBefore(tr, lastRow);
     });
   };
 
@@ -1701,18 +1668,4 @@ RG = (function() {
     };
   }
 
-
-
 }());
-
-
-    // //currently only used by vmr services move to there?
-    // tei2json: function(tei, result_callback) {
-    //   var url, options, xmldom, ts, i, lac_witnesses, lac_docID;
-    //   url = staticUrl + '/tei2json/';
-    //   $.post(url, {
-    //     'tei': tei
-    //   }, function(json) {
-    //     result_callback(json);
-    //   });
-    // },
