@@ -218,9 +218,7 @@ OR = (function() {
     html = header[0];
     highestUnit = header[1];
     html.push.apply(html, temp[0]);
-    overlapOptions = {
-      'column_lengths': temp[1]
-    };
+    overlapOptions = {'column_lengths': temp[1]};
     if (options.hasOwnProperty('highlighted_wit')) {
       overlapOptions.highlighted_wit = options.highlighted_wit;
     }
@@ -448,8 +446,7 @@ OR = (function() {
   makeStandoffReading = function(type, readingDetails, parentReading, outerCallback) {
     var scrollOffset, apparatus, unit, callback;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      document.getElementById('scroller').scrollTop
-    ];
+                    document.getElementById('scroller').scrollTop];
     addToUndoStack(CL.data);
     apparatus = readingDetails.app_id;
     unit = CL.findUnitById(apparatus, readingDetails.unit_id);
@@ -592,7 +589,7 @@ OR = (function() {
     var conflictUnits, conflict;
     conflictUnits = _getPotentialConflicts(id);
     conflict = false;
-    if (conflict_units.length === 0) {
+    if (conflictUnits.length === 0) {
       return true;
     }
     if (!CL.data.hasOwnProperty('apparatus' + newAppRow)) {
@@ -639,13 +636,11 @@ OR = (function() {
   mergeAllLacs = function() {
     var typeList, parentTemplate;
     typeList = ['lac', 'lac_verse'];
-    parentTemplate = {
-      'created': true,
-      'type': 'lac',
-      'details': 'lac',
-      'text': [],
-      'witnesses': []
-    };
+    parentTemplate = {'created': true,
+                      'type': 'lac',
+                      'details': 'lac',
+                      'text': [],
+                      'witnesses': []};
     _mergeAllSuppliedEmptyReadings(typeList, parentTemplate, true);
   };
 
@@ -653,12 +648,10 @@ OR = (function() {
   mergeAllOms = function() {
     var typeList, parentTemplate;
     typeList = ['om', 'om_verse'];
-    parentTemplate = {
-      'created': true,
-      'type': 'om',
-      'text': [],
-      'witnesses': []
-    };
+    parentTemplate = {'created': true,
+                      'type': 'om',
+                      'text': [],
+                      'witnesses': []};
     _mergeAllSuppliedEmptyReadings(typeList, parentTemplate, true);
   };
 
@@ -866,7 +859,7 @@ OR = (function() {
     labelForm.innerHTML = html.join('');
     document.getElementsByTagName('body')[0].appendChild(labelForm);
 
-    //the +25 here is to move it out of the way of the other labels and readings so you can still see them
+    // the +25 here is to move it out of the way of the other labels and readings so you can still see them
     left = parseInt(left) - document.getElementById('scroller').scrollLeft + 25;
     top = parseInt(top) - document.getElementById('scroller').scrollTop;
     document.getElementById('label_form').style.left = left + 'px';
@@ -893,8 +886,7 @@ OR = (function() {
   _manualChangeLabel = function(rdgDetails, newLabel) {
     var reading, scrollOffset;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-                    document.getElementById('scroller').scrollTop
-                    ];
+                    document.getElementById('scroller').scrollTop];
     addToUndoStack(CL.data);
     reading = CL.data[rdgDetails[1]][rdgDetails[0]].readings[rdgDetails[2]];
     reading.label = newLabel;
@@ -908,8 +900,7 @@ OR = (function() {
   _highlightWitness = function(witness, stage) {
     var scrollOffset;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-                    document.getElementById('scroller').scrollTop
-                   ];
+                    document.getElementById('scroller').scrollTop];
     CL.highlighted = witness;
     if (stage === 'approved') {
       showApprovedVersion({'container': CL.container, 'highlighted_wit': witness});
@@ -973,8 +964,7 @@ OR = (function() {
     var scrollOffset, unitNumber, appId, unit, subtype, parentPos, subreadingPos, parentReading,
       subreading, options;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-                    document.getElementById('scroller').scrollTop
-                   ];
+                    document.getElementById('scroller').scrollTop];
     addToUndoStack(CL.data);
 
     if (idString.indexOf('_app_') === -1) {
@@ -1013,8 +1003,7 @@ OR = (function() {
   _getDeleteUnit = function(unit) {
     var scrollOffset, details, id;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-                    document.getElementById('scroller').scrollTop
-                   ];
+                    document.getElementById('scroller').scrollTop];
     addToUndoStack(CL.data);
     details = CL.getUnitAppReading(unit.id);
     id = CL.data[details[1]][details[0]]._id;
@@ -1076,8 +1065,7 @@ OR = (function() {
   _moveOverlapDown = function(unit) {
     var details, id, scrollOffset, appNum, currentLoc, newLoc, isSpace;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-                    document.getElementById('scroller').scrollTop
-                   ];
+                    document.getElementById('scroller').scrollTop];
     addToUndoStack(CL.data);
     details = CL.getUnitAppReading(unit.id);
     id = CL.data[details[1]][details[0]]._id;
@@ -1249,13 +1237,11 @@ OR = (function() {
         readingPos = rdgDetails[2];
         unit = CL.data[appId][unitPos];
         reading = unit.readings[readingPos];
-        readingDetails = {
-          'app_id': appId,
-          'unit_id': unit._id,
-          'unit_pos': unitPos,
-          'reading_pos': readingPos,
-          'reading_id': reading._id
-        };
+        readingDetails = {'app_id': appId,
+                          'unit_id': unit._id,
+                          'unit_pos': unitPos,
+                          'reading_pos': readingPos,
+                          'reading_id': reading._id};
         CL.markStandoffReading(key, 'Subreading', readingDetails, 'order_readings', {
           'top': SimpleContextMenu._menuElement.style.top,
           'left': SimpleContextMenu._menuElement.style.left
@@ -1284,13 +1270,11 @@ OR = (function() {
                 readingPos = rdgDetails[2];
                 unit = CL.data[appId][unitPos];
                 reading = unit.readings[readingPos];
-                readingDetails = {
-                  'app_id': appId,
-                  'unit_id': unit._id,
-                  'unit_pos': unitPos,
-                  'reading_pos': readingPos,
-                  'reading_id': reading._id
-                };
+                readingDetails = {'app_id': appId,
+                                  'unit_id': unit._id,
+                                  'unit_pos': unitPos,
+                                  'reading_pos': readingPos,
+                                  'reading_id': reading._id};
                 CL.markStandoffReading(rule[1], ruleName, readingDetails, 'order_readings', {
                   'top': SimpleContextMenu._menuElement.style.top,
                   'left': SimpleContextMenu._menuElement.style.left
@@ -1322,13 +1306,11 @@ OR = (function() {
         readingPos = rdgDetails[2];
         unit = CL.data[appId][unitPos];
         reading = unit.readings[readingPos];
-        readingDetails = {
-          'app_id': appId,
-          'unit_id': unit._id,
-          'unit_pos': unitPos,
-          'reading_pos': readingPos,
-          'reading_id': reading._id
-        };
+        readingDetails = {'app_id': appId,
+                          'unit_id': unit._id,
+                          'unit_pos': unitPos,
+                          'reading_pos': readingPos,
+                          'reading_id': reading._id};
         CL.markStandoffReading(orRules[key][1], key, readingDetails, 'order_readings', {
           'top': SimpleContextMenu._menuElement.style.top,
           'left': SimpleContextMenu._menuElement.style.left
@@ -1361,8 +1343,7 @@ OR = (function() {
   _markReading = function(value, reading) {
     var scrollOffset;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-                    document.getElementById('scroller').scrollTop
-                   ];
+                    document.getElementById('scroller').scrollTop];
     CL.markReading(value, reading);
     showOrderReadings({'container': CL.container});
     document.getElementById('scroller').scrollLeft = scrollOffset[0];
@@ -1437,18 +1418,15 @@ OR = (function() {
       spinner.showLoadingOverlay();
       url = CL.services.apparatusServiceUrl;
       $.fileDownload(url, {
-        httpMethod: "POST",
+        httpMethod: 'POST',
         data: {
           settings: CL.getExporterSettings(),
-          data: JSON.stringify([{
-            "context": CL.context,
-            "structure": CL.data
-          }])
+          data: JSON.stringify([{'context': CL.context, 'structure': CL.data}])
         },
         successCallback: function() {
           spinner.removeLoadingOverlay();
         }
-        //can also add a failCallback here if you want
+        // can also add a failCallback here if you want
       });
     }
   };
@@ -1629,8 +1607,7 @@ OR = (function() {
     var eventList, scrollOffset;
     if (OR.undoStack.length > 0) {
       scrollOffset = [document.getElementById('scroller').scrollLeft,
-                      document.getElementById('scroller').scrollTop
-                     ];
+                      document.getElementById('scroller').scrollTop];
       eventList = CL.data.event_list;
       CL.data = JSON.parse(OR.undoStack.pop());
       showOrderReadings({
@@ -1709,12 +1686,10 @@ OR = (function() {
                 if (!matchedReadings.hasOwnProperty(unit._id)) {
                   matchedReadings[unit._id] = [];
                 }
-                rdgDetails = {
-                  'app_id': key,
-                  'unit_id': unit._id,
-                  'unit_pos': i,
-                  'reading_id': reading._id
-                };
+                rdgDetails = {'app_id': key,
+                              'unit_id': unit._id,
+                              'unit_pos': i,
+                              'reading_id': reading._id};
                 if (reading.hasOwnProperty('subreadings')) {
                   rdgDetails.subreadings = true;
                 }
@@ -1744,12 +1719,10 @@ OR = (function() {
                 // this pass through. Somehow this still works!
                 if (reading) {
                   if (matchedReadings[unit._id][j].hasOwnProperty('subreadings')) {
-                    CL.makeStandoffReading('none', {
-                      'app_id': key,
-                      'unit_id': unit._id,
-                      'unit_pos': i,
-                      'reading_id': matchedReadings[unit._id][j].reading_id
-                    }, parentId);
+                    CL.makeStandoffReading('none', {'app_id': key,
+                                                    'unit_id': unit._id,
+                                                    'unit_pos': i,
+                                                    'reading_id': matchedReadings[unit._id][j].reading_id}, parentId);
                   } else {
                     CL.doMakeStandoffReading('none', key, unit, reading, newParent);
                   }

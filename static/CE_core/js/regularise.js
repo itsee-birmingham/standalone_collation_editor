@@ -282,8 +282,8 @@ RG = (function() {
           cellsDict[rules[key].witnesses[0]] = [ruleCells.join(' ')];
         }
         events[subrowId] = rules[key].scope + ': ' +
-                            _getRegWitsAsString(rules[key].witnesses) + ' (' +
-                            rules[key].class + ')';
+                           _getRegWitsAsString(rules[key].witnesses) + ' (' +
+                           rules[key].class + ')';
       }
     }
     return [keysToSort, cellsDict, events];
@@ -314,7 +314,7 @@ RG = (function() {
   };
 
   showVerseCollation = function(data, context, container, options) {
-    var html, i, eventRows, row, header, unitEvents, globalExceptionsHtml, showHideRegularisationsButtonText,
+    var html, i, temp, eventRows, row, header, unitEvents, globalExceptionsHtml, showHideRegularisationsButtonText,
         removeWitsForm, wits, footerHtml, preselectedAddedHighlight;
     console.log(JSON.parse(JSON.stringify(data)));
     CL.stage = 'regularise';
@@ -676,14 +676,14 @@ RG = (function() {
     return token['interface'];
   };
 
-  _hasDeletionScheduled = function(rule_id) {
+  _hasDeletionScheduled = function(ruleId) {
     for (let i = 0; i < _forDeletion.length; i += 1) {
-      if (_forDeletion[i].id === rule_id) {
+      if (_forDeletion[i].id === ruleId) {
         return true;
       }
     }
     for (let i = 0; i < _forGlobalExceptions.length; i += 1) {
-      if (_forGlobalExceptions[i].id === rule_id) {
+      if (_forGlobalExceptions[i].id === ruleId) {
         return true;
       }
     }
@@ -779,7 +779,7 @@ RG = (function() {
   };
 
   _doRunCollation = function(collationData, rules, output, scrollOffset, callback) {
-    var options, setting, resultCallback, dataSettings, algorithmSettings, displaySettings;
+    var options, resultCallback, dataSettings, algorithmSettings, displaySettings;
 
     options = {'configs': {}, 'data': {}};
 
@@ -796,7 +796,7 @@ RG = (function() {
     options.data.data_settings = dataSettings;
 
     displaySettings = {};
-    for (setting in CL.displaySettings) {
+    for (let setting in CL.displaySettings) {
       if (CL.displaySettings.hasOwnProperty(setting)) {
         if (CL.displaySettings[setting] === true) {
           displaySettings[setting] = CL.displaySettings[setting];
@@ -813,7 +813,7 @@ RG = (function() {
       options.configs.local_python_functions = CL.localPythonFunctions;
     }
     algorithmSettings = {};
-    for (setting in CL.collationAlgorithmSettings) {
+    for (let setting in CL.collationAlgorithmSettings) {
       if (CL.collationAlgorithmSettings.hasOwnProperty(setting)) {
         if (CL.collationAlgorithmSettings[setting] !== false) {
           algorithmSettings[setting] = CL.collationAlgorithmSettings[setting];
@@ -889,9 +889,9 @@ RG = (function() {
       }
     }
     $('#save_settings').on('click', function(event) {
-      var setting, data;
+      var data;
       data = cforms.serialiseForm('settings_form');
-      for (setting in CL.displaySettings) {
+      for (let setting in CL.displaySettings) {
         if (CL.displaySettings.hasOwnProperty(setting)) {
           if (data.hasOwnProperty(setting) && data[setting] !== null) {
             CL.displaySettings[setting] = data[setting];
@@ -1002,13 +1002,11 @@ RG = (function() {
     normalisedText = normalisedText.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
     //now make the rules
     if (data.scope === 'always' || data.scope === 'verse') {
-      rule = {
-        'type': 'regularisation',
-        'scope': data.scope,
-        'class': data['class'] || 'none',
-        't': _getWordTokenForWitness(unit, reading, word).replace(/&lt;/g, '<').replace(/&gt;/g, '>'),
-        'n': normalisedText
-      };
+      rule = {'type': 'regularisation',
+              'scope': data.scope,
+              'class': data['class'] || 'none',
+              't': _getWordTokenForWitness(unit, reading, word).replace(/&lt;/g, '<').replace(/&gt;/g, '>'),
+              'n': normalisedText};
       if (data.hasOwnProperty('comments')) {
         rule.comments = data.comments;
       }
@@ -1035,12 +1033,10 @@ RG = (function() {
       rules = [];
       for (let i = 0; i < witnesses.length; i += 1) {
         witness = witnesses[i];
-        rule = {
-          'type': 'regularisation',
-          'scope': data.scope,
-          'class': data['class'] || 'none',
-          'n': normalisedText
-        };
+        rule = {'type': 'regularisation',
+                'scope': data.scope,
+                'class': data['class'] || 'none',
+                'n': normalisedText};
         if (data.hasOwnProperty('comments')) {
           rule.comments = data.comments;
         }

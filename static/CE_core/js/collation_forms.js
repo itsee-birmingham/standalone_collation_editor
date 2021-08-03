@@ -58,6 +58,8 @@ cforms = (function () {
                 json[key] = null;
               }
             }
+          } else if ($(elem).hasClass('json')) {
+            json[key] = JSON.stringify(subjson)
           } else {
             json[key] = subjson;
           }
@@ -106,6 +108,10 @@ cforms = (function () {
         value = JSON.parse(value);
       } else if ($(elem).hasClass('stringlist')) {
         value = value.split('|');
+      } else if ($(elem).hasClass('json')) {
+        if (value !== '') {
+          value = JSON.parse(value);
+        }
       } else if ($(elem).hasClass('integer')) {
         value = parseInt(value, 10);
         if (isNaN(value)) {
@@ -172,6 +178,7 @@ cforms = (function () {
     }
     return value;
   };
+
 
   _getFormElements = function (form_id, elem_list) {
     var elems, filtered_elems, i;

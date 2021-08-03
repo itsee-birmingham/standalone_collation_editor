@@ -1,25 +1,30 @@
+/*jshint esversion: 6 */
 spinner = (function() {
+  "use strict";
+
+  var showLoadingOverlay, removeLoadingOverlay;
 
   showLoadingOverlay = function(message) {
+    var overlay, messageDiv, spinnerDiv;
     if (!document.getElementById('overlay')) {
       overlay = document.createElement('div');
       overlay.id = 'overlay';
-      message_div = document.createElement('div');
-      message_div.id = 'overlay_message';
+      messageDiv = document.createElement('div');
+      messageDiv.id = 'overlay_message';
       if (typeof message !== 'undefined') {
-        message_div.innerHTML = '<p class="center">' + message + '</p>';
+        messageDiv.innerHTML = '<p class="center">' + message + '</p>';
       }
-      spinner_div = document.createElement('div');
-      spinner_div.id = 'spinner';
-      spinner_div.innerHTML = '<span class="flower-12l-48x48" />';
+      spinnerDiv = document.createElement('div');
+      spinnerDiv.id = 'spinner';
+      spinnerDiv.innerHTML = '<span class="flower-12l-48x48" />';
 
-      overlay.appendChild(message_div);
-      overlay.appendChild(spinner_div);
+      overlay.appendChild(messageDiv);
+      overlay.appendChild(spinnerDiv);
       document.getElementsByTagName('body')[0].appendChild(overlay);
     }
   };
 
-  removeLoadingOverlay = function(message) {
+  removeLoadingOverlay = function() {
     if (document.getElementById('overlay')) {
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('overlay'));
     }

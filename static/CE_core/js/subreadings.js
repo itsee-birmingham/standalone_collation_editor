@@ -69,7 +69,7 @@ SR = (function() {
                     markedReading = CL.data.marked_readings[type][j];
                     if (markedReading.apparatus === key) { //if in right apparatus row
                       if (markedReading.start === apparatus[i].start &&
-                        markedReading.end === apparatus[i].end) { //if unit extent is correct
+                                markedReading.end === apparatus[i].end) { //if unit extent is correct
                         //get the parent
                         parent = _findParentReading(apparatus[i], key, markedReading, true);
                         if (_test) {
@@ -180,20 +180,20 @@ SR = (function() {
     }
   };
 
-  /**This merges the subreadings back in with their parent readings */
+  /** This merges the subreadings back in with their parent readings */
   loseSubreadings = function() {
     var data, apparatus, readings, reading;
     _subreadingsAre = 'lost';
     data = CL.data;
     for (let key in data) {
       if (data.hasOwnProperty(key)) {
-        if (key.indexOf('apparatus') !== -1) { //loop through lines of apparatus
+        if (key.indexOf('apparatus') !== -1) {  // loop through lines of apparatus
           apparatus = data[key];
-          for (let i = 0; i < apparatus.length; i += 1) { //loop through units in apparatus
+          for (let i = 0; i < apparatus.length; i += 1) {  // loop through units in apparatus
             readings = apparatus[i].readings;
-            for (let j = 0; j < readings.length; j += 1) { //loop through readings in unit
+            for (let j = 0; j < readings.length; j += 1) {  // loop through readings in unit
               reading = readings[j];
-              if (reading.hasOwnProperty('subreadings')) { //if there are subreadings
+              if (reading.hasOwnProperty('subreadings')) {  // if there are subreadings
                 _doLoseSubreadings(reading);
               }
             }
@@ -201,8 +201,8 @@ SR = (function() {
         }
       }
     }
-    //      	console.log('RESULT OF LOSE SUBREADINGS BELOW')
-    //      	console.log(JSON.parse(JSON.stringify(CL.data)))
+    // console.log('RESULT OF LOSE SUBREADINGS BELOW')
+    // console.log(JSON.parse(JSON.stringify(CL.data)))
   };
 
 
@@ -234,7 +234,7 @@ SR = (function() {
   };
 
   _addCombinedGapDataToParent = function(parent, standoffData) {
-    //put subreadings combined gap data in now
+    // put subreadings combined gap data in now
     if (standoffData.hasOwnProperty('combined_gap_after')) {
       if (parent.text.length > 0) {
         parent.text[parent.text.length - 1].combined_gap_after = [];
@@ -298,7 +298,7 @@ SR = (function() {
     }
   };
 
-  /**removes supplied data from the main reading */
+  /** removes supplied data from the main reading */
   _removeFromMainReading = function(list) {
     var token, reading, witness, index, witnesses;
     for (let i = 0; i < list.length; i += 1) {
@@ -543,11 +543,6 @@ SR = (function() {
     }
     //target is the reading at the object level where two of the keys are witnesses and text
     target = CL.getSubreadingOfWitness(reading, witness, true);
-    //        	if (reading.hasOwnProperty('SR_text') && reading.SR_text.hasOwnProperty(witness)) {
-    //        		target = reading.SR_text[witness];
-    //        	} else if (reading.hasOwnProperty('subreadings')) {
-    //        		target = SR._find_target_subreading
-    //        	}
     if (target === null) {
       target = reading;
     }
@@ -790,7 +785,7 @@ SR = (function() {
     return {
       findSubreadings: findSubreadings,
       loseSubreadings: loseSubreadings,
-      //private for testing only
+      // private for testing only
       _getCorrectStandoffReadingText: _getCorrectStandoffReadingText,
       _addCombinedGapDataToParent: _addCombinedGapDataToParent,
       _cleanStandoffMarking: _cleanStandoffMarking,
@@ -804,7 +799,7 @@ SR = (function() {
       _addNewSubreading: _addNewSubreading,
       _stripExtraWitnessDetailsFromTextList: _stripExtraWitnessDetailsFromTextList,
       _doLoseSubreadings: _doLoseSubreadings,
-      //private variables for testing only
+      // private variables for testing only
       _test: _test,
       _subreadingsAre: _subreadingsAre,
     };
