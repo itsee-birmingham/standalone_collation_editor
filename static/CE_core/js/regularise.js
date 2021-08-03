@@ -314,9 +314,8 @@ RG = (function() {
   };
 
   showVerseCollation = function(data, context, container, options) {
-    var html, i, tr, temp, event_rows, row, triangles, bk, ch, v, nextCh, nextV, prevCh, prevV,
-      header, unit_events, key, global_exceptions_html, show_hide_regularisations_button_text,
-      remove_wits_form, wits, footerHtml, preselected_added_highlight;
+    var html, i, eventRows, row, header, unitEvents, globalExceptionsHtml, showHideRegularisationsButtonText,
+        removeWitsForm, wits, footerHtml, preselectedAddedHighlight;
     console.log(JSON.parse(JSON.stringify(data)));
     CL.stage = 'regularise';
 
@@ -327,13 +326,13 @@ RG = (function() {
       options.highlighted_wit = CL.highlighted;
     }
     if (CL.witnessAddingMode === true) {
-			//this sets this a default so that when all is highlighted this will work - any data specified in options will override it
+			// this sets this a default so that when all is highlighted this will work - any data specified
+      // in options will override it
       CL.highlightedAdded = JSON.parse(JSON.stringify(CL.witnessesAdded));
 		}
     if (CL.witnessAddingMode === true && !options.hasOwnProperty('highlighted_added_wits')) {
       options.highlighted_added_wits = CL.highlightedAdded;
     }
-
     options.sort = true;
     SimpleContextMenu.setup({'preventDefault': true, 'preventForms': false});
     if (CL.witnessEditingMode === false || CL.witnessAddingMode === true) {
@@ -350,7 +349,7 @@ RG = (function() {
         return _makeMenu('regularisation_staged');
       });
     }
-    //remove the witness removal window if shown
+    // remove the witness removal window if shown
     if (document.getElementById('remove_witnesses_div')) {
       document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
     }
@@ -360,14 +359,14 @@ RG = (function() {
         if ((wits[1] === 'removed' || wits[1] === 'both') && CL.witnessRemovingMode === true) {
           $.get(staticUrl + 'CE_core/html_fragments/remove_witnesses_form.html', function(html) {
             if (!document.getElementById('remove_witnesses_div')) {
-              remove_wits_form = document.createElement('div');
+              removeWitsForm = document.createElement('div');
             } else {
-              remove_wits_form = document.getElementById('remove_witnesses_div');
+              removeWitsForm = document.getElementById('remove_witnesses_div');
             }
-            remove_wits_form.setAttribute('id', 'remove_witnesses_div');
-            remove_wits_form.setAttribute('class', 'remove_witnesses_div dialogue_form');
-            remove_wits_form.innerHTML = html;
-            document.getElementsByTagName('body')[0].appendChild(remove_wits_form);
+            removeWitsForm.setAttribute('id', 'remove_witnesses_div');
+            removeWitsForm.setAttribute('class', 'remove_witnesses_div dialogue_form');
+            removeWitsForm.innerHTML = html;
+            document.getElementsByTagName('body')[0].appendChild(removeWitsForm);
             CL.setUpRemoveWitnessesForm(wits[2], data, 'regularised');
           }, 'text');
         }
@@ -385,13 +384,16 @@ RG = (function() {
       CL.services.showLoginStatus();
     }
     document.getElementById('header').className = 'regularisation_header';
-    global_exceptions_html = '<div class="dialogue_form"  id="global_exceptions" style="display:none"><div class="dialogue_form_header drag-zone" id="global_exceptions_header"><span>Global Exceptions</span><span id="global_exceptions_ex">&#9660;</span></div><div id="global_exceptions_list" style="display:none"></div></div>';
+    globalExceptionsHtml = '<div class="dialogue_form"  id="global_exceptions" style="display:none">' +
+                           '<div class="dialogue_form_header drag-zone" id="global_exceptions_header">' +
+                           '<span>Global Exceptions</span><span id="global_exceptions_ex">&#9660;</span></div>' +
+                           '<div id="global_exceptions_list" style="display:none"></div></div>';
     container.innerHTML = '<div id="scroller" class="fillPage"><table class="collation_overview">' +
-      html.join('') + '</table>' + global_exceptions_html + '</div><div id="single_witness_reading"></div>';
+      html.join('') + '</table>' + globalExceptionsHtml + '</div><div id="single_witness_reading"></div>';
     CL.expandFillPageClients();
 
     if (RG.showRegularisations === true) {
-      show_hide_regularisations_button_text = 'hide regularisations';
+      showHideRegularisationsButtonText = 'hide regularisations';
       CL.services.getRuleExceptions(CL.context, function(rules) {
         if (rules.length > 0) {
           _showGlobalExceptions(rules);
@@ -400,22 +402,25 @@ RG = (function() {
         }
       });
     } else {
-      show_hide_regularisations_button_text = 'show regularisations';
+      showHideRegularisationsButtonText = 'show regularisations';
     }
-    $('#footer').addClass('pure-form'); //this does the styling of the select elements in the footer using pure (they cannot be styled individually)
+    //this does the styling of the select elements in the footer using pure (they cannot be styled individually)
+    $('#footer').addClass('pure-form');
     footerHtml = [];
     if (CL.project.hasOwnProperty('showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
       footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
     }
     if (CL.witnessEditingMode === false || CL.witnessAddingMode === true) {
-      footerHtml.push('<button class="pure-button left_foot" id="show_hide_regularisations_button">' + show_hide_regularisations_button_text + '</button>');
+      footerHtml.push('<button class="pure-button left_foot" id="show_hide_regularisations_button">' +
+                      showHideRegularisationsButtonText + '</button>');
     }
     if (CL.witnessEditingMode === false) {
       footerHtml.push('<span id="extra_buttons"></span>');
       footerHtml.push('<span id="stage_links"></span>');
     }
     if (CL.witnessEditingMode === true) {
-      footerHtml.push('<button class="pure-button right_foot" id="return_to_saved_table_button">Return to summary table</button>');
+      footerHtml.push('<button class="pure-button right_foot" id="return_to_saved_table_button">' +
+                      'Return to summary table</button>');
     } else {
       footerHtml.push('<button class="pure-button right_foot" id="go_to_sv_button">move to set variants</button>');
     }
@@ -436,14 +441,24 @@ RG = (function() {
     _addFooterFunctions();
 
     CL.addTriangleFunctions('table');
-    cforms.populateSelect(CL.getHandsAndSigla(), document.getElementById('highlighted'), {'value_key': 'document', 'text_keys': 'hand', 'selected':options.highlighted_wit, 'add_select': true, 'select_label_details': {'label': 'highlight witness', 'value': 'none' }});
+    cforms.populateSelect(CL.getHandsAndSigla(),
+                          document.getElementById('highlighted'),
+                          {'value_key': 'document',
+                           'text_keys': 'hand',
+                           'selected':options.highlighted_wit,
+                           'add_select': true,
+                           'select_label_details': {'label': 'highlight witness', 'value': 'none' }});
     if (CL.witnessAddingMode === true && CL.witnessesAdded.length > 0) {
 			if (options.highlighted_added_wits.length === 1) {
-				preselected_added_highlight = options.highlighted_added_wits[0];
+				preselectedAddedHighlight = options.highlighted_added_wits[0];
 			} else {
-				preselected_added_highlight = 'all';
+				preselectedAddedHighlight = 'all';
 			}
-			cforms.populateSelect(CL.sortWitnesses(CL.witnessesAdded), document.getElementById('added_highlight'), {'selected': preselected_added_highlight, 'add_select': true, 'select_label_details': {'label': 'highlight all added witnesses', 'value': 'all'}})
+			cforms.populateSelect(CL.sortWitnesses(CL.witnessesAdded),
+                            document.getElementById('added_highlight'),
+                            {'selected': preselectedAddedHighlight,
+                             'add_select': true,
+                             'select_label_details': {'label': 'highlight all added witnesses', 'value': 'all'}});
 		}
 
     //TODO: probably better in for loop
@@ -471,19 +486,19 @@ RG = (function() {
 
     CL.makeVerseLinks();
 
-    event_rows = temp[2];
-    for (i = 0; i < event_rows.length; i += 1) {
-      row = document.getElementById(event_rows[i]);
+    eventRows = temp[2];
+    for (let i = 0; i < eventRows.length; i += 1) {
+      row = document.getElementById(eventRows[i]);
       if (row !== null) {
         CL.addHoverEvents(row);
       }
     }
-    unit_events = temp[3];
-    for (key in unit_events) {
-      if (unit_events.hasOwnProperty(key)) {
+    unitEvents = temp[3];
+    for (let key in unitEvents) {
+      if (unitEvents.hasOwnProperty(key)) {
         row = document.getElementById(key);
         if (row) {
-          CL.addHoverEvents(row, unit_events[key]);
+          CL.addHoverEvents(row, unitEvents[key]);
         }
       }
     }
@@ -515,7 +530,7 @@ RG = (function() {
   _highlightAddedWitness = function (witness) {
     var scrollOffset, witnesses;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-                     document.getElementById('scroller').scrollTop];
+                    document.getElementById('scroller').scrollTop];
 
     if (witness === 'all') {
       witnesses = CL.witnessesAdded;
@@ -542,7 +557,7 @@ RG = (function() {
     });
     $('#go_to_sv_button').on('click',
       function(event) {
-        var extra_results;
+        var extraResults;
         spinner.showLoadingOverlay();
         //remove any forms still present
         if (document.getElementById('reg_form')) {
@@ -554,22 +569,20 @@ RG = (function() {
         //check that there are no rules in stacks waiting to be added/deleted/have exceptions made etc.
         if (allRuleStacksEmpty()) {
           if (SV.areAllUnitsComplete()) { //check nothing is lost and we have a full complement of witnesses for each unit
-            extra_results = CL.applyPreStageChecks('set_variants');
-            if (extra_results[0] === true) {
+            extraResults = CL.applyPreStageChecks('set_variants');
+            if (extraResults[0] === true) {
               _removeUnrequiredData(); //remove the key-value pairs we don't need anymore
               CL.data.marked_readings = {}; //added for SV
               CL.addUnitAndReadingIds(); //added for SV
 
-              SV.showSetVariants({
-                'container': container
-              });
+              SV.showSetVariants({'container': container});
               document.getElementById('scroller').scrollLeft = 0;
               document.getElementById('scroller').scrollTop = 0;
             } else {
               if (CL.showSubreadings === true) {
                 SR.findSubreadings();
               }
-              alert(extra_results[1]);
+              alert(extraResults[1]);
               spinner.removeLoadingOverlay();
             }
           } else {
@@ -595,8 +608,6 @@ RG = (function() {
       });
   };
 
-
-
   allRuleStacksEmpty = function() {
     if (!$.isEmptyObject(_rules) || _forDeletion.length > 0 || _forGlobalExceptions.length > 0) {
       return false;
@@ -604,30 +615,29 @@ RG = (function() {
     return true;
   };
 
-  //pub-e
 
   //*********  private functions *********
 
-  _calculateLacWits = function(collation_data, result_callback) {
-    var i, transcription_id, lac_transcriptions;
-    lac_transcriptions = JSON.parse(JSON.stringify(CL.dataSettings.witness_list));
-    if (collation_data.results[0].hasOwnProperty('transcription_id')) {
+  _calculateLacWits = function(collationData, resultCallback) {
+    var transcriptionId, lacTranscriptions;
+    lacTranscriptions = JSON.parse(JSON.stringify(CL.dataSettings.witness_list));
+    if (collationData.results[0].hasOwnProperty('transcription_id')) {
       console.warn('The use of \'transcription_id\' is deprecated. \'transcription\' should be used instead.');
     }
-    for (i = 0; i < collation_data.results.length; i += 1) {
+    for (let i = 0; i < collationData.results.length; i += 1) {
       //TODO: remove first condition and keep final two when transcription_id key no longer supported
-      if (collation_data.results[i].hasOwnProperty('transcription_id')) {
-        transcription_id = collation_data.results[i].transcription_id;
-      } else if (collation_data.results[i].hasOwnProperty('transcription_identifier')) {
-        transcription_id = collation_data.results[i].transcription_identifier;
+      if (collationData.results[i].hasOwnProperty('transcription_id')) {
+        transcriptionId = collationData.results[i].transcription_id;
+      } else if (collationData.results[i].hasOwnProperty('transcription_identifier')) {
+        transcriptionId = collationData.results[i].transcription_identifier;
       } else {
-        transcription_id = collation_data.results[i].transcription;
+        transcriptionId = collationData.results[i].transcription;
       }
-      if (lac_transcriptions.indexOf(transcription_id) !== -1) {
-        lac_transcriptions.splice(lac_transcriptions.indexOf(transcription_id), 1);
+      if (lacTranscriptions.indexOf(transcriptionId) !== -1) {
+        lacTranscriptions.splice(lacTranscriptions.indexOf(transcriptionId), 1);
       }
     }
-    result_callback(lac_transcriptions);
+    resultCallback(lacTranscriptions);
   };
 
   _hasRuleApplied = function(id) {
@@ -680,40 +690,39 @@ RG = (function() {
     return false;
   };
 
-  _getRegWitsAsString = function(wit_list) {
-    var i, new_wits;
-    new_wits = [];
-    for (i = 0; i < wit_list.length; i += 1) {
-      new_wits.push(wit_list[i]);
+  _getRegWitsAsString = function(witList) {
+    var newWits;
+    newWits = [];
+    for (let i = 0; i < witList.length; i += 1) {
+      newWits.push(witList[i]);
     }
-    return new_wits.join(', ');
+    return newWits.join(', ');
   };
 
-  runCollation = function(collation_data, output, scrollOffset, callback) {
-    var rule_list;
-    //put all the rules in a single list
-    rule_list = [];
+  runCollation = function(collationData, output, scrollOffset, callback) {
+    var ruleList;
+    // put all the rules in a single list
+    ruleList = [];
     for (let key in _rules) {
       if (_rules.hasOwnProperty(key)) {
-        rule_list.push.apply(rule_list, _rules[key]);
+        ruleList.push.apply(ruleList, _rules[key]);
       }
     }
-    CL.services.updateRuleset(_forDeletion, _forGlobalExceptions, rule_list, CL.context, function() {
+    CL.services.updateRuleset(_forDeletion, _forGlobalExceptions, ruleList, CL.context, function() {
       _forDeletion = [];
       _forGlobalExceptions = [];
       _rules = {};
-      _fetchRules(collation_data, function(rules) {
-        _doRunCollation(collation_data, rules, output, scrollOffset, callback);
+      _fetchRules(function(rules) {
+        _doRunCollation(collationData, rules, output, scrollOffset, callback);
       });
     });
   };
 
 
-
   /** add lac_verse and om_verse to the collated data */
   _integrateLacOmReadings = function(data) {
-    var special_witnesses, new_lac_witnesses;
-    special_witnesses = [];
+    var specialWitnesses, newLacWitnesses;
+    specialWitnesses = [];
     if (data.hasOwnProperty('special_categories')) {
       for (let j = 0; j < data.special_categories.length; j+=1) {
         for (let i = 0; i < data.apparatus.length; i += 1) {
@@ -724,25 +733,25 @@ RG = (function() {
             'witnesses': data.special_categories[j].witnesses
           });
         }
-        special_witnesses.push.apply(special_witnesses, data.special_categories[j].witnesses);
+        specialWitnesses.push.apply(specialWitnesses, data.special_categories[j].witnesses);
       }
     }
-    new_lac_witnesses = CL.removeSpecialWitnesses(data.lac_readings, special_witnesses);
-    if (typeof data.lac_readings !== 'undefined' && data.lac_readings.length > 0 && new_lac_witnesses.length > 0) {
+    newLacWitnesses = CL.removeSpecialWitnesses(data.lac_readings, specialWitnesses);
+    if (typeof data.lac_readings !== 'undefined' && data.lac_readings.length > 0 && newLacWitnesses.length > 0) {
       for (let i = 0; i < data.apparatus.length; i += 1) {
         if (data.lac_readings.indexOf(data.overtext_name) != -1) {
           data.apparatus[i].readings.splice(0, 0, {
             'text': [],
             'type': 'lac_verse',
             'details': CL.project.lacUnitLabel,
-            'witnesses': new_lac_witnesses
+            'witnesses': newLacWitnesses
           });
         } else {
           data.apparatus[i].readings.push({
             'text': [],
             'type': 'lac_verse',
             'details': CL.project.lacUnitLabel,
-            'witnesses': new_lac_witnesses
+            'witnesses': newLacWitnesses
           });
         }
       }
@@ -769,26 +778,22 @@ RG = (function() {
     return data;
   };
 
-  _doRunCollation = function(collation_data, rules, output, scrollOffset, callback) {
-    var options, setting, result_callback, data_settings,
-      algorithm_settings, displaySettings;
+  _doRunCollation = function(collationData, rules, output, scrollOffset, callback) {
+    var options, setting, resultCallback, dataSettings, algorithmSettings, displaySettings;
 
-    options = {'configs': {},
-               'data': {}};
+    options = {'configs': {}, 'data': {}};
 
     // set the data values
     options.data.rules = rules;
-    options.data.unit_data = collation_data;
-    // if (CL.project.hasOwnProperty('id')) {
-    //   options.data.project = CL.project.id;
-    // }
+    options.data.unit_data = collationData;
+
     //data settings
-    data_settings = {};
-    data_settings.base_text = CL.dataSettings.base_text;
-    data_settings.base_text_siglum = CL.dataSettings.base_text_siglum;
-    data_settings.language = CL.dataSettings.language;
-    data_settings.witness_list = CL.dataSettings.witness_list;
-    options.data.data_settings = data_settings;
+    dataSettings = {};
+    dataSettings.base_text = CL.dataSettings.base_text;
+    dataSettings.base_text_siglum = CL.dataSettings.base_text_siglum;
+    dataSettings.language = CL.dataSettings.language;
+    dataSettings.witness_list = CL.dataSettings.witness_list;
+    options.data.data_settings = dataSettings;
 
     displaySettings = {};
     for (setting in CL.displaySettings) {
@@ -807,15 +812,15 @@ RG = (function() {
     if (!$.isEmptyObject(CL.localPythonFunctions)) {
       options.configs.local_python_functions = CL.localPythonFunctions;
     }
-    algorithm_settings = {};
+    algorithmSettings = {};
     for (setting in CL.collationAlgorithmSettings) {
       if (CL.collationAlgorithmSettings.hasOwnProperty(setting)) {
         if (CL.collationAlgorithmSettings[setting] !== false) {
-          algorithm_settings[setting] = CL.collationAlgorithmSettings[setting];
+          algorithmSettings[setting] = CL.collationAlgorithmSettings[setting];
         }
       }
     }
-    options.configs.algorithm_settings = algorithm_settings;
+    options.configs.algorithm_settings = algorithmSettings;
 
     if (CL.services.hasOwnProperty('collatexHost')) {
       options.configs.collatexHost = CL.services.collatexHost;
@@ -823,11 +828,11 @@ RG = (function() {
 
     if (output === 'add_witnesses') {
       options.configs.split_single_reading_units = true;
-      result_callback = function(data) {
+      resultCallback = function(data) {
         callback(data);
       }
     } else {
-      result_callback = function(data) {
+      resultCallback = function(data) {
         if (data === null) {
           alert(CL.context + ' does not collate.');
           spinner.removeLoadingOverlay();
@@ -844,39 +849,41 @@ RG = (function() {
         }
       };
     }
-    CL.services.doCollation(CL.context, options, result_callback);
+    CL.services.doCollation(CL.context, options, resultCallback);
   };
 
   _showSettings = function() {
-    var settings_div, i, settings_html;
+    var settingsDiv, settingsHtml;
     if (document.getElementById('settings') !== null) {
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('settings'));
     }
-    settings_div = document.createElement('div');
-    settings_div.setAttribute('id', 'settings');
-    settings_div.setAttribute('class', 'settings_dialogue dialogue_form');
-    settings_div.innerHTML = '<div class="dialogue_form_header"><span id="settings_title">Settings</span></div><form id="settings_form"></form>';
-    settings_html = [];
+    settingsDiv = document.createElement('div');
+    settingsDiv.setAttribute('id', 'settings');
+    settingsDiv.setAttribute('class', 'settings_dialogue dialogue_form');
+    settingsDiv.innerHTML = '<div class="dialogue_form_header"><span id="settings_title">Settings</span></div>' +
+                            '<form id="settings_form"></form>';
+    settingsHtml = [];
     CL.displaySettingsDetails.configs.sort(function(a, b) {
       return a.menu_pos - b.menu_pos;
     });
-    for (i = 0; i < CL.displaySettingsDetails.configs.length; i += 1) {
+    for (let i = 0; i < CL.displaySettingsDetails.configs.length; i += 1) {
       if (CL.displaySettingsDetails.configs[i].menu_pos === null) {
-        settings_html.push('<input class="boolean" name="' + CL.displaySettingsDetails.configs[i].id +
+        settingsHtml.push('<input class="boolean" name="' + CL.displaySettingsDetails.configs[i].id +
           '" id="' + CL.displaySettingsDetails.configs[i].id +
           '" type="hidden" value="' + CL.displaySettingsDetails.configs[i].check_by_default + '"/>');
       } else {
-        settings_html.push('<label for="' + CL.displaySettingsDetails.configs[i].id + '">');
-        settings_html.push('<input class="boolean" name="' + CL.displaySettingsDetails.configs[i].id + '" id="' + CL.displaySettingsDetails.configs[i].id + '" type="checkbox"/>');
-        settings_html.push(CL.displaySettingsDetails.configs[i].label + '</label>');
-        settings_html.push('<br/>');
+        settingsHtml.push('<label for="' + CL.displaySettingsDetails.configs[i].id + '">');
+        settingsHtml.push('<input class="boolean" name="' + CL.displaySettingsDetails.configs[i].id + '" id="' +
+                          CL.displaySettingsDetails.configs[i].id + '" type="checkbox"/>');
+        settingsHtml.push(CL.displaySettingsDetails.configs[i].label + '</label>');
+        settingsHtml.push('<br/>');
       }
     }
-    settings_html.push('<input class="pure-button dialogue-form-button" type="button" id="save_settings" value="save and recollate"/>');
-    settings_html.push('<input class="pure-button dialogue-form-button" type="button" id="close_settings" value="cancel"/>');
-    document.getElementsByTagName('body')[0].appendChild(settings_div);
-    document.getElementById('settings_form').innerHTML = settings_html.join('');
-    for (i = 0; i < CL.displaySettingsDetails.configs.length; i += 1) {
+    settingsHtml.push('<input class="pure-button dialogue-form-button" type="button" id="save_settings" value="save and recollate"/>');
+    settingsHtml.push('<input class="pure-button dialogue-form-button" type="button" id="close_settings" value="cancel"/>');
+    document.getElementsByTagName('body')[0].appendChild(settingsDiv);
+    document.getElementById('settings_form').innerHTML = settingsHtml.join('');
+    for (let i = 0; i < CL.displaySettingsDetails.configs.length; i += 1) {
       if (document.getElementById(CL.displaySettingsDetails.configs[i].id)) {
         document.getElementById(CL.displaySettingsDetails.configs[i].id).checked = CL.displaySettings[CL.displaySettingsDetails.configs[i].id];
       }
@@ -902,7 +909,7 @@ RG = (function() {
     });
   };
 
-  _fetchRules = function(collation_data, callback) {
+  _fetchRules = function(callback) {
     //get the rules according to the appropriate service
     CL.services.getRules(CL.context, function(rules) {
       callback(rules);
@@ -931,8 +938,7 @@ RG = (function() {
           var scrollOffset;
           spinner.showLoadingOverlay();
           scrollOffset = [document.getElementById('scroller').scrollLeft,
-            document.getElementById('scroller').scrollTop
-          ];
+                          document.getElementById('scroller').scrollTop];
           RG.showRegularisations = false;
           showVerseCollation(CL.data, CL.context, CL.container);
           document.getElementById('scroller').scrollLeft = scrollOffset[0];
@@ -946,8 +952,7 @@ RG = (function() {
           var scrollOffset;
           spinner.showLoadingOverlay();
           scrollOffset = [document.getElementById('scroller').scrollLeft,
-            document.getElementById('scroller').scrollTop
-          ];
+                          document.getElementById('scroller').scrollTop];
           RG.showRegularisations = true;
           showVerseCollation(CL.data, CL.context, CL.container);
           document.getElementById('scroller').scrollLeft = scrollOffset[0];
@@ -973,7 +978,7 @@ RG = (function() {
   };
 
   _addNewToken = function(element) {
-    var lastRow, event, tr;
+    var lastRow, tr;
     $(element).on('click', function(event) {
       lastRow = event.target.parentNode.parentNode;
       tr = document.createElement('tr');
@@ -988,12 +993,13 @@ RG = (function() {
     return token[witness].index;
   };
 
-  _createRule = function(data, user, original_text, normalised_text, unit, reading, word, witnesses) {
-    var rule, rules, witness, context, i, j, reconstructed_readings;
+  // TODO: check on originalText use
+  _createRule = function(data, user, originalText, normalisedText, unit, reading, word, witnesses) {
+    var rule, rules, witness, context, reconstructedReadings;
     //sort text out so that anything we turned to &lt; or &gt; get stored as < and >
-    //TODO: I'm not sure we even use original_text anymore - check and streamline?
-    original_text = original_text;
-    normalised_text = normalised_text.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+    //TODO: I'm not sure we even use originalText anymore - check and streamline?
+    originalText = originalText;
+    normalisedText = normalisedText.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
     //now make the rules
     if (data.scope === 'always' || data.scope === 'verse') {
       rule = {
@@ -1001,7 +1007,7 @@ RG = (function() {
         'scope': data.scope,
         'class': data['class'] || 'none',
         't': _getWordTokenForWitness(unit, reading, word).replace(/&lt;/g, '<').replace(/&gt;/g, '>'),
-        'n': normalised_text
+        'n': normalisedText
       };
       if (data.hasOwnProperty('comments')) {
         rule.comments = data.comments;
@@ -1027,13 +1033,13 @@ RG = (function() {
     }
     if (data.scope === 'manuscript' || data.scope === 'once') {
       rules = [];
-      for (i = 0; i < witnesses.length; i += 1) {
+      for (let i = 0; i < witnesses.length; i += 1) {
         witness = witnesses[i];
         rule = {
           'type': 'regularisation',
           'scope': data.scope,
           'class': data['class'] || 'none',
-          'n': normalised_text
+          'n': normalisedText
         };
         if (data.hasOwnProperty('comments')) {
           rule.comments = data.comments;
@@ -1046,16 +1052,18 @@ RG = (function() {
         } else {
           rule.user = user.id;
         }
-        //check to see if witness already has a reconstructed rule applied and if so make sure we are ignoring the presence of underdots and []
+        // check to see if witness already has a reconstructed rule applied and if so make sure we are ignoring
+        // the presence of underdots and []
         if (CL.data.apparatus[unit].readings[reading].text[word][witness].hasOwnProperty('decision_class')) {
-          reconstructed_readings = [];
-          for (j = 0; j < CL.project.ruleClasses; j += 1) {
-            if (CL.project.ruleClasses[j].hasOwnProperty('reconstructedreading') && CL.project.ruleClasses[j].reconstructedreading === true) {
-              reconstructed_readings.push(CL.project.ruleClasses[j].value);
+          reconstructedReadings = [];
+          for (let j = 0; j < CL.project.ruleClasses; j += 1) {
+            if (CL.project.ruleClasses[j].hasOwnProperty('reconstructedreading') &&
+                      CL.project.ruleClasses[j].reconstructedreading === true) {
+              reconstructedReadings.push(CL.project.ruleClasses[j].value);
             }
           }
-          for (j = 0; j < CL.data.apparatus[unit].readings[reading].text[word][witness].decision_class.length; j += 1) {
-            if (reconstructed_readings.indexOf(CL.data.apparatus[unit].readings[reading].text[word][witness].decision_class) !== -1) {
+          for (let j = 0; j < CL.data.apparatus[unit].readings[reading].text[word][witness].decision_class.length; j += 1) {
+            if (reconstructedReadings.indexOf(CL.data.apparatus[unit].readings[reading].text[word][witness].decision_class) !== -1) {
               if (!rule.conditions) {
                 rule.conditions = {};
               }
@@ -1068,7 +1076,6 @@ RG = (function() {
           rule.context = {
             'witness': witness
           };
-          //rule.t = original_text;
           rule.t = _getWordTokenForWitness(unit, reading, word).replace(/&lt;/g, '<').replace(/&gt;/g, '>');
         } else if (data.scope === 'once') {
           context = {};
@@ -1088,23 +1095,20 @@ RG = (function() {
   };
 
   _redipsInitRegularise = function(id) {
-    var rd, data, clone, original_form, normalised_form, normalised_text,
-      reg_menu, scope, clas, comments, witnesses, context, unit_data,
-      witness, unit, reading, word, original, original_text, suffix,
-      reg_rules, key, new_reg_rules, selected, ignore_supplied, ignore_unclear,
-      create_function, original_display_text, word_id;
+    var rd, clone, original, wordId, normalisedForm, normalisedText, unitData, unit, reading, word, witnesses,
+        originalText, originalDisplayText, createFunction;
     rd = REDIPS.drag;
     rd.init(id);
     rd.event.dropped = function() {
       clone = document.getElementById(rd.obj.id);
       original = document.getElementById(rd.objOld.id);
-      word_id = rd.objOld.id;
-      normalised_form = rd.td.target.childNodes[0];
+      wordId = rd.objOld.id;
+      normalisedForm = rd.td.target.childNodes[0];
       //if we are normalising to a typed in value
-      if (normalised_form.tagName === 'INPUT') {
-        normalised_text = normalised_form.value.trim();
-        if (/^\s*$/.test(normalised_text) === false) { //it there is at least one non-space character
-          if (/^\S+\s\S/.test(normalised_text) === true) { // if there are two or more strings separated by a space
+      if (normalisedForm.tagName === 'INPUT') {
+        normalisedText = normalisedForm.value.trim();
+        if (/^\s*$/.test(normalisedText) === false) { //it there is at least one non-space character
+          if (/^\S+\s\S/.test(normalisedText) === true) { // if there are two or more strings separated by a space
             //you have typed a space into the box with is not allowed, regularisation is single token to single token only!
             if (clone.parentNode !== null) {
               clone.parentNode.removeChild(clone);
@@ -1114,43 +1118,43 @@ RG = (function() {
                   'interface');
             return;
           } else {
-            //you are asking to regularise a single token to a single token that is allowed and we will continue
-            rd.td.target.innerHTML = '<div>' + normalised_text.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>';
+            // you are asking to regularise a single token to a single token that is allowed and we will continue
+            rd.td.target.innerHTML = '<div>' + normalisedText.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>';
           }
         } else {
-          //you are trying to normalise to an empty string so stop it!
+          // you are trying to normalise to an empty string so stop it!
           if (clone.parentNode !== null) {
             clone.parentNode.removeChild(clone);
           }
           return;
         }
       } else { // we are normalising to an existing value
-        normalised_text = normalised_form.childNodes[0].textContent;
+        normalisedText = normalisedForm.childNodes[0].textContent;
       }
-      normalised_text = CL.project.prepareNormalisedString(normalised_text);
-      //stop the dragged clone being added to the dom
+      normalisedText = CL.project.prepareNormalisedString(normalisedText);
+      // stop the dragged clone being added to the dom
       if (clone.parentNode !== null) {
         clone.parentNode.removeChild(clone);
       }
-      unit_data = rd.objOld.id;
-      //get the unit, reading and word data to lookup stuff in data structure
-      unit = parseInt(unit_data.substring(0, unit_data.indexOf('_r')).replace('variant_unit_', ''), 10);
-      reading = parseInt(unit_data.substring(unit_data.indexOf('_r') + 2, unit_data.indexOf('_w')), 10);
-      word = parseInt(unit_data.substring(unit_data.indexOf('_w') + 2), 10);
+      unitData = rd.objOld.id;
+      // get the unit, reading and word data to lookup stuff in data structure
+      unit = parseInt(unitData.substring(0, unitData.indexOf('_r')).replace('variant_unit_', ''), 10);
+      reading = parseInt(unitData.substring(unitData.indexOf('_r') + 2, unitData.indexOf('_w')), 10);
+      word = parseInt(unitData.substring(unitData.indexOf('_w') + 2), 10);
       if (CL.witnessAddingMode !== true) {
         witnesses = CL.data.apparatus[unit].readings[reading].witnesses;
       } else {
         witnesses = CL.data.apparatus[unit].readings[reading].witnesses.filter(x => CL.witnessesAdded.includes(x));
       }
-      original_text = CL.data.apparatus[unit].readings[reading].text[word];
-      original_display_text = CL.data.apparatus[unit].readings[reading].text[word]['interface'];
+      originalText = CL.data.apparatus[unit].readings[reading].text[word];
+      originalDisplayText = CL.data.apparatus[unit].readings[reading].text[word]['interface'];
       if (document.getElementById('reg_form') !== null) {
         document.getElementsByTagName('body')[0].removeChild(document.getElementById('reg_form'));
       }
-      create_function = function() {
-        var i, data, new_unit, new_unit_data, new_reading, new_witnesses, suffix;
-        //create the rule
-        //make sure all the data (even any disabled ones are submitted)
+      createFunction = function() {
+        var data, newUnit, newUnitData, newReading, newWitnesses, suffix;
+        // create the rule
+        // make sure all the data (even any disabled ones are submitted)
         $('#conditions input').removeAttr('disabled');
         if (document.getElementById('scope').value === 'none') {
           return false;
@@ -1160,61 +1164,60 @@ RG = (function() {
           data['class'] = 'none';
         }
         CL.services.getUserInfo(function(user) {
-          _rules[word_id] = _createRule(data, user, original_text, normalised_text, unit, reading, word, witnesses);
+          _rules[wordId] = _createRule(data, user, originalText, normalisedText, unit, reading, word, witnesses);
         });
         document.getElementsByTagName('body')[0].removeChild(document.getElementById('reg_form'));
         rd.enableDrag(false, rd.objOld);
         $(original).addClass('regularisation_staged');
         $(original.parentNode).addClass('redips-mark');
-        //add witnesses to normalised form in data structure
-        new_unit_data = rd.td.target.firstChild.id;
-        if (new_unit_data !== '') { //only try this if it is not a user added reading
-          new_unit = parseInt(new_unit_data.substring(0, new_unit_data.indexOf('_r')).replace('variant_unit_', ''), 10);
-          new_reading = parseInt(new_unit_data.substring(new_unit_data.indexOf('_r') + 2, new_unit_data.indexOf('_w')), 10);
+        // add witnesses to normalised form in data structure
+        newUnitData = rd.td.target.firstChild.id;
+        if (newUnitData !== '') { //only try this if it is not a user added reading
+          newUnit = parseInt(newUnitData.substring(0, newUnitData.indexOf('_r')).replace('variant_unit_', ''), 10);
+          newReading = parseInt(newUnitData.substring(newUnitData.indexOf('_r') + 2, newUnitData.indexOf('_w')), 10);
           if (CL.witnessAddingMode !== true) {
-            //TODO: check this isn't causing problems by not eliminating suffixes.
-            new_witnesses = CL.getReadingWitnesses(CL.data.apparatus[unit].readings[reading]);
+            // TODO: check this isn't causing problems by not eliminating suffixes.
+            newWitnesses = CL.getReadingWitnesses(CL.data.apparatus[unit].readings[reading]);
           } else {
-            //TODO: check this isn't causing problems by not eliminating suffixes.
-            new_witnesses = CL.getReadingWitnesses(CL.data.apparatus[unit].readings[reading]).filter(x => CL.witnessesAdded.includes(x));
+            // TODO: check this isn't causing problems by not eliminating suffixes.
+            newWitnesses = CL.getReadingWitnesses(CL.data.apparatus[unit].readings[reading]).filter(x => CL.witnessesAdded.includes(x));
           }
           if (CL.project.hasOwnProperty('id')) {
-            for (i = 0; i < new_witnesses.length; i += 1) {
+            for (let i = 0; i < newWitnesses.length; i += 1) {
               suffix = _getSuffix(data['class']);
-              CL.data.apparatus[new_unit].readings[new_reading].witnesses.push(new_witnesses[i] + suffix);
+              CL.data.apparatus[newUnit].readings[newReading].witnesses.push(newWitnesses[i] + suffix);
             }
           }
         }
       };
       $.get(staticUrl + 'CE_core/html_fragments/rule_menu.html', function(html) {
-        reg_menu = document.createElement('div');
-        reg_menu.setAttribute('id', 'reg_form');
-        reg_menu.setAttribute('class', 'reg_form dialogue_form');
-        reg_menu.innerHTML = html.replace('{unit_data}', unit_data).replace('{original_text}', CL.project.prepareDisplayString(original_display_text)).replace('{normalised_text}', CL.project.prepareDisplayString(normalised_text).replace(/</g, '&lt;').replace(/>/g, '&gt;'));
-        document.getElementsByTagName('body')[0].appendChild(reg_menu);
+        var regMenu, regRules, newRegRules, selected;
+        regMenu = document.createElement('div');
+        regMenu.setAttribute('id', 'reg_form');
+        regMenu.setAttribute('class', 'reg_form dialogue_form');
+        html = html.replace('{unit_data}', unitData);
+        html = html.replace('{original_text}', CL.project.prepareDisplayString(originalDisplayText));
+        html = html.replace('{normalised_text}',
+                            CL.project.prepareDisplayString(normalisedText).replace(/</g, '&lt;').replace(/>/g, '&gt;'));
+        regMenu.innerHTML = html;
+        document.getElementsByTagName('body')[0].appendChild(regMenu);
 
-        reg_rules = CL.getRuleClasses('create_in_RG', true, 'value', ['identifier', 'name', 'RG_default']);
-        new_reg_rules = [];
+        regRules = CL.getRuleClasses('create_in_RG', true, 'value', ['identifier', 'name', 'RG_default']);
+        newRegRules = [];
         selected = 'none';
-        for (key in reg_rules) {
-          if (reg_rules.hasOwnProperty(key)) {
-            if (typeof reg_rules[key][0] !== 'undefined') {
-              new_reg_rules.push({
-                'value': key,
-                'label': reg_rules[key][1] + ' (' + reg_rules[key][0] + ')'
-              });
+        for (let key in regRules) {
+          if (regRules.hasOwnProperty(key)) {
+            if (typeof regRules[key][0] !== 'undefined') {
+              newRegRules.push({'value': key, 'label': regRules[key][1] + ' (' + regRules[key][0] + ')'});
             } else {
-              new_reg_rules.push({
-                'value': key,
-                'label': reg_rules[key][1]
-              });
+              newRegRules.push({'value': key, 'label': regRules[key][1]});
             }
-            if (reg_rules[key][2] === true) {
+            if (regRules[key][2] === true) {
               selected = key;
             }
           }
         }
-        _setUpRuleMenu(rd, new_reg_rules, selected, create_function);
+        _setUpRuleMenu(rd, newRegRules, selected, createFunction);
       }, 'text');
     };
   };
@@ -1228,34 +1231,39 @@ RG = (function() {
     return null;
   };
 
-  _setUpRuleMenu = function(rd, classes, selected, create_function) {
-    var left_pos, window_width, rule_scopes, conditions_html, i, id, setting;
-    window_width = window.innerWidth;
-    left_pos = rd.td.current.offsetLeft + rd.obj.redips.container.offsetParent.offsetLeft - document.getElementById('scroller').scrollLeft;
-    if (left_pos + parseInt(document.getElementById('reg_form').offsetWidth) >= window_width) {
-      left_pos = (window_width - parseInt(document.getElementById('reg_form').offsetWidth) - 20);
+  _setUpRuleMenu = function(rd, classes, selected, createFunction) {
+    var leftPos, windowWidth, ruleScopes, conditionsHtml, id, setting;
+    windowWidth = window.innerWidth;
+    leftPos = rd.td.current.offsetLeft + rd.obj.redips.container.offsetParent.offsetLeft -
+                        document.getElementById('scroller').scrollLeft;
+    if (leftPos + parseInt(document.getElementById('reg_form').offsetWidth) >= windowWidth) {
+      leftPos = (windowWidth - parseInt(document.getElementById('reg_form').offsetWidth) - 20);
     }
-    document.getElementById('reg_form').style.left = left_pos + 'px';
+    document.getElementById('reg_form').style.left = leftPos + 'px';
 
     if (CL.witnessAddingMode === true) {
       document.getElementById('rule_creation_warning').innerHTML = 'Rules created will only apply to the witnesses being added.';
     }
 
-    rule_scopes = _getRuleScopes();
-    cforms.populateSelect(rule_scopes, document.getElementById('scope'), {'value_key': 'value', 'text_keys': 'label', 'add_select': false});
-    cforms.populateSelect(classes, document.getElementById('class'), {'value_key': 'value', 'text_keys': 'label', 'add_select': false, 'selected': selected});
+    ruleScopes = _getRuleScopes();
+    cforms.populateSelect(ruleScopes,
+                          document.getElementById('scope'),
+                          {'value_key': 'value', 'text_keys': 'label', 'add_select': false});
+    cforms.populateSelect(classes,
+                          document.getElementById('class'),
+                          {'value_key': 'value', 'text_keys': 'label', 'add_select': false, 'selected': selected});
 
     if (CL.hasOwnProperty('ruleConditions') && CL.ruleConditions !== undefined) {
-      conditions_html = [];
-      for (i = 0; i < CL.ruleConditions.configs.length; i += 1) {
+      conditionsHtml = [];
+      for (let i = 0; i < CL.ruleConditions.configs.length; i += 1) {
         id = 'conditions_' + CL.ruleConditions.configs[i].id;
-        conditions_html.push('<label for="' + id + '">');
-        conditions_html.push('<input type="checkbox" class="boolean" id="' + id + '" name="' + id + '"/>');
-        conditions_html.push(CL.ruleConditions.configs[i].label);
-        conditions_html.push('</label><br/>');
+        conditionsHtml.push('<label for="' + id + '">');
+        conditionsHtml.push('<input type="checkbox" class="boolean" id="' + id + '" name="' + id + '"/>');
+        conditionsHtml.push(CL.ruleConditions.configs[i].label);
+        conditionsHtml.push('</label><br/>');
       }
-      document.getElementById('conditions').innerHTML = conditions_html.join('');
-      for (i = 0; i < CL.ruleConditions.configs.length; i += 1) {
+      document.getElementById('conditions').innerHTML = conditionsHtml.join('');
+      for (let i = 0; i < CL.ruleConditions.configs.length; i += 1) {
         if (CL.ruleConditions.configs[i].hasOwnProperty('linked_to_settings') && CL.ruleConditions.configs[i].linked_to_settings === true) {
           setting = CL.ruleConditions.configs[i].setting_id;
           id = 'conditions_' + CL.ruleConditions.configs[i].id;
@@ -1273,30 +1281,27 @@ RG = (function() {
     $('#cancel_button').on('click', function(event) {
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('reg_form'));
     });
-    $('#save_rule_button').on('click', create_function);
+    $('#save_rule_button').on('click', createFunction);
   };
 
   _getRuleScopes = function() {
-    var rule_scopes, scopes_and_labels, allowed_scopes, key;
-    allowed_scopes = ['once', 'verse', 'manuscript', 'always'];
-    rule_scopes = CL.services.supportedRuleScopes;
-    scopes_and_labels = [];
-    for (key in rule_scopes) {
-      if (rule_scopes.hasOwnProperty(key) && allowed_scopes.indexOf(key) !== -1) {
-        scopes_and_labels.push({
-          'value': key,
-          'label': rule_scopes[key]
-        });
+    var ruleScopes, scopesAndLabels, allowedScopes;
+    allowedScopes = ['once', 'verse', 'manuscript', 'always'];
+    ruleScopes = CL.services.supportedRuleScopes;
+    scopesAndLabels = [];
+    for (let key in ruleScopes) {
+      if (ruleScopes.hasOwnProperty(key) && allowedScopes.indexOf(key) !== -1) {
+        scopesAndLabels.push({'value': key, 'label': ruleScopes[key]});
       }
     }
-    return scopes_and_labels;
+    return scopesAndLabels;
   };
 
-  _getSuffix = function(decision_class) {
-    var i, suffix;
+  _getSuffix = function(decisionClass) {
+    var suffix;
     suffix = '';
-    for (i = 0; i < CL.ruleClasses.length; i += 1) {
-      if (CL.ruleClasses[i].value === decision_class) {
+    for (let i = 0; i < CL.ruleClasses.length; i += 1) {
+      if (CL.ruleClasses[i].value === decisionClass) {
         if (CL.ruleClasses[i].hasOwnProperty('suffixed_sigla') &&
             CL.ruleClasses[i].suffixed_sigla === true &&
             typeof CL.ruleClasses[i].identifier !== 'undefined') {
@@ -1304,41 +1309,23 @@ RG = (function() {
         }
       }
     }
-    //This is what was in master branch but it was improved and corrected in the muya_dev branch
-    // if (CL.project.hasOwnProperty('ruleClasses') && CL.project.ruleClasses !== undefined) {
-    //   rule_classes = CL.project.ruleClasses;
-    // } else if (CL.services.hasOwnProperty('ruleClasses')) {
-    //   rule_classes = CL.services.ruleClasses;
-    // } else {
-    //   rule_classes = DEF.ruleClasses;
-    // }
-    // for (i = 0; i < rule_classes.length; i += 1) {
-    //   if (rule_classes[i].value === decision_class) {
-    //     if (rule_classes[i].hasOwnProperty('suffixed_sigla') &&
-    //         rule_classes[i].suffixed_sigla === true &&
-    //         rule_classes[i].hasOwnProperty('identifier') &&
-    //         typeof rule_classes[i].identifier !== 'undefined') {
-    //       suffix += rule_classes[i].identifier;
-    //     }
-    //   }
-    // }
     return suffix;
   };
 
-  _makeMenu = function(menu_name) {
-    if (menu_name === 'regularised') {
+  _makeMenu = function(menuName) {
+    if (menuName === 'regularised') {
       document.getElementById('context_menu').innerHTML = '<li id="delete_rule"><span>Delete rule</span></li>';
     }
-    if (menu_name === 'regularised_global') {
-      document.getElementById('context_menu').innerHTML = '<li id="add_exception"><span>Add exception</span></li><li id="delete_rule"><span>Delete rule</span></li>';
+    if (menuName === 'regularised_global') {
+      document.getElementById('context_menu').innerHTML = '<li id="add_exception"><span>Add exception</span></li>' +
+                                                          '<li id="delete_rule"><span>Delete rule</span></li>';
     }
-    if (menu_name === 'regularisation_staged') {
+    if (menuName === 'regularisation_staged') {
       document.getElementById('context_menu').innerHTML = '<li id="delete_unapplied_rule"><span>Delete rule</span></li>';
     }
-    if (menu_name === 'group_delete') {
+    if (menuName === 'group_delete') {
       document.getElementById('context_menu').innerHTML = '<li id="delete_selected_rules"><span>Delete selected rules</span></li>';
     }
-
     _addContextMenuHandlers();
     return 'context_menu';
   };
@@ -1396,20 +1383,19 @@ RG = (function() {
   };
 
   _removeGlobalExceptions = function() {
-    var data, key, rule_ids;
+    var data, ruleIds;
     data = cforms.serialiseForm('global_exceptions_form');
-    rule_ids = [];
-    for (key in data) {
+    ruleIds = [];
+    for (let key in data) {
       if (data[key] !== null) {
-        rule_ids.push(key);
+        ruleIds.push(key);
       }
     }
-    //get the rules
-    if (rule_ids.length > 0) {
-      CL.services.getRulesByIds(rule_ids, function(rules) {
-        var i;
-        //remove this context from exceptions
-        for (i = 0; i < rules.length; i += 1) {
+    // get the rules
+    if (ruleIds.length > 0) {
+      CL.services.getRulesByIds(ruleIds, function(rules) {
+        // remove this context from exceptions
+        for (let i = 0; i < rules.length; i += 1) {
           if (rules[i].hasOwnProperty('exceptions') && rules[i].exceptions !== null) {
             if (rules[i].exceptions.indexOf(CL.context) !== -1) {
               rules[i].exceptions.splice(rules[i].exceptions.indexOf(CL.context), 1);
@@ -1419,7 +1405,7 @@ RG = (function() {
             }
           }
         }
-        //resave the rules
+        // resave the rules
         CL.services.updateRules(rules, CL.context, function() {
           RG.recollate(false);
         });
@@ -1428,13 +1414,11 @@ RG = (function() {
   };
 
   _scheduleAddGlobalException = function() {
-    var element, row, rule_id;
+    var element, row, ruleId;
     element = SimpleContextMenu._target_element;
     row = _getAncestorRow(element);
-    rule_id = row.id.substring(row.id.indexOf('_rule_') + 6);
-    _forGlobalExceptions.push({
-      'id': rule_id
-    });
+    ruleId = row.id.substring(row.id.indexOf('_rule_') + 6);
+    _forGlobalExceptions.push({'id': ruleId});
     $(row).addClass('deleted');
   };
 
@@ -1456,46 +1440,45 @@ RG = (function() {
     selectableId = tbody.id;
     $('#' + selectableId + ' > tr.ui-selected').each(function () {
       _scheduleRuleDeletion(this);
-      //remove the class so it is not selected again if we delete more
+      // remove the class so it is not selected again if we delete more
       $(this).removeClass('ui-selected');
     });
   };
 
   _scheduleRuleDeletion = function(element) {
-    var i, j, element, row, rule_id, unit_num, row_num, word_num, rule_type, word_data, key, witness_data, witnesses, ok;
+    var i, j, element, row, ruleId, unitNum, rowNum, wordNum, ruleType, wordData, witnessData, witnesses, ok;
     if (element === undefined) {
       element = SimpleContextMenu._target_element;
     }
     row = _getAncestorRow(element);
-    unit_num = row.id.substring(row.id.indexOf('_unit_') + 6, row.id.indexOf('_row_'));
-    row_num = row.id.substring(row.id.indexOf('_row_') + 5, row.id.indexOf('_word_'));
-    word_num = row.id.substring(row.id.indexOf('_word_') + 6, row.id.indexOf('_rule_'));
-    rule_id = row.id.substring(row.id.indexOf('_rule_') + 6);
-    word_data = CL.data.apparatus[unit_num].readings[row_num].text[word_num];
-    witnesses = word_data.reading;
-    rule_type = null;
+    unitNum = row.id.substring(row.id.indexOf('_unit_') + 6, row.id.indexOf('_row_'));
+    rowNum = row.id.substring(row.id.indexOf('_row_') + 5, row.id.indexOf('_word_'));
+    wordNum = row.id.substring(row.id.indexOf('_word_') + 6, row.id.indexOf('_rule_'));
+    ruleId = row.id.substring(row.id.indexOf('_rule_') + 6);
+    wordData = CL.data.apparatus[unitNum].readings[rowNum].text[wordNum];
+    witnesses = wordData.reading;
+    ruleType = null;
     i = 0;
-    while (i < witnesses.length && rule_type === null) {
-      witness_data = word_data[witnesses[i]];
-      if (witness_data.hasOwnProperty('decision_details')) {
+    while (i < witnesses.length && ruleType === null) {
+      witnessData = wordData[witnesses[i]];
+      if (witnessData.hasOwnProperty('decision_details')) {
         j = 0;
-        while (j < witness_data.decision_details.length && rule_type === null) {
-          if (rule_id === witness_data.decision_details[j].id) {
-            rule_type = witness_data.decision_details[j].scope;
+        while (j < witnessData.decision_details.length && ruleType === null) {
+          if (ruleId === witnessData.decision_details[j].id) {
+            ruleType = witnessData.decision_details[j].scope;
           }
           j += 1;
         }
       }
       i += 1;
     }
-    if (rule_type === 'always') {
-      ok = confirm('You are asking to delete a global rule.\nDeleting this rule will mean it is deleted everywhere in your project for all editors.\nIf you just want the rule to be ignored in this verse you can add an exception.\nAre you sure you want to delete this rule?');
+    if (ruleType === 'always') {
+      ok = confirm('You are asking to delete a global rule.\nDeleting this rule will mean it is deleted everywhere ' +
+                   'in your project for all editors.\nIf you just want the rule to be ignored in this verse you can ' +
+                   'add an exception.\nAre you sure you want to delete this rule?');
       if (ok) {
         $(row).addClass('deleted');
-        _forDeletion.push({
-          id: rule_id,
-          scope: rule_type
-        });
+        _forDeletion.push({id: ruleId, scope: ruleType});
         if (CL.witnessEditingMode === true) {
           CL.isDirty = true;
         }
@@ -1504,10 +1487,7 @@ RG = (function() {
       }
     } else {
       $(row).addClass('deleted');
-      _forDeletion.push({
-        id: rule_id,
-        scope: rule_type
-      });
+      _forDeletion.push({id: ruleId, scope: ruleType});
       if (CL.witnessEditingMode === true) {
         CL.isDirty = true;
       }
@@ -1557,32 +1537,31 @@ RG = (function() {
     }
   };
 
-
-
   _showCollationTable = function(data, context, container) {
-    var i, j, k, html, column, row, witnesses;
+    var html, row, column, witnesses;
     html = [];
     html.push('<tr>');
+    //TODO do we still need both of these
     //sigils for collateX 1.3 witnesses for 1.5+
     if (data.hasOwnProperty('sigils')) {
       witnesses = data.sigils;
     } else {
       witnesses = data.witnesses;
     }
-    for (i = 0; i < witnesses.length; i += 1) {
+    for (let i = 0; i < witnesses.length; i += 1) {
       html.push('<td>' + witnesses[i] + '</td>');
     }
     html.push('</tr>');
-    for (i = 0; i < data.table.length; i += 1) {
+    for (let i = 0; i < data.table.length; i += 1) {
       row = data.table[i];
       html.push('<tr>');
-      for (j = 0; j < row.length; j += 1) {
+      for (let j = 0; j < row.length; j += 1) {
         column = row[j];
         if (column === null) {
           html.push('<td></td>');
         } else {
           html.push('<td>');
-          for (k = 0; k < column.length; k += 1) {
+          for (let k = 0; k < column.length; k += 1) {
             if (column[k].hasOwnProperty('n')) {
               html.push(column[k].n);
             } else {
