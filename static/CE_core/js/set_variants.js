@@ -1291,8 +1291,7 @@ SV = (function() {
     };
     rd.event.dropped = function() {
       scrollOffset = [document.getElementById('scroller').scrollLeft,
-        document.getElementById('scroller').scrollTop
-      ];
+                      document.getElementById('scroller').scrollTop];
       if (rd.td.target.parentElement.id === 'number_row') {  // if you drag onto a number
         _moveUnit(rd);
       } else {
