@@ -842,6 +842,9 @@ OR = (function() {
 
   editLabel = function(rdgDetails, menuPos, saveFunction) {
     var left, top, labelForm, html, newLabel, reading, currentLabel;
+    if (document.getElementById('label_form')) {
+      document.getElementsByTagName('body')[0].removeChild(document.getElementById('label_form'));
+    }
     left = menuPos.left;
     top = menuPos.top;
     labelForm = document.createElement('div');
@@ -864,7 +867,7 @@ OR = (function() {
     top = parseInt(top) - document.getElementById('scroller').scrollTop;
     document.getElementById('label_form').style.left = left + 'px';
     document.getElementById('label_form').style.top = top + 'px';
-    document.getElementById('new_label').value = currentLabel; //populate field with current label value
+    document.getElementById('new_label').value = currentLabel; // populate field with current label value
     drag.initDraggable('label_form', true, true);
     $('#close_label_button').on('click', function(event) {
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('label_form'));
