@@ -198,6 +198,9 @@ SV = (function() {
       checkBugStatus('saved', 'state');
       SR.loseSubreadings();
       CL.saveCollation('set');
+      if (CL.showSubreadings === true) {
+        SR.findSubreadings();
+      }
     });
 
     $('#return_to_saved_table_button').on('click', function() {
@@ -4376,7 +4379,10 @@ SV = (function() {
         CL.makeMainReading(unit, parentReading, subtype, subreadingPos, options);
       }
     } else {
-      //this section is a top level action called from the context menu so must be prepared to a certain extent
+      //TODO: this needs looking at as it is causing errors after the first use but then is triggering
+      // recombine also triggers the problem but highlighing fixes so unprep or redraw needs to be better to present
+      // issue on line 4397 which has no subreading sometimes - save is what causes this issue not the code here
+      // this section is a top level action called from the context menu so must be prepared to a certain extent
       scrollOffset = [document.getElementById('scroller').scrollLeft,
         document.getElementById('scroller').scrollTop
       ];
