@@ -1997,6 +1997,9 @@ CL = (function() {
     SR.loseSubreadings(); //must always lose subreadings first or find subreadings doesn't find them all!
     SR.findSubreadings({'unit_id': unit._id}); //we need this to see if we have any!
     reading = findReadingById(unit, readingDetails.reading_id);
+    console.log(unit)
+    console.log(readingDetails)
+    console.log(reading)
     fosilisedReading = JSON.parse(JSON.stringify(reading));
     tValuesForSettings = _extractAllTValuesForRGAppliedRules(reading, unit, apparatus);
     options = {};
