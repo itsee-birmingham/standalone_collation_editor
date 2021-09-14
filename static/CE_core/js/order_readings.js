@@ -195,6 +195,8 @@ OR = (function() {
         CL.addHoverEvents(row);
       }
     }
+    console.log('VVVVVVV');
+    console.log(JSON.parse(JSON.stringify(CL.data)))
   };
 
   showApprovedVersion = function(options) {
