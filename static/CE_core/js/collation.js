@@ -58,8 +58,8 @@ CL = (function() {
       getReading, lacOmFix, getSubreadingOfWitness, overlapHasEmptyReading, removeNullItems,
       addStageLinks, addExtraFooterButtons, makeVerseLinks, getUnitAppReading, setList,
       getActiveUnitWitnesses, getExporterSettings, saveCollation, sortWitnesses,
-      getSpecifiedAncestor, hideTooltip, addHoverEvents, markReading, showSplitWitnessMenu,
-      markStandoffReading, findUnitPosById, findReadingById, findReadingPosById, applyPreStageChecks,
+      getSpecifiedAncestor, hideTooltip, addHoverEvents, markReading, showSplitWitnessMenu, markStandoffReading,
+      findUnitPosById, findReadingById, findReadingByText, findReadingPosById, applyPreStageChecks,
       makeStandoffReading, doMakeStandoffReading, makeMainReading, getOrderedAppLines,
       loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses,
       calculatePosition, removeWitness, checkWitnessesAgainstProject, setUpRemoveWitnessesForm,
@@ -1940,6 +1940,16 @@ CL = (function() {
     return null;
   };
 
+  findReadingByText = function(unit, text) {
+    for (let i = 0; i < unit.readings.length; i += 1) {
+      if (unit.readings[i].hasOwnProperty('text_string') && unit.readings[i].text_string === text) {
+        return unit.readings[i];
+      }
+    }
+    return null;
+  };
+
+
   applyPreStageChecks = function(stage) {
     var preStageChecks, result;
     preStageChecks = _getPreStageChecks(stage);
@@ -1997,6 +2007,9 @@ CL = (function() {
     SR.loseSubreadings(); //must always lose subreadings first or find subreadings doesn't find them all!
     SR.findSubreadings({'unit_id': unit._id}); //we need this to see if we have any!
     reading = findReadingById(unit, readingDetails.reading_id);
+    if (reading === null) {
+      reading = findReadingByText(unit, readingDetails.reading_text);
+    }
     console.log(unit)
     console.log(readingDetails)
     console.log(reading)
@@ -5693,6 +5706,7 @@ CL = (function() {
       markStandoffReading: markStandoffReading,
       findUnitPosById: findUnitPosById,
       findReadingById: findReadingById,
+      findReadingByText: findReadingByText,
       applyPreStageChecks: applyPreStageChecks,
       makeStandoffReading: makeStandoffReading,
       doMakeStandoffReading: doMakeStandoffReading,
@@ -5888,6 +5902,7 @@ CL = (function() {
       markStandoffReading: markStandoffReading,
       findUnitPosById: findUnitPosById,
       findReadingById: findReadingById,
+      findReadingByText: findReadingByText,
       applyPreStageChecks: applyPreStageChecks,
       makeStandoffReading: makeStandoffReading,
       doMakeStandoffReading: doMakeStandoffReading,

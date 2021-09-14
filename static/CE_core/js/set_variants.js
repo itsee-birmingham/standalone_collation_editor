@@ -4729,7 +4729,8 @@ SV = (function() {
           'unit_id': unit._id,
           'unit_pos': unitPos,
           'reading_pos': readingPos,
-          'reading_id': reading._id
+          'reading_id': reading._id,
+          'reading_text': reading.text_string
         };
         CL.markStandoffReading(key, 'Subreading', readingDetails, 'set_variants', {
           'top': SimpleContextMenu._menuElement.style.top,
@@ -4801,7 +4802,8 @@ SV = (function() {
           'unit_id': unit._id,
           'unit_pos': unitPos,
           'reading_pos': readingPos,
-          'reading_id': reading._id
+          'reading_id': reading._id,
+          'reading_text': reading.text_string
         };
         CL.markStandoffReading(svRules[key][1], key, readingDetails, 'set_variants', {
           'top': SimpleContextMenu._menuElement.style.top,
