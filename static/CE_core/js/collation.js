@@ -5312,6 +5312,12 @@ CL = (function() {
     reading = parseInt(idString.substring(idString.indexOf('row_') + 4, idString.indexOf('_type_')), 10);
     type = idString.substring(idString.indexOf('type_') + 5, idString.indexOf('_subrow_'));
     subrow = parseInt(idString.substring(idString.indexOf('subrow_') + 7), 10);
+    console.log('-------')
+    console.log(app)
+    console.log(unit)
+    console.log(reading)
+    console.log(type)
+    console.log(subrow)
     if (!isNaN(unit) && !isNaN(reading) && !isNaN(subrow)) {
       return getReadingWitnesses(CL.data[app][unit].readings[reading].subreadings[type][subrow], app,
                                  CL.data[app][unit].start, CL.data[app][unit].end,
