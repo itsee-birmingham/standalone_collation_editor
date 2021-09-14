@@ -4887,6 +4887,7 @@ SV = (function() {
       CL.data = JSON.parse(SV.undoStack.pop());
       CL.data.event_list = eventList;
       _removeSplits();
+      SR.loseSubreadings();
       if (CL.showSubreadings === true) {
         SR.findSubreadings();
       }
