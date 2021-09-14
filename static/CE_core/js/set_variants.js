@@ -910,6 +910,11 @@ SV = (function() {
     //then if we aren't looking at subreadings hide them again
     if (CL.showSubreadings === false) {
       SR.loseSubreadings();
+      if (CL.stage === 'ordered') {
+        SR.findSubreadings({
+          'rule_classes': CL.getRuleClasses('subreading', true, 'value', ['identifier', 'subreading'])
+        }); //only show the subreadings when there class is labelled as subreading in the project)))
+      }
     }
   };
 
