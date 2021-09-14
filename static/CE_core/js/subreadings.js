@@ -37,6 +37,8 @@ SR = (function() {
     var parent, child, apparatus, readings, subreadings, forDeletion, options,
         markedReading, ruleClasses, appId, unit, unitPos, readingPos;
     _subreadingsAre = 'found';
+    console.log('finding now')
+    console.log(JSON.parse(JSON.stringify(CL.data)))
     if (_test) {
       console.log('SR.findSubreadings');
     }
@@ -52,10 +54,10 @@ SR = (function() {
           apparatus = CL.data[key];
           for (let i = 0; i < apparatus.length; i += 1) {
             if (!findOptions.hasOwnProperty('unit_id') || findOptions.hasOwnProperty('unit_id')) { //apparatus[i]._id === findOptions.unit_id) {
-              if (findOptions.hasOwnProperty('unit_id')) {
-                //remember appId so we can just delete the unused marked readings for this unit
-                appId = key;
-              }
+              // if (findOptions.hasOwnProperty('unit_id')) {
+              //   //remember appId so we can just delete the unused marked readings for this unit
+              //   appId = key;
+              // }
               readings = apparatus[i].readings;
               forDeletion = [];
               //this deals with the words regularised in RG
