@@ -38,7 +38,8 @@ OR = (function() {
   showOrderReadings = function(options) {
     var html, highestUnit, header, row, overlaps, appIds, footerHtml, num, temp, eventRows,
         overlapOptions, newOverlapOptions, container, undoButton, showHideSubreadingsButtonText;
-    //console.log(CL.data);
+    console.log('*********')
+    console.log(JSON.parse(JSON.stringify(CL.data)));
     CL.stage = 'ordered';
     addLabels(false);
 
