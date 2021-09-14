@@ -4708,7 +4708,7 @@ SV = (function() {
       $('#mark_as_' + key).off('click.' + key + '_c');
       $('#mark_as_' + key).off('mouseover.' + key + '_mo');
       $('#mark_as_' + key).on('click.' + key + '_c', function(event) {
-        var element, div, unit, appId, unitPos, rdgDetails, readingPos, reading, readingDetails;
+        var element, div, unit, appId, unitPos, rdgDetails, readingPos, reading, readingDetails, readingText, tokenList;
         element = SimpleContextMenu._target_element;
         div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
           if ($(e).hasClass('spanlike')) {
@@ -4722,15 +4722,21 @@ SV = (function() {
         readingPos = rdgDetails[2];
         unit = CL.data[appId][unitPos];
         reading = unit.readings[readingPos];
-        console.log('_addContextMenuHandlers')
-        console.log(JSON.parse(JSON.stringify(reading)))
+        readingText = reading.text_string;
+        if (readingText === undefined) {
+          tokenList = [];
+          for (let i = 0; i < reading.text.length; i += 1) {
+            tokenList.push(reading.text[i].interface);
+          }
+          readingText = tokenList.join(' ');
+        }
         readingDetails = {
           'app_id': appId,
           'unit_id': unit._id,
           'unit_pos': unitPos,
           'reading_pos': readingPos,
           'reading_id': reading._id,
-          'reading_text': reading.text_string
+          'reading_text': reading.readingText
         };
         CL.markStandoffReading(key, 'Subreading', readingDetails, 'set_variants', {
           'top': SimpleContextMenu._menuElement.style.top,
@@ -4795,8 +4801,6 @@ SV = (function() {
         readingPos = rdgDetails[2];
         unit = CL.data[appId][unitPos];
         reading = unit.readings[readingPos];
-        console.log('_addEvent')
-        console.log(JSON.parse(JSON.stringify(reading)))
         readingText = reading.text_string;
         if (readingText === undefined) {
           tokenList = [];

@@ -2010,8 +2010,6 @@ CL = (function() {
     var apparatus, unit, parent, reading, fosilisedReading, tValuesForSettings, options, displaySettings,
       resultCallback, data;
     data = {};
-    console.log('&&&&&&&')
-    console.log(readingDetails)
     apparatus = readingDetails.app_id;
     unit = findUnitById(apparatus, readingDetails.unit_id);
     parent = findReadingById(unit, parentId);
@@ -2019,12 +2017,8 @@ CL = (function() {
     SR.findSubreadings({'unit_id': unit._id}); //we need this to see if we have any!
     reading = findReadingById(unit, readingDetails.reading_id);
     if (reading === null) {
-      console.log('look for reading by text');
       reading = findReadingByText(unit, readingDetails.reading_text);
     }
-    console.log(unit)
-    console.log(readingDetails)
-    console.log(reading)
     fosilisedReading = JSON.parse(JSON.stringify(reading));
     tValuesForSettings = _extractAllTValuesForRGAppliedRules(reading, unit, apparatus);
     options = {};
