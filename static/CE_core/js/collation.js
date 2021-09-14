@@ -1947,8 +1947,8 @@ CL = (function() {
         return unit.readings[i];
       } else {
         tokenList = [];
-        for (let i = 0; i < reading.text.length; i += 1) {
-          tokenList.push(reading.text[i].interface);
+        for (let j = 0; j < unit.readings[i].text.length; j += 1) {
+          tokenList.push(unit.readings[i].text[j].interface);
         }
         if (tokenList.join(' ') == text) {
           return unit.readings[i];
