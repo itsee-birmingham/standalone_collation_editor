@@ -4723,7 +4723,7 @@ SV = (function() {
         unit = CL.data[appId][unitPos];
         reading = unit.readings[readingPos];
         console.log('_addContextMenuHandlers')
-        console.log(reading)
+        console.log(JSON.parse(JSON.stringify(reading)))
         readingDetails = {
           'app_id': appId,
           'unit_id': unit._id,

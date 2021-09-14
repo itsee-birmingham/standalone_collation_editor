@@ -51,7 +51,7 @@ SR = (function() {
         if (key.indexOf('apparatus') !== -1) {
           apparatus = CL.data[key];
           for (let i = 0; i < apparatus.length; i += 1) {
-            if (!findOptions.hasOwnProperty('unit_id') || apparatus[i]._id === findOptions.unit_id) {
+            if (!findOptions.hasOwnProperty('unit_id') || findOptions.hasOwnProperty('unit_id') { //apparatus[i]._id === findOptions.unit_id) {
               if (findOptions.hasOwnProperty('unit_id')) {
                 //remember appId so we can just delete the unused marked readings for this unit
                 appId = key;
@@ -152,11 +152,11 @@ SR = (function() {
         }
       }
     }
-    if (findOptions.hasOwnProperty('unit_id')) {
-      _cleanStandoffMarking(appId, findOptions.unit_id); //then limit 'cleaning' to this unit
-    } else {
+    // if (findOptions.hasOwnProperty('unit_id')) {
+    //   _cleanStandoffMarking(appId, findOptions.unit_id); //then limit 'cleaning' to this unit
+    // } else {
       _cleanStandoffMarking(); //clean the lot
-    }
+    // }
     if (CL.data.hasOwnProperty('separated_witnesses')) {
       for (let i = 0; i < CL.data.separated_witnesses.length; i += 1) {
         unit = CL.findUnitById(CL.data.separated_witnesses[i].app_id, CL.data.separated_witnesses[i].unit_id);
