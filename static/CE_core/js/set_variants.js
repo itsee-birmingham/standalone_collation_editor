@@ -4722,6 +4722,8 @@ SV = (function() {
         readingPos = rdgDetails[2];
         unit = CL.data[appId][unitPos];
         reading = unit.readings[readingPos];
+        console.log('_addContextMenuHandlers')
+        console.log(reading)
         readingDetails = {
           'app_id': appId,
           'unit_id': unit._id,
@@ -4792,6 +4794,8 @@ SV = (function() {
         readingPos = rdgDetails[2];
         unit = CL.data[appId][unitPos];
         reading = unit.readings[readingPos];
+        console.log('_addEvent')
+        console.log(reading)
         readingDetails = {
           'app_id': appId,
           'unit_id': unit._id,
