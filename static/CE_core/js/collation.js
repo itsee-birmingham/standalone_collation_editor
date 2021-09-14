@@ -293,7 +293,7 @@ CL = (function() {
         console.log('my witness is a main reading so here is the reading text');
         console.log(JSON.parse(JSON.stringify(witnessText)));
       }
-    } else if (reading.hasOwnProperty('SR_text') && reading.SR_text.hasOwnProperty(witness)) {
+    } else if (reading.hasOwnProperty('SR_text') && reading.SR_text.hasOwnProperty(witness) && readingType !== 'mainreading') {
       if (reading.SR_text[witness].text.length > 0) {
         witnessText = reading.SR_text[witness].text;
         if (test === true) {
