@@ -5318,6 +5318,10 @@ CL = (function() {
     console.log(reading)
     console.log(type)
     console.log(subrow)
+    console.log(CL.data[app][unit])
+    console.log(CL.data[app][unit].readings[reading])
+    console.log(CL.data[app][unit].readings[reading].subreadings[type])
+    console.log(CL.data[app][unit].readings[reading].subreadings[type][subrow])
     if (!isNaN(unit) && !isNaN(reading) && !isNaN(subrow)) {
       return getReadingWitnesses(CL.data[app][unit].readings[reading].subreadings[type][subrow], app,
                                  CL.data[app][unit].start, CL.data[app][unit].end,
