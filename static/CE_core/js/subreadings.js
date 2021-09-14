@@ -183,6 +183,7 @@ SR = (function() {
   /** This merges the subreadings back in with their parent readings */
   loseSubreadings = function() {
     var data, apparatus, readings, reading;
+    console.trace()
     _subreadingsAre = 'lost';
     data = CL.data;
     for (let key in data) {

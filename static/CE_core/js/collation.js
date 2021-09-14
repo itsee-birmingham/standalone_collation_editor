@@ -5313,12 +5313,6 @@ CL = (function() {
     type = idString.substring(idString.indexOf('type_') + 5, idString.indexOf('_subrow_'));
     subrow = parseInt(idString.substring(idString.indexOf('subrow_') + 7), 10);
     console.log('-------')
-    console.log(app)
-    console.log(unit)
-    console.log(reading)
-    console.log(type)
-    console.log(subrow)
-    console.log(CL.data[app][unit])
     console.log(CL.data[app][unit].readings[reading])
     console.log(CL.data[app][unit].readings[reading].subreadings[type])
     console.log(CL.data[app][unit].readings[reading].subreadings[type][subrow])
