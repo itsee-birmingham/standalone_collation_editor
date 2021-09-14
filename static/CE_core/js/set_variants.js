@@ -4736,7 +4736,7 @@ SV = (function() {
           'unit_pos': unitPos,
           'reading_pos': readingPos,
           'reading_id': reading._id,
-          'reading_text': reading.readingText
+          'reading_text': readingText
         };
         CL.markStandoffReading(key, 'Subreading', readingDetails, 'set_variants', {
           'top': SimpleContextMenu._menuElement.style.top,
