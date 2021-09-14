@@ -4803,7 +4803,7 @@ SV = (function() {
           'unit_pos': unitPos,
           'reading_pos': readingPos,
           'reading_id': reading._id,
-          'reading_text': reading.text_string
+          'reading_text': CL.extractWitnessText(reading)
         };
         CL.markStandoffReading(svRules[key][1], key, readingDetails, 'set_variants', {
           'top': SimpleContextMenu._menuElement.style.top,
