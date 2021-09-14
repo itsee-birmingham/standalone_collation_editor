@@ -51,7 +51,7 @@ SR = (function() {
         if (key.indexOf('apparatus') !== -1) {
           apparatus = CL.data[key];
           for (let i = 0; i < apparatus.length; i += 1) {
-            if (!findOptions.hasOwnProperty('unit_id') || findOptions.hasOwnProperty('unit_id') { //apparatus[i]._id === findOptions.unit_id) {
+            if (!findOptions.hasOwnProperty('unit_id') || findOptions.hasOwnProperty('unit_id')) { //apparatus[i]._id === findOptions.unit_id) {
               if (findOptions.hasOwnProperty('unit_id')) {
                 //remember appId so we can just delete the unused marked readings for this unit
                 appId = key;
