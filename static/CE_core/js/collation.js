@@ -1973,6 +1973,7 @@ CL = (function() {
 
   _extractAllTValuesForRGAppliedRules = function(reading, unit, apparatus) {
     var witness, tValue, tokensForSettings, structuredTokens;
+    console.trace();
     tokensForSettings = [];
     if (reading.hasOwnProperty('subreadings')) {
       for (let key in reading.subreadings) {
