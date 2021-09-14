@@ -1941,9 +1941,18 @@ CL = (function() {
   };
 
   findReadingByText = function(unit, text) {
+    var tokenList
     for (let i = 0; i < unit.readings.length; i += 1) {
       if (unit.readings[i].hasOwnProperty('text_string') && unit.readings[i].text_string === text) {
         return unit.readings[i];
+      } else {
+        tokenList = [];
+        for (let i = 0; i < reading.text.length; i += 1) {
+          tokenList.push(reading.text[i].interface);
+        }
+        if (tokenList.join(' ') == text) {
+          return unit.readings[i];
+        }
       }
     }
     return null;
@@ -2010,6 +2019,7 @@ CL = (function() {
     SR.findSubreadings({'unit_id': unit._id}); //we need this to see if we have any!
     reading = findReadingById(unit, readingDetails.reading_id);
     if (reading === null) {
+      console.log('look for reading by text');
       reading = findReadingByText(unit, readingDetails.reading_text);
     }
     console.log(unit)
