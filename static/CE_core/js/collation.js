@@ -2001,6 +2001,8 @@ CL = (function() {
     var apparatus, unit, parent, reading, fosilisedReading, tValuesForSettings, options, displaySettings,
       resultCallback, data;
     data = {};
+    console.log('&&&&&&&')
+    console.log(readingDetails)
     apparatus = readingDetails.app_id;
     unit = findUnitById(apparatus, readingDetails.unit_id);
     parent = findReadingById(unit, parentId);

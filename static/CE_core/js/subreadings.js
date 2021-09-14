@@ -37,8 +37,6 @@ SR = (function() {
     var parent, child, apparatus, readings, subreadings, forDeletion, options,
         markedReading, ruleClasses, appId, unit, unitPos, readingPos;
     _subreadingsAre = 'found';
-    console.log('finding now')
-    console.log(JSON.parse(JSON.stringify(CL.data)))
     if (_test) {
       console.log('SR.findSubreadings');
     }
