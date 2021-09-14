@@ -941,7 +941,6 @@ CL = (function() {
 
   addSubreadingEvents = function(stage, baseSubreadingRules) {
     var scrollOffset;
-    console.log(stage);
     if (CL.showSubreadings === true) {
       if (document.getElementById('show_hide_subreadings_button')) {
         $('#show_hide_subreadings_button').on('click.hide_subreadings', function(event) {
@@ -5312,10 +5311,6 @@ CL = (function() {
     reading = parseInt(idString.substring(idString.indexOf('row_') + 4, idString.indexOf('_type_')), 10);
     type = idString.substring(idString.indexOf('type_') + 5, idString.indexOf('_subrow_'));
     subrow = parseInt(idString.substring(idString.indexOf('subrow_') + 7), 10);
-    console.log('-------')
-    console.log(CL.data[app][unit].readings[reading])
-    console.log(CL.data[app][unit].readings[reading].subreadings[type])
-    console.log(CL.data[app][unit].readings[reading].subreadings[type][subrow])
     if (!isNaN(unit) && !isNaN(reading) && !isNaN(subrow)) {
       return getReadingWitnesses(CL.data[app][unit].readings[reading].subreadings[type][subrow], app,
                                  CL.data[app][unit].start, CL.data[app][unit].end,

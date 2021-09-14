@@ -38,8 +38,7 @@ OR = (function() {
   showOrderReadings = function(options) {
     var html, highestUnit, header, row, overlaps, appIds, footerHtml, num, temp, eventRows,
         overlapOptions, newOverlapOptions, container, undoButton, showHideSubreadingsButtonText;
-    console.log('*********')
-    console.log(JSON.parse(JSON.stringify(CL.data)));
+    // console.log(CL.data);
     CL.stage = 'ordered';
     addLabels(false);
 
@@ -195,8 +194,6 @@ OR = (function() {
         CL.addHoverEvents(row);
       }
     }
-    console.log('VVVVVVV');
-    console.log(JSON.parse(JSON.stringify(CL.data)))
   };
 
   showApprovedVersion = function(options) {
