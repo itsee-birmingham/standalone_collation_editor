@@ -2430,20 +2430,23 @@ SV = (function() {
     document.getElementById('scroller').scrollTop = scrollOffset[1];
   };
 
-  //allGaps is true when one of the units contains only gaps
+  // allGaps is true when one of the units contains only gaps
   _checkOverlapBoundaries = function(unit1, unit2, appId, allGaps) {
     var unit1Ids, unit2Ids;
     if (appId !== 'apparatus') {
       return true;
     }
-    if (!unit1.hasOwnProperty('overlap_units') && !unit2.hasOwnProperty('overlap_units')) {
+    if ((!unit1.hasOwnProperty('overlap_units') || $.isEmptyObject(unit1.overlap_units)) &&
+          (!unit2.hasOwnProperty('overlap_units') || $.isEmptyObject(unit2.overlap_units))) {
       return true;
     }
     if (allGaps === true) {
-      if (!CL.unitHasText(unit1) && !unit1.hasOwnProperty('overlap_units')) {
+      if (!CL.unitHasText(unit1) && (!unit1.hasOwnProperty('overlap_units') ||
+                                      $.isEmptyObject(unit1.overlap_units))) {
         return true;
       }
-      if (!CL.unitHasText(unit2) && !unit2.hasOwnProperty('overlap_units')) {
+      if (!CL.unitHasText(unit2) && (!unit2.hasOwnProperty('overlap_units') ||
+                                      $.isEmptyObject(unit2.overlap_units))) {
         return true;
       }
     }
