@@ -793,7 +793,7 @@ SV = (function() {
           for (let j = 0; j < reading.witnesses.length; j += 1) {
             witness = reading.witnesses[j];
             console.log(witness);
-            console.log(JSON.parse(JSON.strigify(reading)));
+            console.log(JSON.parse(JSON.stringify(reading)));
             for (let k = 0; k < reading.text.length; k += 1) {
               if (reading.text[k].hasOwnProperty(witness)) {
                 unit.readings[index].text[k][witness] = reading.text[k][witness];
