@@ -792,15 +792,9 @@ SV = (function() {
           //put individual details for each witness in the new reading
           for (let j = 0; j < reading.witnesses.length; j += 1) {
             witness = reading.witnesses[j];
-            console.log(witness)
             for (let k = 0; k < reading.text.length; k += 1) {
               if (reading.text[k].hasOwnProperty(witness)) {
                 unit.readings[index].text[k][witness] = reading.text[k][witness];
-
-
-                console.log(unit.readings[index])
-                console.log(unit.readings[index].text[k])
-                console.log(unit.readings[index].text[k][witness])
                 //check if any readings need the regularised flag (because some witnesses have decisions to apply)
                 if (unit.readings[index].text[k][witness].hasOwnProperty('decision_class')) {
                   unit.readings[index].text[k].regularised = true;
