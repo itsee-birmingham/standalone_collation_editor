@@ -578,6 +578,9 @@ OR = (function() {
     }
     for (let i = 0; i < overlapLineNumbers.length; i += 1) {
       for (let j = 0; j < CL.data['apparatus' + overlapLineNumbers[i]].length; j += 1) {
+        console.log('mergedSharedOverlapReadings');
+        console.log('apparatus' + overlapLineNumbers[i]);
+        console.log('unit num = ' + j);
         SV.unsplitUnitWitnesses(j, 'apparatus' + overlapLineNumbers[i]);
       }
     }
