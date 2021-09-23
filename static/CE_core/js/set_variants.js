@@ -1,5 +1,5 @@
 /*jshint esversion: 6 */
-var testing;
+var testing = true;
 SV = (function() {
   "use strict";
 
@@ -232,7 +232,7 @@ SV = (function() {
   showSetVariantsData = function(options) {
     var temp, header, html, appIds, num, overlaps, overlapOptions, newOverlapOptions, errorPanelHtml, eventRows,
 				row, wits, removeWitsForm, removeFunction;
-    //sort out options and get layout
+    // sort out options and get layout
     if (typeof options === 'undefined') {
       options = {};
     }
@@ -243,7 +243,7 @@ SV = (function() {
       options.highlighted_added_wits = CL.highlightedAdded;
     }
     options.sort = true;
-    //remove the witness removal window if shown
+    // remove the witness removal window if shown
     if (document.getElementById('remove_witnesses_div')) {
       document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
     }
@@ -280,7 +280,6 @@ SV = (function() {
     prepareForOperation();
     CL.lacOmFix(); //also does extra gaps
     unprepareForOperation();
-
     temp = CL.getUnitLayout(CL.data.apparatus, 1, 'set_variants', options);
     header = CL.getCollationHeader(CL.data, temp[1], true);
     html = header[0];
@@ -313,7 +312,6 @@ SV = (function() {
       '<span id="error_message">message</span></div></div>';
     document.getElementById('scroller').innerHTML = '<table class="collation_overview">' + html.join('') +
       '</table>' + errorPanelHtml;
-
     eventRows = temp[2];
     for (let i = 0; i < eventRows.length; i += 1) {
       row = document.getElementById(eventRows[i]);
@@ -386,6 +384,9 @@ SV = (function() {
     });
   };
 
+  // DEBUG
+  // this function changes the end value of overlapped reading if top line is split and added word ends up at an
+  // addition. It also needs to change any correspinding marked_readings.
   calculateUnitLengths = function(appId, options) {
     var index, app, topLine, id, start, firstHit, gapBefore, lastEnd, length, gapCounts, highestGap, gapAfter,
       	previousUnitGapAfter, previousUnitEnd, originalColumnLengths;
@@ -394,30 +395,30 @@ SV = (function() {
     }
     topLine = CL.data.apparatus;
     app = CL.data[appId];
-    options.overlap_details = {}; //get rid of the one from the last apparatus
-    //copy the originalColumnLengths data so we can use to calculate gapAfter accurately
+    options.overlap_details = {};  // get rid of the one from the last apparatus
+    // copy the originalColumnLengths data so we can use to calculate gapAfter accurately
     originalColumnLengths = JSON.parse(JSON.stringify(options.column_lengths));
 
     for (let i = 0; i < app.length; i += 1) {
       id = app[i]._id;
-      //first find real start value
+      // first find real start value
       start = -1;
       for (let j = 0; j < topLine.length; j += 1) {
         if (topLine[j].hasOwnProperty('overlap_units') &&
-          topLine[j].overlap_units.hasOwnProperty(id) && start === -1) {
+              topLine[j].overlap_units.hasOwnProperty(id) && start === -1) {
           start = topLine[j].start;
           app[i].start = start;
         }
       }
       length = 0;
       gapBefore = 0;
-      //find the first hit of this overlap_unit id in the top line
-      //recoding the number of units in top line at this index which come before
+      // find the first hit of this overlap_unit id in the top line
+      // recoding the number of units in top line at this index which come before
       firstHit = -1;
       for (let j = 0; j < topLine.length; j += 1) {
         if (topLine[j].start === start) {
           if (topLine[j].hasOwnProperty('overlap_units') &&
-            topLine[j].overlap_units.hasOwnProperty(id)) {
+                topLine[j].overlap_units.hasOwnProperty(id)) {
             if (firstHit === -1) {
               firstHit = j;
             }
@@ -428,7 +429,7 @@ SV = (function() {
           }
         }
       }
-      //if we might have a conflict with gaps here then adjust as necessary
+      // if we might have a conflict with gaps here then adjust as necessary
       if (start === previousUnitEnd) {
         gapBefore = Math.max(gapBefore - (originalColumnLengths[previousUnitEnd] - previousUnitGapAfter), 0);
       }
@@ -444,7 +445,7 @@ SV = (function() {
           if (lastEnd !== null && lastEnd + 2 === topLine[index].start) {
             length += 1;
           }
-          //now work out what we might need to take off the last position column length
+          // now work out what we might need to take off the last position column length
           if (topLine[index].start % 2 === 1) { //if we start with odd number
             if (topLine[index].start > highestGap) {
               highestGap = topLine[index].start;
@@ -463,11 +464,14 @@ SV = (function() {
         }
         index += 1;
       }
-      //change the end value of the overlap
+      // DEBUG
+      // Here you must check if there is also a standoff reading with needs the unit extent correcting
+
+      // change the end value of the overlap
       app[i].end = lastEnd;
       previousUnitGapAfter = gapAfter;
       previousUnitEnd = lastEnd;
-      //adjust column length if necessary
+      // adjust column length if necessary
       if (lastEnd % 2 === 1) {
         if (gapCounts.hasOwnProperty(highestGap)) {
           if (options.column_lengths.hasOwnProperty(highestGap)) {
@@ -792,8 +796,7 @@ SV = (function() {
           //put individual details for each witness in the new reading
           for (let j = 0; j < reading.witnesses.length; j += 1) {
             witness = reading.witnesses[j];
-            console.log(witness);
-            console.log(JSON.parse(JSON.stringify(reading)));
+            //DEBUG - problems with 3:21 move to OR is here
             for (let k = 0; k < reading.text.length; k += 1) {
               if (reading.text[k].hasOwnProperty(witness)) {
                 unit.readings[index].text[k][witness] = reading.text[k][witness];
@@ -898,24 +901,23 @@ SV = (function() {
    *  into their parents so we don't have to worry about them.
    */
   prepareForOperation = function() {
-    _removeOffsetSubreadings(); //this runs find_subreadings
+    _removeOffsetSubreadings();  // this runs find_subreadings
     SR.loseSubreadings();
   };
 
-  /** Reverse the prepare operation by returning the necessary subreadings and offset readings
-   */
+  /** Reverse the prepare operation by returning the necessary subreadings and offset readings */
   unprepareForOperation = function() {
-    //first run find_subreadings so that the offset subreadings that were made
-    //main readings in prepare are put back as subreadings (if they still match their offset record)
+    // first run find_subreadings so that the offset subreadings that were made
+    // main readings in prepare are put back as subreadings (if they still match their offset record)
     SR.loseSubreadings();
-    SR.findSubreadings(); //this looks like the breaking point
-    //then if we aren't looking at subreadings hide them again
+    SR.findSubreadings();  // this looks like the breaking point
+    // then if we aren't looking at subreadings hide them again
     if (CL.showSubreadings === false) {
       SR.loseSubreadings();
       if (CL.stage === 'ordered') {
         SR.findSubreadings({
           'rule_classes': CL.getRuleClasses('subreading', true, 'value', ['identifier', 'subreading'])
-        }); //only show the subreadings when there class is labelled as subreading in the project)))
+        });  // only show the subreadings when there class is labelled as subreading in the project)))
       }
     }
   };
@@ -3362,8 +3364,7 @@ SV = (function() {
     var text, apps, witnesses, witnessesCopy, overlapWitnesses, words, wordsDict, scrollOffset, rdg, add,
       	splitAdds, newunit, omReadingsCopy, lacReadingsCopy, newReading, specialCategoryWitnesses;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-                    document.getElementById('scroller').scrollTop
-                    ];
+                    document.getElementById('scroller').scrollTop];
     _addToUndoStack(CL.data);
     CL.hideTooltip();
     prepareForOperation();
@@ -3372,7 +3373,7 @@ SV = (function() {
     apps = [];
     witnesses = [];
     overlapWitnesses = {};  // this is a keyed by overlap_status
-    //get all the witnesses in the unit and any in corresponding overlapping units (using the overlap_status flag)
+    // get all the witnesses in the unit and any in corresponding overlapping units (using the overlap_status flag)
     for (let i = 0; i < unit.readings.length; i += 1) {
       witnesses.push.apply(witnesses, CL.getAllReadingWitnesses(unit.readings[i]));
       if (unit.readings[i].hasOwnProperty('overlap_status')) {
@@ -3628,7 +3629,7 @@ SV = (function() {
       CL.addUnitId(newunit);
       apps.push(newunit);
     }
-    //replace the current data with this new stuff
+    // replace the current data with this new stuff
     CL.data[appId].splice(index, 1);
     for (let i = apps.length - 1; i >= 0; i -= 1) {
       CL.addUnitId(apps[i]);
@@ -3645,12 +3646,13 @@ SV = (function() {
         }
       }
     }
-    //now sort them by start index and then by index of first item in text
+    // now sort them by start index and then by index of first item in text
     CL.data[appId].sort(_compareFirstWordIndexes);
     _tidyUnits(appId);
     unprepareForOperation();
-    checkBugStatus('split', appId + ' unit ' + index + '.');
     showSetVariantsData();
+
+    checkBugStatus('split', appId + ' unit ' + index + '.');
     document.getElementById('scroller').scrollLeft = scrollOffset[0];
     document.getElementById('scroller').scrollTop = scrollOffset[1];
   };
@@ -3661,7 +3663,7 @@ SV = (function() {
     scrollOffset = [document.getElementById('scroller').scrollLeft,
       document.getElementById('scroller').scrollTop
     ];
-    //find the correct apparatus
+    // find the correct apparatus
     if (index.match(/_app_/g)) {
       apparatusNum = parseInt(index.match(/\d+/g)[1], 10);
       index = parseInt(index.match(/\d+/g)[0], 10);
@@ -3669,8 +3671,9 @@ SV = (function() {
     } else {
       appId = 'apparatus';
     }
-    //make sure this only happens if at least one of the readings has more that one token or one has combined gap before or after
-    //at this point all subreadings will be same length as main reading or have been turned back into main readings by prepare_for_operation
+    // make sure this only happens if at least one of the readings has more that one token or one has combined
+    // gap before or after at this point all subreadings will be same length as main reading or have been turned back
+    // into main readings by prepare_for_operation
     operationNeeded = false;
     for (let i = 0; i < CL.data[appId][index].readings.length; i += 1) {
       if (CL.data[appId][index].readings[i].text.length > 1) {
@@ -3700,7 +3703,7 @@ SV = (function() {
       //if start and end are the same and its an even number
       if (CL.data[appId][i].start === CL.data[appId][i].end && CL.data[appId][i].start % 2 === 0) {
         if (CL.sortReadings(CL.data[appId][i].readings)[0].text.length === 0) {
-          //move the extra one to the next unit space
+          // move the extra one to the next unit space
           CL.data[appId][i].start = CL.data[appId][i].start + 1;
           CL.data[appId][i].end = CL.data[appId][i].end + 1;
           SV.reindexUnit(CL.data[appId][i].start);

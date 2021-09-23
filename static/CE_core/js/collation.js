@@ -2014,7 +2014,9 @@ CL = (function() {
     unit = findUnitById(apparatus, readingDetails.unit_id);
     parent = findReadingById(unit, parentId);
     SR.loseSubreadings(); //must always lose subreadings first or find subreadings doesn't find them all!
-    SR.findSubreadings({'unit_id': unit._id}); //we need this to see if we have any!
+    // DEBUG commented out for checking
+    // SR.findSubreadings({'unit_id': unit._id}); //we need this to see if we have any!
+    SR.findSubreadings(); //we need this to see if we have any!
     reading = findReadingById(unit, readingDetails.reading_id);
     if (reading === null) {
       reading = findReadingByText(unit, readingDetails.reading_text);
@@ -2079,9 +2081,9 @@ CL = (function() {
                 }
               }
               SR.loseSubreadings();
-              SR.findSubreadings({
-                'unit_id': unit._id
-              });
+              // DEBUG commented out for checking
+              //SR.findSubreadings({'unit_id': unit._id});
+              SR.findSubreadings();
               k -= 1;
             }
           }
@@ -2099,7 +2101,9 @@ CL = (function() {
      * NB: running SR.findSubreadings actually makes the standoff marked reading a real subreading in
      * the display and is a required step even if it is to be hidden again immediately afterwards
      */
-    SR.findSubreadings({'unit_id': unit._id});
+    // DEBUG commented out for checking
+    // SR.findSubreadings({'unit_id': unit._id});
+    SR.findSubreadings();
     //			console.log('RESULT OF _FIND_SUBREADINGS BELOW')
     //			console.log(JSON.parse(JSON.stringify(CL.data)))
     //			console.log('++++++++++++++++++++++++ about to lose subreadings')
@@ -2394,6 +2398,8 @@ CL = (function() {
     }
     //now if this was a standoff marked reading delete the entry in marked_readings unless this is part of prepare_for_operation
     if (options.hasOwnProperty('delete_offset') && options.delete_offset === true) {
+      console.log('Warning I will delete the offset')
+      console.stack()
       for (let key in CL.data.marked_readings) {
         if (CL.data.marked_readings.hasOwnProperty(key)) {
           for (let i = 0; i < CL.data.marked_readings[key].length; i += 1) {
