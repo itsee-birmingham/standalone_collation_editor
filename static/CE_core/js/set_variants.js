@@ -49,10 +49,11 @@ SV = (function() {
 	    _checkAllWitnessesIntegrity, _checkWitnessIntegrity, _getFirstIndexForWitnesses,
 	    _compareWitnessQueue, _checkWordOrderIntegrity, _checkUnitIntegrity,
 	    _removeOffsetSubreadings, _hasStandoffSubreading, _makeMainReading, _addReadingFlag, _removeReadingFlag,
-      _subreadingIdSort, _makeMenu, _addContextMenuHandlers, _addOverlappedEvent, _addEvent, _markReading,
-	    _addToUndoStack, _undo, _removeSplits, _checkTAndNPresence, _checkForStandoffReading, _checkSiglaProblems,
-	    _checkIndexesPresent, _checkUniqueWitnesses, _getAllUnitWitnesses, _compareIndexStrings,
-	    _compareIndexes, _compareFirstWordIndexes, _setUpSVRemoveWitnessesForm, _highlightAddedWitness;
+      _subreadingIdSort, _makeMenu, _addContextMenuHandlers, _addOverlappedEvent, _addEvent, _markReading, _undo,
+	    _addToUndoStack, _removeSplits, _checkTAndNPresence, _checkForStandoffReading, _getMatchingStandoffReading,
+	    _updateMarkedReadingData, _checkSiglaProblems, _checkIndexesPresent, _checkUniqueWitnesses, _getAllUnitWitnesses,
+	    _compareIndexStrings, _compareIndexes, _compareFirstWordIndexes, _setUpSVRemoveWitnessesForm,
+      _highlightAddedWitness;
 
 
   //*********  public functions *********
@@ -384,9 +385,6 @@ SV = (function() {
     });
   };
 
-  // DEBUG
-  // this function changes the end value of overlapped reading if top line is split and added word ends up at an
-  // addition. It also needs to change any correspinding marked_readings.
   calculateUnitLengths = function(appId, options) {
     var index, app, topLine, id, start, firstHit, gapBefore, lastEnd, length, gapCounts, highestGap, gapAfter,
       	previousUnitGapAfter, previousUnitEnd, originalColumnLengths;
@@ -464,9 +462,9 @@ SV = (function() {
         }
         index += 1;
       }
-      // DEBUG
-      // Here you must check if there is also a standoff reading with needs the unit extent correcting
-
+      if (app[i].end !== lastEnd) {
+        _updateMarkedReadingData(app[i], lastEnd);
+      }
       // change the end value of the overlap
       app[i].end = lastEnd;
       previousUnitGapAfter = gapAfter;
@@ -756,7 +754,7 @@ SV = (function() {
 
     for (let i = 0; i < unit.readings.length; i += 1) {
       reading = unit.readings[i];
-      //get the text and add '_a' if it is the first reading of an overlapped unit (although I don't think we ever call this on overlapped units anymore)
+      // get the text and add '_a' if it is the first reading of an overlapped unit (although I don't think we ever call this on overlapped units anymore)
       text = CL.extractWitnessText(reading, {
         'app_id': appId,
         'unit_id': unit._id
@@ -766,16 +764,17 @@ SV = (function() {
       }
       if (reading.hasOwnProperty('overlap_status')) {
         if (reading.overlap_status === 'duplicate') {
-          text = text + '_OLSTS_duplicate' + i; //make sure each duplicate is unique because we do not want to merge these - they might need to be treated differently
+          text = text + '_OLSTS_duplicate' + i; // make sure each duplicate is unique because we do not want to merge these - they might need to be treated differently
         } else {
-          text = text + '_OLSTS_' + reading.overlap_status; //the capital letters are there to help ensure no clash with any real words
+          text = text + '_OLSTS_' + reading.overlap_status; // the capital letters are there to help ensure no clash with any real words
         }
       }
       if (reading.hasOwnProperty('type') && reading.type === 'lac_verse') {
         text = text + '_lac_verse';
       }
-      //find out if this is a standoff reading
-      //at this point all witnesses to the reading should be standoff if it is a standoff reading made into a main reading so just check first witness (and keep fingers crossed!)
+      // find out if this is a standoff reading
+      // at this point all witnesses to the reading should be standoff if it is a standoff reading made into a main
+      // reading so just check first witness (and keep fingers crossed!)
       isStandoff = true;
       standoffRecord = CL.findStandoffRegularisation(unit, reading.witnesses[0], appId);
       if (standoffRecord === null) {
@@ -786,14 +785,14 @@ SV = (function() {
         readingList.push(null);
       } else {
         index = readingList.indexOf(text);
-        if (index !== -1 && text.length > 0) { //if we have text and the reading is already in the list of readings
+        if (index !== -1 && text.length > 0) {  // if we have text and the reading is already in the list of readings
           readingList.push(null); //needed so our list indexes stay alligned with the readings in the unit
           for (let j = 0; j < reading.witnesses.length; j += 1) {
             if (unit.readings[index].witnesses.indexOf(reading.witnesses[j]) === -1) {
               unit.readings[index].witnesses.push(reading.witnesses[j]);
             }
           }
-          //put individual details for each witness in the new reading
+          // put individual details for each witness in the new reading
           for (let j = 0; j < reading.witnesses.length; j += 1) {
             witness = reading.witnesses[j];
             //DEBUG - problems with 3:21 move to OR is here
@@ -1081,10 +1080,10 @@ SV = (function() {
 
   _moveToReorder = function() {
     var allComplete, allInOrder, standoffProblems, extraResults;
-    //we are keeping any empty units from the last state of SV
-    //we need to combined overlaps with identical index points
+    // we are keeping any empty units from the last state of SV
+    // we need to combined overlaps with identical index points
     spinner.showLoadingOverlay();
-    SR.loseSubreadings(); //for preparation and is needed
+    SR.loseSubreadings(); // for preparation and is needed
     allComplete = areAllUnitsComplete();
     allInOrder = _checkAllWitnessesIntegrity();
     standoffProblems = checkStandoffReadingProblems();
@@ -1093,19 +1092,19 @@ SV = (function() {
       extraResults = CL.applyPreStageChecks('order_readings');
       if (extraResults[0] === true) {
         CL.showSubreadings = false;
-        //we have some legacy data which has not had all of the matching readings in each unit combined
-        //so to ensure they are fixed now we need to call the following 3 functions
-        //would be nicer to just change the data on the database but it would mean rewriting in python
+        // we have some legacy data which has not had all of the matching readings in each unit combined
+        // so to ensure they are fixed now we need to call the following 3 functions
+        // would be nicer to just change the data on the database but it would mean rewriting in python
         prepareForOperation();
         _removeSplits();
         unprepareForOperation();
-        SR.loseSubreadings(); //for preparation and is needed
-        OR.removeSplits(); //ensure all the units are unsplit (readings wise) - still needed
-        OR.mergeSharedExtentOverlaps(); //do this before adding labels so the labels are correct))
+        SR.loseSubreadings(); // for preparation and is needed
+        OR.removeSplits(); // ensure all the units are unsplit (readings wise) - still needed
+        OR.mergeSharedExtentOverlaps(); // do this before adding labels so the labels are correct))
         OR.makeWasGapWordsGaps();
-        //merge lacs into a single unit if in settings (default is also true to protect existing projects)
-        //we used to do this with OM as well but om verse should never be merged with OM so I don't run it anymore as there
-        //should be no more that one OM and om verse in any given unit.
+        // merge lacs into a single unit if in settings (default is also true to protect existing projects)
+        // we used to do this with OM as well but om verse should never be merged with OM so I don't run it anymore as there
+        // should be no more that one OM and om verse in any given unit.
         if (CL.project.combineAllLacsInOR === true) {
           OR.mergeAllLacs();
         }
@@ -1113,8 +1112,8 @@ SV = (function() {
           OR.mergeAllOms();
         }
 
-        OR.addLabels(true); //this adds the reading labels to the datastructure itself - still required so they can be edited
-        //log that we have moved to OR in the event_list
+        OR.addLabels(true); // this adds the reading labels to the datastructure itself - still required so they can be edited
+        // log that we have moved to OR in the event_list
         if (CL.data.hasOwnProperty('event_list')) {
           CL.data.event_list.push('moved to order readings');
         }
@@ -1147,7 +1146,7 @@ SV = (function() {
       }
       alert('You cannot move to order readings because one of the witnesses has words out of order');
       spinner.removeLoadingOverlay();
-      //TODO: more informative errors for the above including highlighting the problems on the screen
+      // TODO: more informative errors for the above including highlighting the problems on the screen
     } else if (standoffProblems[0]) {
       if (CL.showSubreadings === true) {
         SR.findSubreadings();
@@ -4912,7 +4911,7 @@ SV = (function() {
         for (let i = 0; i < CL.data[key].length; i += 1) {
           if (CL.data[key][i].hasOwnProperty('split_readings')) {
             delete CL.data[key][i].split_readings;
-            //this is only called if they are split at the time this function is called
+            // this is only called if they are split at the time this function is called
             unsplitUnitWitnesses(i, key);
           }
         }
@@ -4954,6 +4953,43 @@ SV = (function() {
       }
     }
     return [false];
+  };
+
+  _updateMarkedReadingData = function(unit, newEndValue) {
+    var witnesses, standoffReading;
+    witnesses = [];
+    for (let i = 0; i < unit.readings.length; i += 1) {
+      if (unit.readings[i].hasOwnProperty('standoff_subreadings')) {
+        witnesses = witnesses.concat(unit.readings[i].standoff_subreadings);
+      }
+      if (unit.readings[i].hasOwnProperty('SR_text')) {
+        witnesses = witnesses.concat(unit.readings[i].witnesses);
+      }
+    }
+    for (let i = 0; i < witnesses.length; i += 1) {
+      standoffReading = _getMatchingStandoffReading(witnesses[i], unit);
+      if (standoffReading !== null) {
+        standoffReading.end = newEndValue;
+      }
+    }
+  };
+
+  _getMatchingStandoffReading = function(witness, unit) {
+    if (CL.data.hasOwnProperty('marked_readings')) {
+      for (let type in CL.data.marked_readings) {
+        if (CL.data.marked_readings.hasOwnProperty(type)) {
+          for (let i = 0; i < CL.data.marked_readings[type].length; i += 1) {
+            if (CL.data.marked_readings[type][i].start === unit.start &&
+										CL.data.marked_readings[type][i].end === unit.end) {
+              if (CL.data.marked_readings[type][i].witness === witness) {
+                return CL.data.marked_readings[type][i];
+              }
+            }
+          }
+        }
+      }
+    }
+    return null;
   };
 
   _checkForStandoffReading = function(witness, unit) {
@@ -5340,6 +5376,8 @@ SV = (function() {
       _removeSplits: _removeSplits,
       _checkTAndNPresence: _checkTAndNPresence,
       _checkForStandoffReading: _checkForStandoffReading,
+      _getMatchingStandoffReading: _getMatchingStandoffReading,
+      _updateMarkedReadingData: _updateMarkedReadingData,
       _checkSiglaProblems: _checkSiglaProblems,
       _checkIndexesPresent: _checkIndexesPresent,
       _checkUniqueWitnesses: _checkUniqueWitnesses,
