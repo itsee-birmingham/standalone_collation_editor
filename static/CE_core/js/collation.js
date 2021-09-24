@@ -2392,8 +2392,6 @@ CL = (function() {
     }
     //now if this was a standoff marked reading delete the entry in marked_readings unless this is part of prepare_for_operation
     if (options.hasOwnProperty('delete_offset') && options.delete_offset === true) {
-      console.log('Warning I will delete the offset')
-      console.stack()
       for (let key in CL.data.marked_readings) {
         if (CL.data.marked_readings.hasOwnProperty(key)) {
           for (let i = 0; i < CL.data.marked_readings[key].length; i += 1) {
