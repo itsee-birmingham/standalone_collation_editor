@@ -194,6 +194,7 @@ OR = (function() {
         CL.addHoverEvents(row);
       }
     }
+    SV.checkBugStatus('loaded order readings');
   };
 
   showApprovedVersion = function(options) {
@@ -484,6 +485,7 @@ OR = (function() {
     }
   };
 
+  // DEBUG this does not allow overlap units to have standoff subreadings
   // Need to work this out from the top line references to the overlap units as we can't actually rely on the start
   // and end values in the overlaps
   mergeSharedExtentOverlaps = function() {
