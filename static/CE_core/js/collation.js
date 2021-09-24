@@ -2014,8 +2014,6 @@ CL = (function() {
     unit = findUnitById(apparatus, readingDetails.unit_id);
     parent = findReadingById(unit, parentId);
     SR.loseSubreadings(); //must always lose subreadings first or find subreadings doesn't find them all!
-    // DEBUG commented out for checking
-    // SR.findSubreadings({'unit_id': unit._id}); //we need this to see if we have any!
     SR.findSubreadings(); //we need this to see if we have any!
     reading = findReadingById(unit, readingDetails.reading_id);
     if (reading === null) {
@@ -2081,8 +2079,6 @@ CL = (function() {
                 }
               }
               SR.loseSubreadings();
-              // DEBUG commented out for checking
-              //SR.findSubreadings({'unit_id': unit._id});
               SR.findSubreadings();
               k -= 1;
             }
@@ -2101,8 +2097,6 @@ CL = (function() {
      * NB: running SR.findSubreadings actually makes the standoff marked reading a real subreading in
      * the display and is a required step even if it is to be hidden again immediately afterwards
      */
-    // DEBUG commented out for checking
-    // SR.findSubreadings({'unit_id': unit._id});
     SR.findSubreadings();
     //			console.log('RESULT OF _FIND_SUBREADINGS BELOW')
     //			console.log(JSON.parse(JSON.stringify(CL.data)))
