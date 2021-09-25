@@ -2278,8 +2278,8 @@ SV = (function() {
       //make a list of all the combinedGapBeforeSubreadings witnesses in the leftmost unit
       for (let i = 0; i < unit1.readings.length; i += 1) {
         if (unit1.readings[i].hasOwnProperty('combined_gap_before_subreadings')) {
-          ccombinedGapBeforeSubreadings.push.apply(combinedGapBeforeSubreadings,
-																									 unit1.readings[i].combined_gap_before_subreadings);
+          combinedGapBeforeSubreadings.push.apply(combinedGapBeforeSubreadings,
+																									unit1.readings[i].combined_gap_before_subreadings);
         }
         if (unit1.readings[i].hasOwnProperty('combined_gap_before_subreadings_details')) {
           for (let key in unit1.readings[i].combined_gap_before_subreadings_details) {
