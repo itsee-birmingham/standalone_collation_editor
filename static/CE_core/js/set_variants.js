@@ -50,8 +50,8 @@ SV = (function() {
 	    _compareWitnessQueue, _checkWordOrderIntegrity, _checkUnitIntegrity,
 	    _removeOffsetSubreadings, _hasStandoffSubreading, _makeMainReading, _addReadingFlag, _removeReadingFlag,
       _subreadingIdSort, _makeMenu, _addContextMenuHandlers, _addOverlappedEvent, _addEvent, _markReading, _undo,
-	    _addToUndoStack, _removeSplits, _checkTAndNPresence, _checkForStandoffReading, _getMatchingStandoffReading,
-	    _updateMarkedReadingData, _checkSiglaProblems, _checkIndexesPresent, _checkUniqueWitnesses, _getAllUnitWitnesses,
+	    _addToUndoStack, _removeSplits, _checkTAndNPresence, _checkForStandoffReading,
+	    _checkSiglaProblems, _checkIndexesPresent, _checkUniqueWitnesses, _getAllUnitWitnesses,
 	    _compareIndexStrings, _compareIndexes, _compareFirstWordIndexes, _setUpSVRemoveWitnessesForm,
       _highlightAddedWitness;
 
@@ -463,7 +463,7 @@ SV = (function() {
         index += 1;
       }
       if (app[i].end !== lastEnd) {
-        _updateMarkedReadingData(app[i], lastEnd);
+        SR.updateMarkedReadingData(app[i], {'end': lastEnd});
       }
       // change the end value of the overlap
       app[i].end = lastEnd;
@@ -2303,6 +2303,9 @@ SV = (function() {
       newunit.start = Math.min(unit1.start, unit2.start);
       newunit.end = Math.max(unit1.end, unit2.end);
       newunit.first_word_index = _getLowestIndex(unit1.first_word_index, unit2.first_word_index);
+      if (unit1.hasOwnProperty('row')) {
+        newunit.row = unit1.row;
+      }
 
       if (unit1.hasOwnProperty('overlap_units')) { //at this point they are the same so we can just take one
         newunit.overlap_units = unit1.overlap_units;
@@ -3991,7 +3994,7 @@ SV = (function() {
     ];
     _addToUndoStack(CL.data);
     unit = CL.data[unitDetails[1]][unitDetails[0]];
-    unit.row = targetRow;
+    unit.row = parseInt(targetRow);
     CL.data['apparatus' + targetRow].push(unit);
     CL.data['apparatus' + targetRow].sort(_compareFirstWordIndexes);
     CL.data[unitDetails[1]].splice(unitDetails[0], 1);
@@ -4955,43 +4958,6 @@ SV = (function() {
     return [false];
   };
 
-  _updateMarkedReadingData = function(unit, newEndValue) {
-    var witnesses, standoffReading;
-    witnesses = [];
-    for (let i = 0; i < unit.readings.length; i += 1) {
-      if (unit.readings[i].hasOwnProperty('standoff_subreadings')) {
-        witnesses = witnesses.concat(unit.readings[i].standoff_subreadings);
-      }
-      if (unit.readings[i].hasOwnProperty('SR_text')) {
-        witnesses = witnesses.concat(unit.readings[i].witnesses);
-      }
-    }
-    for (let i = 0; i < witnesses.length; i += 1) {
-      standoffReading = _getMatchingStandoffReading(witnesses[i], unit);
-      if (standoffReading !== null) {
-        standoffReading.end = newEndValue;
-      }
-    }
-  };
-
-  _getMatchingStandoffReading = function(witness, unit) {
-    if (CL.data.hasOwnProperty('marked_readings')) {
-      for (let type in CL.data.marked_readings) {
-        if (CL.data.marked_readings.hasOwnProperty(type)) {
-          for (let i = 0; i < CL.data.marked_readings[type].length; i += 1) {
-            if (CL.data.marked_readings[type][i].start === unit.start &&
-										CL.data.marked_readings[type][i].end === unit.end) {
-              if (CL.data.marked_readings[type][i].witness === witness) {
-                return CL.data.marked_readings[type][i];
-              }
-            }
-          }
-        }
-      }
-    }
-    return null;
-  };
-
   _checkForStandoffReading = function(witness, unit) {
     if (CL.data.hasOwnProperty('marked_readings')) {
       for (let type in CL.data.marked_readings) {
@@ -5376,8 +5342,6 @@ SV = (function() {
       _removeSplits: _removeSplits,
       _checkTAndNPresence: _checkTAndNPresence,
       _checkForStandoffReading: _checkForStandoffReading,
-      _getMatchingStandoffReading: _getMatchingStandoffReading,
-      _updateMarkedReadingData: _updateMarkedReadingData,
       _checkSiglaProblems: _checkSiglaProblems,
       _checkIndexesPresent: _checkIndexesPresent,
       _checkUniqueWitnesses: _checkUniqueWitnesses,

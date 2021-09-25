@@ -10,13 +10,13 @@ SR = (function() {
       _subreadingsAre = 'lost';
 
   //public function declarations
-  let findSubreadings, loseSubreadings;
+  let findSubreadings, loseSubreadings, updateMarkedReadingData;
 
   //private function declarations
   let _getCorrectStandoffReadingText, _addCombinedGapDataToParent, _cleanStandoffMarking,
       _removeFromMainReading, _findChildReading, _isSeparatedReading, _findParentReading,
       _witnessIn, _makeSubreadings, _addToSubreadings, _addNewSubreading,
-      _stripExtraWitnessDetailsFromTextList, _doLoseSubreadings;
+      _stripExtraWitnessDetailsFromTextList, _doLoseSubreadings, _getMatchingStandoffReading;
 
   //*********  public functions *********
 
@@ -194,7 +194,29 @@ SR = (function() {
     // console.log(JSON.parse(JSON.stringify(CL.data)))
   };
 
-
+  updateMarkedReadingData = function(unit, options) {
+    var witnesses, standoffReading;
+    witnesses = [];
+    for (let i = 0; i < unit.readings.length; i += 1) {
+      if (unit.readings[i].hasOwnProperty('standoff_subreadings')) {
+        witnesses = witnesses.concat(unit.readings[i].standoff_subreadings);
+      }
+      if (unit.readings[i].hasOwnProperty('SR_text')) {
+        witnesses = witnesses.concat(unit.readings[i].witnesses);
+      }
+    }
+    for (let i = 0; i < witnesses.length; i += 1) {
+      standoffReading = _getMatchingStandoffReading(witnesses[i], unit);
+      if (standoffReading !== null) {
+        if (options.hasOwnProperty('end')) {
+          standoffReading.end = options.end;
+        }
+        if (options.hasOwnProperty('row')) {
+          standoffReading.apparatus = 'apparatus' + options.row;
+        }
+      }
+    }
+  };
 
   //*********  private functions *********
 
@@ -766,11 +788,32 @@ SR = (function() {
     delete reading.subreadings;
   };
 
+  _getMatchingStandoffReading = function(witness, unit) {
+    if (CL.data.hasOwnProperty('marked_readings')) {
+      for (let type in CL.data.marked_readings) {
+        if (CL.data.marked_readings.hasOwnProperty(type)) {
+          for (let i = 0; i < CL.data.marked_readings[type].length; i += 1) {
+            if (CL.data.marked_readings[type][i].apparatus === 'apparatus' + unit.row) {
+              if (CL.data.marked_readings[type][i].start === unit.start &&
+                      CL.data.marked_readings[type][i].end === unit.end) {
+                if (CL.data.marked_readings[type][i].witness === witness) {
+                  return CL.data.marked_readings[type][i];
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return null;
+  };
+
   if (testing) {
 
     return {
       findSubreadings: findSubreadings,
       loseSubreadings: loseSubreadings,
+      updateMarkedReadingData: updateMarkedReadingData,
       // private for testing only
       _getCorrectStandoffReadingText: _getCorrectStandoffReadingText,
       _addCombinedGapDataToParent: _addCombinedGapDataToParent,
@@ -785,6 +828,7 @@ SR = (function() {
       _addNewSubreading: _addNewSubreading,
       _stripExtraWitnessDetailsFromTextList: _stripExtraWitnessDetailsFromTextList,
       _doLoseSubreadings: _doLoseSubreadings,
+      _getMatchingStandoffReading: _getMatchingStandoffReading,
       // private variables for testing only
       _test: _test,
       _subreadingsAre: _subreadingsAre,
@@ -794,6 +838,7 @@ SR = (function() {
     return {
       findSubreadings: findSubreadings,
       loseSubreadings: loseSubreadings,
+      updateMarkedReadingData: updateMarkedReadingData
     };
   }
 }());

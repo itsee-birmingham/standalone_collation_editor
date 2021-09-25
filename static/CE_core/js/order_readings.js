@@ -11,7 +11,7 @@ OR = (function() {
 
   // public function declarations
   let showOrderReadings, showApprovedVersion, getUnitData, relabelReadings, reorderRows, editLabel,
-      addLabels, makeStandoffReading, removeSplits, mergeSharedExtentOverlaps, mergedSharedOverlapReadings,
+      addLabels, makeStandoffReading, removeSplits, mergeSharedExtentOverlaps, mergeSharedOverlapReadings,
       canUnitMoveTo, addToUndoStack, makeWasGapWordsGaps, mergeAllLacs, mergeAllOms, redipsInitOrderReadings;
 
   // private function declarations
@@ -38,7 +38,7 @@ OR = (function() {
   showOrderReadings = function(options) {
     var html, highestUnit, header, row, overlaps, appIds, footerHtml, num, temp, eventRows,
         overlapOptions, newOverlapOptions, container, undoButton, showHideSubreadingsButtonText;
-    // console.log(CL.data);
+    console.log(JSON.parse(JSON.stringify(CL.data)));
     CL.stage = 'ordered';
     addLabels(false);
 
@@ -558,15 +558,13 @@ OR = (function() {
     // the empty ones again it reruns the empty line deletion once it is done so maybe make that a separate function?
     _repositionOverlaps();
     _throughNumberApps(2);
-
     // now check the reading in each of the overlaped units for matching ones and merge if necessary
-    mergedSharedOverlapReadings();
-
+    mergeSharedOverlapReadings();
   };
 
   // Merges any shared readings in overlap units. Most, if not all, will have been created in the process of adding
   // witnesses but it is possible that they could happen in the course of editing depending on the editor.
-  mergedSharedOverlapReadings = function() {
+  mergeSharedOverlapReadings = function() {
     var match, overlapLineNumbers;
     SV.prepareForOperation();
     overlapLineNumbers = [];
@@ -1438,7 +1436,7 @@ OR = (function() {
 
   /** prep stuff for loading into order readings */
   _compareOverlaps = function(a, b) {
-    //always put overlap readings at the bottom (of their parent reading)
+    // always put overlap readings at the bottom (of their parent reading)
     if (a.hasOwnProperty('overlap')) {
       return 1;
     }
@@ -1447,12 +1445,12 @@ OR = (function() {
     }
   };
 
-  //through number all the overlapping apparatus lines from start_line with the
-  //first number of the renumbered readings labeled as startIndex
-  //it is safe to assume that when we call this with a startRow value that all
-  //app lines are thru numbered from 2 at the point we call it.
+  // through number all the overlapping apparatus lines from start_line with the
+  // first number of the renumbered readings labeled as startIndex
+  // it is safe to assume that when we call this with a startRow value that all
+  // app lines are thru numbered from 2 at the point we call it.
   _throughNumberApps = function(startIndex, startRow) {
-    var overlapLines, m, renumber, j, all;
+    var overlapLines, m, renumber, j, all, unit;
     all = false;
     if (typeof startRow === 'undefined') {
       all = true;
@@ -1493,6 +1491,13 @@ OR = (function() {
         for (let i = startRow; i < overlapLines.length; i += 1) {
           if (CL.data.hasOwnProperty('old_apparatus' + overlapLines[i])) {
             CL.data['apparatus' + j] = CL.data['old_apparatus' + overlapLines[i]];
+            for (let k = 0; k < CL.data['apparatus' + j].length; k += 1) {
+              unit = CL.data['apparatus' + j][k];
+              // now check that any marked_readings for this row are also updated
+              SR.updateMarkedReadingData(unit, {'row': j});
+              // and update the row info in the unit
+              unit.row = j;
+            }
             delete CL.data['old_apparatus' + overlapLines[i]];
           }
           j += 1;
@@ -1525,13 +1530,16 @@ OR = (function() {
         moveTo = _unitCanMoveTo(apparatusLine[j]._id, overlapLines, i);
         if (moveTo !== -1) {
           CL.data['apparatus' + moveTo].push(JSON.parse(JSON.stringify(apparatusLine[j])));
+          SR.updateMarkedReadingData(apparatusLine[j], {'row': moveTo});
+          // now we have sorted out the marked reading we can update the row on the unit
+          CL.data['apparatus' + moveTo][CL.data['apparatus' + moveTo].length-1].row = moveTo;
           CL.data['apparatus' + moveTo].sort(_compareStartIndexes);
           apparatusLine[j] = null;
         }
       }
       CL.removeNullItems(apparatusLine);
     }
-    //now delete any apparatus lines we don't need any more
+    // now delete any apparatus lines we don't need any more
     for (let key in CL.data) {
       if (CL.data.hasOwnProperty(key)) {
         if (key.match(/apparatus\d+/) !== null) {
@@ -1653,6 +1661,7 @@ OR = (function() {
         leadUnit.readings.push(JSON.parse(JSON.stringify(unit.readings[1])));
         leadUnit.start = CL.data.apparatus[locations[0]].start;
         leadUnit.end = CL.data.apparatus[locations[1]].end;
+        SR.updateMarkedReadingData(unit, {'row': leadUnit.row});
         _deleteUnit(apparatus, unitIds[i]);
       }
     }
@@ -1758,7 +1767,7 @@ OR = (function() {
       makeStandoffReading: makeStandoffReading,
       removeSplits: removeSplits,
       mergeSharedExtentOverlaps: mergeSharedExtentOverlaps,
-      mergedSharedOverlapReadings: mergedSharedOverlapReadings,
+      mergeSharedOverlapReadings: mergeSharedOverlapReadings,
       canUnitMoveTo: canUnitMoveTo,
       addToUndoStack: addToUndoStack,
       makeWasGapWordsGaps: makeWasGapWordsGaps,
@@ -1787,7 +1796,7 @@ OR = (function() {
       makeStandoffReading: makeStandoffReading,
       removeSplits: removeSplits,
       mergeSharedExtentOverlaps: mergeSharedExtentOverlaps,
-      mergedSharedOverlapReadings: mergedSharedOverlapReadings,
+      mergeSharedOverlapReadings: mergeSharedOverlapReadings,
       canUnitMoveTo: canUnitMoveTo,
       addToUndoStack: addToUndoStack,
       makeWasGapWordsGaps: makeWasGapWordsGaps,
