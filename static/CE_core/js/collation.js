@@ -3692,6 +3692,7 @@ CL = (function() {
     });
   };
 
+  // DEBUG
   prepareAdditionalCollation = function(existingCollation, witsToAdd) {
     var context;
     spinner.showLoadingOverlay();
@@ -3734,6 +3735,7 @@ CL = (function() {
           // copy so we can change CL.data without screwing this up
           data = JSON.parse(JSON.stringify(CL.data));
           console.log(JSON.parse(JSON.stringify(data)))
+          console.log('new unit above')
           // assume CL.context agrees with the new data since it was used to fetch it
           if (CL.context === existingCollation.context) {
             // check we have basetext agreement
@@ -3797,7 +3799,7 @@ CL = (function() {
         mainCollation.structure.om_readings.push(newData.om_readings[i]);
       }
     }
-    //update hand_id_map
+    // update hand_id_map
     for (let key in newData.hand_id_map) {
       if (newData.hand_id_map.hasOwnProperty(key)) {
         if (!mainCollation.structure.hand_id_map.hasOwnProperty(key)) {
@@ -3805,17 +3807,23 @@ CL = (function() {
         }
       }
     }
-    //should move index point by index point - check what we have in each list
-    //if in existing and not new add new as om/lac verse/om_verse
-    //if in new and not existing all existing needs to be om lac verse/om verse
-    //make reading for any combined or shared units and check against existing readings
-    index = 1; //this refers to the position indicated by numbers under the basetext
+    // should move index point by index point - check what we have in each list
+    // if in existing and not new add new as om/lac verse/om_verse
+    // if in new and not existing all existing needs to be om lac verse/om verse
+    // make reading for any combined or shared units and check against existing readings
+    index = 1;  // this refers to the position indicated by numbers under the basetext
     while (index <= (newData.overtext[0].tokens.length * 2) + 1) {
-      //if new data has one then
+      console.log(index)
+      // if new data has one then
+
       newUnits = _getUnitsByStartIndex(index, newData.apparatus);
       existingUnits = _getUnitsByStartIndex(index, mainCollation.structure.apparatus);
+      if (index === 19) {
+        console.log(JSON.parse(JSON.stringify(newUnits)))
+        console.log(JSON.parse(JSON.stringify(existingUnits)))
+      }
       if (newUnits.length === 0 && existingUnits.length === 0) {
-        index += 1; //because for loop will never run and index is only incremented here and in the for loop
+        index += 1;  // because for loop will never run and index is only incremented here and in the for loop
       }
       for (let z = 0; z < Math.max(newUnits.length, existingUnits.length); z += 1) {
         newUnit = z < newUnits.length ? newUnits[z] : null;
@@ -3829,8 +3837,9 @@ CL = (function() {
           if (newUnit === null) {
             omReading = null;
             for (let i = 0; i < existingUnit.readings.length; i += 1) {
+              // TODO: this last condition should not be needed if we stop adding om to things that are not (or remove it when no longer used)
               if (existingUnit.readings[i].hasOwnProperty('type') && existingUnit.readings[i].type == 'om' &&
-                !existingUnit.readings[i].hasOwnProperty('overlap_status')) {
+                !existingUnit.readings[i].hasOwnProperty('overlap_status') && existingUnit.readings[i].text.length === 0) {
                 omReading = existingUnit.readings[i];
               }
             }

@@ -1,5 +1,5 @@
 /*jshint esversion: 6 */
-var testing = true;
+var testing = false;
 SV = (function() {
   "use strict";
 
@@ -795,7 +795,6 @@ SV = (function() {
           // put individual details for each witness in the new reading
           for (let j = 0; j < reading.witnesses.length; j += 1) {
             witness = reading.witnesses[j];
-            //DEBUG - problems with 3:21 move to OR is here
             for (let k = 0; k < reading.text.length; k += 1) {
               if (reading.text[k].hasOwnProperty(witness)) {
                 unit.readings[index].text[k][witness] = reading.text[k][witness];
@@ -1747,8 +1746,6 @@ SV = (function() {
               newReading = CL.findReadingById(unit, newReadingId);
               if (toAdd[j][1].hasOwnProperty('type')) {
                 newReading.type = toAdd[j][1].type;
-              } else {
-                newReading.type = 'om';
               }
               // for some reason doSplitReadingWitnesses adds incorrect details so for now we are overwriting them
               // because that code is used in many other places and I don't want to break them!
@@ -2259,10 +2256,8 @@ SV = (function() {
         witnessEquality, overlapBoundaries, overlapStatusAgreement;
 
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      							document.getElementById('scroller').scrollTop
-    ];
-
-    //make sure unit 1 is leftmost and unit 2 is rightmost
+      							document.getElementById('scroller').scrollTop];
+    // make sure unit 1 is leftmost and unit 2 is rightmost
     unit1 = CL.data[appId][Math.min(units[0][0], units[1][0])];
     unit2 = CL.data[appId][Math.max(units[0][0], units[1][0])];
     witnessEquality = _checkWitnessEquality(unit1, unit2, appId);
@@ -2808,27 +2803,27 @@ SV = (function() {
     scrollOffset = [document.getElementById('scroller').scrollLeft,
       document.getElementById('scroller').scrollTop
     ];
-    //at this point both units are from same apparatus
+    // at this point both units are from same apparatus
     appId = units[0][1];
-    //first in merge list is always the target, second is always the one you moved
-    //so you are moving the second one and taking position from first
+    // first in merge list is always the target, second is always the one you moved
+    // so you are moving the second one and taking position from first
     unit1 = CL.data[appId][units[0][0]];
     unit2 = CL.data[appId][units[1][0]];
     unit2ReadingPos = units[1][2];
-    //get the reading you've moved (as a list for later merging)
-    //TODO: is there any good reason why reading is made into a list?
+    // get the reading you've moved (as a list for later merging)
+    // TODO: is there any good reason why reading is made into a list?
     reading = [unit2.readings[unit2ReadingPos]];
     readingId = reading[0]._id;
 
     prepareForOperation();
-    //Now get the real reading and position following the prepare operation
+    // Now get the real reading and position following the prepare operation
     reading = [CL.findReadingById(unit2, readingId)];
     unit2ReadingPos = CL.findReadingPosById(unit2, readingId);
 
     witnesses = reading[0].witnesses.join(',');
     if (!reading[0].hasOwnProperty('overlap_status') || reading[0].overlap_status === 'duplicate') {
       doMoveOut = true;
-      //if any of these witnesses are in the list of overlapped readings
+      // if any of these witnesses are in the list of overlapped readings
       // if the unit you are moving it into is part of the same overlapped reading
       if (unit2.hasOwnProperty('overlap_units')) {
         for (let key in unit2.overlap_units) {
@@ -2871,17 +2866,17 @@ SV = (function() {
         delete reading[0].combined_gap_before_subreadings;
         delete reading[0].combined_gap_before_subreadings_details;
         delete reading[0].combined_gap_after_subreadings;
-        //and remove its index numbers so it doesn't influence later reindexing
-        //and any combined gap details
+        // and remove its index numbers so it doesn't influence later reindexing
+        // and any combined gap details
         for (let i = 0; i < reading[0].text.length; i += 1) {
           delete reading[0].text[i].index;
           delete reading[0].text[i].combined_gap_before;
           delete reading[0].text[i].combined_gap_after;
         }
 
-        //remove reading from its original unit
+        // remove reading from its original unit
         unit2.readings.splice(unit2ReadingPos, 1);
-        //replace it with an om reading or two depending on overlap status
+        // replace it with an om reading or two depending on overlap status
         replacementReadings = _getReplacementOmReading(unit2, reading[0]);
         for (let i = 0; i < replacementReadings.length; i += 1) {
           CL.addReadingId(replacementReadings[i], unit2.start, unit2.end);
@@ -2889,7 +2884,7 @@ SV = (function() {
         }
 
         unsplitUnitWitnesses(units[1][0], appId);
-        //merge reading into target unit
+        // merge reading into target unit
         unit1 = _combineReadings(unit1.readings, reading, unit1, true);
 
         if (unit1.start === unit1.end) {
@@ -2900,9 +2895,9 @@ SV = (function() {
         _separateOverlapWitnesses(units[0][0]);
         problems = _checkWordOrderIntegrity(unit2.start, unit1.start, reading[0].witnesses);
         CL.addReadingIds(unit1);
-        //now see if the remaining unit has any text left and if not check to see if it has overlapping readings
-        //if it doesn't have overlapping readings we can delete it.
-        //if it does its safer to leave it here for the editor to decide what to do.
+        // now see if the remaining unit has any text left and if not check to see if it has overlapping readings
+        // if it doesn't have overlapping readings we can delete it.
+        // if it does its safer to leave it here for the editor to decide what to do.
         if (!CL.unitHasText(CL.data[appId][units[1][0]])) {
           if (!unit2.hasOwnProperty('overlap_units')) {
             CL.data[appId][units[1][0]] = null;
@@ -3063,7 +3058,7 @@ SV = (function() {
     }];
   };
 
-  //keep combined_gap_before_subreadings
+  // keep combined_gap_before_subreadings
   /** used when moving readings and combining units to figure out all the reading combinations */
   _combineReadings = function(readings1, readings2, newunit, moveReading) {
     var read1, read2, newReadings, witness, index, current, text, newRdg;
@@ -3238,8 +3233,8 @@ SV = (function() {
   /** add type and detail data for empty (lac/om) readings */
   _addTypeAndDetails = function(newreading, reading1, reading2) {
     var type1, type2;
-    //I think lac should trump om should that ever occur (which it shouldn't)
-    //if both are the same type them details come from reading1 they should also be the same anyway
+    // I think lac should trump om should that ever occur (which it shouldn't)
+    // if both are the same type them details come from reading1 they should also be the same anyway
     if (typeof reading2 === 'undefined') {
       if (reading1.text.length === 0) {
         newreading.type = reading1.type;
@@ -3267,7 +3262,7 @@ SV = (function() {
         }
       }
     }
-    //TODO: test if this works with non-empty readings (difficult to find example with identical witnesses)
+    // TODO: test if this works with non-empty readings (difficult to find example with identical witnesses)
     if (reading1.hasOwnProperty('overlap')) {
       newreading.overlap = true;
     }
