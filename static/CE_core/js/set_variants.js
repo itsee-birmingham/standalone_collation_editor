@@ -1746,8 +1746,6 @@ SV = (function() {
               newReading = CL.findReadingById(unit, newReadingId);
               if (toAdd[j][1].hasOwnProperty('type')) {
                 newReading.type = toAdd[j][1].type;
-              } else {
-                newReading.type = 'om';
               }
               // for some reason doSplitReadingWitnesses adds incorrect details so for now we are overwriting them
               // because that code is used in many other places and I don't want to break them!
@@ -2258,10 +2256,8 @@ SV = (function() {
         witnessEquality, overlapBoundaries, overlapStatusAgreement;
 
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      							document.getElementById('scroller').scrollTop
-    ];
-
-    //make sure unit 1 is leftmost and unit 2 is rightmost
+      							document.getElementById('scroller').scrollTop];
+    // make sure unit 1 is leftmost and unit 2 is rightmost
     unit1 = CL.data[appId][Math.min(units[0][0], units[1][0])];
     unit2 = CL.data[appId][Math.max(units[0][0], units[1][0])];
     witnessEquality = _checkWitnessEquality(unit1, unit2, appId);
@@ -3236,10 +3232,6 @@ SV = (function() {
 
   /** add type and detail data for empty (lac/om) readings */
   _addTypeAndDetails = function(newreading, reading1, reading2) {
-    console.log(newreading)
-    console.log(reading1)
-    console.log(reading2)
-    console.log('-------')
     var type1, type2;
     // I think lac should trump om should that ever occur (which it shouldn't)
     // if both are the same type them details come from reading1 they should also be the same anyway
@@ -3270,10 +3262,6 @@ SV = (function() {
         }
       }
     }
-    console.log(newreading)
-    console.log(reading1)
-    console.log(reading2)
-    console.log('========')
     // TODO: test if this works with non-empty readings (difficult to find example with identical witnesses)
     if (reading1.hasOwnProperty('overlap')) {
       newreading.overlap = true;
