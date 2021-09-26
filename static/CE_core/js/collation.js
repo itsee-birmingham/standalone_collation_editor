@@ -3813,15 +3813,10 @@ CL = (function() {
     // make reading for any combined or shared units and check against existing readings
     index = 1;  // this refers to the position indicated by numbers under the basetext
     while (index <= (newData.overtext[0].tokens.length * 2) + 1) {
-      console.log(index)
       // if new data has one then
 
       newUnits = _getUnitsByStartIndex(index, newData.apparatus);
       existingUnits = _getUnitsByStartIndex(index, mainCollation.structure.apparatus);
-      if (index === 19) {
-        console.log(JSON.parse(JSON.stringify(newUnits)))
-        console.log(JSON.parse(JSON.stringify(existingUnits)))
-      }
       if (newUnits.length === 0 && existingUnits.length === 0) {
         index += 1;  // because for loop will never run and index is only incremented here and in the for loop
       }
