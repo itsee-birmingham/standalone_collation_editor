@@ -84,7 +84,7 @@ CL = (function() {
       _getMousePosition, _displayWitnessesHover, _getWitnessesForReading,
       _findStandoffWitness, _getPreStageChecks, _makeRegDecisionsStandoff,
       _contextInputOnload, _removeWitnessFromUnit, _addToSavedCollation,
-      _displaySavedCollation, _mergeCollationObjects,
+      _displaySavedCollation, _mergeCollationObjects, _separateOverlapsInAddedUnits,
       _getUnitsByStartIndex, _mergeNewLacOmVerseReadings, _mergeNewReading,
       _getReadingHistory, _getNextTargetRuleInfo, _removeAppliedRules,
       _getHistoricalReading, _extractAllTValuesForRGAppliedRules,
@@ -3692,7 +3692,6 @@ CL = (function() {
     });
   };
 
-  // DEBUG
   prepareAdditionalCollation = function(existingCollation, witsToAdd) {
     var context;
     spinner.showLoadingOverlay();
@@ -3776,11 +3775,20 @@ CL = (function() {
     }
   };
 
+  _separateOverlapsInAddedUnits = function() {
+    for (let i = 0; i < CL.data.apparatus.length; i += 1) {
+      if (CL.data.apparatus[i].hasOwnProperty('added')) {
+        SV.separateOverlapWitnesses(i, undefined);
+        delete CL.data.apparatus[i].added;
+      }
+    }
+  };
+
   _mergeCollationObjects = function(mainCollation, newData, addedWits) {
     var unit, index, newUnit, existingUnit, newUnits, existingUnits, newReadingText,
       matchingReadingFound, unitQueue, nextUnits, unit1, unit2, tempUnit, omReading,
       existingWitnesses, unitId, position, before, after, beforeIds, afterIds,
-      sharedIds;
+      sharedIds, overlappedWitnesses;
 
     for (let i = 0; i < addedWits.length; i += 1) {
       if (mainCollation.data_settings.witness_list.indexOf(addedWits[i]) === -1) {
@@ -3832,9 +3840,12 @@ CL = (function() {
           if (newUnit === null) {
             omReading = null;
             for (let i = 0; i < existingUnit.readings.length; i += 1) {
-              // TODO: this last condition should not be needed if we stop adding om to things that are not (or remove it when no longer used)
-              if (existingUnit.readings[i].hasOwnProperty('type') && existingUnit.readings[i].type == 'om' &&
-                !existingUnit.readings[i].hasOwnProperty('overlap_status') && existingUnit.readings[i].text.length === 0) {
+              // NB: this last condition should not be needed but before 26/09/21 the code was incorrectly
+              // adding type="om" to readings even if they had text when they were combined/moved above an overlap
+              if (existingUnit.readings[i].hasOwnProperty('type') &&
+                    existingUnit.readings[i].type == 'om' &&
+                    !existingUnit.readings[i].hasOwnProperty('overlap_status') &&
+                    existingUnit.readings[i].text.length === 0) {
                 omReading = existingUnit.readings[i];
               }
             }
@@ -3860,11 +3871,12 @@ CL = (function() {
               return;
             }
           } else if (existingUnit === null) {
-            //then add a new unit
-            //get all the witnesses
+            // then add a new unit and make sure any overlapped witnesses are separated appropriately
+            // get all the witnesses
             existingWitnesses = [];
             for (let i = 0; i < mainCollation.structure.apparatus[0].readings.length; i += 1) {
-              existingWitnesses.push.apply(existingWitnesses, mainCollation.structure.apparatus[0].readings[i].witnesses);
+              existingWitnesses.push.apply(existingWitnesses,
+                                           mainCollation.structure.apparatus[0].readings[i].witnesses);
             }
             if (mainCollation.structure.lac_readings.length > 0) {
               newUnit.readings.push({
@@ -3912,10 +3924,10 @@ CL = (function() {
                   }
                 }
               } else {
-                //TODO: address comment below
-                //something has probably gone wrong but we could just add an om reading!
-                //We should probably quit in the same as the reverse situation above because it means
-                //something is wrong in the basetext which should always be om and should always be in the unit being
+                // TODO: address comment below
+                // something has probably gone wrong but we could just add an om reading!
+                // We should probably quit in the same as the reverse situation above because it means
+                // something is wrong in the basetext which should always be om and should always be in the unit being
                 // changed
                 newUnit.readings.push({
                   'text': [],
@@ -3923,6 +3935,7 @@ CL = (function() {
                 });
               }
             }
+            newUnit.added = true;
             mainCollation.structure.apparatus.push(newUnit);
             mainCollation.structure.apparatus.sort(SV._compareFirstWordIndexes);
             before = null;
@@ -3942,10 +3955,12 @@ CL = (function() {
               afterIds = Object.keys(after.overlap_units);
               sharedIds = beforeIds.filter(x => afterIds.includes(x));
               if (sharedIds.length > 0) {
+                overlappedWitnesses = [];
                 //then we have shared overlaps and we must add them to the new unit
                 newUnit.overlap_units = {};
                 for (let i = 0; i < sharedIds.length; i += 1) {
                   newUnit.overlap_units[sharedIds[i]] = before.overlap_units[sharedIds[i]];
+                  overlappedWitnesses.push.apply(overlappedWitnesses, before.overlap_units[sharedIds[i]]);
                 }
               }
             }
@@ -4086,6 +4101,7 @@ CL = (function() {
     if (collation) {
       CL.context = collation.context;
       CL.data = collation.structure;
+      _separateOverlapsInAddedUnits();
 
       if (!CL.data.apparatus[0].hasOwnProperty('_id')) {
         addUnitAndReadingIds();
@@ -5821,6 +5837,7 @@ CL = (function() {
       _extractAllTValuesForRGAppliedRules: _extractAllTValuesForRGAppliedRules,
       _makeStandoffReading2: _makeStandoffReading2,
       _getFunctionFromString: _getFunctionFromString,
+      _separateOverlapsInAddedUnits: _separateOverlapsInAddedUnits,
       //private variables for testing only
       _contextInput: _contextInput,
       _defaultDisplaySettings: _defaultDisplaySettings,

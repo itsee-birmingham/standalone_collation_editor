@@ -24,9 +24,9 @@ SV = (function() {
   //public function declarations
   let showSetVariants, showSetVariantsData, calculateUnitLengths, getUnitData,
     	getSpacerUnitData, getEmptySpacerCell, reindexUnit, checkCombinedGapFlags,
-    	doSplitReadingWitnesses, unsplitUnitWitnesses, splitReadingWitnesses,
-    	prepareForOperation, unprepareForOperation, makeStandoffReading, checkIds,
-    	checkBugStatus, checkStandoffReadingProblems, areAllUnitsComplete;
+    	doSplitReadingWitnesses, unsplitUnitWitnesses, splitReadingWitnesses, separateOverlapWitnesses,
+    	doSeperateOverlapWitnesses, prepareForOperation, unprepareForOperation, makeStandoffReading,
+    	checkIds, checkBugStatus, checkStandoffReadingProblems, areAllUnitsComplete;
 
   //private function declarations
   let _moveToReorder, _setupMessage, _highlightWitness, _showSubreadings,
@@ -34,7 +34,7 @@ SV = (function() {
 	    _incrementSubIndex, _decrementSubIndex, _incrementMainIndex, _decrementMainIndex,
 	    _reindexReadings, _checkAndFixIndexOrder, _checkAndFixReadingIndexes, _splitReadings,
 	    _unsplitReadings, _removeWitnessFromTokens, _removeWitnessFromReading,
-	    _removeSeparatedWitnessData, _getOverlappedWitnessesForUnit, _separateOverlapWitnesses,
+	    _removeSeparatedWitnessData, _getOverlappedWitnessesForUnit,
 	    _doMoveWholeUnit, _targetHasOverlapConflict, _sourceHasOverlapConflict, _allOverlapsMatch,
 	    _neighboursShareOverlaps, _doMoveSingleReading, _unitAtLocation, _getOverlapDetailsForGap,
 	    _getOverlappedWitnessesForGap, _moveUnit, _checkWitnessEquality, _getLowestIndex,
@@ -1719,7 +1719,7 @@ SV = (function() {
     return witnesses;
   };
 
-  _separateOverlapWitnesses = function(unitNum, gapLocation) {
+  separateOverlapWitnesses = function(unitNum, gapLocation) {
     var overlappedWitnesses, toAdd, unit, toSplit, newReadingId, newReading;
     //get the overlapped witnesses for this point
     if (typeof gapLocation !== 'undefined') {
@@ -1784,7 +1784,7 @@ SV = (function() {
       CL.data.apparatus[unitNum].first_word_index = CL.data.apparatus[unitNum].first_word_index.first_word_index;
       if (_getOverlappedWitnessesForGap(targetLocation).length > 0) {
         CL.data.apparatus[unitNum].overlap_units = _getOverlapDetailsForGap(targetLocation);
-        _separateOverlapWitnesses(unitNum, targetLocation);
+        separateOverlapWitnesses(unitNum, targetLocation);
       }
       //sort the result
       CL.data.apparatus.sort(_compareFirstWordIndexes);
@@ -2027,7 +2027,7 @@ SV = (function() {
         CL.data.apparatus = CL.removeNullItems(CL.data.apparatus);
         if (_getOverlappedWitnessesForGap(targetLocation).length > 0) {
           CL.data.apparatus[newUnitPos].overlap_units = _getOverlapDetailsForGap(targetLocation);
-          _separateOverlapWitnesses(newUnitPos, targetLocation);
+          separateOverlapWitnesses(newUnitPos, targetLocation);
         }
         // see if the unit that things were moved out of needs deleting or not
         if (!CL.unitHasText(unit2)) {
@@ -2115,14 +2115,15 @@ SV = (function() {
 
   /** return all overlapped witnesses for overlaps that contain this index point (odd numbered indexes only) */
   _getOverlappedWitnessesForGap = function(gapIndex) {
-    var unitBefore, unitAfter, overlappedWitnesses;
+    var unitBefore, unitAfter, overlappedWitnesses, apparatus;
     overlappedWitnesses = [];
-    for (let i = 0; i < CL.data.apparatus.length; i += 1) {
-      if (CL.data.apparatus[i].end === gapIndex - 1) {
-        unitBefore = CL.data.apparatus[i];
+    apparatus = CL.data.apparatus;
+    for (let i = 0; i < apparatus.length; i += 1) {
+      if (apparatus[i].end === gapIndex - 1) {
+        unitBefore = apparatus[i];
       }
-      if (CL.data.apparatus[i].start === gapIndex + 1) {
-        unitAfter = CL.data.apparatus[i];
+      if (apparatus[i].start === gapIndex + 1) {
+        unitAfter = apparatus[i];
       }
       if (typeof unitBefore !== 'undefined' && typeof unitAfter !== 'undefined') {
         if (unitBefore.hasOwnProperty('overlap_units') && unitAfter.hasOwnProperty('overlap_units')) {
@@ -2369,7 +2370,7 @@ SV = (function() {
       CL.data[appId].splice(Math.min(units[0][0], units[1][0]), 1);
       //here add this to data and then reload page
       CL.data[appId].splice(index, 0, newunit);
-      _separateOverlapWitnesses(index);
+      separateOverlapWitnesses(index);
       if (newunit.start === newunit.end) {
         SV.reindexUnit(newunit.start);
       } else {
@@ -2892,7 +2893,7 @@ SV = (function() {
         } else {
           _reindexMovedReading(unit1.start, reading[0].witnesses);
         }
-        _separateOverlapWitnesses(units[0][0]);
+        separateOverlapWitnesses(units[0][0]);
         problems = _checkWordOrderIntegrity(unit2.start, unit1.start, reading[0].witnesses);
         CL.addReadingIds(unit1);
         // now see if the remaining unit has any text left and if not check to see if it has overlapping readings
@@ -5227,7 +5228,9 @@ SV = (function() {
       getEmptySpacerCell: getEmptySpacerCell,
       reindexUnit: reindexUnit,
       checkCombinedGapFlags: checkCombinedGapFlags,
+      separateOverlapWitnesses: separateOverlapWitnesses,
       doSplitReadingWitnesses: doSplitReadingWitnesses,
+      doSeperateOverlapWitnesses: doSeperateOverlapWitnesses,
       unsplitUnitWitnesses: unsplitUnitWitnesses,
       splitReadingWitnesses: splitReadingWitnesses,
       prepareForOperation: prepareForOperation,
@@ -5270,7 +5273,6 @@ SV = (function() {
       _removeWitnessFromReading: _removeWitnessFromReading,
       _removeSeparatedWitnessData: _removeSeparatedWitnessData,
       _getOverlappedWitnessesForUnit: _getOverlappedWitnessesForUnit,
-      _separateOverlapWitnesses: _separateOverlapWitnesses,
       _doMoveWholeUnit: _doMoveWholeUnit,
       _targetHasOverlapConflict: _targetHasOverlapConflict,
       _sourceHasOverlapConflict: _sourceHasOverlapConflict,
@@ -5362,7 +5364,9 @@ SV = (function() {
       getEmptySpacerCell: getEmptySpacerCell,
       reindexUnit: reindexUnit,
       checkCombinedGapFlags: checkCombinedGapFlags,
+      separateOverlapWitnesses: separateOverlapWitnesses,
       doSplitReadingWitnesses: doSplitReadingWitnesses,
+      doSeperateOverlapWitnesses: doSeperateOverlapWitnesses,
       unsplitUnitWitnesses: unsplitUnitWitnesses,
       splitReadingWitnesses: splitReadingWitnesses,
       prepareForOperation: prepareForOperation,
@@ -5373,6 +5377,7 @@ SV = (function() {
       checkStandoffReadingProblems: checkStandoffReadingProblems,
       areAllUnitsComplete: areAllUnitsComplete,
       undoStackLength: undoStackLength,
+
 
       //TODO: properly make this public!
       _combineReadings: _combineReadings,
