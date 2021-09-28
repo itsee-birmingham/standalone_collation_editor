@@ -1111,6 +1111,9 @@ CL = (function() {
           } else if (format === 'regularise') {
             unitData = RG.getUnitData(unit.readings, idString, unit.start, unit.end, unitDataOptions);
           } else if (format === 'set_variants') {
+            if (unit.hasOwnProperty('overlap_units')) {
+              unitDataOptions.overlap_units = unit.overlap_units;
+            }
             unitData = SV.getUnitData(unit.readings, idString, unit.start, unit.end, unitDataOptions);
             spacerRows.push(SV.getSpacerUnitData(idString, unit.start, unit.end));
           } else if (format === 'reorder') {
