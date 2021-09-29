@@ -133,7 +133,6 @@ SR = (function() {
               }
             }
             _removeFromMainReading(forDeletion);
-
             for (let j = 0; j < apparatus[i].readings.length; j += 1) {
               if (apparatus[i].readings[j].witnesses.length === 0 &&
                       !apparatus[i].readings[j].hasOwnProperty('subreadings')) {
@@ -292,8 +291,9 @@ SR = (function() {
       if (CL.data.marked_readings.hasOwnProperty(key)) {
         for (let i = 0; i < CL.data.marked_readings[key].length; i += 1) {
           if (typeof unit === 'undefined' || (CL.data.marked_readings[key][i].start === unit.start &&
-              CL.data.marked_readings[key][i].end === unit.end &&
-              CL.data.marked_readings[key][i].apparatus === appId)) {
+                CL.data.marked_readings[key][i].end === unit.end &&
+                  CL.data.marked_readings[key][i].apparatus === appId)) {
+
             if (CL.data.marked_readings[key][i].hasOwnProperty('applied')) {
               delete CL.data.marked_readings[key][i].applied;
             } else {
@@ -748,30 +748,32 @@ SR = (function() {
               }
               //remove the extra readings from each word, siglum and reading
               text = _stripExtraWitnessDetailsFromTextList(JSON.parse(JSON.stringify(reading.subreadings[type][i].text)), witness);
-              reading.SR_text[witness] = {
-                'text': text
-              };
-              for (let k = 0; k < reading.SR_text[witness].text.length; k += 1) {
-                if (reading.SR_text[witness].text[k][witness].hasOwnProperty('decision_details')) {
-                  reading.SR_text[witness].text[k]['interface'] = reading.SR_text[witness].text[k][witness].decision_details[0].t;
-                } else {
-                  if (reading.SR_text[witness].text[k].hasOwnProperty('t')) {
-                    reading.SR_text[witness].text[k]['interface'] = reading.SR_text[witness].text[k].t;
+              if (!reading.SR_text.hasOwnProperty(witness)) {
+                reading.SR_text[witness] = {
+                  'text': text
+                };
+                for (let k = 0; k < reading.SR_text[witness].text.length; k += 1) {
+                  if (reading.SR_text[witness].text[k][witness].hasOwnProperty('decision_details')) {
+                    reading.SR_text[witness].text[k]['interface'] = reading.SR_text[witness].text[k][witness].decision_details[0].t;
                   } else {
-                    if (reading.SR_text[witness].text[k][witness]['interface'] === undefined) {
-                      reading.SR_text[witness].text[k]['interface'] = reading.SR_text[witness].text[k]['interface'];
-                      reading.SR_text[witness].text[k][witness]['interface'] = reading.SR_text[witness].text[k]['interface'];
+                    if (reading.SR_text[witness].text[k].hasOwnProperty('t')) {
+                      reading.SR_text[witness].text[k]['interface'] = reading.SR_text[witness].text[k].t;
                     } else {
-                      reading.SR_text[witness].text[k]['interface'] = reading.SR_text[witness].text[k][witness]['interface'];
+                      if (reading.SR_text[witness].text[k][witness]['interface'] === undefined) {
+                        reading.SR_text[witness].text[k]['interface'] = reading.SR_text[witness].text[k]['interface'];
+                        reading.SR_text[witness].text[k][witness]['interface'] = reading.SR_text[witness].text[k]['interface'];
+                      } else {
+                        reading.SR_text[witness].text[k]['interface'] = reading.SR_text[witness].text[k][witness]['interface'];
+                      }
                     }
                   }
                 }
-              }
-              if (reading.subreadings[type][i].hasOwnProperty('type')) {
-                reading.SR_text[witness].type = reading.subreadings[type][i].type;
-              }
-              if (reading.subreadings[type][i].hasOwnProperty('details')) {
-                reading.SR_text[witness].details = reading.subreadings[type][i].details;
+                if (reading.subreadings[type][i].hasOwnProperty('type')) {
+                  reading.SR_text[witness].type = reading.subreadings[type][i].type;
+                }
+                if (reading.subreadings[type][i].hasOwnProperty('details')) {
+                  reading.SR_text[witness].details = reading.subreadings[type][i].details;
+                }
               }
               if (reading.hasOwnProperty('standoff_subreadings')) {
                 reading.standoff_subreadings.splice(reading.standoff_subreadings.indexOf(witness), 1);
