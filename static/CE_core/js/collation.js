@@ -942,6 +942,7 @@ CL = (function() {
   addSubreadingEvents = function(stage, baseSubreadingRules) {
     var scrollOffset;
     if (CL.showSubreadings === true) {
+      // hide the subreadings (except the edition ones if we are have supplied baseSubreadingRules)
       if (document.getElementById('show_hide_subreadings_button')) {
         $('#show_hide_subreadings_button').on('click.hide_subreadings', function(event) {
           scrollOffset = [document.getElementById('scroller').scrollLeft,
@@ -951,18 +952,12 @@ CL = (function() {
           CL.showSubreadings = false;
           SR.loseSubreadings();
           if (typeof baseSubreadingRules !== 'undefined') {
-            SR.findSubreadings({
-              'rule_classes': baseSubreadingRules
-            });
+            SR.findSubreadings({'rule_classes': baseSubreadingRules});
           }
           if (stage === 'reorder') {
-            OR.showOrderReadings({
-              'container': CL.container
-            });
+            OR.showOrderReadings({'container': CL.container});
           } else if (stage === 'approved') {
-            OR.showApprovedVersion({
-              'container': CL.container
-            });
+            OR.showApprovedVersion({'container': CL.container});
           } else {
             SV.showSetVariantsData();
             addSubreadingEvents(stage, baseSubreadingRules);
@@ -973,6 +968,7 @@ CL = (function() {
       }
     } else {
       if (document.getElementById('show_hide_subreadings_button')) {
+        // show all the subreadings
         $('#show_hide_subreadings_button').on('click.show_subreadings', function(event) {
           scrollOffset = [document.getElementById('scroller').scrollLeft,
                           document.getElementById('scroller').scrollTop];
@@ -981,13 +977,9 @@ CL = (function() {
           SR.loseSubreadings(); //this is needed because if we have any showing (for example in order readings) and we try to fun find_subreadings we will lose the ones already showing
           SR.findSubreadings();
           if (stage === 'reorder') {
-            OR.showOrderReadings({
-              'container': CL.container
-            });
+            OR.showOrderReadings({'container': CL.container});
           } else if (stage === 'approved') {
-            OR.showApprovedVersion({
-              'container': CL.container
-            });
+            OR.showApprovedVersion({'container': CL.container});
           } else {
             SV.showSetVariantsData();
             addSubreadingEvents(stage, baseSubreadingRules);
@@ -2558,7 +2550,6 @@ CL = (function() {
   };
 
   removeWitnesses = function(hands, stage) {
-    console.log('^^^^^^^^^^ remove witnesses');
     var success, i, dataCopy, witnessListCopy;
     spinner.showLoadingOverlay();
 
