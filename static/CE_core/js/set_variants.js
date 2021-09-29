@@ -1098,7 +1098,7 @@ SV = (function() {
     // we are keeping any empty units from the last state of SV
     // we need to combined overlaps with identical index points
     spinner.showLoadingOverlay();
-    SR.loseSubreadings(); // for preparation and is needed
+    SR.loseSubreadings(); //  for preparation and is needed
     allComplete = areAllUnitsComplete();
     allInOrder = _checkAllWitnessesIntegrity();
     standoffProblems = checkStandoffReadingProblems();
@@ -1113,13 +1113,13 @@ SV = (function() {
         prepareForOperation();
         _removeSplits();
         unprepareForOperation();
-        SR.loseSubreadings(); // for preparation and is needed
-        OR.removeSplits(); // ensure all the units are unsplit (readings wise) - still needed
-        OR.mergeSharedExtentOverlaps(); // do this before adding labels so the labels are correct))
+        SR.loseSubreadings(); //  for preparation and is needed
+        OR.removeSplits(); //  ensure all the units are unsplit (readings wise) - still needed
+        OR.mergeSharedExtentOverlaps(); //  do this before adding labels so the labels are correct))
         OR.makeWasGapWordsGaps();
         // merge lacs into a single unit if in settings (default is also true to protect existing projects)
-        // we used to do this with OM as well but om verse should never be merged with OM so I don't run it anymore as there
-        // should be no more that one OM and om verse in any given unit.
+        // we used to do this with OM as well but om verse should never be merged with OM so I don't run it anymore
+        // as there should be no more that one OM and om verse in any given unit.
         if (CL.project.combineAllLacsInOR === true) {
           OR.mergeAllLacs();
         }
@@ -1134,8 +1134,8 @@ SV = (function() {
         }
         SR.findSubreadings({
           'rule_classes': CL.getRuleClasses('subreading', true, 'value', ['identifier', 'subreading'])
-        }); //only show the subreadings when there class is labelled as subreading in the project)))
-        //remove the remove witnesses menu if it is still hanging about
+        }); // only show the subreadings when there class is labelled as subreading in the project)))
+        // remove the remove witnesses menu if it is still hanging about
         if (document.getElementById('remove_witnesses_div')) {
           document.getElementById('remove_witnesses_div').parentNode.removeChild(document.getElementById('remove_witnesses_div'));
         }
