@@ -933,12 +933,10 @@ OR = (function() {
                                                                  'keep_as_main_reading']);
       for (let key in orRules) {
         if (orRules.hasOwnProperty(key)) {
-          if (orRules[key][0]) {
-            subreadings.push([key, orRules[key][1], orRules[key][2]]);
-          } else if (orRules[key][3]) {
+          if (orRules[key][3]) {
             menu.push('<li id="mark_as_' + orRules[key][1] + '"><span>Mark/Unmark as ' + key + '</span></li>');
           } else {
-            menu.push('<li id="mark_as_' + orRules[key][1] + '"><span>Mark as ' + key + '</span></li>');
+            subreadings.push([key, orRules[key][1], orRules[key][2]]);
           }
         }
       }

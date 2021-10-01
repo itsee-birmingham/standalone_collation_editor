@@ -10,25 +10,25 @@ SV = (function() {
    * move_unit (calling do_move_whole_unit and do_move_single-reading)
    *  */
 
-  //public variable declarations
+  // public variable declarations
   let undoStack = [],
     	messagePosLeft = null,
     	undoStackLength = 6,
     	showSharedUnits = false;
 
-  //private variable declarations
+  // private variable declarations
   let _watchList = [],
     	_selectedVariantUnits = [],
     	_messageExpanded = true;
 
-  //public function declarations
+  // public function declarations
   let showSetVariants, showSetVariantsData, calculateUnitLengths, getUnitData,
     	getSpacerUnitData, getEmptySpacerCell, reindexUnit, checkCombinedGapFlags,
     	doSplitReadingWitnesses, unsplitUnitWitnesses, splitReadingWitnesses, separateOverlapWitnesses,
     	doSeperateOverlapWitnesses, prepareForOperation, unprepareForOperation, makeStandoffReading,
     	checkIds, checkBugStatus, checkStandoffReadingProblems, areAllUnitsComplete;
 
-  //private function declarations
+  // private function declarations
   let _moveToReorder, _setupMessage, _highlightWitness, _showSubreadings,
 	    _redipsInitSV, _reindexMovedReading, _indexLessThan, _indexLessThanOrEqualTo,
 	    _incrementSubIndex, _decrementSubIndex, _incrementMainIndex, _decrementMainIndex,
@@ -75,7 +75,7 @@ SV = (function() {
     if (typeof options === 'undefined') {
       options = {};
     }
-    //make sure we have a container to put things in
+    // make sure we have a container to put things in
     if (options.hasOwnProperty('container')) {
       if (container !== options.container) {
         container = options.container;
@@ -84,7 +84,7 @@ SV = (function() {
       container = document.getElementsByTagName('body')[0];
     }
     if (CL.witnessRemovingMode !== true) {
-      //attach right click menus
+      // attach right click menus
       SimpleContextMenu.setup({
         'preventDefault': true,
         'preventForms': false
@@ -154,16 +154,20 @@ SV = (function() {
       footerHtml.push('<select class="right_foot" id="added_highlight" name="added_highlight"></select>');
     }
     footerHtml.push('<button class="pure-button right_foot" id="undo_button" style="display:none">undo</button>');
-    $('#footer').addClass('pure-form');  // this does the styling of the select elements in the footer using pure (they cannot be styled individually)
+    // this does the styling of the select elements in the footer using pure (they cannot be styled individually)
+    $('#footer').addClass('pure-form');
     document.getElementById('footer').innerHTML = footerHtml.join('');
     CL.addExtraFooterButtons('set');
     CL.addStageLinks();
 
     // get the data itself
-    container.innerHTML = '<div id="redips-drag"><div id="scroller" class="fillPage"></div><div id="single_witness_reading"></div></div>';
-    document.getElementById('single_witness_reading').style.bottom = document.getElementById('footer').offsetHeight + 'px';
+    container.innerHTML = '<div id="redips-drag"><div id="scroller" class="fillPage"></div>' +
+                          '<div id="single_witness_reading"></div></div>';
+    document.getElementById('single_witness_reading').style.bottom = document.getElementById('footer').offsetHeight +
+                                                                     'px';
     if (CL.witnessAddingMode === true) {
-      //this sets this a default so that when all is highlighted this will work - any data specified in options will override it
+      // this sets this a default so that when all is highlighted this will work - any data specified in
+      // options will override it
       CL.highlightedAdded = JSON.parse(JSON.stringify(CL.witnessesAdded));
     }
     showSetVariantsData(options);
@@ -285,7 +289,7 @@ SV = (function() {
     }
 
     prepareForOperation();
-    CL.lacOmFix(); //also does extra gaps
+    CL.lacOmFix();  // also does extra gaps
     unprepareForOperation();
     temp = CL.getUnitLayout(CL.data.apparatus, 1, 'set_variants', options);
     header = CL.getCollationHeader(CL.data, temp[1], true);
@@ -450,7 +454,7 @@ SV = (function() {
             length += 1;
           }
           // now work out what we might need to take off the last position column length
-          if (topLine[index].start % 2 === 1) { //if we start with odd number
+          if (topLine[index].start % 2 === 1) {  // if we start with odd number
             if (topLine[index].start > highestGap) {
               highestGap = topLine[index].start;
             }
@@ -540,7 +544,7 @@ SV = (function() {
       html.push('<td class="start_' + start + '" headers="NA_' + start + '" colspan="' + colspan + '">');
     }
 
-    //is the unit highlighted? used for showing errors
+    // is the unit highlighted? used for showing errors
     if (options.hasOwnProperty('highlighted_unit') && parseInt(id) === options.highlighted_unit[1]) {
       highlightedUnit = ' highlighted_unit';
     } else {
@@ -554,23 +558,23 @@ SV = (function() {
       }
     }
     for (let i = 0; i < data.length; i += 1) {
-      //what is the reading text?
+      // what is the reading text?
       text = CL.extractDisplayText(data[i], i, data.length, options.unit_id, options.app_id);
 
       if (text.indexOf('system_gen_') !== -1) {
         text = text.replace('system_gen_', '');
       }
-      //what labels need to be used?
+      // what labels need to be used?
       readingLabel = CL.getReadingLabel(i, data[i], svRules);
       readingSuffix = CL.getReadingSuffix(data[i], svRules);
-      //what is the row id? (and add it to the list for adding events)
+      // what is the row id? (and add it to the list for adding events)
       rowId = 'variant_unit_' + id + '_row_' + i;
       rowList.push(rowId);
 
-      //Work out what reading highlighting classes we need
+      // Work out what reading highlighting classes we need
       highlightedClasses = [];
       if (data[i].witnesses.indexOf(highlightedHand) != -1) {
-        //this is the regular highlighting of any selected witness
+        // this is the regular highlighting of any selected witness
         highlightedClasses.push('highlighted');
       }
       if (options.hasOwnProperty('highlighted_added_wits') &&
@@ -710,13 +714,13 @@ SV = (function() {
     originalUnit = CL.data[apparatus][unitNum];
     aReading = originalUnit.readings[0];
     reading = originalUnit.readings[readingPos];
-    //copy the original reading to make a the new one
+    // copy the original reading to make a the new one
     newReading = JSON.parse(JSON.stringify(reading));
-    //remove readings on witnessList from the original reading
+    // remove readings on witnessList from the original reading
     for (let i = 0; i < witnessList.length; i += 1) {
       _removeWitnessFromReading(reading, witnessList[i]);
     }
-    //if no witnesses left at all and there are no subreadings then delete the original reading
+    // if no witnesses left at all and there are no subreadings then delete the original reading
     if (reading.witnesses.length === 0 && !reading.hasOwnProperty('subreadings')) {
       originalUnit.readings.splice(readingPos, 1);
       originalRemoved = true;
@@ -724,8 +728,8 @@ SV = (function() {
       checkCombinedGapFlags(reading);
       originalRemoved = false;
     }
-    //remove all not on witnessList from newReading
-    newWitnessList = CL.getAllReadingWitnesses(newReading); //a copy so we aren't manipulating what we are looping!
+    // remove all not on witnessList from newReading
+    newWitnessList = CL.getAllReadingWitnesses(newReading);  // a copy so we aren't manipulating what we are looping!
     for (let i = 0; i < newWitnessList.length; i += 1) {
       if (witnessList.indexOf(newWitnessList[i]) === -1) {
         _removeWitnessFromReading(newReading, newWitnessList[i]);
@@ -734,20 +738,20 @@ SV = (function() {
     checkCombinedGapFlags(newReading);
     if (typeof idForNewReading !== 'undefined') {
       newReading._id = idForNewReading;
-			//add the new reading into the unit, we know this is an addition because it has a supplied id
+			// add the new reading into the unit, we know this is an addition because it has a supplied id
       originalUnit.readings.splice(readingPos + 1, 0, newReading);
       return newReading._id;
     } else if (originalRemoved === true) {
       if (!newReading.hasOwnProperty('_id')) {
         CL.addReadingId(newReading, originalUnit.start, originalUnit.end);
       }
-      originalUnit.readings.splice(readingPos, 0, newReading); //add the new reading into the unit
+      originalUnit.readings.splice(readingPos, 0, newReading);  // add the new reading into the unit
       return newReading._id;
     } else {
-      //change id of new reading so it is distinct from the original one
-      //in the if loop we deleted the original so id can stay!
+      // change id of new reading so it is distinct from the original one
+      // in the if loop we deleted the original so id can stay!
       CL.addReadingId(newReading, originalUnit.start, originalUnit.end);
-      originalUnit.readings.splice(readingPos + 1, 0, newReading); //add the new reading into the unit
+      originalUnit.readings.splice(readingPos + 1, 0, newReading);  // add the new reading into the unit
       return newReading._id;
     }
     if (log) {
@@ -772,7 +776,8 @@ SV = (function() {
 
     for (let i = 0; i < unit.readings.length; i += 1) {
       reading = unit.readings[i];
-      // get the text and add '_a' if it is the first reading of an overlapped unit (although I don't think we ever call this on overlapped units anymore)
+      // get the text and add '_a' if it is the first reading of an overlapped unit (although I don't
+      // think we ever call this on overlapped units anymore)
       text = CL.extractWitnessText(reading, {
         'app_id': appId,
         'unit_id': unit._id
@@ -782,9 +787,12 @@ SV = (function() {
       }
       if (reading.hasOwnProperty('overlap_status')) {
         if (reading.overlap_status === 'duplicate') {
-          text = text + '_OLSTS_duplicate' + i; // make sure each duplicate is unique because we do not want to merge these - they might need to be treated differently
+          // make sure each duplicate is unique because we do not want to merge
+          // these - they might need to be treated differently
+          text = text + '_OLSTS_duplicate' + i;
         } else {
-          text = text + '_OLSTS_' + reading.overlap_status; // the capital letters are there to help ensure no clash with any real words
+          // the capital letters are there to help ensure no clash with any real words
+          text = text + '_OLSTS_' + reading.overlap_status;
         }
       }
       if (reading.hasOwnProperty('type') && reading.type === 'lac_verse') {
@@ -817,13 +825,13 @@ SV = (function() {
               if (reading.text[k].hasOwnProperty(witness)) {
                 unit.readings[index].text[k][witness] = reading.text[k][witness];
               }
-              //check if any readings need the regularised flag (because some witnesses have decisions to apply)
+              // check if any readings need the regularised flag (because some witnesses have decisions to apply)
               if (unit.readings[index].text[k][witness].hasOwnProperty('decision_class')) {
                 unit.readings[index].text[k].regularised = true;
               }
             }
           }
-          //append the new witnesses to reading and doc_id inside text
+          // append the new witnesses to reading and doc_id inside text
           for (let j = 0; j < unit.readings[index].text.length; j += 1) {
             for (let k = 0; k < reading.text[j].reading.length; k += 1) {
               if (unit.readings[index].text[j].reading.indexOf(reading.text[j].reading[k]) === -1) {
@@ -833,7 +841,7 @@ SV = (function() {
           }
           unit.readings[i] = null;
         } else if (index !== -1 && text.length === 0 && reading.type === 'om') {
-          readingList.push(null); //needed so our list indexes stay alligned with the readings in the unit
+          readingList.push(null);  // needed so our list indexes stay alligned with the readings in the unit
           if (unit.readings[index].type === 'om') {
             unit.readings[index].witnesses.push.apply(unit.readings[index].witnesses, reading.witnesses);
             reading = null;
@@ -4493,7 +4501,7 @@ SV = (function() {
    *  */
   _makeMenu = function(menuName) {
     var menu, subreadings, svRules;
-    //menus for full units
+    // menus for full units
     if (menuName === 'unit') {
       document.getElementById('context_menu').innerHTML = '<li id="split_words"><span>Split words</span></li><li id="split_readings"><span>Split readings</span></li>';
     } else if (menuName === 'overlap_unit') {
@@ -4522,18 +4530,15 @@ SV = (function() {
       if (menuName === 'split_unit' || menuName === 'split_unit_a' || menuName === 'overlap_split_unit') {
         menu.push('<li id="split_witnesses"><span>Split Witnesses</span></li>');
       }
+
       if (menuName === 'split_unit' || menuName === 'split_omlac_unit' || menuName === 'overlap_split_unit') {
         svRules = CL.getRuleClasses('create_in_SV', true, 'name', ['subreading', 'value', 'identifier', 'keep_as_main_reading']);
         subreadings = [];
         for (let key in svRules) {
           if (svRules.hasOwnProperty(key)) {
-            if (svRules[key][0]) {
-              subreadings.push([key, svRules[key][1], svRules[key][2]]);
-            } else if (svRules[key][3]) {
-              menu.push('<li id="mark_as_' + svRules[key][1] + '"><span>Mark/Unmark as ' + key + '</span></li>');
-            } else {
-              menu.push('<li id="mark_as_' + svRules[key][1] + '"><span>Mark as ' + key + '</span></li>');
-            }
+            menu.push('<li id="mark_as_' + svRules[key][1] + '"><span>Mark/Unmark as ' + key + '</span></li>');
+          } else {
+            subreadings.push([key, svRules[key][1], svRules[key][2]]);
           }
         }
         if (subreadings.length === 1) {
@@ -4697,27 +4702,29 @@ SV = (function() {
         _addOverlappedEvent(CL.overlappedOptions[i].id, CL.overlappedOptions[i].reading_flag);
       }
     }
-    //special added for SV
-    svRules = CL.getRuleClasses('create_in_SV', true, 'name', ['subreading', 'value', 'identifier', 'keep_as_main_reading']);
-    //this deals with all non-genuine subreadings which will always have their own entry in the context menu
+    // special added for SV
+    svRules = CL.getRuleClasses('create_in_SV', true, 'name',
+                                ['subreading', 'value', 'identifier', 'keep_as_main_reading']);
+    // this deals with all non-genuine subreadings which will always have their own entry in the context menu
     for (let key in svRules) {
       if (svRules.hasOwnProperty(key)) {
         if (!svRules[key][0]) {
           if (document.getElementById('mark_as_' + svRules[key][1])) {
-            //add event decides if its a keep as main reading or not and adds correct handler
+            // add event decides if its a keep as main reading or not and adds correct handler
             _addEvent(svRules, key);
           }
         }
       }
     }
-    //if there is a generic SVsubreading entry in the context menu then we deal with the distinction in a drop down
+    // if there is a generic SVsubreading entry in the context menu then we deal with the distinction in a drop down
     if (document.getElementById('mark_as_SVsubreading')) {
-      //make menu for mark_as_SVsubreading
+      // make menu for mark_as_SVsubreading
       key = 'SVsubreading';
       $('#mark_as_' + key).off('click.' + key + '_c');
       $('#mark_as_' + key).off('mouseover.' + key + '_mo');
       $('#mark_as_' + key).on('click.' + key + '_c', function(event) {
-        var element, div, unit, appId, unitPos, rdgDetails, readingPos, reading, readingDetails, readingText, tokenList;
+        var element, div, unit, appId, unitPos, rdgDetails, readingPos, reading, readingDetails,
+            readingText, tokenList;
         element = SimpleContextMenu._target_element;
         div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
           if ($(e).hasClass('spanlike')) {
@@ -4758,7 +4765,7 @@ SV = (function() {
     } else {
       for (let key in svRules) {
         if (svRules.hasOwnProperty(key)) {
-          if (svRules[key][0]) { //if this is a subreading (hence dealt with as subreading in menu)
+          if (svRules[key][0]) {  // if this is a subreading (hence dealt with as subreading in menu)
             if (document.getElementById('mark_as_' + svRules[key][1])) {
               _addEvent(svRules, key);
             }
@@ -4835,7 +4842,7 @@ SV = (function() {
         CL.hideTooltip();
       });
     } else {
-      //else just add the marker and allow its removal
+      // else just add the marker and allow its removal
       $('#mark_as_' + svRules[key][1]).off('click.' + key + '_c');
       $('#mark_as_' + svRules[key][1]).off('mouseover.' + key + '_mo');
       $('#mark_as_' + svRules[key][1]).on('click.' + key + '_c', function(event) {

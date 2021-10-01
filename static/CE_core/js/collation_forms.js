@@ -153,18 +153,16 @@ cforms = (function () {
           if (isNaN(value)) {
             value = null;
           }
-        } else {
-          if ($(elem).hasClass('boolean')) {
-            if (value === 'true') {
-              value = true;
-            } else {
-              if (value === 'false') {
-                value = false;
-              }
+        } else if ($(elem).hasClass('boolean')) {
+          if (value === 'true') {
+            value = true;
+          } else {
+            if (value === 'false') {
+              value = false;
             }
           }
         }
-      } else {
+      } else if (!$(elem).hasClass('stringnotnull')) {
         value = null;
       }
     } else {

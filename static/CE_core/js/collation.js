@@ -1734,7 +1734,7 @@ CL = (function() {
       witnessHtml.push('<label class="inline-label">Details:</label><input disabled="disabled" type="text" name="reading_details" id="reading_details"/><br/></br/>');
       subTypes = getRuleClasses('subreading', true, 'value', 'identifier');
       if (Object.keys(subTypes).length > 1) {
-        witnessHtml.push('<label>Subreading type: <select name="subreading_type" id="subreading_select"></select></label><br/><br/>');
+        witnessHtml.push('<label>Subreading type: <select class="stringnotnull" name="subreading_type" id="subreading_select"></select></label><br/><br/>');
       } else {
         id = error_types[Object.keys(subTypes)];
         witnessHtml.push('<input type="hidden" id="subreading_type" name="subreading_type" value="' + id + '"/>');
@@ -1799,14 +1799,14 @@ CL = (function() {
         'button': 'Mark ' + name
       });
     }
-    //populate the parent drop down
+    // populate the parent drop down
     parents = [];
     for (let i = 0; i < CL.data[readingDetails.app_id][readingDetails.unit_pos].readings.length; i += 1) {
-      //if the reading is
+      // if the reading is:
       //	not the reading being made a subreading
-      //	its not an empty reading (doesn't have a type attribute)
-      //	it is an empty reading but isn't lac verse or om verse (probably should change this and deal with them differently)
-      //	the unit is an overlap and i != 0 (which means this is the a reading)
+      //	not an empty reading (doesn't have a type attribute)
+      //	an empty reading but isn't lac verse or om verse (probably should change this and deal with them differently)
+      //	in a unit that is an overlap and i != 0 (which means this reading is not the a reading)
       if (i !== readingDetails.reading_pos &&
         (!CL.data[readingDetails.app_id][readingDetails.unit_pos].readings[i].hasOwnProperty('type') ||
           (CL.data[readingDetails.app_id][readingDetails.unit_pos].readings[i].hasOwnProperty('type') &&
@@ -1830,7 +1830,7 @@ CL = (function() {
     if (document.getElementById('subreading_select')) {
       subreadingClasses = [];
       for (let i = 0; i < CL.ruleClasses.length; i += 1) {
-        if (CL.ruleClasses[i].create_in_SV === true && CL.ruleClasses[i].subreading === true) {
+        if (CL.ruleClasses[i].create_in_SV === true && CL.ruleClasses[i].keep_as_main_reading === false) {//CL.ruleClasses[i].subreading === true) {
           subreadingClasses.push(CL.ruleClasses[i]);
         }
       }
@@ -1854,7 +1854,7 @@ CL = (function() {
     $('#select_button').on('click', function(event) {
       var extraDetails, data, witnessList, unit, callback;
       data = cforms.serialiseForm('select_wit_form');
-      if (data.parent_reading !== 'none') {
+      if (data.parent_reading !== null) {
         witnessList = [];
         for (let key in data) {
           if (key === 'duplicate') {
@@ -2008,8 +2008,8 @@ CL = (function() {
     apparatus = readingDetails.app_id;
     unit = findUnitById(apparatus, readingDetails.unit_id);
     parent = findReadingById(unit, parentId);
-    SR.loseSubreadings(); //must always lose subreadings first or find subreadings doesn't find them all!
-    SR.findSubreadings(); //we need this to see if we have any!
+    SR.loseSubreadings(); //  must always lose subreadings first or find subreadings doesn't find them all!
+    SR.findSubreadings(); //  we need this to see if we have any!
     reading = findReadingById(unit, readingDetails.reading_id);
     if (reading === null) {
       reading = findReadingByText(unit, readingDetails.reading_text);
@@ -2111,7 +2111,7 @@ CL = (function() {
     //			console.log(JSON.parse(JSON.stringify(CL.data)))
   };
 
-  //at this point the reading is *always* a main reading never a subreading
+  // at this point the reading is *always* a main reading never a subreading
   doMakeStandoffReading = function(type, apparatus, unit, reading, parent) {
     var ruleDetails, readingText, details, existingStandoff, typeString;
     // must lose subreadings so the main reading we are dealing with contains *all* witnesses
@@ -2166,7 +2166,6 @@ CL = (function() {
           CL.data.marked_readings[typeString] = [];
         }
         CL.data.marked_readings[typeString].push(details);
-        //					}
       } else {
         //this is a completely new subreading so make a new one
         //DAVID broken 11:23 here regularising an om to a lac
@@ -2188,7 +2187,8 @@ CL = (function() {
                    'reading_history': [readingText],
                    'value': type,
                    'subreading': [ruleDetails[Object.keys(ruleDetails)[0]][3]],
-                   'name': [ruleDetails[Object.keys(ruleDetails)[0]][2]]};
+                   'name': [ruleDetails[Object.keys(ruleDetails)[0]][2]]
+                 };
 
         if (parent.text.length === 0 && parent.hasOwnProperty('details')) {
           details.om_details = parent.details;
@@ -3727,8 +3727,6 @@ CL = (function() {
           lacOmFix();
           // copy so we can change CL.data without screwing this up
           data = JSON.parse(JSON.stringify(CL.data));
-          console.log(JSON.parse(JSON.stringify(data)))
-          console.log('new unit above')
           // assume CL.context agrees with the new data since it was used to fetch it
           if (CL.context === existingCollation.context) {
             // check we have basetext agreement
