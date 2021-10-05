@@ -4536,9 +4536,11 @@ SV = (function() {
         subreadings = [];
         for (let key in svRules) {
           if (svRules.hasOwnProperty(key)) {
-            menu.push('<li id="mark_as_' + svRules[key][1] + '"><span>Mark/Unmark as ' + key + '</span></li>');
-          } else {
-            subreadings.push([key, svRules[key][1], svRules[key][2]]);
+            if (svRules[key][3]) {
+              menu.push('<li id="mark_as_' + svRules[key][1] + '"><span>Mark/Unmark as ' + key + '</span></li>');
+            } else {
+              subreadings.push([key, svRules[key][1], svRules[key][2]]);
+            }
           }
         }
         if (subreadings.length === 1) {
