@@ -448,8 +448,8 @@ SV = (function() {
       gapAfter = 0;
       while (index < topLine.length) {
         if (topLine[index].hasOwnProperty('overlap_units') &&
-          topLine[index].overlap_units.hasOwnProperty(id)) {
-          length += topLine[index].end - topLine[index].start + 1;
+              topLine[index].overlap_units.hasOwnProperty(id)) {
+              length += topLine[index].end - topLine[index].start + 1;
           if (lastEnd !== null && lastEnd + 2 === topLine[index].start) {
             length += 1;
           }
@@ -482,7 +482,11 @@ SV = (function() {
       // adjust column length if necessary
       if (lastEnd % 2 === 1) {
         if (gapCounts.hasOwnProperty(highestGap)) {
-          if (options.column_lengths.hasOwnProperty(highestGap)) {
+          // The second condition here was added on 6th October 2021 - It might break some situations but fixes a bug found
+          // TODO: this whole thing could perhaps be removed - need to find a situation where it is actually needed
+          // and the second condition doesn't prevent it being applied
+          if (options.column_lengths.hasOwnProperty(highestGap) &&
+                  options.column_lengths[highestGap] !== gapCounts[highestGap]) {
             options.column_lengths[highestGap] = options.column_lengths[highestGap] - gapCounts[highestGap];
           }
         }
@@ -596,12 +600,12 @@ SV = (function() {
             if (i === 0) {
               splitClass = 'split_unit_a';
             } else {
-              if (data[i].witnesses.filter(x => allOverlappedWitnesses.includes(x)).length === data[i].witnesses.length) {
+              if (CL.witnessAddingMode === true &&
+                    data[i].witnesses.filter(x => allOverlappedWitnesses.includes(x)).length === data[i].witnesses.length) {
                 splitClass = 'redips-drag split_duplicate_unit';
               } else {
                 splitClass = 'redips-drag split_unit';
               }
-
             }
           }
           html.push('<div id="' + 'drag_unit_' + id + '_reading_' + i + '" class="' + splitClass + '">');
@@ -794,6 +798,9 @@ SV = (function() {
           // the capital letters are there to help ensure no clash with any real words
           text = text + '_OLSTS_' + reading.overlap_status;
         }
+      }
+      if (reading.hasOwnProperty('reading_classes') && reading.reading_classes.length > 0) {
+        text = text + '_RDGCLS_' + reading.reading_classes.join('_');
       }
       if (reading.hasOwnProperty('type') && reading.type === 'lac_verse') {
         text = text + '_lac_verse';
