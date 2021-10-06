@@ -910,7 +910,7 @@ SV = (function() {
           showSetVariantsData();
         }
         if (stage === 'order_readings') {
-          OR.relabelReadings(CL.data[rdgDetails[1]][rdgDetails[0]].readings);
+          OR.relabelReadings(CL.data[rdgDetails[1]][rdgDetails[0]].readings, true);
           OR.showOrderReadings({
             'container': CL.container
           });
