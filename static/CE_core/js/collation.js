@@ -731,17 +731,7 @@ CL = (function() {
         }
         i += 1;
       } else if (i === unitIndex) { //we do have a variant for this word
-        if (unit.readings.length > 0 ||
-          //this is now set to always show units regardless of whether they have variation
-          //the unused logic is left in incase we want to revert to the old way sometime
-          (format === 'reorder') ||
-          (format === 'set_variants') ||
-          (format === 'approved') ||
-          (format === 'set_variants' && SV.showSharedUnits === true) ||
-          (format === 'regularise' && CL.displaySettings.view_original_forms === true) ||
-          (format === 'regularise' && RG.showRegularisations === true) ||
-          format === 'version_additions' ||
-          format === 'other_version_additions') {
+        if (unit.readings.length > 0) {
           //check to see if we need any gaps at this index point before the unit (to account for combined gap before in another reading)
           if (options.overlap_details[unit._id].hasOwnProperty('gap_before') &&
             options.overlap_details[unit._id].gap_before > 0) {
