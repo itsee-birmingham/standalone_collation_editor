@@ -6,97 +6,9 @@ cforms = (function () {
   let serialiseForm, populateSelect;
 
   // private function declarations
-  let _getFormElements, _getValue;
+  let _getValue, _getFormElements, _hasData;
 
-  /**TODO: make sure you catch errors with parseInt and leave
-  the string as it is - forms should be validating entry
-  anyway before this point! */
-  serialiseForm = function(formId, elemList, prefix) {
-      var j, elems, json, elem, subelems, key, subjson, value;
-    elems = _getFormElements(formId, elemList);
-    json = {};
-    for (let i = 0; i < elems.length; i += 1) {
-      elem = elems[i];
-      if ($(elem).hasClass('data_group')) {
-        //construct a list of all elements descending from elem
-        subelems = [];
-        // j records where we are in the list of elements so we can set i
-        // to this to continue our loop where we left of with sub elements
-        j = i + 1;
-        while ($.contains(elem, elems[j])) {
-          subelems.push(elems[j]);
-          j += 1;
-        }
-        key = typeof prefix === 'undefined' ? elem.id : elem.id.replace(prefix, '');
-        subjson = serialiseForm(formId, subelems, elem.id + '_');
-        if (!$.isEmptyObject(subjson)) {
-          if ($(elem).hasClass('objectlist')) {
-            if (hasData(subjson)) {
-              try {
-                json[key.substring(0, key.lastIndexOf('_'))].push(subjson);
-              } catch (err) {
-                json[key.substring(0, key.lastIndexOf('_'))] = [ subjson ];
-              }
-            } else {
-              if (!json.hasOwnProperty(key.substring(0, key.lastIndexOf('_')))) {
-                json[key.substring(0, key.lastIndexOf('_'))] = [];
-              }
-            }
-          } else if ($(elem).hasClass('stringlist')) {
-            //make an array of strings
-            json[key] = [];
-            for (let k in subjson) {
-              if (subjson.hasOwnProperty(k)) {
-                // don't allow empty strings or null in the array
-                if (subjson[k] !== '' && subjson[k] !== null) {
-                  json[key].push(subjson[k]);
-                }
-              }
-            }
-            if (json[key].length === 0) {
-              if (!$(elem).hasClass('emptylist')) {
-                json[key] = null;
-              }
-            }
-          } else if ($(elem).hasClass('json')) {
-            json[key] = JSON.stringify(subjson)
-          } else {
-            json[key] = subjson;
-          }
-        } else {
-          json[key] = null;
-        }
-        // reset i to the first element not in our sublist j-1 since we increment j *after* each addition
-        i = j - 1;
-      } else {
-        value = _getValue(elem);
-        if (elem.type !== 'radio') {
-          if (typeof prefix === 'undefined') {
-            json[elem.name] = value;
-          } else {
-            json[elem.name.replace(prefix, '')] = value;
-          }
-        } else {
-          if (!json.hasOwnProperty(elem.name) || value !== 'radio_null') {
-            if (typeof prefix === 'undefined') {
-              if (value === 'radio_null') {
-                json[elem.name] = null;
-              } else {
-                json[elem.name] = value;
-              }
-            } else {
-              if (value === 'radio_null') {
-                json[elem.name.replace(prefix, '')] = null;
-              } else {
-                json[elem.name.replace(prefix, '')] = value;
-              }
-            }
-          }
-        }
-      }
-    }
-    return json;
-  };
+
 
   _getValue = function (elem) {
     var value;
@@ -175,6 +87,119 @@ cforms = (function () {
       }
     }
     return value;
+  };
+
+  _getFormElements = function (formId, elemList) {
+    var elems, filteredElems;
+    elems = typeof elemList !== 'undefined' ? elemList : document.getElementById(formId).elements;
+    filteredElems = [];
+    for (let i = 0; i < elems.length; i += 1) {
+      if (elems[i].disabled === false && (elems[i].name || $(elems[i]).hasClass('data_group'))) {
+        filteredElems.push(elems[i]);
+      }
+    }
+    return filteredElems;
+  };
+
+  _hasData = function (json) {
+    for (let key in json) {
+      if (json.hasOwnProperty(key)) {
+        if (json[key] !== null && json[key] !== '') {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  /**TODO: make sure you catch errors with parseInt and leave
+  the string as it is - forms should be validating entry
+  anyway before this point! */
+  serialiseForm = function(formId, elemList, prefix) {
+      var j, elems, json, elem, subelems, key, subjson, value;
+    elems = _getFormElements(formId, elemList);
+    json = {};
+    for (let i = 0; i < elems.length; i += 1) {
+      elem = elems[i];
+      if ($(elem).hasClass('data_group')) {
+        //construct a list of all elements descending from elem
+        subelems = [];
+        // j records where we are in the list of elements so we can set i
+        // to this to continue our loop where we left of with sub elements
+        j = i + 1;
+        while ($.contains(elem, elems[j])) {
+          subelems.push(elems[j]);
+          j += 1;
+        }
+        key = typeof prefix === 'undefined' ? elem.id : elem.id.replace(prefix, '');
+        subjson = serialiseForm(formId, subelems, elem.id + '_');
+        if (!$.isEmptyObject(subjson)) {
+          if ($(elem).hasClass('objectlist')) {
+            if (_hasData(subjson)) {
+              try {
+                json[key.substring(0, key.lastIndexOf('_'))].push(subjson);
+              } catch (err) {
+                json[key.substring(0, key.lastIndexOf('_'))] = [ subjson ];
+              }
+            } else {
+              if (!json.hasOwnProperty(key.substring(0, key.lastIndexOf('_')))) {
+                json[key.substring(0, key.lastIndexOf('_'))] = [];
+              }
+            }
+          } else if ($(elem).hasClass('stringlist')) {
+            //make an array of strings
+            json[key] = [];
+            for (let k in subjson) {
+              if (subjson.hasOwnProperty(k)) {
+                // don't allow empty strings or null in the array
+                if (subjson[k] !== '' && subjson[k] !== null) {
+                  json[key].push(subjson[k]);
+                }
+              }
+            }
+            if (json[key].length === 0) {
+              if (!$(elem).hasClass('emptylist')) {
+                json[key] = null;
+              }
+            }
+          } else if ($(elem).hasClass('json')) {
+            json[key] = JSON.stringify(subjson)
+          } else {
+            json[key] = subjson;
+          }
+        } else {
+          json[key] = null;
+        }
+        // reset i to the first element not in our sublist j-1 since we increment j *after* each addition
+        i = j - 1;
+      } else {
+        value = _getValue(elem);
+        if (elem.type !== 'radio') {
+          if (typeof prefix === 'undefined') {
+            json[elem.name] = value;
+          } else {
+            json[elem.name.replace(prefix, '')] = value;
+          }
+        } else {
+          if (!json.hasOwnProperty(elem.name) || value !== 'radio_null') {
+            if (typeof prefix === 'undefined') {
+              if (value === 'radio_null') {
+                json[elem.name] = null;
+              } else {
+                json[elem.name] = value;
+              }
+            } else {
+              if (value === 'radio_null') {
+                json[elem.name.replace(prefix, '')] = null;
+              } else {
+                json[elem.name.replace(prefix, '')] = value;
+              }
+            }
+          }
+        }
+      }
+    }
+    return json;
   };
 
   /** Populate a select
@@ -263,17 +288,7 @@ cforms = (function () {
     }
   };
 
-  _getFormElements = function (formId, elemList) {
-    var elems, filteredElems;
-    elems = typeof elemList !== 'undefined' ? elemList : document.getElementById(formId).elements;
-    filteredElems = [];
-    for (let i = 0; i < elems.length; i += 1) {
-      if (elems[i].disabled === false && (elems[i].name || $(elems[i]).hasClass('data_group'))) {
-        filteredElems.push(elems[i]);
-      }
-    }
-    return filteredElems;
-  };
+
 
   return {
     populateSelect: populateSelect,
