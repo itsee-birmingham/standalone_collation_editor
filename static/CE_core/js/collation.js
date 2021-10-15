@@ -1563,7 +1563,7 @@ CL = (function() {
       return JSON.stringify(CL.services.exporterSettings);
     }
     // exporter factory has its own defaults so no need to have any here
-    return;
+    return '{}';
   };
 
   saveCollation = function(status, successCallback) {

@@ -485,7 +485,6 @@ OR = (function() {
     }
   };
 
-  // DEBUG this does not allow overlap units to have standoff subreadings
   // Need to work this out from the top line references to the overlap units as we can't actually rely on the start
   // and end values in the overlaps
   mergeSharedExtentOverlaps = function() {
@@ -1415,13 +1414,18 @@ OR = (function() {
         spinner.removeLoadingOverlay();
       });
     } else {
-      var url;
+      var url, settings;
+      settings = JSON.parse(CL.getExporterSettings());
+      if (!settings.hasOwnProperty('options')) {
+        settings.options = {};
+      }
+      settings.options.rule_classes = CL.ruleClasses;
       spinner.showLoadingOverlay();
       url = CL.services.apparatusServiceUrl;
       $.fileDownload(url, {
         httpMethod: 'POST',
         data: {
-          settings: CL.getExporterSettings(),
+          settings: JSON.stringify(settings),
           data: JSON.stringify([{'context': CL.context, 'structure': CL.data}])
         },
         successCallback: function() {
