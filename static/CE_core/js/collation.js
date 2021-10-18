@@ -1723,12 +1723,7 @@ CL = (function() {
       witnessHtml.push('<label class="inline-label">Parent reading:</label><select name="parent_reading" id="parent_reading"></select><br/><br/>');
       witnessHtml.push('<label class="inline-label">Details:</label><input disabled="disabled" type="text" name="reading_details" id="reading_details"/><br/></br/>');
       subTypes = getRuleClasses('subreading', true, 'value', 'identifier');
-      if (Object.keys(subTypes).length > 1) {
-        witnessHtml.push('<label>Subreading type: <select class="stringnotnull" name="subreading_type" id="subreading_select"></select></label><br/><br/>');
-      } else {
-        id = error_types[Object.keys(subTypes)];
-        witnessHtml.push('<input type="hidden" id="subreading_type" name="subreading_type" value="' + id + '"/>');
-      }
+      witnessHtml.push('<label>Subreading type: <select class="stringnotnull" name="subreading_type" id="subreading_select"></select></label><br/><br/>');
     } else if (details.type !== 'duplicate') {
       witnessHtml.push('<label class="inline-label">Parent reading:</label><select name="parent_reading" id="parent_reading"></select><br/>');
       witnessHtml.push('<label class="inline-label">Details:</label><input disabled="disabled" type="text" name="reading_details" id="reading_details"/><br/></br/>');
@@ -1770,10 +1765,10 @@ CL = (function() {
   };
 
   // mark readings using standoff model
-  // TODO: can this be made simpler by at least assigning the unit to a variable?
   markStandoffReading = function(type, name, readingDetails, format, menuPos) {
     var reading, parents, unit, newReadingId, subreadingClasses, totalReadingWitnesses, callback;
-    reading = CL.data[readingDetails.app_id][readingDetails.unit_pos].readings[readingDetails.reading_pos];
+    unit = CL.data[readingDetails.app_id][readingDetails.unit_pos];
+    reading = unit.readings[readingDetails.reading_pos];
     totalReadingWitnesses = reading.witnesses.length;
     //show the menu to identify the parent reading and split the witnesses if necessary
     if (reading.witnesses.length > 1 || reading.hasOwnProperty('subreadings')) {
@@ -1791,22 +1786,20 @@ CL = (function() {
     }
     // populate the parent drop down
     parents = [];
-    for (let i = 0; i < CL.data[readingDetails.app_id][readingDetails.unit_pos].readings.length; i += 1) {
+    for (let i = 0; i < unit.readings.length; i += 1) {
       // if the reading is:
       //	not the reading being made a subreading
       //	not an empty reading (doesn't have a type attribute)
       //	an empty reading but isn't lac verse or om verse (probably should change this and deal with them differently)
       //	in a unit that is an overlap and i != 0 (which means this reading is not the a reading)
       if (i !== readingDetails.reading_pos &&
-        (!CL.data[readingDetails.app_id][readingDetails.unit_pos].readings[i].hasOwnProperty('type') ||
-          (CL.data[readingDetails.app_id][readingDetails.unit_pos].readings[i].hasOwnProperty('type') &&
-            CL.data[readingDetails.app_id][readingDetails.unit_pos].readings[i].type !== 'om_verse' &&
-            CL.data[readingDetails.app_id][readingDetails.unit_pos].readings[i].type !== 'lac_verse')) &&
-        (readingDetails.app_id === 'apparatus' || (
-          readingDetails.app_id !== 'apparatus' && i !== 0))) {
+            (!unit.readings[i].hasOwnProperty('type') || (unit.readings[i].hasOwnProperty('type') &&
+                                                          unit.readings[i].type !== 'om_verse' &&
+                                                          unit.readings[i].type !== 'lac_verse')) &&
+            (readingDetails.app_id === 'apparatus' || ( readingDetails.app_id !== 'apparatus' && i !== 0))) {
         parents.push({
           'label': getAlphaId(i),
-          'value': CL.data[readingDetails.app_id][readingDetails.unit_pos].readings[i]._id
+          'value': unit.readings[i]._id
         });
       }
     }
@@ -1820,8 +1813,14 @@ CL = (function() {
     if (document.getElementById('subreading_select')) {
       subreadingClasses = [];
       for (let i = 0; i < CL.ruleClasses.length; i += 1) {
-        if (CL.ruleClasses[i].create_in_SV === true && CL.ruleClasses[i].keep_as_main_reading === false) {//CL.ruleClasses[i].subreading === true) {
-          subreadingClasses.push(CL.ruleClasses[i]);
+        if (format === 'set_variants') {
+          if (CL.ruleClasses[i].create_in_SV === true && CL.ruleClasses[i].keep_as_main_reading === false) {
+            subreadingClasses.push(CL.ruleClasses[i]);
+          }
+        } else if (format === 'order_readings') {
+          if (CL.ruleClasses[i].create_in_OR === true && CL.ruleClasses[i].keep_as_main_reading === false) {
+            subreadingClasses.push(CL.ruleClasses[i]);
+          }
         }
       }
       cforms.populateSelect(subreadingClasses, document.getElementById('subreading_select'),
@@ -1843,6 +1842,7 @@ CL = (function() {
     // Add event handler to do the job
     $('#select_button').on('click', function(event) {
       var extraDetails, data, witnessList, unit, callback;
+      unit = CL.data[readingDetails.app_id][readingDetails.unit_pos];
       data = cforms.serialiseForm('select_wit_form');
       if (data.parent_reading !== null) {
         witnessList = [];
@@ -1861,18 +1861,18 @@ CL = (function() {
           //if the reading that is being created is not the same as the a reading when we are in an overlapped reading
           if (readingDetails.app_id === 'apparatus' ||
                     (readingDetails.app_id !== 'apparatus' &&
-                      extraDetails.trim() !== extractWitnessText(CL.data[readingDetails.app_id][readingDetails.unit_pos].readings[0]))) {
-            data.parent_reading = createNewReading(CL.data[readingDetails.app_id][readingDetails.unit_pos],
+                      extraDetails.trim() !== extractWitnessText(unit.readings[0]))) {
+            data.parent_reading = createNewReading(unit,
                                                    data.parent_reading, extraDetails);
           } else {
             alert('The reading you have entered is the same as the a reading. This is not allowed in overlapped units.');
             return;
           }
         } else if (data.parent_reading === 'gap') {
-          data.parent_reading = createNewReading(CL.data[readingDetails.app_id][readingDetails.unit_pos],
+          data.parent_reading = createNewReading(unit,
                                                  data.parent_reading, extraDetails);
         } else if (data.parent_reading === 'om') {
-          data.parent_reading = createNewReading(CL.data[readingDetails.app_id][readingDetails.unit_pos],
+          data.parent_reading = createNewReading(unit,
                                                  data.parent_reading);
         }
 
@@ -1884,7 +1884,6 @@ CL = (function() {
           if (!CL.data.hasOwnProperty('separated_witnesses')) {
             CL.data.separated_witnesses = [];
           }
-          unit = CL.data[readingDetails.app_id][readingDetails.unit_pos];
           CL.data.separated_witnesses.push({'app_id': readingDetails.app_id,
                                             'unit_id': unit._id,
                                             'witnesses': witnessList,

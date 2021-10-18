@@ -4329,8 +4329,6 @@ SV = (function() {
                             if (readings[rowNum].subreadings.hasOwnProperty(sr)) {
                               if (sr === type) { //this may need to change if we allow chaining here
                                 for (let l = 0; l < readings[rowNum].subreadings[sr].length; l += 1) {
-                                  //TODO: this must be witness specific and only change the target witness
-																	// all others must be left alone!
                                   if (readings[rowNum].subreadings[sr][l].witnesses.indexOf(data.marked_readings[type][k].witness) !== -1) {
                                     subreadingId = 'unit_' + i + '_' + appString + 'row_' + rowNum + '_type_' + type + '_subrow_' + l;
                                     if (makeMainIds.hasOwnProperty(subreadingId)) {
@@ -4405,10 +4403,6 @@ SV = (function() {
         CL.makeMainReading(unit, parentReading, subtype, subreadingPos, options);
       }
     } else {
-      //TODO: this needs looking at as it is causing errors after the first use but then is triggering
-      // recombine also triggers the problem but highlighing fixes so unprep or redraw needs to be better to present
-      // issue on line 4397 which has no subreading sometimes - save is what causes this issue not the code here
-      // this section is a top level action called from the context menu so must be prepared to a certain extent
       scrollOffset = [document.getElementById('scroller').scrollLeft,
                       document.getElementById('scroller').scrollTop];
       _addToUndoStack(CL.data);
@@ -4480,19 +4474,19 @@ SV = (function() {
 
   _subreadingIdSort = function(a, b) {
     var rowA, rowB, typeA, typeB, subRowA, subRowB;
-    //row first
+    // row first
     rowA = parseInt(a.substring(a.indexOf('_row_') + 5, a.indexOf('_type_')));
     rowB = parseInt(b.substring(b.indexOf('_row_') + 5, b.indexOf('_type_')));
     if (rowA !== rowB) {
       return rowB - rowA;
     }
-    //then type
+    // then type
     typeA = a.substring(a.indexOf('_type_') + 6, a.indexOf('_subrow_'));
     typeB = b.substring(b.indexOf('_type_') + 6, b.indexOf('_subrow_'));
     if (typeA !== typeB) {
       return a < b ? -1 : 1;
     }
-    //then subrow
+    // then subrow
     subRowA = parseInt(a.substring(a.indexOf('_subrow_') + 8));
     subRowB = parseInt(b.substring(b.indexOf('_subrow_') + 8));
     if (subRowA !== subRowB) {
