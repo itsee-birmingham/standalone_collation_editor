@@ -106,10 +106,10 @@ class Exporter(object):
         text = self.check_for_suffixed_reading_marker(text, subtype)
         if type:
             rdg.set('type', type)
-        if subtype:
-            rdg.set('cause', subtype)
         elif len(text) > 1:
             rdg.set('type', text[1])
+        if subtype:
+            rdg.set('cause', subtype)
         rdg.text = text[0]
         pos = i+1
         rdg.set('varSeq', '{}'.format(pos))
