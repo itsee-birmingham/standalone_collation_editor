@@ -15,7 +15,7 @@ OR = (function() {
       canUnitMoveTo, addToUndoStack, makeWasGapWordsGaps, mergeAllLacs, mergeAllOms, redipsInitOrderReadings;
 
   // private function declarations
-  let _uniqueifyIds, _approveVerse, _getSiglaSuffixes, _doGetSiglaSuffixes,
+  let _uniqueifyIds, _approveVerse, _getSiglaSuffixes, _doGetSiglaSuffixes, _getMainReadingSpecialClasses,
       _orderWitnessesForOutput, _areAllEmptyReadings, _getSubunitData,
       _manualChangeLabel, _highlightWitness, _makeMenu, _makeMainReading, _getDeleteUnit,
       _moveOverlapUp, _compareStartIndexes, _moveOverlapDown, _addContextMenuHandlers,
@@ -683,7 +683,7 @@ OR = (function() {
   _approveVerse = function() {
     var standoffProblems, extraResults;
     spinner.showLoadingOverlay();
-    SR.loseSubreadings(); //for preparation and is needed
+    SR.loseSubreadings();  // for preparation and is needed
     standoffProblems = SV.checkStandoffReadingProblems();
     if (!standoffProblems[0]) {
       extraResults = CL.applyPreStageChecks('approve');
@@ -695,24 +695,28 @@ OR = (function() {
           OR.mergeAllOms();
         }
         CL.showSubreadings = false;
-        //now do the stuff we need to do
-        //make sure all ids are unique (we know there is a problem with overlapping a readings for example)
+        // now do the stuff we need to do
+        // make sure all ids are unique (we know there is a problem with overlapping a readings for example)
         delete CL.data.event_list;
         _uniqueifyIds();
         _orderWitnessesForOutput();
-        SR.loseSubreadings(); //always lose before finding
+        SR.loseSubreadings();  // always lose before finding
         SR.findSubreadings({'rule_classes': CL.getRuleClasses('subreading', true,
                                                               'value', ['identifier', 'subreading'])});
         _getSiglaSuffixes();
-        //at this point the saved approved version always and only ever has the correct subreadings shown
-        //we don't have the option to show/hide subreadings in the interface so we can be sure they are always correct
+        // TODO: fosilise the reading suffixes and main reading label suffixes here
+        // then make output dependent on these not being present
+        _getMainReadingSpecialClasses();
+
+        // at this point the saved approved version always and only ever has the correct subreadings shown we
+        // don't have the option to show/hide subreadings in the interface so we can be sure they are always correct
         CL.saveCollation('approved', function() {
           showApprovedVersion({
             'container': CL.container
           });
         });
       } else {
-        SR.loseSubreadings(); //always lose before finding
+        SR.loseSubreadings();  // always lose before finding
         if (CL.showSubreadings === true) {
           SR.findSubreadings();
         } else {
@@ -723,7 +727,7 @@ OR = (function() {
         spinner.removeLoadingOverlay();
       }
     } else if (standoffProblems[0]) {
-      SR.loseSubreadings(); //always lose before finding
+      SR.loseSubreadings();  // always lose before finding
       if (CL.showSubreadings === true) {
         SR.findSubreadings();
       } else {
@@ -733,6 +737,46 @@ OR = (function() {
       }
       alert('You cannot approve this verse because ' + standoffProblems[1]);
       spinner.removeLoadingOverlay();
+    }
+  };
+
+  _getMainReadingSpecialClasses = function () {
+    var unit, reading, ruleClasses;
+    ruleClasses = CL.getRuleClasses('keep_as_main_reading', true, 'value', ['identifier', 'suffixed_label', 'suffixed_reading']);
+    if ($.isEmptyObject(ruleClasses)) {
+        return;
+    }
+    for (let key in CL.data) {
+      if (CL.data.hasOwnProperty(key)) {
+        if (key.indexOf('apparatus') != -1) {
+          for (let i = 0; i < CL.data[key].length; i += 1) {
+            unit = CL.data[key][i];
+            for (let j = 0; j < unit.readings.length; j += 1) {
+              reading = unit.readings[j];
+              if (reading.hasOwnProperty('reading_classes') && reading.reading_classes.length > 0) {
+                for (let k = 0; k < reading.reading_classes.length; k += 1) {
+                  if (ruleClasses.hasOwnProperty(reading.reading_classes[k])) {
+                    if (ruleClasses[reading.reading_classes[k]][1] === true) {
+                      if (reading.hasOwnProperty('label_suffix')) {
+                        reading.label_suffix = reading.label_suffix + ruleClasses[reading.reading_classes[k]][0];
+                      } else {
+                        reading.label_suffix = ruleClasses[reading.reading_classes[k]][0];
+                      }
+                    }
+                    if (ruleClasses[reading.reading_classes[k]][2] === true) {
+                      if (reading.hasOwnProperty('reading_suffix')) {
+                        reading.reading_suffix = reading.reading_suffix + ruleClasses[reading.reading_classes[k]][0];
+                      } else {
+                        reading.reading_suffix = ruleClasses[reading.reading_classes[k]][0];
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   };
 
