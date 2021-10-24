@@ -1414,7 +1414,7 @@ OR = (function() {
         spinner.removeLoadingOverlay();
       });
     } else {
-      var url, settings;
+      var url, settings, data;
       settings = JSON.parse(CL.getExporterSettings());
       if (!settings.hasOwnProperty('options')) {
         settings.options = {};
@@ -1422,16 +1422,22 @@ OR = (function() {
       settings.options.rule_classes = CL.ruleClasses;
       spinner.showLoadingOverlay();
       url = CL.services.apparatusServiceUrl;
-      $.fileDownload(url, {
-        httpMethod: 'POST',
-        data: {
-          settings: JSON.stringify(settings),
-          data: JSON.stringify([{'context': CL.context, 'structure': CL.data}])
-        },
-        successCallback: function() {
+      data = {settings: JSON.stringify(settings),
+              data: JSON.stringify([{'context': CL.context, 'structure': CL.data}])
+              };
+      $.post(url, data).then(function (response) {
+          var blob, filename, downloadUrl, hiddenLink;
+          blob = new Blob([response], {'type': 'text/txt'});
+          filename = CL.context + '_apparatus.txt';
+          downloadUrl = window.URL.createObjectURL(blob);
+          hiddenLink = document.createElement('a');
+          hiddenLink.style.display = 'none';
+          hiddenLink.href = downloadUrl;
+          hiddenLink.download = filename;
+          document.body.appendChild(hiddenLink);
+          hiddenLink.click();
+          window.URL.revokeObjectURL(downloadUrl);
           spinner.removeLoadingOverlay();
-        }
-        // can also add a failCallback here if you want
       });
     }
   };
