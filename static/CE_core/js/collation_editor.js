@@ -4,7 +4,7 @@ collation_editor = (function() {
   var init = function(callback) {
     $.when(
       $.getScript(staticUrl + 'CE_core/js/collation_forms.js'),
-      $.getScript(staticUrl + 'CE_core/js/fileDownload.js'),
+      // $.getScript(staticUrl + 'CE_core/js/fileDownload.js'),
       $.Deferred(function(deferred) {
         $(deferred.resolve);
       })
