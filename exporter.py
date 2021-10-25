@@ -79,8 +79,7 @@ class Exporter(object):
         return witnesses
 
     def get_label(self, label, subtype, reading):
-        if subtype is None or subtype == 'subreading':
-            # subreadings already have their labels constructed correctly
+        if subtype is None:
             return label
         if 'label_suffix' in reading:
             return '{}{}'.format(label, reading['label_suffix'])
@@ -107,7 +106,10 @@ class Exporter(object):
 
     def make_reading(self, reading, i, label, witnesses, type=None, subtype=None):
         rdg = etree.Element('rdg')
-        rdg.set('n', self.get_label(label, subtype, reading))
+        if type != 'subreading':
+            rdg.set('n', self.get_label(label, subtype, reading))
+        else:
+            rdg.set('n', label)
         text = self.get_text(reading, type)
         text = self.check_for_suffixed_reading_marker(text, subtype, reading)
         if type:
