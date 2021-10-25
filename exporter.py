@@ -79,7 +79,8 @@ class Exporter(object):
         return witnesses
 
     def get_label(self, label, subtype, reading):
-        if subtype is None:
+        if subtype is None or subtype == 'subreading':
+            # subreadings already have their labels constructed correctly
             return label
         if 'label_suffix' in reading:
             return '{}{}'.format(label, reading['label_suffix'])
