@@ -582,11 +582,11 @@ SR = (function() {
         suffixString = options.rules[typeList[i]][0];
       }
       if (options.rules[typeList[i]][1]) {
-        if (suffixString !== '-' || (suffixString === '-' && realSuffixList.indexOf('-') === -1)) {
+        if (realSuffixList.indexOf(suffixString) === -1) {
           realSuffixList.push(suffixString);
         }
       } else {
-        if (suffixString !== '-' || (suffixString === '-' && fakeSuffixList.indexOf('-') === -1)) {
+        if (fakeSuffixList.indexOf(suffixString) === -1) {
           fakeSuffixList.push(suffixString);
         }
       }
