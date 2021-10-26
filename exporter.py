@@ -154,7 +154,7 @@ class Exporter(object):
             for i, reading in enumerate(unit['readings']):
                 wits = self.get_witnesses(reading, missing)
                 if self.negative_apparatus is True:
-                    if ((len(wits) > 0 or reading['label'] == 'a')
+                    if ((len(wits) > 0 or reading['label'] == 'a' or 'subreadings' in reading)
                             and ('overlap_status' not in reading
                                  or reading['overlap_status'] not in self.overlap_status_to_ignore)):
                         if reading['label'] == 'a':
@@ -177,7 +177,7 @@ class Exporter(object):
                                                                  wits, 'subreading', key))
 
                 else:
-                    if ((len(wits) > 0 or reading['label'] == 'a')
+                    if ((len(wits) > 0 or reading['label'] == 'a' or 'subreadings' in reading)
                             and ('overlap_status' not in reading
                                  or reading['overlap_status'] not in self.overlap_status_to_ignore)):
                         if len(wits) > 0:
