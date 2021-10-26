@@ -78,7 +78,14 @@ class Exporter(object):
                 witnesses.remove(miss)
         return witnesses
 
-    def get_label(self, label, subtype, reading):
+    def get_label(self, label, type, subtype, reading):
+        if type == 'subreading':
+            # then just remove any duplicate markers
+            new_label = []
+            for char in list(label):
+                if char not in new_label:
+                    new_label.append(char)
+            return ''.join(new_label)
         if subtype is None:
             return label
         if 'label_suffix' in reading:
@@ -106,10 +113,7 @@ class Exporter(object):
 
     def make_reading(self, reading, i, label, witnesses, type=None, subtype=None):
         rdg = etree.Element('rdg')
-        if type != 'subreading':
-            rdg.set('n', self.get_label(label, subtype, reading))
-        else:
-            rdg.set('n', label)
+        rdg.set('n', self.get_label(label, type, subtype, reading))
         text = self.get_text(reading, type)
         text = self.check_for_suffixed_reading_marker(text, subtype, reading)
         if type:
