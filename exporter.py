@@ -80,12 +80,7 @@ class Exporter(object):
 
     def get_label(self, label, type, subtype, reading):
         if type == 'subreading':
-            # then just remove any duplicate markers
-            new_label = []
-            for char in list(label):
-                if char not in new_label:
-                    new_label.append(char)
-            return ''.join(new_label)
+            return label
         if subtype is None:
             return label
         if 'label_suffix' in reading:
