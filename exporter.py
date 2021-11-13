@@ -130,6 +130,17 @@ class Exporter(object):
             rdg.append(wit)
         return rdg
 
+    # This function removes any duplicate letters in the subreading suffix. Version 2.0 prevents this from happening
+    # in the data when items are approved but before that duplication could have been saved in the data.
+    def fix_subreading_suffix(self, suffix):
+        if len(suffix) <= 1:
+            return suffix
+        new_label = []
+        for char in suffix:
+            if char not in new_label:
+                new_label.append(char)
+        return ''.join(new_label)
+
     def get_app_units(self, apparatus, overtext, context, missing):
         app_list = []
         for unit in apparatus:
@@ -166,9 +177,9 @@ class Exporter(object):
                                 wits = self.get_witnesses(subreading, missing)
                                 if len(wits) > 0:
                                     readings = True
-                                    app.append(self.make_reading(subreading, i,
-                                                                 '%s%s' % (reading['label'],
-                                                                           subreading['suffix']),
+                                    subreading_label = '{}{}'.format(reading['label'],
+                                                                     self.fix_subreading_suffix(subreading['suffix']))
+                                    app.append(self.make_reading(subreading, i, subreading_label,
                                                                  wits, 'subreading', key))
 
                 else:
@@ -187,9 +198,9 @@ class Exporter(object):
                                 wits = self.get_witnesses(subreading, missing)
                                 if len(wits) > 0:
                                     readings = True
-                                    app.append(self.make_reading(subreading, i,
-                                                                 '%s%s' % (reading['label'],
-                                                                           subreading['suffix']),
+                                    subreading_label = '{}{}'.format(reading['label'],
+                                                                     self.fix_subreading_suffix(subreading['suffix']))
+                                    app.append(self.make_reading(subreading, i, subreading_label,
                                                                  wits, 'subreading', key))
 
             if readings:
