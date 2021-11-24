@@ -1,5 +1,5 @@
 /*jshint esversion: 6 */
-var testing;
+var testing = true;
 CL = (function() {
   "use strict";
 
@@ -908,7 +908,7 @@ CL = (function() {
     if (n < 26) {
       return _alpha[n];
     }
-    return _alpha[Math.floor(n / 26)] + _alpha[n % 26];
+    return _alpha[Math.floor(n - (26*parseInt(n / 26)))] + '\''.repeat(parseInt(n / 26))
   };
 
   getReadingSuffix = function(reading, rules) {
