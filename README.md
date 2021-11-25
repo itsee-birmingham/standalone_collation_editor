@@ -1,45 +1,64 @@
 Introduction
 ---
-This code is the core of the collation editor. The code in this repository is not designed to run as it is.
-It needs to be embedded into a larger platform with a database or similar storage. The connections are made with a services file written in Javascript. Further configuration of settings and other options can also be provided if needed. Data input is all in JSON.
+This code is the core of the collation editor. The code in this repository is not designed to run as it is. It needs to
+be embedded into a larger platform with a database or similar storage. The connections are made with a services file
+written in JavaScript. Further configuration of settings and other options can also be provided if needed. Data input
+is all in JSON.
 
 
 Referencing
 ---
 
-To cite the collation editor core code please use the doi:   [![DOI](https://zenodo.org/badge/142011800.svg)](https://zenodo.org/badge/latestdoi/142011800)
+To cite the collation editor core code please use the doi:   
+[![DOI](https://zenodo.org/badge/142011800.svg)](https://zenodo.org/badge/latestdoi/142011800)
 
 Acknowledgements
 ---
 
-Add in funding bodies, funding project details and other libraries used like redips
+The software was created by Catherine Smith at the Institute for Textual Scholarship and Electronic Editing (ITSEE) in
+the University of Birmingham. The restructuring required for the 1.0 release was completed by Catherine Smith and Troy
+A. Griffitts.  The software was developed for and supported by the following research projects:
 
+- The Workspace for Collaborative Editing (AHRC/DFG collaborative project 2010-2013)
+- COMPAUL (funded by the European Union 7th Framework Programme under grant agreement 283302, 2011-2016)
+- MUYA (funded by the European Union Horizon 2020 Research and Innovation Programme under grant agreement 694612, 2016-2022)
+- CATENA (funded by the European Union Horizon 2020 Research and Innovation Programme under grant agreement 770816, 2018-2023)
+
+The collation editor makes use of several third party libraries written and made available by other developers. Details
+of sources and licenses are available in the headers of the relevant JavaScript files. The redips drag and drop library
+(https://github.com/dbunic/REDIPS_drag) warrants special mention as it is used for all of the drag and drop interaction.
 
 Documentation
 ---
 
-This documentation is a work in progress. I will gradually fill in the gaps as time allows. The data structures required as input are fairly well documented in the README file of the standalone collation editor repository on github:
+This documentation is a work in progress. I will gradually fill in the gaps as time allows. The data structures
+required as input are fairly well documented in the README file of the standalone collation editor repository on
+github:
 
  https://github.com/itsee-birmingham/standalone_collation_editor
 
 Terminology
 ---
 
-For the purposes of this documentation the Documents/Works/Texts model will be used.(See David C. Parker, *Textual Scholarship and the making of the New Testament* Oxford: OUP (2011), pp. 10-14,29)
+For the purposes of this documentation the Documents/Works/Texts model will be used.
+(See David C. Parker, *Textual Scholarship and the making of the New Testament* Oxford: OUP (2011), pp. 10-14,29)
 
 - **Document** - The physical artefact on which the text of a work is preserved
 - **Work** - The work which is distilled from the texts that exist of it
 - **Text** - The version or versions of a work preserved in document
 
 
-
 Dependencies
 ---
+
+The following are required to run the collation editor code but are not provided in the repository.
 
 - Python3
 - JQuery 3 (tested with 3.6.0)
 - Pure css
 - collateX (by default the Java web services are used but this is configurable)
+
+Other dependencies are provided in the repository.
 
 Installation
 ---
@@ -48,25 +67,30 @@ For the python import statements to work this repository must be a subdirectory 
 Initialising the collation editor
 ---
 
-The HTML file which will contain the collation editor must load in all of the javascript and css dependencies listed above and the ```static/CE_core/js/collation_editor.js``` file.
+The HTML file which will contain the collation editor must load in all of the JavaScript and css dependencies listed
+above and the ```static/CE_core/js/collation_editor.js``` file.
 
 The variable ```staticUrl``` must be set to the full path to the static files on the system.
 
-You will also need a services file as described below to make the connections to your own platform. The path from staticUrl to the services file must be specified in a ```servicesFile``` variable.
+You will also need a services file as described below to make the connections to your own platform. The path from
+staticUrl to the services file must be specified in a ```servicesFile``` variable.
 
-Once these two variables have been set you need to call ```collation_editor.init()```. This will load in all of the other javascript and css files required for the collation editor to work. You may also supply a callback function which will be run on the completion of the file loading.
+Once these two variables have been set you need to call ```collation_editor.init()```. This will load in all of the
+other JavaScript and css files required for the collation editor to work. You may also supply a callback function which
+will be run on the completion of the file loading.
 
-Once the services file has loaded it must call ```CL.setServiceProvider()``` providing itself as the argument. Setting this will trigger the initialisation of the editor.
+Once the services file has loaded it must call ```CL.setServiceProvider()``` providing itself as the argument. Setting
+this will trigger the initialisation of the editor.
 
 An example of the initialisation code.
 
 ```html
 <link rel=stylesheet href="collation/pure-release-1.0.0/pure-min.css" type="text/css"/>
-<script type="text/javascript" src="collation/js/jquery-3.6.0.min.js"></script>
-<script type="text/javascript" src="collation/CE_core/js/collation_editor.js"></script>
-<script type="text/javascript">
-  let staticUrl = 'http://localhost:8080/collation/';
-  let servicesFile = 'js/local_services.js';
+<script type="text/JavaScript" src="collation/js/jquery-3.6.0.min.js"></script>
+<script type="text/JavaScript" src="collation/CE_core/js/collation_editor.js"></script>
+<script type="text/JavaScript">
+  const staticUrl = 'http://localhost:8080/collation/';
+  const servicesFile = 'js/local_services.js';
   collation_editor.init();
 </script>
 ```
@@ -74,13 +98,17 @@ An example of the initialisation code.
 Services File
 ---
 
-To connect the collation editor to your own database or platform a services file must be provided. Some variables and functions are required, others are optional and additional configuration can also be added. The first two types are described in this section and the configuration additions are explained in the configuration section.
+To connect the collation editor to your own database or platform a services file must be provided. Some variables and
+functions are required, others are optional and additional configuration can also be added. The first two types are
+described in this section and the configuration additions are explained in the configuration section.
 
-On loading the services file must call ```CL.setServiceProvider()``` passing a reference to the service file object as the argument.
+On loading the services file must call ```CL.setServiceProvider()``` passing a reference to the service file object as
+the argument.
 
-Example services files can be found in the services directory of the collation_editor_contrib repository here: **TODO: make contrib repository and put stuff in it**
+Example services files can be found in the contrib directory.
 
-**TODO:** ensure that somewhere it is recorded how to specify functions such as sortWitnesses, prepareDisplay String etc in project settings (code for this has changed so essential it is done correctly now) include how to do it in services somewhere for good measure (might already be done)
+Project configuration files should not contains JavaScript functions directly but should include references to
+functions available in the static files on the server and imported using the ```localJavaScript``` variable.
 
 
 ### Required Service File Variables
@@ -94,9 +122,13 @@ The collation editor supports four different rules scopes.
   - manuscript - everywhere in this specified witness
   - always - everywhere in every witness
 
-You can decide which of these you want your system to support and must ensure that the selected scopes can be stored and retrieved through the service file. The file based system offered in the standalone collation editor only supports two scopes (once and always) due to the storage and retrieval limitations.
+You can decide which of these you want your system to support and must ensure that the selected scopes can be stored
+and retrieved through the service file. The file based system offered in the standalone collation editor only supports
+two scopes (once and always) due to the storage and retrieval limitations.
 
-This variables is a JSON object in which the supported rule scopes as a string are each a key, the string must match the one in the list above. The value of the key is what is used in the drop down box when users select the scope for the rule they are creating. This can be any string that will adequately describe the scope for your users.
+This variables is a JSON object in which the supported rule scopes as a string are each a key, the string must match
+the one in the list above. The value of the key is what is used in the drop down box when users select the scope for
+the rule they are creating. This can be any string that will adequately describe the scope for your users.
 
 An example for a system that supports once and always rule scopes is as follows:
 
@@ -107,7 +139,9 @@ An example for a system that supports once and always rule scopes is as follows:
   };
 ```
 
-In future releases it may be possible for projects to limit the supported rules scopes to a subset of those provided by the services and also to change the value of the string displayed to users. Some of the key names may also be changed in 2.0.0 to be more generic (verse and manuscript in particular).
+In future releases it may be possible for projects to limit the supported rules scopes to a subset of those provided by
+the services and also to change the value of the string displayed to users. Some of the key names may also be changed
+in 2.0.0 to be more generic (verse and manuscript in particular).
 
 
 ### Required Service File Functions
@@ -123,7 +157,7 @@ This function is called as part of the initialisation sequence.
 
 The only requirement for this function is that it set ```CL.managingEditor``` to either ```true``` or ```false``` depending on whether the current user is the managing editor of the current project.
 
-If the index page is to be set up with javascript using the settings provided in the ```contextInput``` variable in the services file then the function should call ```CL.loadIndexPage()``` with the current project as the only argument. If the index page is to be provided in an alternative way they this function must show the index page and set any other platform requirements for its use.
+If the index page is to be set up with JavaScript using the settings provided in the ```contextInput``` variable in the services file then the function should call ```CL.loadIndexPage()``` with the current project as the only argument. If the index page is to be provided in an alternative way they this function must show the index page and set any other platform requirements for its use.
 
 If ```CL.loadIndexPage()``` is not used as part of the index page setup then this function also needs to add a button with the id *switch_project_button* and one with the id *project_summary* if those functions are required on the platform. In addition, if you want users to be able to change the collation algorithm settings then a button with the id *collation_settings* should also be added. Details of how to activate the buttons can be found in the relevant entries in the Optional Service File Functions section.
 
@@ -256,9 +290,9 @@ This should retrieve the collation with the given id and run the callback on the
 
 ### Optional Service File Variables
 
-- #### ```localJavascript```
+- #### ```localJavaScript```
 
-This variable should be an array of strings giving the full url of any additional javascript you need the collation editor to load. These might be required run the services for your framework (an internal api file for example) or you might want to use additional files to store configuration functions that you call in the services. These files will be loaded as part of the collation editor initialisation functions called after the services have been set.
+This variable should be an array of strings giving the full url of any additional JavaScript you need the collation editor to load. These might be required run the services for your framework (an internal api file for example) or you might want to use additional files to store configuration functions that you call in the services. These files will be loaded as part of the collation editor initialisation functions called after the services have been set.
 
 
 - ```localCollationFunction```
@@ -368,7 +402,7 @@ The data should be structured as a JSON object with the stage/s to be modified a
 
 The value of this key should be an array of JSON objects each with the following three keys:
 
-- **function** *[string]* - the function to run. The can either be the function itself (in the services file only) or, as in the example below a reference to a function elsewhere such as the javascript files listed in the ```localJavascript``` variable.
+- **function** *[string]* - the function to run. The can either be the function itself (in the services file only) or, as in the example below a reference to a function elsewhere such as the JavaScript files listed in the ```localJavaScript``` variable.
 - **pass_condition** *[boolean]* - the boolean returned from the function if the test has passed and the user may continue to the next stage.
 - **fail_message** *[string]* - the string displayed to the user if a test condition fails and they are prevented from moving to the next stage.
 
@@ -562,7 +596,7 @@ Each JSON object in the **configs** array should have the following keys:
 - **menu_pos** *[integer]* - An integer to describe where in the list of settings this one should appear on the settings menu (use ```null``` if this is to run behind the scenes and therefore not appear on the menu).
 - **execution_pos** *[integer]* - An integer to determine the order in which settings functions are applied. This can be important in some cases as the settings can interact in different ways depending on the order in which they are applied.
 
-For an example of the javascript configuration see the [default_settings.js](https://github.com/itsee-birmingham/standalone_collation_editor/blob/master/collation/core/static/CE_core/js/default_settings.js) file.
+For an example of the JavaScript configuration see the [default_settings.js](https://github.com/itsee-birmingham/standalone_collation_editor/blob/master/collation/core/static/CE_core/js/default_settings.js) file.
 
 
 **Python requirements**
@@ -613,7 +647,7 @@ This variable provides details of the rule classes/categories that will be avail
 
 Not all of the features make sense when combined and not all combinations will work, for example it does not make sense to mark a regularisation with a suffix to the label if you do not want to have it appear as a subreading in the final edition. For clarity when viewing subreadings in set variants or viewing non-edition subreadings in order reading all regularisation classes applied will appear suffixed to the reading label, any labels for categories that do not have 'suffixed_reading' set to true in the settings will appear in parentheses.
 
-For an example of the javascript configuration see the [default_settings.js](https://github.com/itsee-birmingham/standalone_collation_editor/blob/master/collation/core/static/CE_core/js/default_settings.js) file.
+For an example of the JavaScript configuration see the [default_settings.js](https://github.com/itsee-birmingham/standalone_collation_editor/blob/master/collation/core/static/CE_core/js/default_settings.js) file.
 
 
 - #### ```ruleConditions```
@@ -643,11 +677,11 @@ Each JSON object in the **configs** array should have the following keys (option
 
 The 'linked_to_settings' key gives you the option to ensure that conditions are selected depending on the value of the setting at the point the rule is made. For example, if you have a setting which hides all the supplied text markers and that is active at the time a rule is made then the ignore supplied makers condition should also be selected since the user has no idea what supplied markers are in the text they are regularising. If the display setting value is the same as the 'apply_when' value of that setting then the condition will be automatically selected and disabled so the user cannot override that selection. it is important that the setting linked to and the condition do the same thing.
 
-For an example of the javascript configuration see the [default_settings.js](https://github.com/itsee-birmingham/standalone_collation_editor/blob/master/collation/core/static/CE_core/js/default_settings.js) file.
+For an example of the JavaScript configuration see the [default_settings.js](https://github.com/itsee-birmingham/standalone_collation_editor/blob/master/collation/core/static/CE_core/js/default_settings.js) file.
 
 **Python requirements**
 
-If you specify new rule conditions in the javascript they need to be supported by appropriate python code since the rule conditions are applied on the server side.
+If you specify new rule conditions in the JavaScript they need to be supported by appropriate python code since the rule conditions are applied on the server side.
 
 The data provided to, and the data returned from, the method differ depending on the method type specified in the config.
 
@@ -788,7 +822,7 @@ This default behaviour can be overridden by providing this function in the servi
 This function can be used to override the default export function in the collation editor core code. If this function is not provided and the default code used then the ```apparatusServiceUrl``` variable must be set so that the default code can find the python service. The default function will probably be good enough for many use cases as it generates the file download based on the settings specified in the ```exporterSettings``` variable in the services file. It can be useful to override the function if a CSRF token is required by the platform to download the output or to control other aspects of the export.
 
 *NB* If you do implement this function there is a pre 2.0 version bug you need to be aware of should any of your user's projects make use of regularisation rules which have the 'keep_as_main_reading' option set to 'true'.
-If this is the case, then the rule configurations must be provided in the 'options' key in the exporterSettings as the display settings for these rules are added in the exporter. The rules are available in the ```CL.ruleClasses``` variable in the javascript. In collations approved using the 2.0 release this is no longer necessary as the required presentation data is stored in the collation data structure during the approval process for verse 2.0.0 onwards. If you provide functions to export larger volumes of data you also need to be aware of this and ensure that the rule configurations are provided to the exporter in this case.
+If this is the case, then the rule configurations must be provided in the 'options' key in the exporterSettings as the display settings for these rules are added in the exporter. The rules are available in the ```CL.ruleClasses``` variable in the JavaScript. In collations approved using the 2.0 release this is no longer necessary as the required presentation data is stored in the collation data structure during the approval process for verse 2.0.0 onwards. If you provide functions to export larger volumes of data you also need to be aware of this and ensure that the rule configurations are provided to the exporter in this case.
 
 The function has an optional success callback argument which should be run when the function is complete.
 
@@ -844,13 +878,13 @@ This function is required if ```prepareDisplayString()``` is used. It must exact
 Python/Server Services
 ---
 
-To support the server side code packaged with the collation editor some urls are required to provide the connection between the python and the javascript. The code required for each service should be minimal as they largely serve to pass data from the client side to the server side.
+To support the server side code packaged with the collation editor some urls are required to provide the connection between the python and the JavaScript. The code required for each service should be minimal as they largely serve to pass data from the client side to the server side.
 
 ### Collation Service
 
 The collation service needs to respond to an ajax call from the ```doCollation()``` services function and start the collation process by initialising and calling the collation preprocessor. The preprocessor applies the regularisation rules, runs the collation with collateX using the provided settings and processes and formats the collateX export for display in the collation editor.
 
-All of the settings required are provided by the javascript. They can be altered here if needed but in most cases that will not be necessary.
+All of the settings required are provided by the JavaScript. They can be altered here if needed but in most cases that will not be necessary.
 
 The service needs to create a PreProcessor object using the data passed in the request as as options.configs. In should then call the process_witness_list function of that object using the data passed in the request as options.data. It should then return the output of this process as JSON or, if something goes wrong, an error message.
 
@@ -876,7 +910,7 @@ def collate(request):
 
 ### Settings Applier
 
-There is one point in the collation editor code where the javascript needs to be able to apply the current settings to a string. This code was overlooked in the initial abstraction of the code away from the New Testament Greek context in which it was developed and the original Greek settings remained hard coded into the javascript code. This meant that the correct settings were not being applied for most other projects. The hard coded settings have now been removed from the javascript but a Python service is now required in its place. No one has reported problems with the way this worked in versions before 2.0 so it is very unlikely that any existing projects were negatively affected by this.
+There is one point in the collation editor code where the JavaScript needs to be able to apply the current settings to a string. This code was overlooked in the initial abstraction of the code away from the New Testament Greek context in which it was developed and the original Greek settings remained hard coded into the JavaScript code. This meant that the correct settings were not being applied for most other projects. The hard coded settings have now been removed from the JavaScript but a Python service is now required in its place. No one has reported problems with the way this worked in versions before 2.0 so it is very unlikely that any existing projects were negatively affected by this.
 
 The collation editor provides a SettingsApplier class which uses the same configuration and Python support code as is used in the display settings configuration applied during the collation process.
 
@@ -901,7 +935,7 @@ def apply_settings(request):
 The apparatus exporter should be available at the URL specified in the ```apparatusServiceUrl``` variable or
 the ```getApparatusForContext()``` function depending on which is used.
 
-The service is required to pass the data and configuration from the javascript into the ExporterFactory which in turn
+The service is required to pass the data and configuration from the JavaScript into the ExporterFactory which in turn
 passes everything onto the exporter specified in the configuration.  The configuration is explained in the
 documentation for the ```exporterSettings``` variable.
 
@@ -1132,7 +1166,6 @@ If this is a gap before the very first extant word in the given unit then you mu
 ```
 
 
-
 Configuration
 ---
 
@@ -1213,8 +1246,8 @@ editor and was determined based on whether or not the application of the rule ch
 to collateX. This distinction meant that pre-collation rules were not always being applied if they were made after a
 post-collation rule for the same word. This lead to confusion for several users.
 
-In 1.1.0 the pre- post-collation distinction has been scrapped to remove this problem with rule chaining. This is the regularisation
-system which any new projects should be using.
+In 1.1.0 the pre- post-collation distinction has been scrapped to remove this problem with rule chaining. This is the
+regularisation system which any new projects should be using.
 
 It is recommended that projects which started regularising on a version before 1.1.x including those started on the now
 deprecated code continue to use the older system. This has been preserved in a separate repository and can be run in
@@ -1239,19 +1272,31 @@ New features in this version:
   - The option to add and/or remove witnesses from saved collations in the first two stages of the collation editor.
   - Support for lac/om unit readings where the editor need to be more specific about the reason for the absence.
 
-As well as the new features several changes have been made to remove hard coded behaviour which might need to differ for different texts and to remove some of the vocabulary that references biblical verses to be more consistent across projects.
+As well as the new features several changes have been made to remove hard coded behaviour which might need to differ
+for different texts and to remove some of the vocabulary that references biblical verses to be more consistent across
+projects.
+
+One additional change is to the way that reading labels are expressed if the number of readings in a unit is greater
+than 26. In previous releases letters were joined together to form a label such as ba, bb, bc etc. In this release this
+has been changed to a′, b′, c′ etc. Labels are only saved into the data in the move from set variants to order readings
+so existing collation data saved at order reading and approved units will not be updated with the new labels. At the
+set variants stage any saved collations will display the new labels when they are opened. To update saved collations at
+later versions you can start with a saved version of the set variants stage.
 
 The 2.0.x release of the collation editor core code is mostly backwards compatible with 1.1x. There are, however, some
 additions required to the services file and the settings and some of the deprecated features from 1.x have been removed
 as planned.
 
-If you are not yet using 1.1.x you are advised to work through each upgrade listed above in turn rather than starting here. You should use the readme file for the version you are upgrading to with the exception of the upgrade to 1.1.x which is covered in this file.
+If you are not yet using 1.1.x you are advised to work through each upgrade listed above in turn rather than starting
+here. You should use the readme file for the version you are upgrading to with the exception of the upgrade to 1.1.x
+which is covered in this file.
 
 
 
 #### Required changes to the services file.
 
-Some of these changes are required to keep things working. Most are only required in order to maintain existing behaviour. Where a change is required only to preserve existing behaviour it is noted in the explanation.
+Some of these changes are required to keep things working. Most are only required in order to maintain existing
+behaviour. Where a change is required only to preserve existing behaviour it is noted in the explanation.
 
 ##### Changes to variables
   - ```lacUnitLabel``` and ```omUnitLabel``` should be provided in the services file to maintain the existing behaviour which displays 'lac verse' and 'om verse' respectively. The defaults have changed to 'lac unit' and 'om unit' to remove biblical verse assumption. The services choices can also be overridden in individual project settings if required.
@@ -1301,8 +1346,8 @@ Some of these changes are required to keep things working. Most are only require
 
 #### Changes required to Python services
 
-- The collation service requirements have been simplified a lot in this release. Instead of having to unpack all of the data received from the javascript the collation service can now just pass it on to the collation editor python code. If you need to make changes at this stage you can still do so but if that is not necessary then the code can be much simpler. The minimum required code is provided as an example in the description of the collation service above.
-- An new service is required to apply settings and is described above in the Python/Server Services section under Settings Applier. It is called from the new javascript services function ```applySettings()``` (also documented above).
+- The collation service requirements have been simplified a lot in this release. Instead of having to unpack all of the data received from the JavaScript the collation service can now just pass it on to the collation editor python code. If you need to make changes at this stage you can still do so but if that is not necessary then the code can be much simpler. The minimum required code is provided as an example in the description of the collation service above.
+- An new service is required to apply settings and is described above in the Python/Server Services section under Settings Applier. It is called from the new JavaScript services function ```applySettings()``` (also documented above).
 
 #### Exporter changes which may need action in inherited classes
 
