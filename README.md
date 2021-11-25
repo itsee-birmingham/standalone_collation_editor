@@ -28,14 +28,6 @@ The collation editor makes use of several third party libraries written and made
 of sources and licenses are available in the headers of the relevant JavaScript files. The redips drag and drop library
 (https://github.com/dbunic/REDIPS_drag) warrants special mention as it is used for all of the drag and drop interaction.
 
-Documentation
----
-
-This documentation is a work in progress. I will gradually fill in the gaps as time allows. The data structures
-required as input are fairly well documented in the README file of the standalone collation editor repository on
-github:
-
- https://github.com/itsee-birmingham/standalone_collation_editor
 
 Terminology
 ---
