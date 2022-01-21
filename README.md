@@ -287,7 +287,7 @@ This should retrieve the collation with the given id and run the callback on the
 This variable should be an array of strings giving the full url of any additional JavaScript you need the collation editor to load. These might be required run the services for your framework (an internal api file for example) or you might want to use additional files to store configuration functions that you call in the services. These files will be loaded as part of the collation editor initialisation functions called after the services have been set.
 
 
-- ```localCollationFunction```
+- #### ```localCollationFunction```
 
 **This variable can be overwritten in individual project settings (but this may not be advisable)**
 
