@@ -707,7 +707,7 @@ OR = (function() {
         // TODO: fosilise the reading suffixes and main reading label suffixes here
         // then make output dependent on these not being present
         _getMainReadingSpecialClasses();
-
+        // The following comment is no longer true as we do have that button in the approved screen!
         // at this point the saved approved version always and only ever has the correct subreadings shown we
         // don't have the option to show/hide subreadings in the interface so we can be sure they are always correct
         CL.saveCollation('approved', function() {
@@ -896,7 +896,7 @@ OR = (function() {
     labelForm.setAttribute('id', 'label_form');
     labelForm.setAttribute('class', 'label_form');
     html = [];
-    html.push('<div class="dialogue_form_header drag-zone">Edit Label</div>')
+    html.push('<div class="dialogue_form_header drag-zone">Edit Label</div>');
     html.push('<form id="label_change_form">');
     html.push('<label for="new_label">new label:<br/><input type="text" id="new_label"/></label><br/><br/>');
     html.push('<input class="pure-button dialogue-form-button" id="close_label_button" type="button" value="Cancel"/>');
@@ -1458,7 +1458,7 @@ OR = (function() {
         spinner.removeLoadingOverlay();
       });
     } else {
-      var url, settings, data;
+      var url, settings, callback;
       settings = JSON.parse(CL.getExporterSettings());
       if (!settings.hasOwnProperty('options')) {
         settings.options = {};
@@ -1466,23 +1466,40 @@ OR = (function() {
       settings.options.rule_classes = CL.ruleClasses;
       spinner.showLoadingOverlay();
       url = CL.services.apparatusServiceUrl;
-      data = {settings: JSON.stringify(settings),
-              data: JSON.stringify([{'context': CL.context, 'structure': CL.data}])
-              };
-      $.post(url, data).then(function (response) {
-          var blob, filename, downloadUrl, hiddenLink;
-          blob = new Blob([response], {'type': 'text/txt'});
-          filename = CL.context + '_apparatus.txt';
-          downloadUrl = window.URL.createObjectURL(blob);
-          hiddenLink = document.createElement('a');
-          hiddenLink.style.display = 'none';
-          hiddenLink.href = downloadUrl;
-          hiddenLink.download = filename;
-          document.body.appendChild(hiddenLink);
-          hiddenLink.click();
-          window.URL.revokeObjectURL(downloadUrl);
-          spinner.removeLoadingOverlay();
-      });
+      callback = function(collations) {
+          var collationId, innerCallback;
+          for (let i=0; i<collations.length; i+=1) {
+              if (collations[i].status === 'approved') {
+                  collationId = collations[i].id;
+              }
+          }
+          innerCallback = function (collation) {
+              var data;
+              data = {settings: JSON.stringify(settings),
+                      data: JSON.stringify([{'context': CL.context, 'structure': collation.structure}])
+                      };
+              $.post(url, data).then(function (response) {
+                  var blob, filename, downloadUrl, hiddenLink;
+                  blob = new Blob([response], {'type': 'text/txt'});
+                  filename = CL.context + '_apparatus.txt';
+                  downloadUrl = window.URL.createObjectURL(blob);
+                  hiddenLink = document.createElement('a');
+                  hiddenLink.style.display = 'none';
+                  hiddenLink.href = downloadUrl;
+                  hiddenLink.download = filename;
+                  document.body.appendChild(hiddenLink);
+                  hiddenLink.click();
+                  window.URL.revokeObjectURL(downloadUrl);
+                  spinner.removeLoadingOverlay();
+              }).fail(function (response) {
+                  alert('This unit cannot be exported 2. First try reapproving the unit. If the problem persists please ' +
+                        'recollate the unit from the collation home page.');
+                  spinner.removeLoadingOverlay();
+              });
+          };
+          loadSavedCollation(collationId, innerCallback);
+      };
+      getSavedCollations(CL.context, undefined, callback);
     }
   };
 
@@ -1785,10 +1802,12 @@ OR = (function() {
                 // this pass through. Somehow this still works!
                 if (reading) {
                   if (matchedReadings[unit._id][j].hasOwnProperty('subreadings')) {
-                    CL.makeStandoffReading('none', {'app_id': key,
-                                                    'unit_id': unit._id,
-                                                    'unit_pos': i,
-                                                    'reading_id': matchedReadings[unit._id][j].reading_id}, parentId);
+                    CL.makeStandoffReading('none',
+                                           {'app_id': key,
+                                            'unit_id': unit._id,
+                                            'unit_pos': i,
+                                            'reading_id': matchedReadings[unit._id][j].reading_id},
+                                            parentId, undefined, true);
                   } else {
                     CL.doMakeStandoffReading('none', key, unit, reading, newParent);
                   }

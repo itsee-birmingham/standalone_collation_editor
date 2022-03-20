@@ -79,7 +79,7 @@ CL = (function() {
       _combinedGapInNextUnit, _getNewGapRdgDetails, _addExtraGapReadings, _extraGapIsWithinAnOverlap,
       _getInclusiveOverlapReadings, _getExtraGapLocation, _createExtraGaps, _addLacReading,
       _addNavEvent, _findLatestStageVerse, _loadLatestStageVerse, _removeOverlappedReadings,
-      _applySettings, _getApprovalSettings, _compareReadings,
+      _getApprovalSettings, _compareReadings,
       _disableEventPropagation, _showCollationSettings, _checkWitnesses, _getScrollPosition,
       _getMousePosition, _displayWitnessesHover, _getWitnessesForReading,
       _findStandoffWitness, _getPreStageChecks, _makeRegDecisionsStandoff,
@@ -1612,6 +1612,8 @@ CL = (function() {
         CL.services.saveCollation(CL.context, collation, confirmMessage, approvalSettings[0],
                                   approvalSettings[1], function(savedSuccessful) {
           document.getElementById('message_panel').innerHTML = savedSuccessful ? successMessage : '';
+          // I don't know why this is needed - somewhere in the code show/hide subreadings must be called after suffixes have been added
+          CL.data = collation.structure;
           if (savedSuccessful) { //only run success callback if successful!
             CL.isDirty = false;
             if (typeof successCallback !== 'undefined') {
@@ -1925,7 +1927,7 @@ CL = (function() {
   };
 
   findReadingByText = function(unit, text) {
-    var tokenList
+    var tokenList;
     for (let i = 0; i < unit.readings.length; i += 1) {
       if (unit.readings[i].hasOwnProperty('text_string') && unit.readings[i].text_string === text) {
         return unit.readings[i];
@@ -1990,7 +1992,7 @@ CL = (function() {
     return structuredTokens;
   };
 
-  makeStandoffReading = function(type, readingDetails, parentId, outerCallback) {
+  makeStandoffReading = function(type, readingDetails, parentId, outerCallback, skipSettings) {
     var apparatus, unit, parent, reading, fosilisedReading, tValuesForSettings, options, displaySettings,
       resultCallback, data;
     data = {};
@@ -2005,6 +2007,12 @@ CL = (function() {
     }
     fosilisedReading = JSON.parse(JSON.stringify(reading));
     tValuesForSettings = _extractAllTValuesForRGAppliedRules(reading, unit, apparatus);
+    // settings can only be skipped if there are no tokens to deal with (it is only relevant for combine lac/om readings)
+    if (tValuesForSettings.length === 0 && skipSettings === true) {
+        skipSettings = true;
+    } else {
+        skipSettings = false;
+    }
     options = {};
     displaySettings = {};
     for (let setting in CL.displaySettings) {
@@ -2017,21 +2025,30 @@ CL = (function() {
     options.display_settings = displaySettings;
     options.display_settings_config = CL.displaySettingsDetails;
 
-    resultCallback = function(data) {
-      var baseReadingsWithSettingsApplied;
-      baseReadingsWithSettingsApplied = {};
-      for (let i = 0; i < data.tokens.length; i += 1) {
-        baseReadingsWithSettingsApplied[data.tokens[i].t] = data.tokens[i]['interface'];
-      }
-      _makeStandoffReading2(reading, fosilisedReading, parent, baseReadingsWithSettingsApplied,
-                            type, unit, apparatus, readingDetails);
-      if (outerCallback !== undefined) {
-        outerCallback();
-      }
-    };
-    data.tokens = tValuesForSettings;
-    data.options = options;
-    CL.services.applySettings(data, resultCallback);
+    if (skipSettings === false) {
+        resultCallback = function(data) {
+          var baseReadingsWithSettingsApplied;
+          baseReadingsWithSettingsApplied = {};
+          for (let i = 0; i < data.tokens.length; i += 1) {
+            baseReadingsWithSettingsApplied[data.tokens[i].t] = data.tokens[i]['interface'];
+          }
+          _makeStandoffReading2(reading, fosilisedReading, parent, baseReadingsWithSettingsApplied,
+                                type, unit, apparatus, readingDetails);
+          if (outerCallback !== undefined) {
+            outerCallback();
+          }
+        };
+        data.tokens = tValuesForSettings;
+        data.options = options;
+        CL.services.applySettings(data, resultCallback);
+    } else {
+        _makeStandoffReading2(reading, fosilisedReading, parent, {},
+                              type, unit, apparatus, readingDetails);
+        if (outerCallback !== undefined) {
+           outerCallback();
+        }
+    }
+
   };
 
   _makeStandoffReading2 = function(reading, fosilisedReading, parent, baseReadingsWithSettingsApplied,
@@ -5789,7 +5806,6 @@ CL = (function() {
       _findLatestStageVerse: _findLatestStageVerse,
       _loadLatestStageVerse: _loadLatestStageVerse,
       _removeOverlappedReadings: _removeOverlappedReadings,
-      _applySettings: _applySettings,
       _getApprovalSettings: _getApprovalSettings,
       _compareReadings: _compareReadings,
       _disableEventPropagation: _disableEventPropagation,
