@@ -11,7 +11,7 @@ cforms = (function () {
 
 
   _getValue = function (elem) {
-    var value;
+    var value, temp;
     value = null;
     if ((elem.tagName === 'INPUT' &&
             (elem.type !== 'checkbox' && elem.type !== 'radio')) || elem.tagName === 'TEXTAREA') {
@@ -58,24 +58,50 @@ cforms = (function () {
         }
       }
     } else if (elem.tagName === 'SELECT') {
-      value = elem.value;
-      if (value !== 'none') {
-        if ($(elem).hasClass('integer')) {
-          value = parseInt(value, 10);
-          if (isNaN(value)) {
-            value = null;
+      if (elem.hasAttribute('multiple')) {
+        value = [];
+        for (let i = 0; i < elem.selectedOptions.length; i += 1) {
+          temp = elem.selectedOptions[i].value;
+          if (temp !== 'none') {
+            if ($(elem).hasClass('integer')) {
+              temp = parseInt(temp, 10);
+              if (isNaN(temp)) {
+                temp = null;
+              }
+            } else if ($(elem).hasClass('boolean')) {
+              if (temp === 'true') {
+                temp = true;
+              } else {
+                if (temp === 'false') {
+                  temp = false;
+                }
+              }
+            }
+          } else if (!$(elem).hasClass('stringnotnull')) {
+            temp = null;
           }
-        } else if ($(elem).hasClass('boolean')) {
-          if (value === 'true') {
-            value = true;
-          } else {
-            if (value === 'false') {
-              value = false;
+          value.push(temp);
+        }
+      } else {
+        value = elem.value;
+        if (value !== 'none') {
+          if ($(elem).hasClass('integer')) {
+            value = parseInt(value, 10);
+            if (isNaN(value)) {
+              value = null;
+            }
+          } else if ($(elem).hasClass('boolean')) {
+            if (value === 'true') {
+              value = true;
+            } else {
+              if (value === 'false') {
+                value = false;
+              }
             }
           }
+        } else if (!$(elem).hasClass('stringnotnull')) {
+          value = null;
         }
-      } else if (!$(elem).hasClass('stringnotnull')) {
-        value = null;
       }
     } else {
       if (elem.type === 'radio') {

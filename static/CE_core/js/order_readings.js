@@ -22,7 +22,7 @@ OR = (function() {
       _addEvent, _markReading, _sortArrayByIndexes,
       _getApparatusForContext, _compareOverlaps, _throughNumberApps, _repositionOverlaps,
       _getPotentialConflicts, _unitCanMoveTo, _findLeadUnit, _deleteUnit, _undo,
-      _findOverlapApparatusAndUnitById, _horizontalCombineOverlaps,
+      _findOverlapApparatusAndUnitById, _horizontalCombineOverlaps, _updateLabel,
       _mergeAllSuppliedEmptyReadings;
 
   //*********  public functions *********
@@ -413,7 +413,8 @@ OR = (function() {
   };
 
   relabelReadings = function(readings, overwrite) {
-    var label;
+    var label, labels;
+    // first do a pass through the regular readings
     for (let i = 0; i < readings.length; i += 1) {
       if (readings[i].hasOwnProperty('type') && (readings[i].type === 'lac' || readings[i].type === 'lac_verse')) {
         label = 'zz';
@@ -427,7 +428,27 @@ OR = (function() {
         label = CL.getAlphaId(i);
       }
       if (overwrite || !readings[i].hasOwnProperty('label')) {
-        readings[i].label = label;
+        if (!readings[i].hasOwnProperty('parents') || readings[i].parents.length <= 1 || CL.project.storeMultipleSupportLabelsAsParents === false) {
+          readings[i].label = label;
+        }
+      }
+    }
+    if (CL.project.storeMultipleSupportLabelsAsParents === true) {
+      // now check the ones with parents
+      for (let i = 0; i < readings.length; i += 1) {
+        labels = [];
+        if (readings[i].hasOwnProperty('parents') && readings[i].parents.length > 1) {
+          for (let j = 0; j < readings.length; j += 1) {
+            if (readings[i].parents.indexOf(readings[j].text_string) !== -1) {
+              labels.push(readings[j].label);
+            }
+          }
+          if (labels.length > 1) {
+            readings[i].label = labels.join('/');
+          } else {
+            delete readings[i].parents;
+          }
+        }
       }
     }
   };
@@ -884,7 +905,7 @@ OR = (function() {
   };
 
   editLabel = function(rdgDetails, menuPos, saveFunction) {
-    var left, top, labelForm, html, newLabel, reading, currentLabel;
+    var left, top, labelForm, html, reading, currentLabel, currentParents, unitReadings, label;
     if (document.getElementById('label_form')) {
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('label_form'));
     }
@@ -893,24 +914,78 @@ OR = (function() {
     labelForm = document.createElement('div');
     reading = CL.data[rdgDetails[1]][rdgDetails[0]].readings[rdgDetails[2]];
     currentLabel = reading.label;
+    currentParents = reading.hasOwnProperty('parents') ? reading.parents : [];
     labelForm.setAttribute('id', 'label_form');
     labelForm.setAttribute('class', 'label_form');
     html = [];
     html.push('<div class="dialogue_form_header drag-zone">Edit Label</div>');
     html.push('<form id="label_change_form">');
-    html.push('<label for="new_label">new label:<br/><input type="text" id="new_label"/></label><br/><br/>');
+    html.push('<label id="new_label_label" for="new_label">New label:<br/><input type="text" id="new_label" name="new_label"/></label><br/><br/>');
+    if (CL.project.storeMultipleSupportLabelsAsParents === true) {
+      html.push('<label for="multiple_support">Multiple support: </label><input type="checkbox" id="multiple_support"/><br/>');
+      html.push('<label id="parent_select_label" for="parent_select" class="top_label disabled">Parents: </label><select class="disabled" disabled="disabled" id="parent_select" name="parent_select" multiple></select><br/><br/>');
+    }
     html.push('<input class="pure-button dialogue-form-button" id="close_label_button" type="button" value="Cancel"/>');
     html.push('<input class="pure-button dialogue-form-button" id="save_label_button" type="button" value="Save"/>');
     html.push('</form>');
     labelForm.innerHTML = html.join('');
     document.getElementsByTagName('body')[0].appendChild(labelForm);
-
+    if (CL.project.storeMultipleSupportLabelsAsParents === true) {
+      unitReadings = [];
+      for (let i = 0; i < CL.data[rdgDetails[1]][rdgDetails[0]].readings.length; i += 1) {
+        label = CL.data[rdgDetails[1]][rdgDetails[0]].readings[i].label;
+        if (i !== rdgDetails[2] && label !== 'zz' && label !== 'zu' && label.indexOf('/') === -1) {
+          unitReadings.push({'label': label,
+                             'reading': CL.data[rdgDetails[1]][rdgDetails[0]].readings[i].text_string});
+        }
+      }
+      cforms.populateSelect(unitReadings, document.getElementById('parent_select'),
+                            {'value_key': 'reading', 'text_keys': 'reading', 'add_select': false});
+    }
+    document.getElementById('new_label').value = currentLabel; // populate field with current label value
+    if (currentParents.length > 1) {
+      document.getElementById('multiple_support').setAttribute('checked', 'checked');
+      $('#parent_select_label').removeClass('disabled');
+      $('#parent_select').removeClass('disabled');
+      document.getElementById('parent_select').removeAttribute('disabled');
+      $('#new_label_label').addClass('disabled');
+      document.getElementById('new_label').setAttribute('disabled', 'disabled');
+      // select the correct parents
+      for (let i = 0; i < currentParents.length; i += 1) {
+        $('#parent_select option[value="' + currentParents[i] + '"]').prop('selected', true);
+      }
+      $('#parent_select').focus();
+    };
+    if (document.getElementById('multiple_support')) {
+      $('#multiple_support').on('click', function () {
+        if (document.getElementById('multiple_support').checked === true) {
+          $('#parent_select_label').removeClass('disabled');
+          $('#parent_select').removeClass('disabled');
+          document.getElementById('parent_select').removeAttribute('disabled');
+          $('#new_label_label').addClass('disabled');
+          document.getElementById('new_label').setAttribute('disabled', 'disabled');
+        } else {
+          $('#parent_select_label').addClass('disabled');
+          $('#parent_select').addClass('disabled');
+          document.getElementById('parent_select').setAttribute('disabled', 'disabled');
+          $('#new_label_label').removeClass('disabled');
+          document.getElementById('new_label').removeAttribute('disabled');
+          // unselect all parents
+          $('#parent_select option').prop('selected', false);
+        }
+      });
+    }
+    if (document.getElementById('parent_select')) {
+      $('#parent_select').on('change', function () {
+        _updateLabel(rdgDetails);
+      });
+    }
     // the +25 here is to move it out of the way of the other labels and readings so you can still see them
     left = parseInt(left) - document.getElementById('scroller').scrollLeft + 25;
     top = parseInt(top) - document.getElementById('scroller').scrollTop;
     document.getElementById('label_form').style.left = left + 'px';
     document.getElementById('label_form').style.top = top + 'px';
-    document.getElementById('new_label').value = currentLabel; // populate field with current label value
+
     drag.initDraggable('label_form', true, true);
     $('#close_label_button').on('click', function(event) {
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('label_form'));
@@ -921,21 +996,43 @@ OR = (function() {
       });
     } else {
       $('#save_label_button').on('click', function(event) {
+        let data, newLabel, newParents;
+        data = cforms.serialiseForm('label_change_form');
+        console.log(data);
+        newParents = data.parent_select;
         newLabel = document.getElementById('new_label').value.replace(/\s+/g, '');
-        if (newLabel != '') {
-          _manualChangeLabel(rdgDetails, newLabel);
+        if (newLabel !== '') {
+          _manualChangeLabel(rdgDetails, newLabel, newParents);
         }
       });
     }
   };
 
-  _manualChangeLabel = function(rdgDetails, newLabel) {
+  _updateLabel = function (rdgDetails) {
+    let readings, labels;
+    readings = [];
+    labels = [];
+    for (let i = 0; i < document.getElementById('parent_select').selectedOptions.length; i += 1) {
+      readings.push(document.getElementById('parent_select').selectedOptions[i].value);
+    }
+    for (let i = 0; i < CL.data[rdgDetails[1]][rdgDetails[0]].readings.length; i += 1) {
+      if (readings.indexOf(CL.data[rdgDetails[1]][rdgDetails[0]].readings[i].text_string) !== -1) {
+        labels.push(CL.data[rdgDetails[1]][rdgDetails[0]].readings[i].label);
+      }
+    }
+    document.getElementById('new_label').value = labels.join('/');
+  };
+
+  _manualChangeLabel = function(rdgDetails, newLabel, parents) {
     var reading, scrollOffset;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
                     document.getElementById('scroller').scrollTop];
     addToUndoStack(CL.data);
     reading = CL.data[rdgDetails[1]][rdgDetails[0]].readings[rdgDetails[2]];
     reading.label = newLabel;
+    if (parents !== undefined && parents.length > 0) {
+      reading.parents = parents;
+    }
     document.getElementsByTagName('body')[0].removeChild(document.getElementById('label_form'));
     showOrderReadings({'container': CL.container});
     document.getElementById('scroller').scrollLeft = scrollOffset[0];

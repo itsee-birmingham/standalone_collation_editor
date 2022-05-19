@@ -3133,7 +3133,6 @@ CL = (function() {
       SV.undoStackLength = CL.services.undoStackLength;
     } //default in SV cannot be overriden in projects due to potential memory issues
 
-
     //settings for witness changes
     if (project.hasOwnProperty('allowWitnessChangesInSavedCollations')) {
       CL.project.allowWitnessChangesInSavedCollations = project.allowWitnessChangesInSavedCollations;
@@ -3142,6 +3141,16 @@ CL = (function() {
     } else {
       //default is false
       CL.project.allowWitnessChangesInSavedCollations = false;
+    }
+
+    //settings for label storage in later stages
+    if (project.hasOwnProperty('storeMultipleSupportLabelsAsParents')) {
+      CL.project.storeMultipleSupportLabelsAsParents = project.storeMultipleSupportLabelsAsParents;
+    } else if (CL.services.hasOwnProperty('storeMultipleSupportLabelsAsParents')) {
+      CL.project.storeMultipleSupportLabelsAsParents = CL.services.storeMultipleSupportLabelsAsParents;
+    } else {
+      //default is false
+      CL.project.storeMultipleSupportLabelsAsParents = false;
     }
 
     //this bit does the index page settings.
