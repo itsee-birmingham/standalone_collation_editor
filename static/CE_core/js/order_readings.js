@@ -998,7 +998,6 @@ OR = (function() {
       $('#save_label_button').on('click', function(event) {
         let data, newLabel, newParents;
         data = cforms.serialiseForm('label_change_form');
-        console.log(data);
         newParents = data.parent_select;
         newLabel = document.getElementById('new_label').value.replace(/\s+/g, '');
         if (newLabel !== '') {
