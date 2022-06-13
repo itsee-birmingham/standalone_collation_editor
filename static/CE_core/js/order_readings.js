@@ -1032,6 +1032,9 @@ OR = (function() {
     if (parents !== undefined && parents.length > 0) {
       reading.parents = parents;
     }
+    if (parents === undefined) {
+      delete reading.parents;
+    }
     document.getElementsByTagName('body')[0].removeChild(document.getElementById('label_form'));
     showOrderReadings({'container': CL.container});
     document.getElementById('scroller').scrollLeft = scrollOffset[0];
