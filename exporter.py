@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import re
-import codecs
-import json
 # using etree rather than lxml here to reduce dependencies in core code
 import xml.etree.ElementTree as etree
 
