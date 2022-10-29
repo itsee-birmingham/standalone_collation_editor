@@ -468,6 +468,15 @@ This is a boolean variable. It works in the same was as ```combineAllLacsInAppro
 The default is false.
 
 
+- #### ```storeMultipleSupportLabelsAsParents```
+
+**This variable can be overwritten in individual project settings**
+
+This is a boolean variable. If it is set to false (the default) then the label editing is completely free and the editor can type anything they want into the reading label box. If it is set to true then readings which could support multiple other readings can be recorded with links to the supported readings. The advantage of using this setting is that when the readings are reordered the labels supporting multiple other readings can be preserved and updated.
+
+The default is false.
+
+
 - #### ```approvalSettings```
 
 **This variable can be overwritten in individual project settings**
@@ -1378,3 +1387,11 @@ Changelog 2.x release
 
 * Bug fixed in the function which combines all lac and/or all om readings in the code to approve a unit. This but was caused by the introduction of the the settings applier as a service which added an asynchronous call into a sequence of actions which had to be run in a specific order. As the settings are never relevant to lac and om readings the settings applier is now skipped when combining lac and/or om readings.
 * The default behaviour of ```getApparatusForContext()``` has been changed to use the approved version of the data which has been saved rather than the version currently loaded into the interface. This is because the added ability to show the non-edition subreadings on the approved screen changes the data structure in the interface in a way that makes it unsuitable for export if certain conditions exist in the data. There is no problems with always using the saved version as there is no way to save approved data except in the approval process itself. If the services file provides ```getApparatusForContext()``` this should also be amended to use the saved version of the data.
+
+
+
+Catena Dev branch changes
+---
+
+* Optional services and project setting added *storeMultipleSupportLabelsAsParents* which changes the behaviour of the label editing in order readings and stores support for multiple readings using the reading data itself so that it can be preserved and updated when readings are reordered. If this setting is used and set to true it will not have any impact on existing data but will offer the new label storage option for existing data.
+
