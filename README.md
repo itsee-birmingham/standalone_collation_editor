@@ -878,6 +878,21 @@ There are probably very few, if any, good reasons to use this. It is present to 
 This function is required if ```prepareDisplayString()``` is used. It must exactly reverse the changes made to the string by that function. It is used when making regularisation rules to ensure the stored strings are what is expected and can be transformed by ```prepareNormalisedString()``` correctly in the display.
 
 
+Additional Optional Project Settings
+---
+
+Many of the options available in the services file can also be added to individual project configurations to override the settings in the services file. If this is the case it will be indicated in the documentation for the services file. This section details optional settings not available at the services level.
+
+
+- #### ```witnessDecorators```
+
+The data should be structured as a JSON object. It should have at least two top level keys with one optional key:
+
+- **label** *[string]* - The string/character used to decorate the witness siglum.
+- **superscript** *[boolean]* optional - If set to true the deocrator will be superscripted when displayed.
+- **witnesses** *[array]* - A list of witness which should be decoarated (this should always be a subset of the witnesses specified for the project).
+
+
 Python/Server Services
 ---
 
@@ -1393,5 +1408,6 @@ Changelog 2.x release
 Catena Dev branch changes
 ---
 
-* Optional services and project setting added *storeMultipleSupportLabelsAsParents* which changes the behaviour of the label editing in order readings and stores support for multiple readings using the reading data itself so that it can be preserved and updated when readings are reordered. If this setting is used and set to true it will not have any impact on existing data but will offer the new label storage option for existing data.
+* Optional services and project setting *storeMultipleSupportLabelsAsParents* added which changes the behaviour of the label editing in order readings and stores support for multiple readings using the reading data itself so that it can be preserved and updated when readings are reordered. If this setting is used and set to true it will not have any impact on existing data but will offer the new label storage option for existing data.
 
+* Optional project setting *witnessDecorators* added. This is not available at the services level as the data will be specific to each project. The structure is explained above in the optional project settings section. If data is provided then all hands from that witness will have the label appended after them in the hover overs of the collation editor. This was introduced to provide an easy way to see a group of manuscripts when the grouping was not otherwise made obvious in the sigla. The specific example from the New Testament is the use of a superscript K to make commentary manuscripts more easily identifiable.

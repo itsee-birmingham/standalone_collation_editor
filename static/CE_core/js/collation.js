@@ -64,7 +64,7 @@ CL = (function() {
       loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses,
       calculatePosition, removeWitness, checkWitnessesAgainstProject, setUpRemoveWitnessesForm,
       removeWitnesses, getRemoveWitnessDataFromForm, returnToSummaryTable, prepareAdditionalCollation,
-      removeSpecialWitnesses, runFunction, setOverlappedOptions, setRuleClasses;
+      removeSpecialWitnesses, runFunction, setOverlappedOptions, setRuleClasses, expandWitnessDecorators;
 
   //private function declarations
   let _initialiseEditor, _initialiseProject, _setProjectConfig, _setDisplaySettings,
@@ -179,6 +179,23 @@ CL = (function() {
     }
     unit._id = MD5(text.join(''));
     return unit._id;
+  };
+
+  expandWitnessDecorators = function () {
+    for (let i = 0; i < CL.project.witnessDecorators.length; i += 1) {
+      let hands = [];
+      for (let key in CL.data.hand_id_map) {
+        if (CL.project.witnessDecorators[i].witnesses.indexOf(CL.data.hand_id_map[key]) !== -1) {
+          hands.push(key);
+        }
+      }
+      if (CL.project.witnessDecorators[i].superscript == true) {
+        CL.project.witnessDecorators[i].display = '<sup>' + CL.project.witnessDecorators[i].label + '</sup>';
+      } else {
+        CL.project.witnessDecorators[i].display = CL.project.witnessDecorators[i].label;
+      }
+      CL.project.witnessDecorators[i].hands = hands;
+    }
   };
 
   /** */
@@ -2922,7 +2939,17 @@ CL = (function() {
           }
         }
       }
-      witnesses.push(witness + suffix);
+      if (CL.project.witnessDecorators !== null) {
+        let decorator = [];
+        for (let i = 0; i < CL.project.witnessDecorators.length; i += 1) {
+          if (CL.project.witnessDecorators[i].hands.indexOf(witness) !== -1) {
+            decorator.push(CL.project.witnessDecorators[i].display);
+          }
+        }
+        witnesses.push(witness + decorator.join('') + suffix);
+      } else {
+        witnesses.push(witness + suffix);
+      } 
     }
     witnesses = sortWitnesses(witnesses);
     return witnesses;
@@ -3009,6 +3036,11 @@ CL = (function() {
     }
     if (project.hasOwnProperty('extractWordsForHeader') && typeof project.extractWordsForHeader === 'string') {
       CL.project.extractWordsForHeader = _getFunctionFromString(project.extractWordsForHeader);
+    }
+    if (project.hasOwnProperty('witnessDecorators')) {
+      CL.project.witnessDecorators = project.witnessDecorators;
+    } else {
+      CL.project.witnessDecorators = null;
     }
 
     if (project.hasOwnProperty('prepareDisplayString') && typeof project.prepareDisplayString === 'string') {
@@ -5760,6 +5792,7 @@ CL = (function() {
       removeSpecialWitnesses: removeSpecialWitnesses,
       findReadingPosById: findReadingPosById,
       runFunction: runFunction,
+      expandWitnessDecorators: expandWitnessDecorators,
 
       //deprecated function mapping for calls from older services
       set_service_provider: setServiceProvider,
@@ -5955,6 +5988,7 @@ CL = (function() {
       prepareAdditionalCollation: prepareAdditionalCollation,
       removeSpecialWitnesses: removeSpecialWitnesses,
       runFunction: runFunction,
+      expandWitnessDecorators: expandWitnessDecorators,
 
       //deprecated function mapping for calls from older services
       set_service_provider: setServiceProvider,

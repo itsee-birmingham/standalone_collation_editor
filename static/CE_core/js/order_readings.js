@@ -51,6 +51,9 @@ OR = (function() {
     } else {
       container = options.container;
     }
+    if (CL.project.witnessDecorators !== null) {
+      CL.expandWitnessDecorators();
+    }
     //sort out options and get layout
     if (!options.hasOwnProperty('highlighted_wit') && CL.highlighted !== 'none') {
       options.highlighted_wit = CL.highlighted;
@@ -209,6 +212,9 @@ OR = (function() {
       container = document.getElementsByTagName('body')[0];
     } else {
       container = options.container;
+    }
+    if (CL.project.witnessDecorators !== null) {
+      CL.expandWitnessDecorators();
     }
     //sort out options and get layout
     if (!options.hasOwnProperty('highlighted_wit') && CL.highlighted !== 'none') {

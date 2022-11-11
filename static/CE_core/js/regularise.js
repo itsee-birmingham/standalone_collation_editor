@@ -325,6 +325,9 @@ RG = (function() {
     if (!options.hasOwnProperty('highlighted_wit') && CL.highlighted !== 'none') {
       options.highlighted_wit = CL.highlighted;
     }
+    if (CL.project.witnessDecorators !== null) {
+      CL.expandWitnessDecorators();
+    }
     if (CL.witnessAddingMode === true) {
 			// this sets this a default so that when all is highlighted this will work - any data specified
       // in options will override it

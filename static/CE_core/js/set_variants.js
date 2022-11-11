@@ -83,6 +83,9 @@ SV = (function() {
     } else {
       container = document.getElementsByTagName('body')[0];
     }
+    if (CL.project.witnessDecorators !== null) {
+      CL.expandWitnessDecorators();
+    }
     if (CL.witnessRemovingMode !== true) {
       // attach right click menus
       SimpleContextMenu.setup({
