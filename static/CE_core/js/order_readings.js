@@ -23,7 +23,7 @@ OR = (function() {
       _getApparatusForContext, _compareOverlaps, _throughNumberApps, _repositionOverlaps,
       _getPotentialConflicts, _unitCanMoveTo, _findLeadUnit, _deleteUnit, _undo,
       _findOverlapApparatusAndUnitById, _horizontalCombineOverlaps, _updateLabel,
-      _mergeAllSuppliedEmptyReadings;
+      _mergeAllSuppliedEmptyReadings, _categoriseOm, _doCategoriseOm;
 
   //*********  public functions *********
 
@@ -66,11 +66,17 @@ OR = (function() {
     SimpleContextMenu.attach('main_reading', function() {
       return _makeMenu('main_reading');
     });
+    SimpleContextMenu.attach('main_reading_om', function() {
+      return _makeMenu('main_reading_om');
+    });
     SimpleContextMenu.attach('deletable', function() {
       return _makeMenu('deletable_unit');
     });
     SimpleContextMenu.attach('overlap_main_reading', function() {
       return _makeMenu('overlap_main_reading');
+    });
+    SimpleContextMenu.attach('overlap_main_reading_om', function() {
+      return _makeMenu('overlap_main_reading_om');
     });
     SimpleContextMenu.attach('subreading', function() {
       return _makeMenu('subreading');
@@ -347,6 +353,7 @@ OR = (function() {
         hasContextMenu = true;
       }
       text = CL.extractDisplayText(data[i], i, data.length, options.unit_id, options.app_id);
+
       if (text.indexOf('system_gen_') !== -1) {
         hasContextMenu = false;
         text = text.replace('system_gen_', '');
@@ -382,13 +389,21 @@ OR = (function() {
       html.push('</div></td>');
       if (!overlap) {
         if (hasContextMenu) {
-          html.push('<td class="redips-mark main_reading">');
+            if (['om', 'om_verse'].indexOf(data[i].type) !== -1){
+              html.push('<td class="redips-mark main_reading_om">');
+            } else {
+              html.push('<td class="redips-mark main_reading">');
+            } 
         } else {
           html.push('<td class="redips-mark main_reading_ncm">');
         }
       } else {
         if (hasContextMenu) {
-          html.push('<td class="redips-mark overlap_main_reading">');
+          if (['om', 'om_verse'].indexOf(data[i].type) !== -1){
+            html.push('<td class="redips-mark overlap_main_reading_om">');
+          } else {
+            html.push('<td class="redips-mark overlap_main_reading">');
+          }
         } else {
           html.push('<td class="redips-mark overlap_main_reading_ncm">');
         }
@@ -434,7 +449,8 @@ OR = (function() {
         label = CL.getAlphaId(i);
       }
       if (overwrite || !readings[i].hasOwnProperty('label')) {
-        if (!readings[i].hasOwnProperty('parents') || readings[i].parents.length <= 1 || CL.project.storeMultipleSupportLabelsAsParents === false) {
+        if (!readings[i].hasOwnProperty('parents') || readings[i].parents.length <= 1 || 
+              CL.project.storeMultipleSupportLabelsAsParents === false || (CL.project.useZvForAllReadingsSupport == true && readings[i].label != 'zv')) {
           readings[i].label = label;
         }
       }
@@ -450,7 +466,11 @@ OR = (function() {
             }
           }
           if (labels.length > 1) {
-            readings[i].label = labels.join('/');
+            if (CL.project.useZvForAllReadingsSupport == true && readings[i].label == 'zv') {
+              // then just leave the reading as zv
+            } else {
+              readings[i].label = labels.join('/');
+            }      
           } else {
             delete readings[i].parents;
           }
@@ -899,6 +919,8 @@ OR = (function() {
             html.push('<td></td>');
           } else if (overlapped === true) {
             html.push('<td></td>');
+          } else if (parentLabel === 'zv') {
+            html.push('<td><div class="spanlike">?' + data[type][i].suffix + '.</td></td>');
           } else {
             html.push('<td><div class="spanlike">' + parentLabel + data[type][i].suffix + '.</td></td>');
           }
@@ -1014,18 +1036,27 @@ OR = (function() {
   };
 
   _updateLabel = function (rdgDetails) {
-    let readings, labels;
+    let readings, labels, supportsAll;
     readings = [];
     labels = [];
     for (let i = 0; i < document.getElementById('parent_select').selectedOptions.length; i += 1) {
       readings.push(document.getElementById('parent_select').selectedOptions[i].value);
+    }
+    if (readings.length === document.getElementById('parent_select').length) {
+      supportsAll = true;
+    } else {
+      supportsAll = false;
     }
     for (let i = 0; i < CL.data[rdgDetails[1]][rdgDetails[0]].readings.length; i += 1) {
       if (readings.indexOf(CL.data[rdgDetails[1]][rdgDetails[0]].readings[i].text_string) !== -1) {
         labels.push(CL.data[rdgDetails[1]][rdgDetails[0]].readings[i].label);
       }
     }
-    document.getElementById('new_label').value = labels.join('/');
+    if (supportsAll === true && CL.project.useZvForAllReadingsSupport == true) {
+      document.getElementById('new_label').value = 'zv';
+    } else {
+      document.getElementById('new_label').value = labels.join('/');
+    } 
   };
 
   _manualChangeLabel = function(rdgDetails, newLabel, parents) {
@@ -1073,9 +1104,12 @@ OR = (function() {
       document.getElementById('context_menu').innerHTML = '<li id="unmark_sub"><span>Make main reading</span></li>';
     } else if (menuName === 'deletable_unit') {
       document.getElementById('context_menu').innerHTML = '<li id="delete_unit"><span>Delete unit</span></li>';
-    } else if (menuName === 'main_reading' || menuName === 'overlap_main_reading') {
+    } else if (menuName === 'main_reading' || menuName === 'overlap_main_reading' || menuName === 'main_reading_om' || menuName === 'overlap_main_reading_om') {
       menu = [];
       menu.push('<li id="split_witnesses"><span>Split Witnesses</span></li>');
+      if (CL.project.omCategories.length > 0) {
+        menu.push('<li id="categorise_om"><span>Categorise Om</span></li>');
+      }
       subreadings = [];
       orRules = CL.getRuleClasses('create_in_OR', true, 'name', ['subreading', 'value', 'identifier',
                                                                  'keep_as_main_reading']);
@@ -1256,8 +1290,7 @@ OR = (function() {
   };
 
   _addContextMenuHandlers = function() {
-    // TODO: how many of these declarations are needed?
-    var orRules, key, rule, ruleName, subtype, subreading;
+    var orRules, key, rule, ruleName;
     if (document.getElementById('unmark_sub')) {
       $('#unmark_sub').off('click.ums_c');
       $('#unmark_sub').off('mouseover.ums_mo');
@@ -1285,6 +1318,23 @@ OR = (function() {
         });
       });
       $('#split_witnesses').on('mouseover.sw_mo', function(event) {
+        CL.hideTooltip();
+      });
+    }
+    if (document.getElementById('categorise_om')) {
+      $('#categorise_om').off('click.co_c');
+      $('#categorise_om').off('mouseover.co_mo');
+      $('#categorise_om').on('click.co_c', function(event) {
+        var element, div, readingDetails;
+        element = SimpleContextMenu._target_element;
+        div = CL.getSpecifiedAncestor(element, 'TR');
+        readingDetails = CL.getUnitAppReading(div.id);
+        _categoriseOm(readingDetails, {
+          'top': SimpleContextMenu._menuElement.style.top,
+          'left': SimpleContextMenu._menuElement.style.left
+        });
+      });
+      $('#categorise_om').on('mouseover.co_mo', function(event) {
         CL.hideTooltip();
       });
     }
@@ -1437,6 +1487,56 @@ OR = (function() {
         }
       }
     }
+  };
+
+
+  /** add an om category to an om reading */
+  _categoriseOm = function(readingDetails, menuPos) {
+    var reading, scrollOffset, witnessList, data, newReadingId;
+    scrollOffset = [document.getElementById('scroller').scrollLeft,
+      							document.getElementById('scroller').scrollTop];
+
+    reading = CL.data[readingDetails[1]][readingDetails[0]].readings[readingDetails[2]];
+    CL.showSplitWitnessMenu(reading, menuPos, {
+      'type': 'categoriseOm',
+      'header': 'Select witnesses to categorise',
+      'button': 'Add category',
+      'form_size': 'small'
+    });
+    // populate om categories
+    cforms.populateSelect(CL.project.omCategories, document.getElementById('om_category'));
+    $('#select_button').on('click', function() {
+      witnessList = [];
+      data = cforms.serialiseForm('select_wit_form');
+      if (!$.isEmptyObject(data)) {
+        witnessList = [];
+        for (let key in data) {
+          if (data.hasOwnProperty(key)) {
+            if (data[key] !== null) {
+              witnessList.push(key);
+            }
+          }
+        }
+      }
+      newReadingId = SV.doSplitReadingWitnesses(readingDetails[0], readingDetails[2], witnessList, readingDetails[1], true);
+      _doCategoriseOm(readingDetails[0], newReadingId, readingDetails[1], scrollOffset);
+      document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
+    });
+  };
+
+  _doCategoriseOm = function(unitNumber, readingId, apparatus, scrollOffset) {
+    let unit, reading;
+    unit = CL.data[apparatus][unitNumber];
+    for (let i = 0; i < unit.readings.length; i += 1) {
+      if (unit.readings[i]._id === readingId) {
+        reading = unit.readings[i];
+      }
+    }
+    reading.details = document.getElementById('om_category').value;
+    OR.relabelReadings(CL.data[apparatus][unitNumber].readings, true);
+    showOrderReadings({'container': CL.container});
+    document.getElementById('scroller').scrollLeft = scrollOffset[0];
+    document.getElementById('scroller').scrollTop = scrollOffset[1];
   };
 
   /**adds the correct handler depending on subreading and keep_as_main_reading settings in the project rule configurations */

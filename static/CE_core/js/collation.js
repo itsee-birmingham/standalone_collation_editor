@@ -897,6 +897,8 @@ CL = (function() {
     if (reading.hasOwnProperty('label') && typeof reading.label !== 'undefined') {
       if (reading.label === 'zz') {
         readingLabel = '—';
+      } else if (reading.label === 'zv') {
+        readingLabel = '?';
       }
     }
     if (reading.hasOwnProperty('overlap_status')) {
@@ -911,7 +913,7 @@ CL = (function() {
           }
         }
       }
-    } else if (reading.label !== 'zz') {
+    } else if (reading.label !== 'zz' && reading.label !== 'zv') {
       if (reading.hasOwnProperty('label')) {
         readingLabel = reading.label + labelSuffix + '.';
       } else {
@@ -1743,6 +1745,8 @@ CL = (function() {
       witnessHtml.push('<label class="inline-label">Details:</label><input disabled="disabled" type="text" name="reading_details" id="reading_details"/><br/></br/>');
       subTypes = getRuleClasses('subreading', true, 'value', 'identifier');
       witnessHtml.push('<label>Subreading type: <select class="stringnotnull" name="subreading_type" id="subreading_select"></select></label><br/><br/>');
+    } else if (details.type === 'categoriseOm') {
+      witnessHtml.push('<label class="inline-label">Om Category:</label><select name="om_category" id="om_category"></select><br/>');
     } else if (details.type !== 'duplicate') {
       witnessHtml.push('<label class="inline-label">Parent reading:</label><select name="parent_reading" id="parent_reading"></select><br/>');
       witnessHtml.push('<label class="inline-label">Details:</label><input disabled="disabled" type="text" name="reading_details" id="reading_details"/><br/></br/>');
@@ -3043,6 +3047,14 @@ CL = (function() {
       CL.project.witnessDecorators = null;
     }
 
+    if (project.hasOwnProperty('omCategories')) {
+      CL.project.omCategories = project.omCategories;
+    } else if (CL.services.hasOwnProperty('omCategories')) {
+      CL.project.omCategories = CL.services.omCategories;
+    } else {
+      CL.project.omCategories = [];
+    }
+
     if (project.hasOwnProperty('prepareDisplayString') && typeof project.prepareDisplayString === 'string') {
       CL.project.prepareDisplayString = _getFunctionFromString(project.prepareDisplayString);
     } else if (CL.services.hasOwnProperty('prepareDisplayString')) {
@@ -3178,11 +3190,14 @@ CL = (function() {
     //settings for label storage in later stages
     if (project.hasOwnProperty('storeMultipleSupportLabelsAsParents')) {
       CL.project.storeMultipleSupportLabelsAsParents = project.storeMultipleSupportLabelsAsParents;
+      CL.project.useZvForAllReadingsSupport = true;
     } else if (CL.services.hasOwnProperty('storeMultipleSupportLabelsAsParents')) {
       CL.project.storeMultipleSupportLabelsAsParents = CL.services.storeMultipleSupportLabelsAsParents;
+      CL.project.useZvForAllReadingsSupport = true;
     } else {
       //default is false
       CL.project.storeMultipleSupportLabelsAsParents = false;
+      CL.project.useZvForAllReadingsSupport = false; // this is irrelevant but lets do it ayway
     }
 
     //this bit does the index page settings.
