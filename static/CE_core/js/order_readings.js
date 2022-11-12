@@ -81,6 +81,12 @@ OR = (function() {
     SimpleContextMenu.attach('subreading', function() {
       return _makeMenu('subreading');
     });
+    SimpleContextMenu.attach('first_unit', function() {
+      return _makeMenu('first_unit');
+    });
+    SimpleContextMenu.attach('last_unit', function() {
+      return _makeMenu('last_unit');
+    });
     SimpleContextMenu.attach('overlap_unit', function() {
       return _makeMenu('overlap_unit');
     });
@@ -341,7 +347,13 @@ OR = (function() {
                 '<div class="drag_div" id="drag_unit_' + id + '">');
     }
     if (!overlap) {
-      html.push('<table class="variant_unit" id="variant_unit_' + id + '">');
+      if (options.first_unit == true) {
+        html.push('<table class="variant_unit first_unit" id="variant_unit_' + id + '">');
+      } else if (options.last_unit == true) {
+        html.push('<table class="variant_unit last_unit" id="variant_unit_' + id + '">');
+      } else {
+        html.push('<table class="variant_unit" id="variant_unit_' + id + '">');
+      }
     } else {
       html.push('<table class="variant_unit overlap_unit" id="variant_unit_' + id + '">');
     }
@@ -1133,6 +1145,10 @@ OR = (function() {
         menu.push('<li id="mark_as_ORsubreading"><span>Mark as subreading</span></li>');
       }
       document.getElementById('context_menu').innerHTML = menu.join('');
+    } else if (menuName === 'first_unit') {
+      document.getElementById('context_menu').innerHTML = '<li id="join_backwards"><span>Link unit</span></li>';
+    } else if (menuName === 'last_unit') {
+      document.getElementById('context_menu').innerHTML = '<li id="join_forwards"><span>Link unit</span></li>';
     } else if (menuName === 'overlap_unit') {
       document.getElementById('context_menu').innerHTML = '<li id="move_up"><span>Move unit up</span></li>' +
                                                           '<li id="move_down"><span>Move unit down</span></li>';

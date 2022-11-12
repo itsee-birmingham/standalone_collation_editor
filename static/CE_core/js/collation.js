@@ -1071,6 +1071,14 @@ CL = (function() {
           } else {
             unitDataOptions = {'unit_id': unit._id};
           }
+          if (CL.project.allowJoiningAcrossCollationUnits) {
+            if (j === 0) {
+              unitDataOptions.first_unit = true;
+            }
+            if (j === apparatus.length - 1) {
+              unitDataOptions.last_unit = true;
+            }
+          }
           if (app > 1) {
             unitDataOptions.app_id = 'apparatus' + app;
           } else {
@@ -3198,7 +3206,7 @@ CL = (function() {
     }
 
     // settings for zv labels which must also have set storeMultipleSupportAsParents to true
-    if (CL.poject.storeMultipleSupportLabelsAsParents === true) {
+    if (CL.project.storeMultipleSupportLabelsAsParents === true) {
       if (project.hasOwnProperty('useZvForAllReadingsSupport')) {
         CL.project.useZvForAllReadingsSupport = project.useZvForAllReadingsSupport;
       } else if (CL.services.hasOwnProperty('useZvForAllReadingsSupport')) {
@@ -3211,8 +3219,16 @@ CL = (function() {
       // false if the paired setting is not true
       CL.project.useZvForAllReadingsSupport = false;
     }
-    
 
+    // settings for joining collation units across unit boundaries
+    if (project.hasOwnProperty('allowJoiningAcrossCollationUnits')) {
+      CL.project.allowJoiningAcrossCollationUnits = project.allowJoiningAcrossCollationUnits;
+    } else if (CL.services.hasOwnProperty('allowJoiningAcrossCollationUnits')) {
+      CL.project.allowJoiningAcrossCollationUnits = CL.services.allowJoiningAcrossCollationUnits;
+    } else {
+      //default is false
+      CL.project.allowJoiningAcrossCollationUnits = false;
+    }
 
     //this bit does the index page settings.
     if (project.hasOwnProperty('contextInput')) {
