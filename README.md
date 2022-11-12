@@ -346,6 +346,13 @@ This variable should be a string and should be the text the collation editor nee
 This variable should be a string and should be the text the collation editor needs to display for any witnesses which omit the entire collation unit. The default, which will be used if this variable is not present, is 'om unit'. Until version 2.0.0 the default text was 'om verse'.
 
 
+- #### ```omCategories```
+
+**This variable can be overwritten in individual project settings**
+
+This variable should be an array of strings. If provided the editor will be give the option to categorise om readings using the labels in the array in the Order Readings screen.
+
+
 - #### ```showCollapseAllUnitsButton```
 
 **This variable can be overwritten in individual project settings**
@@ -476,6 +483,13 @@ This is a boolean variable. If it is set to false (the default) then the label e
 
 The default is false.
 
+- #### ```useZvForAllReadingsSupport```
+
+**This variable can be overwritten in individual project settings**
+
+This is a boolean variable which only has an impact on the collation editor if *storeMultipleSupportLabelsAsParents* is set to true. If this boolean is also true then if all possible parent readings are selected from the list when editing a label in order readings, the label itself will be stored as 'zv' and the reading label in the collation editor will be ?. 
+
+The default is false.
 
 - #### ```approvalSettings```
 
@@ -1408,6 +1422,10 @@ Changelog 2.x release
 Catena Dev branch changes
 ---
 
-* Optional services and project setting *storeMultipleSupportLabelsAsParents* added which changes the behaviour of the label editing in order readings and stores support for multiple readings using the reading data itself so that it can be preserved and updated when readings are reordered. If this setting is used and set to true it will not have any impact on existing data but will offer the new label storage option for existing data.
+* Optional services and project setting *storeMultipleSupportLabelsAsParents* added which changes the behaviour of the label editing in order readings and stores support for multiple readings using the reading data itself so that it can be preserved and updated when readings are reordered. If this setting is used and set to true it will not have any impact on existing data but will offer the new label storage option for existing data. 
+
+* Optional services and project setting *useZvForAllReadingsSupport* added. This setting only works if *storeMultipleSupportLabelsAsParents* is also set to true. If this settings is true then when editing the label in order readings if all possible parent witnesses are selected as readings which could be supported by the current reading then the label used internally will be 'zv' and it will show in the collation editor with ?.
 
 * Optional project setting *witnessDecorators* added. This is not available at the services level as the data will be specific to each project. The structure is explained above in the optional project settings section. If data is provided then all hands from that witness will have the label appended after them in the hover overs of the collation editor. This was introduced to provide an easy way to see a group of manuscripts when the grouping was not otherwise made obvious in the sigla. The specific example from the New Testament is the use of a superscript K to make commentary manuscripts more easily identifiable.
+
+* Optional services and project setting *omCategories* added which allows the user to specificy a set of labels as strings to use as subcategories for om readings.

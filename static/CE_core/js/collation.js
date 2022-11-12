@@ -3187,18 +3187,32 @@ CL = (function() {
       CL.project.allowWitnessChangesInSavedCollations = false;
     }
 
-    //settings for label storage in later stages
+    // settings for label storage in later stages
     if (project.hasOwnProperty('storeMultipleSupportLabelsAsParents')) {
       CL.project.storeMultipleSupportLabelsAsParents = project.storeMultipleSupportLabelsAsParents;
-      CL.project.useZvForAllReadingsSupport = true;
     } else if (CL.services.hasOwnProperty('storeMultipleSupportLabelsAsParents')) {
       CL.project.storeMultipleSupportLabelsAsParents = CL.services.storeMultipleSupportLabelsAsParents;
-      CL.project.useZvForAllReadingsSupport = true;
     } else {
       //default is false
       CL.project.storeMultipleSupportLabelsAsParents = false;
-      CL.project.useZvForAllReadingsSupport = false; // this is irrelevant but lets do it ayway
     }
+
+    // settings for zv labels which must also have set storeMultipleSupportAsParents to true
+    if (CL.poject.storeMultipleSupportLabelsAsParents === true) {
+      if (project.hasOwnProperty('useZvForAllReadingsSupport')) {
+        CL.project.useZvForAllReadingsSupport = project.useZvForAllReadingsSupport;
+      } else if (CL.services.hasOwnProperty('useZvForAllReadingsSupport')) {
+        CL.project.useZvForAllReadingsSupport = CL.services.useZvForAllReadingsSupport;
+      } else {
+        // default is false
+        CL.project.useZvForAllReadingsSupport = false;
+      }
+    } else {
+      // false if the paired setting is not true
+      CL.project.useZvForAllReadingsSupport = false;
+    }
+    
+
 
     //this bit does the index page settings.
     if (project.hasOwnProperty('contextInput')) {
