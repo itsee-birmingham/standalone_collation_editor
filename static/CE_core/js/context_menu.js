@@ -9,7 +9,7 @@
  *
  * As long as you leave the copyright notice of the original script, or link back to this website, you can use any of
  * the content published on this website free of charge for any use: commercial or noncommercial. However, under the
- * license they are released through there are limitations to what you may or may not do.
+ * license (CC BY 2.0 UK) they are released through there are limitations to what you may or may not do.
  *
  * You Can:
  * Use the resources in your personal work, in whole or part.
