@@ -697,6 +697,8 @@ CL = (function() {
    * 			overlap_details - a dictionary keyed by id of overlapping reading giving column width for that unit
    *      getUnitDataFunction - a function to be used for getUnitData when the hard coded ones are not good enough
    *      getUnitDataOptions - this allows options to be passed into the getUnitData function
+   *      firstUnitOverlaps - this is used to record any overlaps relating to the first unit so that the join link can be added 
+   *      lastUnitOverlaps - as first unit overlaps but for the last unit 
    * */
   getOverlapLayout = function(apparatus, app, format, overtextLength, options) {
     var j, i, id, rows, unit, rowList, events, idString, tdId, unitIndex, spacerRows,
@@ -723,7 +725,6 @@ CL = (function() {
     while (i <= overtextLength) {
       tdId = app + '_' + i;
       unitIndex = null;
-
       unit = apparatus[j];
       if (unit !== undefined) {
         if (unit.hasOwnProperty('extra_start')) {
@@ -773,6 +774,12 @@ CL = (function() {
               'col_length': options.overlap_details[unit._id].col_length,
               'unit_id': unit._id
             };
+          }
+          if (j === 0 && options.hasOwnProperty('firstUnitOverlaps') && options.firstUnitOverlaps.hasOwnProperty(unit._id)) {
+            unitDataOptions.joinable_backwards = true;
+          }
+          if (j === apparatus.length-1 && options.hasOwnProperty('lastUnitOverlaps') && options.lastUnitOverlaps.hasOwnProperty(unit._id)) {
+            unitDataOptions.joinable_forwards = true;
           }
           if (app > 1) {
             unitDataOptions.app_id = 'apparatus' + app;
@@ -1010,7 +1017,8 @@ CL = (function() {
    * 			highlighted_version - a versional witness to highlight (version editor only)
    * 			highlighted_unit - a unit to mark as having an error
    *      getUnitDataFunction - a function to be used for getUnitData when the hard coded ones are not good enough
-   *      getUnitDataOptions - this allows options to be passed into the getUnitData function*/
+   *      getUnitDataOptions - this allows options to be passed into the getUnitData function 
+   * */
   getUnitLayout = function(apparatus, app, format, options) {
     var j, i, rows, unit, colLenDict, rowList, unitDataOptions, idString, events,
         unitData, unitIndex, spacerRows;
@@ -1073,10 +1081,10 @@ CL = (function() {
           }
           if (CL.project.allowJoiningAcrossCollationUnits) {
             if (j === 0) {
-              unitDataOptions.first_unit = true;
+              unitDataOptions.joinable_backwards = true;
             }
             if (j === apparatus.length - 1) {
-              unitDataOptions.last_unit = true;
+              unitDataOptions.joinable_forwards = true;
             }
           }
           if (app > 1) {

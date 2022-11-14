@@ -66,8 +66,26 @@ OR = (function() {
     SimpleContextMenu.attach('main_reading', function() {
       return _makeMenu('main_reading');
     });
+    SimpleContextMenu.attach('main_reading_joinable_backwards', function() {
+      return _makeMenu('main_reading', true, false);
+    });
+    SimpleContextMenu.attach('main_reading_joinable_forwards', function() {
+      return _makeMenu('main_reading', false, true);
+    });
+    SimpleContextMenu.attach('main_reading_joinable_backwards_joinable_forwards', function() {
+      return _makeMenu('main_reading', true, true);
+    });
     SimpleContextMenu.attach('main_reading_om', function() {
       return _makeMenu('main_reading_om');
+    });
+    SimpleContextMenu.attach('main_reading_om_joinable_backwards', function() {
+      return _makeMenu('main_reading_om', true, false);
+    });
+    SimpleContextMenu.attach('main_reading_om_joinable_forwards', function() {
+      return _makeMenu('main_reading_om', false, true);
+    });
+    SimpleContextMenu.attach('main_reading_om_joinable_backwards_joinable_forwards', function() {
+      return _makeMenu('main_reading_om', true, true);
     });
     SimpleContextMenu.attach('deletable', function() {
       return _makeMenu('deletable_unit');
@@ -75,17 +93,29 @@ OR = (function() {
     SimpleContextMenu.attach('overlap_main_reading', function() {
       return _makeMenu('overlap_main_reading');
     });
+    SimpleContextMenu.attach('overlap_main_reading_joinable_backwards', function() {
+      return _makeMenu('overlap_main_reading', true, false);
+    });
+    SimpleContextMenu.attach('overlap_main_reading_joinable_forwards', function() {
+      return _makeMenu('overlap_main_reading', false, true);
+    });
+    SimpleContextMenu.attach('overlap_main_reading_joinable_backwards_joinable_forwards', function() {
+      return _makeMenu('overlap_main_reading', true, true);
+    });
     SimpleContextMenu.attach('overlap_main_reading_om', function() {
       return _makeMenu('overlap_main_reading_om');
     });
+    SimpleContextMenu.attach('overlap_main_reading_om_joinable_backwards', function() {
+      return _makeMenu('overlap_main_reading_om', true, false);
+    });
+    SimpleContextMenu.attach('overlap_main_reading_om_joinable_forwards', function() {
+      return _makeMenu('overlap_main_reading_om', false, true);
+    });
+    SimpleContextMenu.attach('overlap_main_reading_om_joinable_backwards_joinable_forwards', function() {
+      return _makeMenu('overlap_main_reading_om', true, true);
+    });
     SimpleContextMenu.attach('subreading', function() {
       return _makeMenu('subreading');
-    });
-    SimpleContextMenu.attach('first_unit', function() {
-      return _makeMenu('first_unit');
-    });
-    SimpleContextMenu.attach('last_unit', function() {
-      return _makeMenu('last_unit');
     });
     SimpleContextMenu.attach('overlap_unit', function() {
       return _makeMenu('overlap_unit');
@@ -104,6 +134,14 @@ OR = (function() {
     }
     if (options.hasOwnProperty('highlighted_unit')) {
       overlapOptions.highlighted_unit = options.highlighted_unit;
+    }
+    overlapOptions.firstUnitOverlaps = {};
+    overlapOptions.lastUnitOverlaps = {};
+    if (CL.data.apparatus[0].hasOwnProperty('overlap_units')) {
+      overlapOptions.firstUnitOverlaps = CL.data.apparatus[0].overlap_units;
+    }
+    if (CL.data.apparatus[CL.data.apparatus.length - 1].hasOwnProperty('overlap_units')) {
+      overlapOptions.lastUnitOverlaps = CL.data.apparatus[CL.data.apparatus.length - 1].overlap_units;
     }
     appIds = CL.getOrderedAppLines();
     for (let i = 0; i < appIds.length; i += 1) {
@@ -313,7 +351,7 @@ OR = (function() {
   };
 
   getUnitData = function(data, id, start, end, options) {
-    var html, rows, cells, rowList, temp, events, rowId, type, overlapped, hasContextMenu,
+    var html, rowList, temp, rowId, overlapped, hasContextMenu, readingClass,
         colspan, hand, orRules, readingLabel, readingSuffix, text, overlap;
     html = [];
     rowList = [];
@@ -347,20 +385,15 @@ OR = (function() {
                 '<div class="drag_div" id="drag_unit_' + id + '">');
     }
     if (!overlap) {
-      if (options.first_unit == true) {
-        html.push('<table class="variant_unit first_unit" id="variant_unit_' + id + '">');
-      } else if (options.last_unit == true) {
-        html.push('<table class="variant_unit last_unit" id="variant_unit_' + id + '">');
-      } else {
-        html.push('<table class="variant_unit" id="variant_unit_' + id + '">');
-      }
+      html.push('<table class="variant_unit" id="variant_unit_' + id + '">');
     } else {
       html.push('<table class="variant_unit overlap_unit" id="variant_unit_' + id + '">');
     }
     for (let i = 0; i < data.length; i += 1) {
       //what is the reading text?
       if (data[i].type === 'lac') {
-        hasContextMenu = false;
+        // changing this for the joining options because we will need that for lacs. It was false previously.
+        hasContextMenu = true;
       } else {
         hasContextMenu = true;
       }
@@ -399,31 +432,38 @@ OR = (function() {
       html.push('<td id="' + rowId + '_label" class="reading_label redips-mark"><div class="spanlike">' +
                 readingLabel);
       html.push('</div></td>');
+      readingClass = [];
       if (!overlap) {
-        if (hasContextMenu) {
-            if (['om', 'om_verse'].indexOf(data[i].type) !== -1){
-              html.push('<td class="redips-mark main_reading_om">');
-            } else {
-              html.push('<td class="redips-mark main_reading">');
-            } 
-        } else {
-          html.push('<td class="redips-mark main_reading_ncm">');
-        }
+        readingClass.push('main_reading');
       } else {
-        if (hasContextMenu) {
-          if (['om', 'om_verse'].indexOf(data[i].type) !== -1){
-            html.push('<td class="redips-mark overlap_main_reading_om">');
-          } else {
-            html.push('<td class="redips-mark overlap_main_reading">');
+        readingClass.push('overlap_main_reading');
+      }
+      if (!hasContextMenu) {
+        readingClass.push('ncm');
+      } else {
+        if (['om', 'om_verse'].indexOf(data[i].type) !== -1) {
+          readingClass.push('om');
+        }
+        if (i > 0) {
+          if (options.hasOwnProperty('joinable_backwards') && options.joinable_backwards === true) {
+            readingClass.push('joinable_backwards');
           }
-        } else {
-          html.push('<td class="redips-mark overlap_main_reading_ncm">');
+          if (options.hasOwnProperty('joinable_forwards') && options.joinable_forwards === true) {
+            readingClass.push('joinable_forwards');
+          }
         }
       }
+      html.push('<td class="redips-mark ' + readingClass.join('_') + '">');
       html.push('<div class="spanlike">');
+      if (data[i].hasOwnProperty('join_backwards') && data[i].join_backwards === true) {
+        html.push('⇇&nbsp;');
+      }
       html.push(text);
       if (readingSuffix !== '') {
         html.push(' ' + readingSuffix);
+      }
+      if (data[i].hasOwnProperty('join_forwards') && data[i].join_forwards === true) {
+        html.push('&nbsp;⇉');
       }
       html.push('</div>');
       if (data[i].hasOwnProperty('subreadings')) {
@@ -1108,8 +1148,8 @@ OR = (function() {
     }
   };
 
-  _makeMenu = function(menuName) {
-    var menu, div, key, subreadings, orRules;
+  _makeMenu = function(menuName, addBackwardsJoin, addForwardsJoin) {
+    var menu, div, subreadings, orRules;
     div = document.createElement('div');
     //menus for full units
     if (menuName === 'subreading') {
@@ -1119,8 +1159,14 @@ OR = (function() {
     } else if (menuName === 'main_reading' || menuName === 'overlap_main_reading' || menuName === 'main_reading_om' || menuName === 'overlap_main_reading_om') {
       menu = [];
       menu.push('<li id="split_witnesses"><span>Split Witnesses</span></li>');
-      if (CL.project.omCategories.length > 0) {
+      if (menuName.indexOf('_om') !== -1 && CL.project.omCategories.length > 0) {
         menu.push('<li id="categorise_om"><span>Categorise Om</span></li>');
+      }
+      if (addBackwardsJoin) {
+        menu.push('<li id="backwards_join"><span>⇇ Join</span></li>');
+      }
+      if (addForwardsJoin) {
+        menu.push('<li id="forwards_join"><span>Join ⇉</span></li>');
       }
       subreadings = [];
       orRules = CL.getRuleClasses('create_in_OR', true, 'name', ['subreading', 'value', 'identifier',
@@ -1145,10 +1191,6 @@ OR = (function() {
         menu.push('<li id="mark_as_ORsubreading"><span>Mark as subreading</span></li>');
       }
       document.getElementById('context_menu').innerHTML = menu.join('');
-    } else if (menuName === 'first_unit') {
-      document.getElementById('context_menu').innerHTML = '<li id="join_backwards"><span>Link unit</span></li>';
-    } else if (menuName === 'last_unit') {
-      document.getElementById('context_menu').innerHTML = '<li id="join_forwards"><span>Link unit</span></li>';
     } else if (menuName === 'overlap_unit') {
       document.getElementById('context_menu').innerHTML = '<li id="move_up"><span>Move unit up</span></li>' +
                                                           '<li id="move_down"><span>Move unit down</span></li>';
@@ -1351,6 +1393,50 @@ OR = (function() {
         });
       });
       $('#categorise_om').on('mouseover.co_mo', function(event) {
+        CL.hideTooltip();
+      });
+    }
+    if (document.getElementById('backwards_join')) {
+      $('#backwards_join').off('click.bj_c');
+      $('#backwards_join').off('mouseover.bj_mo');
+      $('#backwards_join').on('click.bj_c', function(event) {
+        var element, div, rdgDetails, reading;
+        element = SimpleContextMenu._target_element;
+        div = CL.getSpecifiedAncestor(element, 'TR');
+        rdgDetails = CL.getUnitAppReading(div.id);
+        reading = CL.data[rdgDetails[1]][rdgDetails[0]].readings[rdgDetails[2]];
+        if (reading.hasOwnProperty('join_backwards') && reading.join_backwards === true) {
+          reading.join_backwards = false;
+        } else {
+          reading.join_backwards = true;
+        }
+        showOrderReadings({
+          'container': CL.container
+        });
+      });
+      $('#backwards_join').on('mouseover.bj_mo', function(event) {
+        CL.hideTooltip();
+      });
+    }
+    if (document.getElementById('forwards_join')) {
+      $('#forwards_join').off('click.fj_c');
+      $('#forwards_join').off('mouseover.fj_mo');
+      $('#forwards_join').on('click.fj_c', function(event) {
+        var element, div, rdgDetails, reading;
+        element = SimpleContextMenu._target_element;
+        div = CL.getSpecifiedAncestor(element, 'TR');
+        rdgDetails = CL.getUnitAppReading(div.id);
+        reading = CL.data[rdgDetails[1]][rdgDetails[0]].readings[rdgDetails[2]];
+        if (reading.hasOwnProperty('join_forwards') && reading.join_forwards === true) {
+          reading.join_forwards = false;
+        } else {
+          reading.join_forwards = true;
+        }
+        showOrderReadings({
+          'container': CL.container
+        });
+      });
+      $('#forwards_join').on('mouseover.fj_mo', function(event) {
         CL.hideTooltip();
       });
     }
