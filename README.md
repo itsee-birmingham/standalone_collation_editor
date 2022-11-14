@@ -491,6 +491,14 @@ This is a boolean variable which only has an impact on the collation editor if *
 
 The default is false.
 
+- #### ```allowJoiningAcrossCollationUnits```
+
+**This variable can be overwritten in individual project settings**
+
+This is a boolean variable. If set to true the user is given the option to add a flag to readings at the extremities of collation units to indicate that the reading should be joined to the corresponding reading in the previous or following unit. The collation editor only sets flags on the readings (join_backwards and join_forwards) which are set to true if the join has been made. All exporters must respect these flags in the exporting if they are used. There is no sanity checking on this, it requires the editor to make the joins accurately.
+
+The default is false.
+
 - #### ```approvalSettings```
 
 **This variable can be overwritten in individual project settings**
@@ -1429,3 +1437,5 @@ Catena Dev branch changes
 * Optional project setting *witnessDecorators* added. This is not available at the services level as the data will be specific to each project. The structure is explained above in the optional project settings section. If data is provided then all hands from that witness will have the label appended after them in the hover overs of the collation editor. This was introduced to provide an easy way to see a group of manuscripts when the grouping was not otherwise made obvious in the sigla. The specific example from the New Testament is the use of a superscript K to make commentary manuscripts more easily identifiable.
 
 * Optional services and project setting *omCategories* added which allows the user to specificy a set of labels as strings to use as subcategories for om readings.
+
+* Optional services and project setting *allowJoiningAcrossCollationUnits* added which, if set to true, allows readings to be joined across collation unit boundaries. The collation editor itself only sets a flag on the reading to identify the join. It is up to all exporters to respect this in the export. There is no sanity checking on the flags, they relly on the editor being accurate.

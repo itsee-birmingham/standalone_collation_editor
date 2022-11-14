@@ -1163,10 +1163,10 @@ OR = (function() {
         menu.push('<li id="categorise_om"><span>Categorise Om</span></li>');
       }
       if (addBackwardsJoin) {
-        menu.push('<li id="backwards_join"><span>⇇ Join</span></li>');
+        menu.push('<li id="backwards_join"><span>Add/Remove Join ⇇</span></li>');
       }
       if (addForwardsJoin) {
-        menu.push('<li id="forwards_join"><span>Join ⇉</span></li>');
+        menu.push('<li id="forwards_join"><span>Add/Remove Join ⇉</span></li>');
       }
       subreadings = [];
       orRules = CL.getRuleClasses('create_in_OR', true, 'name', ['subreading', 'value', 'identifier',
