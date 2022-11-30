@@ -906,7 +906,7 @@ OR = (function() {
 
   _doGetSiglaSuffixes = function(data, app, start, end, firstWordIndex) {
     var readingsWithSuffixes, suffixes;
-    readingsWithSuffixes = CL.getReadingWitnesses(data, app, start, end, firstWordIndex, true);
+    readingsWithSuffixes = CL.getReadingWitnesses(data, app, start, end, firstWordIndex, true, false);
     suffixes = [];
     data.witnesses = CL.sortWitnesses(data.witnesses);
     for (let i = 0; i < readingsWithSuffixes.length; i += 1) {

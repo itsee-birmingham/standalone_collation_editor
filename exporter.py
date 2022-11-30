@@ -11,21 +11,22 @@ class Exporter(object):
     being edited or the output from this exporter can be manually edited to produce the format required.
 
     Args:
-        format (str): The output format requires. options are [negative_xml|positive_xml]. Defaults to positive_xml.
-        include_punctuation (bool): Indicates whether or not to include punctuation in the lemma. Defaults to False.
-        ignore_basetext (bool): Indicates whether or not to report the base text as a witness.
-        overlap_status_to_ignore (list): A list of strings representing the overlap status categories
-                                         that should be ignored in the export. Defaults to ['overlapped','deleted'].
-        consolidate_om_verse (bool): Indicates whether or not witnesses omitted in the entire collation unit are
-                                     listed once at the start of the apparatus or indicated in each variant unit.
-                                     Defaults to True.
-        consolidate_lac_verse (bool): Indicates whether or not witnesses which are lac for the entire collation
-                                      unit are listed once at the start of the apparatus or indicated in each
-                                      variant unit. Defaults to True.
-        include_lemma_when_no_variants (boo): Indicates whether ot not to include the lemma in the export if it
-                                              has no variant readings. Defaults to False.
-        rule_classes (dict): This if the dictionary representing the rule classes used in the current editing project.
-                             Defaults to {}.
+        format (str, optional): The output format requires. options are [negative_xml|positive_xml].
+            Defaults to positive_xml.
+        include_punctuation (bool, optional): Indicates whether or not to include punctuation in the lemma.
+            Defaults to False.
+        ignore_basetext (bool, optional): Indicates whether or not to report the base text as a witness.
+        overlap_status_to_ignore (list, optional): A list of strings representing the overlap status categories
+            that should be ignored in the export. Defaults to ['overlapped','deleted'].
+        consolidate_om_verse (bool, optional): Indicates whether or not witnesses omitted in the entire collation
+            unit are listed once at the start of the apparatus or indicated in each variant unit. Defaults to True.
+        consolidate_lac_verse (bool, optional): Indicates whether or not witnesses which are lac for the entire 
+            collation unit are listed once at the start of the apparatus or indicated in each variant unit.
+            Defaults to True.
+        include_lemma_when_no_variants (bool, optional): Indicates whether ot not to include the lemma in the export
+            if it has no variant readings. Defaults to False.
+        rule_classes (dict, optional): This if the dictionary representing the rule classes used in the current
+            editing project. Defaults to {}.
     """
 
     def __init__(self,
@@ -75,12 +76,12 @@ class Exporter(object):
         Args:
             reading (JSON): The JSON segment representing a reading in the collation editor apparatus.
             is_subreading (bool, optional): Set to true if this reading is a subreading and not a main reading.
-                                            Defaults to False.
+                Defaults to False.
 
         Returns:
             list: A list with at most two items, the first is a string of the text of the reading, the second an
-                  optional string representing the text to present in the case of a reading with no text (such as a
-                  lac or om reading).
+                optional string representing the text to present in the case of a reading with no text (such as a
+                lac or om reading).
         """
         if is_subreading is True:
             return [reading['text_string'].replace('&lt;', '<').replace('&gt;', '>')]
@@ -113,7 +114,7 @@ class Exporter(object):
 
         Returns:
             list: A list of up to two items, the first is the string representing the overtext for this range, 
-            the optional second item is the string 'om' if the first item is an empty string.
+                the optional second item is the string 'om' if the first item is an empty string.
         """
         if start == end and start % 2 == 1:
             return ['', 'om']
@@ -121,8 +122,17 @@ class Exporter(object):
         real_end = int(end/2)-1
         if real_start < 0:
             real_start = 0
-        word_list = [x['original'] for x in overtext['tokens']]
-        return [' '.join(word_list[real_start:real_end+1])]
+        required_text = overtext['tokens'][real_start:real_end+1]
+        words = []
+        for token in required_text:
+            word = []
+            if self.include_punctuation and 'pc_before' in token:
+                word.append(token['pc_before'])
+            word.append(token['original'])
+            if self.include_punctuation and 'pc_after' in token:
+                word.append(token['pc_after'])
+            words.append(''.join(word))
+        return [' '.join(words)]
 
     def get_witnesses(self, reading, to_remove):
         """Function to return the witnesses that should be reported for the given reading.

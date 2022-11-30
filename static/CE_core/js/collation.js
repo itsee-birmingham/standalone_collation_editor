@@ -2874,7 +2874,7 @@ CL = (function() {
   };
 
   // data is a reading object
-  getReadingWitnesses = function(data, appId, start, end, firstWordIndex, withSuffixes) {
+  getReadingWitnesses = function(data, appId, start, end, firstWordIndex, withSuffixes, withDecorators) {
     var witness, suffix, witnesses, key, suffixTypes;
     witnesses = [];
     for (let i = 0; i < data.witnesses.length; i += 1) {
@@ -2961,7 +2961,8 @@ CL = (function() {
           }
         }
       }
-      if (CL.project.witnessDecorators !== null) {
+      // now add witness decorators if required
+      if (withDecorators !== false && CL.project.witnessDecorators !== null) {
         let decorator = [];
         for (let i = 0; i < CL.project.witnessDecorators.length; i += 1) {
           if (CL.project.witnessDecorators[i].hands.indexOf(witness) !== -1) {
