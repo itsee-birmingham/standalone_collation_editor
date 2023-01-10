@@ -361,7 +361,7 @@ class Exporter(object):
         for num in ordered_keys:
             apparatus.extend(entry['structure']['apparatus{}'.format(num)])
 
-        vtree = etree.fromstring('<ab xml:id="{}-APP"></ab>'.format(context))
+        vtree = etree.fromstring('<ab n="{}-APP"></ab>'.format(context))
         # here deal with the whole verse lac and om and only use witnesses elsewhere not in these lists
         missing = []
         if self.consolidate_om_verse or self.consolidate_lac_verse:
