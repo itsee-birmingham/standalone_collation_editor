@@ -1081,14 +1081,14 @@ CL = (function() {
           } else {
             unitDataOptions = {'unit_id': unit._id};
           }
-          if (CL.project.allowJoiningAcrossCollationUnits) {
-            if (j === 0) {
-              unitDataOptions.joinable_backwards = true;
-            }
-            if (j === apparatus.length - 1) {
-              unitDataOptions.joinable_forwards = true;
-            }
-          }
+          // if (CL.project.allowJoiningAcrossCollationUnits) {
+          //   if (j === 0) {
+          //     unitDataOptions.joinable_backwards = true;
+          //   }
+          //   if (j === apparatus.length - 1) {
+          //     unitDataOptions.joinable_forwards = true;
+          //   }
+          // }
           if (app > 1) {
             unitDataOptions.app_id = 'apparatus' + app;
           } else {

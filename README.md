@@ -1438,7 +1438,7 @@ Catena Dev branch changes
 
 * Optional services and project setting *omCategories* added which allows the user to specificy a set of labels as strings to use as subcategories for om readings.
 
-* Optional services and project setting *allowJoiningAcrossCollationUnits* added which, if set to true, allows readings to be joined across collation unit boundaries. The collation editor itself only sets a flag on the reading to identify the join. It is up to all exporters to respect this in the export. There is no sanity checking on the flags, they relly on the editor being accurate.
+* Optional services and project setting *allowJoiningAcrossCollationUnits* added which, if set to true, allows readings to be joined across collation unit boundaries. The collation editor itself only sets a flag on the reading to identify the join. It is up to all exporters to respect this in the export. There is no sanity checking on the flags, they rely on the editor being accurate.
 
 * In exporter.py there is a breaking change in the ```get_text()```, ```make_reading()``` and ```get_label()``` function arguments. The argument 'type' which used to be the string 'subreading' or None is now a boolean called 'is_subreading'. All calls to this function in exporters which inherit from this will need to be changed accordingly.
 
