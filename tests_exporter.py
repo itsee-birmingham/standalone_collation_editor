@@ -1,50 +1,626 @@
 from unittest import TestCase
-from collation.core.data_loader import load_json_test_data
+from unittest.mock import patch
 import xml.etree.ElementTree as etree
 from collation.core.exporter import Exporter
 
 
 class ExporterUnitTests(TestCase):
 
-    def setUp(self):
-        self.test_data = load_json_test_data('unit_test_data.json')
+    BASE_UNIT = {
+            "_id": "b236b6d444ace44590ff97c1c95499df",
+            "end": 8,
+            "start": 6,
+            "readings": [
+              {
+                "_id": "58aebee1743da8ee68cd0144168c79b9",
+                "text": [
+                  {
+                    "5": {
+                      "t": "υιον",
+                      "index": "6",
+                      "siglum": "5",
+                      "original": "υιον",
+                      "rule_match": [
+                        "υιον"
+                      ]
+                    },
+                    "35": {
+                      "t": "υιον",
+                      "index": "6",
+                      "siglum": "35",
+                      "original": "υιον",
+                      "rule_match": [
+                        "υιον"
+                      ]
+                    },
+                    "38": {
+                      "t": "υιον",
+                      "index": "6",
+                      "siglum": "38",
+                      "original": "υιον",
+                      "rule_match": [
+                        "υιον"
+                      ]
+                    },
+                    "02": {
+                      "n": "υιον",
+                      "t": "υν",
+                      "index": "6",
+                      "nomSac": True,
+                      "siglum": "02",
+                      "original": "[υν]",
+                      "supplied": True,
+                      "rule_match": [
+                        "[υν]"
+                      ],
+                      "decision_class": [
+                        "reconstructed"
+                      ],
+                      "decision_details": [
+                        {
+                          "n": "υιον",
+                          "t": "[υν]",
+                          "id": 216662,
+                          "class": "reconstructed",
+                          "scope": "once"
+                        }
+                      ]
+                    },
+                    "index": "6",
+                    "verse": "Gal.1.16",
+                    "reading": [
+                      "35",
+                      "38",
+                      "5",
+                      "L23-S3W4D1",
+                      "basetext",
+                      "02"
+                    ],
+                    "basetext": {
+                      "t": "υιον",
+                      "index": "6",
+                      "lemma": "υιον",
+                      "siglum": "basetext",
+                      "original": "υἱὸν",
+                      "rule_match": [
+                        "υιον"
+                      ]
+                    },
+                    "interface": "υιον",
+                    "L23-S3W4D1": {
+                      "t": "υιον",
+                      "index": "6",
+                      "siglum": "L23-S3W4D1",
+                      "original": "υιον",
+                      "rule_match": [
+                        "υιον"
+                      ]
+                    }
+                  },
+                  {
+                    "5": {
+                      "t": "αυτου",
+                      "index": "8",
+                      "siglum": "5",
+                      "original": "αυτου",
+                      "rule_match": [
+                        "αυτου"
+                      ]
+                    },
+                    "35": {
+                      "t": "αυτου",
+                      "index": "8",
+                      "siglum": "35",
+                      "original": "αυτου",
+                      "rule_match": [
+                        "αυτου"
+                      ]
+                    },
+                    "38": {
+                      "t": "αυτου",
+                      "index": "8",
+                      "siglum": "38",
+                      "original": "αυτου",
+                      "rule_match": [
+                        "αυτου"
+                      ]
+                    },
+                    "02": {
+                      "t": "αυτου",
+                      "index": "8",
+                      "siglum": "02",
+                      "original": "αυτου",
+                      "rule_match": [
+                        "αυτου"
+                      ]
+                    },
+                    "index": "8",
+                    "verse": "Gal.1.16",
+                    "reading": [
+                      "35",
+                      "38",
+                      "5",
+                      "L23-S3W4D1",
+                      "basetext",
+                      "02"
+                    ],
+                    "basetext": {
+                      "t": "αυτου",
+                      "index": "8",
+                      "lemma": "αυτου",
+                      "siglum": "basetext",
+                      "original": "αὐτοῦ",
+                      "rule_match": [
+                        "αυτου"
+                      ]
+                    },
+                    "interface": "αυτου",
+                    "L23-S3W4D1": {
+                      "t": "αυτου",
+                      "index": "8",
+                      "siglum": "L23-S3W4D1",
+                      "original": "αυτου",
+                      "rule_match": [
+                        "αυτου"
+                      ]
+                    }
+                  }
+                ],
+                "label": "a",
+                "SR_text": {
+                  "2574-2": {
+                    "text": [],
+                    "type": "om"
+                  }
+                },
+                "suffixes": [
+                  "V",
+                  "",
+                  "",
+                  "",
+                  "",
+                  ""
+                ],
+                "witnesses": [
+                  "02",
+                  "5",
+                  "35",
+                  "38",
+                  "L23-S3W4D1",
+                  "basetext"
+                ],
+                "subreadings": {
+                  "abbreviation": [
+                    {
+                      "text": [
+                        {
+                          "1": {
+                            "n": "υιον",
+                            "t": "υν",
+                            "index": "6",
+                            "nomSac": True,
+                            "siglum": "1",
+                            "original": "υν",
+                            "rule_match": [
+                              "υν"
+                            ],
+                            "decision_class": [
+                              "abbreviation"
+                            ],
+                            "decision_details": [
+                              {
+                                "n": "υιον",
+                                "t": "υν",
+                                "id": 216738,
+                                "class": "abbreviation",
+                                "scope": "once"
+                              }
+                            ]
+                          },
+                          "index": "6",
+                          "verse": "Gal.1.16",
+                          "reading": [
+                            "1",
+                            "L60-S3W3D1"
+                          ],
+                          "interface": "υιον",
+                          "L60-S3W3D1": {
+                            "n": "υιον",
+                            "t": "υν",
+                            "index": "6",
+                            "nomSac": True,
+                            "siglum": "L60-S3W3D1",
+                            "original": "υν",
+                            "rule_match": [
+                              "υν"
+                            ],
+                            "decision_class": [
+                              "abbreviation"
+                            ],
+                            "decision_details": [
+                              {
+                                "n": "υιον",
+                                "t": "υν",
+                                "id": 217381,
+                                "class": "abbreviation",
+                                "scope": "once"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "1": {
+                            "t": "αυτου",
+                            "index": "8",
+                            "siglum": "1",
+                            "original": "αυτου",
+                            "rule_match": [
+                              "αυτου"
+                            ]
+                          },
+                          "index": "8",
+                          "verse": "Gal.1.16",
+                          "reading": [
+                            "1",
+                            "L60-S3W3D1"
+                          ],
+                          "interface": "αυτου",
+                          "L60-S3W3D1": {
+                            "t": "αυτου",
+                            "index": "8",
+                            "siglum": "L60-S3W3D1",
+                            "original": "αυτου",
+                            "rule_match": [
+                              "αυτου"
+                            ]
+                          }
+                        }
+                      ],
+                      "suffix": "n",
+                      "suffixes": [
+                        "",
+                        ""
+                      ],
+                      "witnesses": [
+                        "1",
+                        "L60-S3W3D1"
+                      ],
+                      "text_string": "υν αυτου"
+                    },
+                    {
+                      "text": [
+                        {
+                          "0278": {
+                            "n": "υιον",
+                            "t": "υιν",
+                            "index": "6",
+                            "nomSac": True,
+                            "siglum": "0278",
+                            "original": "υιν",
+                            "rule_match": [
+                              "υιν"
+                            ],
+                            "decision_class": [
+                              "abbreviation"
+                            ],
+                            "decision_details": [
+                              {
+                                "n": "υιον",
+                                "t": "υιν",
+                                "id": 216731,
+                                "class": "abbreviation",
+                                "scope": "once"
+                              }
+                            ]
+                          },
+                          "index": "6",
+                          "verse": "Gal.1.16",
+                          "reading": [
+                            "0278"
+                          ],
+                          "interface": "υιον"
+                        },
+                        {
+                          "0278": {
+                            "t": "αυτου",
+                            "index": "8",
+                            "siglum": "0278",
+                            "original": "αυτου",
+                            "rule_match": [
+                              "αυτου"
+                            ]
+                          },
+                          "index": "8",
+                          "verse": "Gal.1.16",
+                          "reading": [
+                            "0278"
+                          ],
+                          "interface": "αυτου"
+                        }
+                      ],
+                      "suffix": "n",
+                      "suffixes": [
+                        ""
+                      ],
+                      "witnesses": [
+                        "0278"
+                      ],
+                      "text_string": "υιν αυτου"
+                    }
+                  ]
+                },
+                "text_string": "υιον αυτου"
+              },
+              {
+                "_id": "ec1147ec8fac61b27144abbc40eb8e75",
+                "text": [],
+                "type": "lac",
+                "label": "zz",
+                "SR_text": {
+                  "04": {
+                    "text": [],
+                    "type": "lac_verse",
+                    "details": "lac verse"
+                  },
+                  "P51": {
+                    "text": [
+                      {
+                        "P51": {
+                          "n": "υιον",
+                          "t": "υιον",
+                          "index": "6",
+                          "siglum": "P51",
+                          "unclear": True,
+                          "original": "υ_[ιον]",
+                          "supplied": True,
+                          "interface": "υ_[ιον]",
+                          "rule_match": [
+                            "υ_[ιον]"
+                          ]
+                        },
+                        "index": "6",
+                        "verse": "Gal.1.16",
+                        "reading": [
+                          "P51"
+                        ],
+                        "interface": "υ_[ιον]"
+                      },
+                      {
+                        "P51": {
+                          "n": "αυτου",
+                          "t": "αυτου",
+                          "index": "8",
+                          "siglum": "P51",
+                          "original": "[αυτου]",
+                          "supplied": True,
+                          "interface": "[αυτου]",
+                          "rule_match": [
+                            "[αυτου]"
+                          ]
+                        },
+                        "index": "8",
+                        "verse": "Gal.1.16",
+                        "reading": [
+                          "P51"
+                        ],
+                        "interface": "[αυτου]"
+                      }
+                    ]
+                  }
+                },
+                "created": True,
+                "details": "lac",
+                "suffixes": [
+                  "",
+                  ""
+                ],
+                "witnesses": [
+                  "P51",
+                  "04"
+                ],
+                "text_string": "&lt;lac&gt;",
+                "standoff_subreadings": [
+                  "04",
+                  "P51"
+                ]
+              }
+            ],
+            "first_word_index": "6"
+          }
+
+    OVERTEXT = [
+          {
+            "id": "basetext",
+            "hand": "firsthand",
+            "tokens": [
+              {
+                "t": "αποκαλυψαι",
+                "index": "2",
+                "lemma": "αποκαλυψαι",
+                "verse": "Gal.1.16",
+                "siglum": "basetext",
+                "reading": "basetext",
+                "original": "ἀποκαλύψαι",
+                "rule_match": ["αποκαλυψαι"]
+              },
+              {
+                "t": "τον",
+                "index": "4",
+                "lemma": "τον",
+                "verse": "Gal.1.16",
+                "siglum": "basetext",
+                "reading": "basetext",
+                "original": "τὸν",
+                "rule_match": ["τον"]
+              },
+              {
+                "t": "υιον",
+                "index": "6",
+                "lemma": "υιον",
+                "verse": "Gal.1.16",
+                "siglum": "basetext",
+                "reading": "basetext",
+                "original": "υἱὸν",
+                "rule_match": ["υιον"]
+              },
+              {
+                "t": "αυτου",
+                "index": "8",
+                "lemma": "αυτου",
+                "verse": "Gal.1.16",
+                "siglum": "basetext",
+                "reading": "basetext",
+                "original": "αὐτοῦ",
+                "rule_match": ["αυτου"]
+              },
+              {
+                "t": "εν",
+                "index": "10",
+                "lemma": "εν",
+                "verse": "Gal.1.16",
+                "siglum": "basetext",
+                "reading": "basetext",
+                "original": "ἐν",
+                "pc_before": "(",
+                "pc_after": ")",
+                "rule_match": ["εν"]
+              },
+              {
+                "t": "εμοι",
+                "index": "12",
+                "lemma": "εμοι",
+                "verse": "Gal.1.16",
+                "siglum": "basetext",
+                "reading": "basetext",
+                "original": "ἐμοί",
+                "pc_after": ",",
+                "rule_match": ["εμοι"]
+              },
+              {
+                "t": "ινα",
+                "index": "14",
+                "lemma": "ινα",
+                "verse": "Gal.1.16",
+                "siglum": "basetext",
+                "reading": "basetext",
+                "original": "ἵνα",
+                "rule_match": ["ινα"]
+              },
+              {
+                "t": "ευαγγελιζωμαι",
+                "index": "16",
+                "lemma": "ευαγγελιζωμαι",
+                "verse": "Gal.1.16",
+                "siglum": "basetext",
+                "reading": "basetext",
+                "original": "εὐαγγελίζωμαι",
+                "rule_match": ["ευαγγελιζωμαι"]
+              },
+              {
+                "t": "αυτον",
+                "index": "18",
+                "lemma": "αυτον",
+                "verse": "Gal.1.16",
+                "siglum": "basetext",
+                "reading": "basetext",
+                "original": "αὐτὸν",
+                "rule_match": ["αυτον"]
+              },
+              {
+                "t": "εν",
+                "index": "20",
+                "lemma": "εν",
+                "verse": "Gal.1.16",
+                "siglum": "basetext",
+                "reading": "basetext",
+                "original": "ἐν",
+                "rule_match": ["εν"]
+              },
+              {
+                "t": "τοις",
+                "index": "22",
+                "lemma": "τοις",
+                "verse": "Gal.1.16",
+                "siglum": "basetext",
+                "reading": "basetext",
+                "original": "τοῖς",
+                "rule_match": ["τοις"]
+              },
+              {
+                "t": "εθνεσιν",
+                "index": "24",
+                "lemma": "εθνεσιν",
+                "verse": "Gal.1.16",
+                "siglum": "basetext",
+                "reading": "basetext",
+                "original": "ἔθνεσιν",
+                "pc_after": ",",
+                "rule_match": ["εθνεσιν"]
+              },
+              {
+                "t": "ευθεως",
+                "index": "26",
+                "lemma": "ευθεως",
+                "verse": "Gal.1.16",
+                "siglum": "basetext",
+                "reading": "basetext",
+                "original": "εὐθέως",
+                "rule_match": ["ευθεως"]
+              },
+              {
+                "t": "ου",
+                "index": "28",
+                "lemma": "ου",
+                "verse": "Gal.1.16",
+                "siglum": "basetext",
+                "reading": "basetext",
+                "original": "οὐ",
+                "rule_match": ["ου"]
+              }
+            ],
+            "hand_abbreviation": "*"
+          }
+        ]
 
     def test_get_text_default_settings(self):
-
         exp = Exporter()
-        reading = self.test_data['structure']['apparatus'][2]['readings'][0]
+        reading = self.BASE_UNIT['readings'][0]
         expected_text = ['υιον αυτου']
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
 
     def test_get_text_default_settings_older_format(self):
-
         exp = Exporter()
-        reading = self.test_data['structure']['apparatus'][2]['readings'][0]
+        reading = self.BASE_UNIT['readings'][0]
         # change the data to the older format
         del reading['text_string']
         expected_text = ['υιον αυτου']
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
-
+    
     def test_get_text_default_settings_subreading(self):
-
         exp = Exporter()
-        reading = self.test_data['structure']['apparatus'][2]['readings'][0]['subreadings']['abbreviation'][0]
+        reading = self.BASE_UNIT['readings'][0]['subreadings']['abbreviation'][0]
         expected_text = ['υν αυτου']
         generated_text = exp.get_text(reading, is_subreading=True)
         self.assertEqual(expected_text, generated_text)
 
     def test_get_text_default_settings_om(self):
-
         exp = Exporter()
-        reading = self.test_data['structure']['apparatus'][3]['readings'][1]
-        expected_text = ['om', 'om']
+        reading = {
+                "_id": "9be18d000f92e381ecb456215c00fa0b",
+                "text": [],
+                "type": "om",
+                "label": "b",
+                "suffixes": [""],
+                "witnesses": ["1838"],
+                "text_string": "om."
+              }
+        expected_text = ['om.', 'om']
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
 
     def test_get_text_default_settings_om_verse(self):
-
         exp = Exporter()
         reading = {"_id": "ebc1bfa92e5b52a692309086a3807d63",
                    "text": [],
@@ -54,12 +630,11 @@ class ExporterUnitTests(TestCase):
                    "type": "om_verse",
                    "witnesses": ["467", "1959"]
                    }
-        expected_text = ['om', 'om_verse']
+        expected_text = ['om.', 'om_verse']
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
 
     def test_get_text_default_settings_om_verse_details(self):
-
         exp = Exporter()
         reading = {"_id": "ebc1bfa92e5b52a692309086a3807d63",
                    "text": [],
@@ -75,7 +650,6 @@ class ExporterUnitTests(TestCase):
         self.assertEqual(expected_text, generated_text)
 
     def test_get_text_default_settings_lac(self):
-
         exp = Exporter()
         reading = {"_id": "ebc1bfa92e5b52a692309086a3807d63",
                    "text": [],
@@ -85,12 +659,11 @@ class ExporterUnitTests(TestCase):
                    "type": "lac",
                    "witnesses": ["467", "1959"]
                    }
-        expected_text = ['lac', 'lac']
+        expected_text = ['lac.', 'lac']
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
 
     def test_get_text_default_settings_lac_verse(self):
-
         exp = Exporter()
         reading = {"_id": "ebc1bfa92e5b52a692309086a3807d63",
                    "text": [],
@@ -100,12 +673,11 @@ class ExporterUnitTests(TestCase):
                    "type": "lac_verse",
                    "witnesses": ["467", "1959"]
                    }
-        expected_text = ['lac', 'lac_verse']
+        expected_text = ['lac.', 'lac_verse']
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
 
     def test_get_text_default_settings_lac_verse_details(self):
-
         exp = Exporter()
         reading = {"_id": "ebc1bfa92e5b52a692309086a3807d63",
                    "text": [],
@@ -121,7 +693,6 @@ class ExporterUnitTests(TestCase):
         self.assertEqual(expected_text, generated_text)
 
     def test_get_text_default_settings_lac_special_category_details(self):
-
         exp = Exporter()
         reading = {"_id": "ebc1bfa92e5b52a692309086a3807d63",
                    "text": [],
@@ -137,17 +708,24 @@ class ExporterUnitTests(TestCase):
         self.assertEqual(expected_text, generated_text)
 
     def test_get_text_default_settings_overlapped(self):
-
         exp = Exporter()
-        reading = self.test_data['structure']['apparatus'][1]['readings'][1]
+        reading = {
+                "_id": "e8cfee9e910e487b54542fd6d8953f0c",
+                "text": [],
+                "type": "om",
+                "label": "zu",
+                "suffixes": [""],
+                "witnesses": ["1929*"],
+                "text_string": "overlapped",
+                "overlap_status": "overlapped"
+              }
         expected_text = ['', 'overlapped']
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
 
-    def test_get_lemma_text(self):
-
+    def test_get_lemma_text_defaults(self):
         exp = Exporter()
-        overtext = self.test_data['structure']['overtext'][0]
+        overtext = self.OVERTEXT[0]
     
         # test a few ranges where there is data
         expected_text = ['ἀποκαλύψαι τὸν υἱὸν']
@@ -162,6 +740,10 @@ class ExporterUnitTests(TestCase):
         generated_text = exp.get_lemma_text(overtext, 1, 3)
         self.assertEqual(expected_text, generated_text)
 
+        expected_text = ['ἔθνεσιν']
+        generated_text = exp.get_lemma_text(overtext, 24, 24)
+        self.assertEqual(expected_text, generated_text)
+
         # test where there is no data
         expected_text = ['', 'om']
         generated_text = exp.get_lemma_text(overtext, 27, 27)
@@ -171,35 +753,79 @@ class ExporterUnitTests(TestCase):
         generated_text = exp.get_lemma_text(overtext, 1, 1)
         self.assertEqual(expected_text, generated_text)
 
+    def test_get_lemma_text_with_punctuation(self):
+        exp = Exporter(include_punctuation=True)
+        overtext = self.OVERTEXT[0]
+
+        expected_text = ['ἔθνεσιν,']
+        generated_text = exp.get_lemma_text(overtext, 24, 24)
+        self.assertEqual(expected_text, generated_text)
+
+        expected_text = ['(ἐν)']
+        generated_text = exp.get_lemma_text(overtext, 10, 10)
+        self.assertEqual(expected_text, generated_text)
+
     def test_get_witnesses(self):
         exp = Exporter()
-        reading = self.test_data['structure']['apparatus'][2]['readings'][0]['subreadings']['abbreviation'][1]
+        reading = self.BASE_UNIT['readings'][0]
 
-        expected_witnesses = ['0278', '623', '886', '1913', '1942', '1962', '2105']
+        expected_witnesses = ['02V', '5', '35', '38', 'L23-S3W4D1', 'basetext']
         generated_witnesses = exp.get_witnesses(reading, [])
         self.assertEqual(expected_witnesses, generated_witnesses)
 
-        expected_witnesses = ['0278', '623', '886', '1913', '1942']
-        generated_witnesses = exp.get_witnesses(reading, ['1962', '2105'])
+        expected_witnesses = ['02V', '35', '38', 'L23-S3W4D1']
+        generated_witnesses = exp.get_witnesses(reading, ['5', 'basetext'])
         self.assertEqual(expected_witnesses, generated_witnesses)
 
     def test_get_label_main_reading_1(self):
         exp = Exporter()
-        reading = self.test_data['structure']['apparatus'][0]['readings'][1]
+        reading = self.BASE_UNIT['readings'][1]
         expected_label = 'b'
         generated_label = exp.get_label('b', False, None, reading)
         self.assertEqual(expected_label, generated_label)
 
     def test_get_label_main_reading_2(self):
         exp = Exporter()
-        reading = self.test_data['structure']['apparatus2'][0]['readings'][1]
+        reading = {
+                "_id": "6411b86361757a8d56e7006eddb8ebae",
+                "text": [],
+                "type": "om",
+                "label": "b",
+                "suffixes": [""],
+                "witnesses": ["1929*"],
+                "text_string": "om.",
+                "label_suffix": "f",
+                "reading_classes": ["fehlerMR"]
+              }
         expected_label = 'bf'
         generated_label = exp.get_label('b', False, 'fehler', reading)
         self.assertEqual(expected_label, generated_label)
 
     def test_get_label_subreading(self):
         exp = Exporter()
-        reading = self.test_data['structure']['apparatus'][5]['readings'][1]['subreadings']['fehler'][0]
+        reading = {
+                      "text": [
+                        {
+                          "1398": {
+                            "n": "ευαγγελισωμαι",
+                            "t": "ευαγγελισομαι",
+                            "index": "16",
+                            "siglum": "1398",
+                            "original": "ευαγγελισομαι",
+                            "interface": "ευαγγελισομαι",
+                            "rule_match": ["ευαγγελισομαι"]
+                          },
+                          "index": "16.1",
+                          "verse": "Gal.1.16",
+                          "reading": ["1398"],
+                          "interface": "ευαγγελισομαι"
+                        }
+                      ],
+                      "suffix": "f",
+                      "suffixes": [""],
+                      "witnesses": ["1398"],
+                      "text_string": "ευαγγελισομαι"
+                    }
         expected_label = 'b'
         generated_label = exp.get_label('b', True, 'fehler', reading)
         self.assertEqual(expected_label, generated_label)
@@ -207,7 +833,17 @@ class ExporterUnitTests(TestCase):
     def test_get_label_subreading_legacy_1(self):
         # this tests an older form of the data where label_suffix for main readings were not added in approved data
         exp = Exporter(rule_classes=[{'value': 'fehler', 'identifier': 'f', 'suffixed_label': True}])
-        reading = self.test_data['structure']['apparatus2'][0]['readings'][1]
+        reading = {
+                "_id": "6411b86361757a8d56e7006eddb8ebae",
+                "text": [],
+                "type": "om",
+                "label": "b",
+                "suffixes": [""],
+                "witnesses": ["1929*"],
+                "text_string": "om.",
+                "label_suffix": "f",
+                "reading_classes": ["fehlerMR"]
+              }
         del reading['label_suffix']
         expected_label = 'bf'
         generated_label = exp.get_label('b', False, 'fehler', reading)
@@ -216,7 +852,17 @@ class ExporterUnitTests(TestCase):
     def test_get_label_subreading_legacy_2(self):
         # this tests an older form of the data where label_suffix for main readings were not added in approved data
         exp = Exporter(rule_classes=[{'value': 'fehler', 'identifier': 'f', 'suffixed_label': False}])
-        reading = self.test_data['structure']['apparatus2'][0]['readings'][1]
+        reading = {
+                "_id": "6411b86361757a8d56e7006eddb8ebae",
+                "text": [],
+                "type": "om",
+                "label": "b",
+                "suffixes": [""],
+                "witnesses": ["1929*"],
+                "text_string": "om.",
+                "label_suffix": "f",
+                "reading_classes": ["fehlerMR"]
+              }
         del reading['label_suffix']
         expected_label = 'b'
         generated_label = exp.get_label('b', False, 'fehler', reading)
@@ -224,7 +870,7 @@ class ExporterUnitTests(TestCase):
 
     def test_check_for_suffixed_reading_marker(self):
         exp = Exporter()
-        reading = self.test_data['structure']['apparatus'][2]['readings'][0]
+        reading = self.BASE_UNIT['readings'][0]
         # adapt the data so we have the right input
         reading['reading_suffix'] = 'K'
         expected_text = ['υιον αυτου']
@@ -237,38 +883,21 @@ class ExporterUnitTests(TestCase):
 
     def test_check_for_suffixed_reading_marker_legacy_1(self):
         exp = Exporter(rule_classes=[{'value': 'commentary', 'identifier': 'K', 'suffixed_reading': True}])
-        reading = self.test_data['structure']['apparatus'][2]['readings'][0]
+        reading = self.BASE_UNIT['readings'][0]
+        if 'reading_suffix' in reading:
+            del reading['reading_suffix']
         expected_text = ['υιον αυτου (K)']
         generated_text = exp.check_for_suffixed_reading_marker(['υιον αυτου'], 'commentary', reading)
         self.assertEqual(expected_text, generated_text)
 
     def test_check_for_suffixed_reading_marker_legacy_2(self):
         exp = Exporter(rule_classes=[{'value': 'commentary', 'identifier': 'K', 'suffixed_reading': False}])
-        reading = self.test_data['structure']['apparatus'][2]['readings'][0]
+        reading = self.BASE_UNIT['readings'][0]
+        if 'reading_suffix' in reading:
+            del reading['reading_suffix']
         expected_text = ['υιον αυτου']
         generated_text = exp.check_for_suffixed_reading_marker(['υιον αυτου'], 'commentary', reading)
         self.assertEqual(expected_text, generated_text)
-
-    def test_make_reading_main_reading(self):
-        exp = Exporter()
-        reading = self.test_data['structure']['apparatus'][0]['readings'][1]
-        expected_xml = '<rdg n="b" varSeq="2" wit="6">και<wit><idno>6</idno></wit></rdg>'
-        xml = exp.make_reading(reading, 1, reading['label'], ['6'])
-        self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
-
-    def test_make_reading_subreading(self):
-        exp = Exporter()
-        reading = self.test_data['structure']['apparatus'][14]['readings'][0]['subreadings']['fehler'][0]
-        expected_xml = '<rdg n="af" type="subreading" cause="fehler" varSeq="2" wit="206*">om.<wit><idno>206*</idno></wit></rdg>'
-        xml = exp.make_reading(reading, 1, 'af', ['206*'], True, 'fehler')
-        self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
-
-    def test_make_reading_om_reading(self):
-        exp = Exporter()
-        reading = self.test_data['structure']['apparatus'][3]['readings'][1]
-        expected_xml = '<rdg n="b" type="om" varSeq="2" wit="1838">om<wit><idno>1838</idno></wit></rdg>'
-        xml = exp.make_reading(reading, 1, 'b', ['1838'])
-        self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
 
     def test_fix_subreading_suffix(self):
         exp = Exporter()
@@ -281,90 +910,220 @@ class ExporterUnitTests(TestCase):
         generated_suffix = exp.fix_subreading_suffix('o')
         self.assertEqual(expected_suffix, generated_suffix)
 
-    def test_app_units_positive_apparatus(self):
+    @patch('collation.core.exporter.Exporter.check_for_suffixed_reading_marker')
+    @patch('collation.core.exporter.Exporter.get_text')
+    @patch('collation.core.exporter.Exporter.get_label')
+    def test_make_reading_main_reading_1(self,
+                                         mocked_get_label,
+                                         mocked_get_text,
+                                         mocked_check_for_suffixed_reading_marker):
+        mocked_get_label.return_value = 'b'
+        mocked_get_text.return_value = ['και']
+        mocked_check_for_suffixed_reading_marker.return_value = ['και']
+        # set required args so they are easier to see in the test
+        reading = None  # we don't actually need one because the functions that use it are mocked
+        index_position = 1
+        reading_label = 'b'
+        witnesses = ['6']
         exp = Exporter()
-        app = [self.test_data['structure']['apparatus'][7]]
-        overtext = self.test_data['structure']['overtext'][0]
-        context = self.test_data['context']
+        expected_xml = '<rdg n="b" varSeq="2" wit="6">και<wit><idno>6</idno></wit></rdg>'
+        xml = exp.make_reading(reading, index_position, reading_label, witnesses)
+        # check the right things are passed to the mocked functions
+        mocked_get_label.assert_called_with(reading_label, False, None, reading)
+        mocked_get_text.assert_called_with(reading, False)
+        mocked_check_for_suffixed_reading_marker.assert_called_with(['και'], None, reading)
+        # check the result
+        self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
 
-        expected_xml = '<app type="main" n="Gal.1.16" from="20" to="20"><lem wit="basetext">ἐν</lem><rdg n="a" varSeq="1" wit="P46 01 02 03 06* 06C2 010* 010C1 012 020 025 044 049 075 0150* 0150C 0278 1 5 6 33 35 38 43 51 61* 61C* 69 81 88 103 104 122 177* 177C 203 206* 206C 218 254 256 263S 326 327 330 337 365 378 394 398 424 429 436 442* 442C 451 454 455 459 462 467* 467C 506 606 608 623 629 630 639 642S 720 886 891 915 935 1069 1105 1108 1115 1127 1175 1241 1245 1251 1267 1319* 1319C 1367* 1367C 1398 1405 1505 1523 1524 1563 1573 1611 1617 1730 1736 1739 1741 1750 1751 1753 1798 1817 1831 1834 1836 1837 1838 1841 1863 1881 1899 1908 1910 1912 1913 1929* 1929C 1930 1935 1942 1943 1947 1950* 1950C 1959 1961 1962 1969 1973 1978 1984 1985 1987 1988 1991 1992 1995 1996 2000 2002 2004 2005 2102 2105 2110 2127 2138 2197 2200 2248 2279 2344 2352 2356 2400 2423 2464 2482 2492 2494 2495 2511 2516 2523 2544 2574-1 2574-2 2576 2659 2674 2733 2805 2815 2865 2892 2899 2936 L23-S3W4D1 L60-S3W3D1 L156-S3W4D1 L169-S3W4D1 L587-S3W4D1 L809-S3W4D1 L1126-MOV12 L1159-S3W4D1 L1178-S3W4D1 L1188-S3W4D1 L1298-S3W4D1 L1440-S3W4D1 L2010-S3W4D1 L2058-M2D23 L2058-MOV12 L2058-S3W4D1 basetext">εν<wit><idno>P46</idno><idno>01</idno><idno>02</idno><idno>03</idno><idno>06*</idno><idno>06C2</idno><idno>010*</idno><idno>010C1</idno><idno>012</idno><idno>020</idno><idno>025</idno><idno>044</idno><idno>049</idno><idno>075</idno><idno>0150*</idno><idno>0150C</idno><idno>0278</idno><idno>1</idno><idno>5</idno><idno>6</idno><idno>33</idno><idno>35</idno><idno>38</idno><idno>43</idno><idno>51</idno><idno>61*</idno><idno>61C*</idno><idno>69</idno><idno>81</idno><idno>88</idno><idno>103</idno><idno>104</idno><idno>122</idno><idno>177*</idno><idno>177C</idno><idno>203</idno><idno>206*</idno><idno>206C</idno><idno>218</idno><idno>254</idno><idno>256</idno><idno>263S</idno><idno>326</idno><idno>327</idno><idno>330</idno><idno>337</idno><idno>365</idno><idno>378</idno><idno>394</idno><idno>398</idno><idno>424</idno><idno>429</idno><idno>436</idno><idno>442*</idno><idno>442C</idno><idno>451</idno><idno>454</idno><idno>455</idno><idno>459</idno><idno>462</idno><idno>467*</idno><idno>467C</idno><idno>506</idno><idno>606</idno><idno>608</idno><idno>623</idno><idno>629</idno><idno>630</idno><idno>639</idno><idno>642S</idno><idno>720</idno><idno>886</idno><idno>891</idno><idno>915</idno><idno>935</idno><idno>1069</idno><idno>1105</idno><idno>1108</idno><idno>1115</idno><idno>1127</idno><idno>1175</idno><idno>1241</idno><idno>1245</idno><idno>1251</idno><idno>1267</idno><idno>1319*</idno><idno>1319C</idno><idno>1367*</idno><idno>1367C</idno><idno>1398</idno><idno>1405</idno><idno>1505</idno><idno>1523</idno><idno>1524</idno><idno>1563</idno><idno>1573</idno><idno>1611</idno><idno>1617</idno><idno>1730</idno><idno>1736</idno><idno>1739</idno><idno>1741</idno><idno>1750</idno><idno>1751</idno><idno>1753</idno><idno>1798</idno><idno>1817</idno><idno>1831</idno><idno>1834</idno><idno>1836</idno><idno>1837</idno><idno>1838</idno><idno>1841</idno><idno>1863</idno><idno>1881</idno><idno>1899</idno><idno>1908</idno><idno>1910</idno><idno>1912</idno><idno>1913</idno><idno>1929*</idno><idno>1929C</idno><idno>1930</idno><idno>1935</idno><idno>1942</idno><idno>1943</idno><idno>1947</idno><idno>1950*</idno><idno>1950C</idno><idno>1959</idno><idno>1961</idno><idno>1962</idno><idno>1969</idno><idno>1973</idno><idno>1978</idno><idno>1984</idno><idno>1985</idno><idno>1987</idno><idno>1988</idno><idno>1991</idno><idno>1992</idno><idno>1995</idno><idno>1996</idno><idno>2000</idno><idno>2002</idno><idno>2004</idno><idno>2005</idno><idno>2102</idno><idno>2105</idno><idno>2110</idno><idno>2127</idno><idno>2138</idno><idno>2197</idno><idno>2200</idno><idno>2248</idno><idno>2279</idno><idno>2344</idno><idno>2352</idno><idno>2356</idno><idno>2400</idno><idno>2423</idno><idno>2464</idno><idno>2482</idno><idno>2492</idno><idno>2494</idno><idno>2495</idno><idno>2511</idno><idno>2516</idno><idno>2523</idno><idno>2544</idno><idno>2574-1</idno><idno>2574-2</idno><idno>2576</idno><idno>2659</idno><idno>2674</idno><idno>2733</idno><idno>2805</idno><idno>2815</idno><idno>2865</idno><idno>2892</idno><idno>2899</idno><idno>2936</idno><idno>L23-S3W4D1</idno><idno>L60-S3W3D1</idno><idno>L156-S3W4D1</idno><idno>L169-S3W4D1</idno><idno>L587-S3W4D1</idno><idno>L809-S3W4D1</idno><idno>L1126-MOV12</idno><idno>L1159-S3W4D1</idno><idno>L1178-S3W4D1</idno><idno>L1188-S3W4D1</idno><idno>L1298-S3W4D1</idno><idno>L1440-S3W4D1</idno><idno>L2010-S3W4D1</idno><idno>L2058-M2D23</idno><idno>L2058-MOV12</idno><idno>L2058-S3W4D1</idno><idno>basetext</idno></wit></rdg><rdg n="b" type="om" varSeq="2" wit="336 582 620 1918">om<wit><idno>336</idno><idno>582</idno><idno>620</idno><idno>1918</idno></wit></rdg><rdg n="zz" type="lac" varSeq="3" wit="P51 04 015 016 062 075S 0174 0176 0254 0261 1523S1 1523S2 1798S 1947S 1950S 2248S 2596">lac<wit><idno>P51</idno><idno>04</idno><idno>015</idno><idno>016</idno><idno>062</idno><idno>075S</idno><idno>0174</idno><idno>0176</idno><idno>0254</idno><idno>0261</idno><idno>1523S1</idno><idno>1523S2</idno><idno>1798S</idno><idno>1947S</idno><idno>1950S</idno><idno>2248S</idno><idno>2596</idno></wit></rdg></app>'
-        app_units = exp.get_app_units(app, overtext, context, [])
-        self.assertEqual(etree.tostring(app_units[0], encoding='UTF-8').decode('UTF-8'), expected_xml)
+    @patch('collation.core.exporter.Exporter.check_for_suffixed_reading_marker')
+    @patch('collation.core.exporter.Exporter.get_text')
+    @patch('collation.core.exporter.Exporter.get_label')
+    def test_make_reading_main_reading_2(self,
+                                         mocked_get_label,
+                                         mocked_get_text,
+                                         mocked_check_for_suffixed_reading_marker):
+        mocked_get_label.return_value = 'cf'
+        mocked_get_text.return_value = ['κι']
+        mocked_check_for_suffixed_reading_marker.return_value = ['κι']
+        # set required args so they are easier to see in the test
+        reading = None  # we don't actually need one because the functions that use it are mocked
+        index_position = 2
+        reading_label = 'c'
+        witnesses = ['6', '7']
+        exp = Exporter()
+        expected_xml = '<rdg n="cf" varSeq="3" wit="6 7">κι<wit><idno>6</idno><idno>7</idno></wit></rdg>'
+        xml = exp.make_reading(reading, index_position, reading_label, witnesses)
+        # check the right things are passed to the mocked functions
+        mocked_get_label.assert_called_with(reading_label, False, None, reading)
+        mocked_get_text.assert_called_with(reading, False)
+        mocked_check_for_suffixed_reading_marker.assert_called_with(['κι'], None, reading)
+        # check the result
+        self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
 
-        app = [self.test_data['structure']['apparatus'][0]]
-        overtext = self.test_data['structure']['overtext'][0]
-        context = self.test_data['context']
+    @patch('collation.core.exporter.Exporter.check_for_suffixed_reading_marker')
+    @patch('collation.core.exporter.Exporter.get_text')
+    @patch('collation.core.exporter.Exporter.get_label')
+    def test_make_reading_subreading(self,
+                                     mocked_get_label,
+                                     mocked_get_text,
+                                     mocked_check_for_suffixed_reading_marker):
+        mocked_get_label.return_value = 'af'
+        mocked_get_text.return_value = ['om.', 'om']
+        mocked_check_for_suffixed_reading_marker.return_value = ['om.', 'om']
+        # set required args so they are easier to see in the test
+        reading = None  # we don't actually need one because the functions that use it are mocked
+        index_position = 1
+        reading_label = 'af'  # subreadings have pre-compiled labels in the data
+        witnesses = ['206*']
+        subreading = True
+        subreading_subtype = 'fehler'
+        exp = Exporter()
+        expected_xml = '<rdg n="af" type="subreading" cause="fehler" varSeq="2" wit="206*">om.<wit><idno>206*</idno></wit></rdg>'
+        xml = exp.make_reading(reading, index_position, reading_label, witnesses, subreading, subreading_subtype)
+        # check the right things are passed to the mocked functions
+        mocked_get_label.assert_called_with(reading_label, subreading, subreading_subtype, reading)
+        mocked_get_text.assert_called_with(reading, subreading)
+        mocked_check_for_suffixed_reading_marker.assert_called_with(['om.', 'om'], subreading_subtype, reading)
+        # check the result
+        self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
 
-        expected_xml = '<app type="main" n="Gal.1.16" from="1" to="1"><lem wit="basetext" type="om" /><rdg n="a" type="om" varSeq="1" wit="P46 P51 01 02 03 06* 06C2 010* 010C1 012 020 025 044 049 075 0150* 0150C 0278 1 5 33 35 38 43 51 61* 61C* 69 81 88 103 104 122 177* 177C 203 206* 206C 218 254 256 263S 326 327 330 336 337 365 378 394 398 424 429 436 442* 442C 451 454 455 459 462 467* 467C 506 582 606 608 620 623 629 630 639 642S 720 886 891 915 935 1069 1105 1108 1115 1127 1175 1241 1245 1251 1267 1319* 1319C 1367* 1367C 1398 1405 1505 1523 1524 1563 1573 1611 1617 1730 1736 1739 1741 1750 1751 1753 1798 1817 1831 1834 1836 1837 1838 1841 1863 1881 1899 1908 1910 1912 1913 1918 1929* 1929C 1930 1935 1942 1943 1947 1950* 1950C 1959 1961 1962 1969 1973 1978 1984 1985 1987 1988 1991 1992 1995 1996 2000 2002 2004 2005 2102 2105 2110 2127 2138 2197 2200 2248 2279 2344 2352 2356 2400 2423 2464 2482 2492 2494 2495 2511 2516 2523 2544 2574-1 2574-2 2576 2659 2674 2733 2805 2815 2865 2892 2899 2936 L23-S3W4D1 L60-S3W3D1 L156-S3W4D1 L169-S3W4D1 L587-S3W4D1 L809-S3W4D1 L1126-MOV12 L1159-S3W4D1 L1178-S3W4D1 L1188-S3W4D1 L1298-S3W4D1 L1440-S3W4D1 L2010-S3W4D1 L2058-M2D23 L2058-MOV12 L2058-S3W4D1 basetext">om<wit><idno>P46</idno><idno>P51</idno><idno>01</idno><idno>02</idno><idno>03</idno><idno>06*</idno><idno>06C2</idno><idno>010*</idno><idno>010C1</idno><idno>012</idno><idno>020</idno><idno>025</idno><idno>044</idno><idno>049</idno><idno>075</idno><idno>0150*</idno><idno>0150C</idno><idno>0278</idno><idno>1</idno><idno>5</idno><idno>33</idno><idno>35</idno><idno>38</idno><idno>43</idno><idno>51</idno><idno>61*</idno><idno>61C*</idno><idno>69</idno><idno>81</idno><idno>88</idno><idno>103</idno><idno>104</idno><idno>122</idno><idno>177*</idno><idno>177C</idno><idno>203</idno><idno>206*</idno><idno>206C</idno><idno>218</idno><idno>254</idno><idno>256</idno><idno>263S</idno><idno>326</idno><idno>327</idno><idno>330</idno><idno>336</idno><idno>337</idno><idno>365</idno><idno>378</idno><idno>394</idno><idno>398</idno><idno>424</idno><idno>429</idno><idno>436</idno><idno>442*</idno><idno>442C</idno><idno>451</idno><idno>454</idno><idno>455</idno><idno>459</idno><idno>462</idno><idno>467*</idno><idno>467C</idno><idno>506</idno><idno>582</idno><idno>606</idno><idno>608</idno><idno>620</idno><idno>623</idno><idno>629</idno><idno>630</idno><idno>639</idno><idno>642S</idno><idno>720</idno><idno>886</idno><idno>891</idno><idno>915</idno><idno>935</idno><idno>1069</idno><idno>1105</idno><idno>1108</idno><idno>1115</idno><idno>1127</idno><idno>1175</idno><idno>1241</idno><idno>1245</idno><idno>1251</idno><idno>1267</idno><idno>1319*</idno><idno>1319C</idno><idno>1367*</idno><idno>1367C</idno><idno>1398</idno><idno>1405</idno><idno>1505</idno><idno>1523</idno><idno>1524</idno><idno>1563</idno><idno>1573</idno><idno>1611</idno><idno>1617</idno><idno>1730</idno><idno>1736</idno><idno>1739</idno><idno>1741</idno><idno>1750</idno><idno>1751</idno><idno>1753</idno><idno>1798</idno><idno>1817</idno><idno>1831</idno><idno>1834</idno><idno>1836</idno><idno>1837</idno><idno>1838</idno><idno>1841</idno><idno>1863</idno><idno>1881</idno><idno>1899</idno><idno>1908</idno><idno>1910</idno><idno>1912</idno><idno>1913</idno><idno>1918</idno><idno>1929*</idno><idno>1929C</idno><idno>1930</idno><idno>1935</idno><idno>1942</idno><idno>1943</idno><idno>1947</idno><idno>1950*</idno><idno>1950C</idno><idno>1959</idno><idno>1961</idno><idno>1962</idno><idno>1969</idno><idno>1973</idno><idno>1978</idno><idno>1984</idno><idno>1985</idno><idno>1987</idno><idno>1988</idno><idno>1991</idno><idno>1992</idno><idno>1995</idno><idno>1996</idno><idno>2000</idno><idno>2002</idno><idno>2004</idno><idno>2005</idno><idno>2102</idno><idno>2105</idno><idno>2110</idno><idno>2127</idno><idno>2138</idno><idno>2197</idno><idno>2200</idno><idno>2248</idno><idno>2279</idno><idno>2344</idno><idno>2352</idno><idno>2356</idno><idno>2400</idno><idno>2423</idno><idno>2464</idno><idno>2482</idno><idno>2492</idno><idno>2494</idno><idno>2495</idno><idno>2511</idno><idno>2516</idno><idno>2523</idno><idno>2544</idno><idno>2574-1</idno><idno>2574-2</idno><idno>2576</idno><idno>2659</idno><idno>2674</idno><idno>2733</idno><idno>2805</idno><idno>2815</idno><idno>2865</idno><idno>2892</idno><idno>2899</idno><idno>2936</idno><idno>L23-S3W4D1</idno><idno>L60-S3W3D1</idno><idno>L156-S3W4D1</idno><idno>L169-S3W4D1</idno><idno>L587-S3W4D1</idno><idno>L809-S3W4D1</idno><idno>L1126-MOV12</idno><idno>L1159-S3W4D1</idno><idno>L1178-S3W4D1</idno><idno>L1188-S3W4D1</idno><idno>L1298-S3W4D1</idno><idno>L1440-S3W4D1</idno><idno>L2010-S3W4D1</idno><idno>L2058-M2D23</idno><idno>L2058-MOV12</idno><idno>L2058-S3W4D1</idno><idno>basetext</idno></wit></rdg><rdg n="b" varSeq="2" wit="6">και<wit><idno>6</idno></wit></rdg><rdg n="zz" type="lac" varSeq="3" wit="04 015 016 062 075S 0174 0176 0254 0261 1523S1 1523S2 1798S 1947S 1950S 2248S 2596">lac<wit><idno>04</idno><idno>015</idno><idno>016</idno><idno>062</idno><idno>075S</idno><idno>0174</idno><idno>0176</idno><idno>0254</idno><idno>0261</idno><idno>1523S1</idno><idno>1523S2</idno><idno>1798S</idno><idno>1947S</idno><idno>1950S</idno><idno>2248S</idno><idno>2596</idno></wit></rdg></app>'
-        app_units = exp.get_app_units(app, overtext, context, [])
-        self.assertEqual(etree.tostring(app_units[0], encoding='UTF-8').decode('UTF-8'), expected_xml)
+    @patch('collation.core.exporter.Exporter.check_for_suffixed_reading_marker')
+    @patch('collation.core.exporter.Exporter.get_text')
+    @patch('collation.core.exporter.Exporter.get_label')
+    def test_make_reading_om_reading(self,
+                                     mocked_get_label,
+                                     mocked_get_text,
+                                     mocked_check_for_suffixed_reading_marker):
+        mocked_get_label.return_value = 'b'
+        mocked_get_text.return_value = ['om.', 'om']
+        mocked_check_for_suffixed_reading_marker.return_value = ['om.', 'om']
+        # set required args so they are easier to see in the test
+        reading = None  # we don't actually need one because the functions that use it are mocked
+        index_position = 1
+        reading_label = 'b'
+        witnesses = ['1838']
+        exp = Exporter()
+        expected_xml = '<rdg n="b" type="om" varSeq="2" wit="1838">om.<wit><idno>1838</idno></wit></rdg>'
+        xml = exp.make_reading(reading, index_position, reading_label, witnesses)
+        # check the right things are passed to the mocked functions
+        mocked_get_label.assert_called_with(reading_label, False, None, reading)
+        mocked_get_text.assert_called_with(reading, False)
+        mocked_check_for_suffixed_reading_marker.assert_called_with(['om.', 'om'], None, reading)
+        # check the result
+        self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
 
-        app = [self.test_data['structure']['apparatus'][2]]
-        overtext = self.test_data['structure']['overtext'][0]
-        context = self.test_data['context']
+    @patch('collation.core.exporter.Exporter.make_reading')
+    @patch('collation.core.exporter.Exporter.get_witnesses')
+    @patch('collation.core.exporter.Exporter.get_lemma_text')
+    def test_get_app_units_positive_apparatus(self,
+                                              mocked_get_lemma_text,
+                                              mocked_get_witnesses,
+                                              mocked_make_reading):
+        mocked_get_lemma_text.side_effect = [['my lemma'], ['here'], ['', 'om']]
+        mocked_get_witnesses.side_effect = [['basetext', '6'], ['7', '8'], ['basetext'], ['7', '8'], ['6'], ['basetext', '8'], ['6', '7']]
+        mocked_make_reading.side_effect = [etree.fromstring('<rdg n="a" varSeq="1" wit="basetext 6">my lemma<wit><idno>basetext</idno><idno>6</idno></wit></rdg>'), 
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno><idno>8</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="a" varSeq="1" wit="basetext">here<wit><idno>basetext</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno><idno>8</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="c" type="om" cause="fehlerMR" varSeq="3" wit="6">om.<wit><idno>6</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="a" varSeq="1" wit="basetext 8">om.<wit><idno>basetext</idno><idno>8</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="6 7">addition<wit><idno>6</idno><idno>7</idno></wit></rdg>')]
+        context = 'Gal.1.1'
+        overtext = {'id': 'basetext'}
+        # give it just enough to control the loops and stop calls breaking (data seems to be needed even though they are mocked)
+        apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'}, {'label': 'b'}]},
+                     {'start': 6, 'end': 6, 'readings': [{'label': 'a'}, {'label': 'b'}, {'label': 'c', 'reading_classes':['fehlerMR']}]},
+                     {'start': 7, 'end': 7, 'readings': [{'label': 'a'}, {'label': 'b'}]}]
+        missing = []
+        exp = Exporter()
+        expected_xml = ['<app type="main" n="Gal.1.1" from="2" to="4"><lem wit="basetext">my lemma</lem><rdg n="a" varSeq="1" wit="basetext 6">my lemma<wit><idno>basetext</idno><idno>6</idno></wit></rdg><rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno><idno>8</idno></wit></rdg></app>',
+                        '<app type="main" n="Gal.1.1" from="6" to="6"><lem wit="basetext">here</lem><rdg n="a" varSeq="1" wit="basetext">here<wit><idno>basetext</idno></wit></rdg><rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno><idno>8</idno></wit></rdg><rdg n="c" type="om" cause="fehlerMR" varSeq="3" wit="6">om.<wit><idno>6</idno></wit></rdg></app>',
+                        '<app type="main" n="Gal.1.1" from="7" to="7"><lem wit="basetext" type="om" /><rdg n="a" varSeq="1" wit="basetext 8">om.<wit><idno>basetext</idno><idno>8</idno></wit></rdg><rdg n="b" varSeq="2" wit="6 7">addition<wit><idno>6</idno><idno>7</idno></wit></rdg></app>']
+        app_units = exp.get_app_units(apparatus, overtext, context, missing)
+        result = []
+        for unit in app_units:
+            result.append(etree.tostring(unit, encoding='UTF-8').decode('UTF-8'))
+        self.assertEqual(result, expected_xml)
 
-        expected_xml = '<app type="main" n="Gal.1.16" from="6" to="8"><lem wit="basetext">υἱὸν αὐτοῦ</lem><rdg n="a" varSeq="1" wit="02V 03 06* 06C2 010* 010C1 012 5 35 38 43 51 61* 61C* 69 88 103 122 177* 177C 206* 206C 218 254 256 263S 326 327 330 336 337 365 378 394 424 429 436 442* 442C 451 455 462 467* 467C 582 606 608 620 629 630 639 720 891 915 935 1069 1105 1108 1115 1127 1175 1241 1245 1251 1267 1319* 1319C 1367* 1367C 1398 1405 1505 1523 1524 1563 1573 1611 1617 1730 1736 1741 1750 1753 1798 1817 1831 1837 1838 1841 1863 1881 1899 1918 1929C 1930 1935 1943 1947 1950* 1950C 1959 1961 1969 1973 1978 1984 1985 1987 1988 1991 1992 1995 1996 2000 2002 2005 2102 2110 2127 2197 2200 2248 2279 2344 2352 2356 2400 2423 2482 2492 2494 2495 2516 2523 2544 2574-1 2574-2 2576 2659 2674 2815 2899 2936 L23-S3W4D1 L587-S3W4D1 L809-S3W4D1 L1159-S3W4D1 L1178-S3W4D1 L1188-S3W4D1 L1298-S3W4D1 L1440-S3W4D1 L2010-S3W4D1 L2058-M2D23 L2058-MOV12 L2058-S3W4D1 basetext">υιον αυτου<wit><idno>02V</idno><idno>03</idno><idno>06*</idno><idno>06C2</idno><idno>010*</idno><idno>010C1</idno><idno>012</idno><idno>5</idno><idno>35</idno><idno>38</idno><idno>43</idno><idno>51</idno><idno>61*</idno><idno>61C*</idno><idno>69</idno><idno>88</idno><idno>103</idno><idno>122</idno><idno>177*</idno><idno>177C</idno><idno>206*</idno><idno>206C</idno><idno>218</idno><idno>254</idno><idno>256</idno><idno>263S</idno><idno>326</idno><idno>327</idno><idno>330</idno><idno>336</idno><idno>337</idno><idno>365</idno><idno>378</idno><idno>394</idno><idno>424</idno><idno>429</idno><idno>436</idno><idno>442*</idno><idno>442C</idno><idno>451</idno><idno>455</idno><idno>462</idno><idno>467*</idno><idno>467C</idno><idno>582</idno><idno>606</idno><idno>608</idno><idno>620</idno><idno>629</idno><idno>630</idno><idno>639</idno><idno>720</idno><idno>891</idno><idno>915</idno><idno>935</idno><idno>1069</idno><idno>1105</idno><idno>1108</idno><idno>1115</idno><idno>1127</idno><idno>1175</idno><idno>1241</idno><idno>1245</idno><idno>1251</idno><idno>1267</idno><idno>1319*</idno><idno>1319C</idno><idno>1367*</idno><idno>1367C</idno><idno>1398</idno><idno>1405</idno><idno>1505</idno><idno>1523</idno><idno>1524</idno><idno>1563</idno><idno>1573</idno><idno>1611</idno><idno>1617</idno><idno>1730</idno><idno>1736</idno><idno>1741</idno><idno>1750</idno><idno>1753</idno><idno>1798</idno><idno>1817</idno><idno>1831</idno><idno>1837</idno><idno>1838</idno><idno>1841</idno><idno>1863</idno><idno>1881</idno><idno>1899</idno><idno>1918</idno><idno>1929C</idno><idno>1930</idno><idno>1935</idno><idno>1943</idno><idno>1947</idno><idno>1950*</idno><idno>1950C</idno><idno>1959</idno><idno>1961</idno><idno>1969</idno><idno>1973</idno><idno>1978</idno><idno>1984</idno><idno>1985</idno><idno>1987</idno><idno>1988</idno><idno>1991</idno><idno>1992</idno><idno>1995</idno><idno>1996</idno><idno>2000</idno><idno>2002</idno><idno>2005</idno><idno>2102</idno><idno>2110</idno><idno>2127</idno><idno>2197</idno><idno>2200</idno><idno>2248</idno><idno>2279</idno><idno>2344</idno><idno>2352</idno><idno>2356</idno><idno>2400</idno><idno>2423</idno><idno>2482</idno><idno>2492</idno><idno>2494</idno><idno>2495</idno><idno>2516</idno><idno>2523</idno><idno>2544</idno><idno>2574-1</idno><idno>2574-2</idno><idno>2576</idno><idno>2659</idno><idno>2674</idno><idno>2815</idno><idno>2899</idno><idno>2936</idno><idno>L23-S3W4D1</idno><idno>L587-S3W4D1</idno><idno>L809-S3W4D1</idno><idno>L1159-S3W4D1</idno><idno>L1178-S3W4D1</idno><idno>L1188-S3W4D1</idno><idno>L1298-S3W4D1</idno><idno>L1440-S3W4D1</idno><idno>L2010-S3W4D1</idno><idno>L2058-M2D23</idno><idno>L2058-MOV12</idno><idno>L2058-S3W4D1</idno><idno>basetext</idno></wit></rdg><rdg n="an" type="subreading" cause="abbreviation" varSeq="1" wit="P46 01 020 025 044 049 075 0150* 0150C 1 6 33 81 104 203 398 454 459 506 642S 1739 1834 1836 1908 1910 1912 2004 2138 2464 2511 2733 2805 2865 2892 L60-S3W3D1 L156-S3W4D1 L169-S3W4D1 L1126-MOV12">υν αυτου<wit><idno>P46</idno><idno>01</idno><idno>020</idno><idno>025</idno><idno>044</idno><idno>049</idno><idno>075</idno><idno>0150*</idno><idno>0150C</idno><idno>1</idno><idno>6</idno><idno>33</idno><idno>81</idno><idno>104</idno><idno>203</idno><idno>398</idno><idno>454</idno><idno>459</idno><idno>506</idno><idno>642S</idno><idno>1739</idno><idno>1834</idno><idno>1836</idno><idno>1908</idno><idno>1910</idno><idno>1912</idno><idno>2004</idno><idno>2138</idno><idno>2464</idno><idno>2511</idno><idno>2733</idno><idno>2805</idno><idno>2865</idno><idno>2892</idno><idno>L60-S3W3D1</idno><idno>L156-S3W4D1</idno><idno>L169-S3W4D1</idno><idno>L1126-MOV12</idno></wit></rdg><rdg n="an" type="subreading" cause="abbreviation" varSeq="1" wit="0278 623 886 1913 1942 1962 2105">υιν αυτου<wit><idno>0278</idno><idno>623</idno><idno>886</idno><idno>1913</idno><idno>1942</idno><idno>1962</idno><idno>2105</idno></wit></rdg><rdg n="zz" type="lac" varSeq="3" wit="P51 04 015 016 062 075S 0174 0176 0254 0261 1523S2 1523S1 1798S 1947S 1950S 2248S 2596">lac<wit><idno>P51</idno><idno>04</idno><idno>015</idno><idno>016</idno><idno>062</idno><idno>075S</idno><idno>0174</idno><idno>0176</idno><idno>0254</idno><idno>0261</idno><idno>1523S2</idno><idno>1523S1</idno><idno>1798S</idno><idno>1947S</idno><idno>1950S</idno><idno>2248S</idno><idno>2596</idno></wit></rdg></app>'
-        app_units = exp.get_app_units(app, overtext, context, [])
-        self.assertEqual(etree.tostring(app_units[0], encoding='UTF-8').decode('UTF-8'), expected_xml)
+    @patch('collation.core.exporter.Exporter.make_reading')
+    @patch('collation.core.exporter.Exporter.get_witnesses')
+    @patch('collation.core.exporter.Exporter.get_lemma_text')
+    def test_get_app_units_positive_apparatus_subreading(self,
+                                                         mocked_get_lemma_text,
+                                                         mocked_get_witnesses,
+                                                         mocked_make_reading):
+        mocked_get_lemma_text.side_effect = [['my lemma']]
+        mocked_get_witnesses.side_effect = [['basetext', '6'], ['7'], ['8']]
+        mocked_make_reading.side_effect = [etree.fromstring('<rdg n="a" varSeq="1" wit="basetext 6">my lemma<wit><idno>basetext</idno><idno>6</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7">my lema<wit><idno>7</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg type="subreading" cause="orthographic" n="bo" varSeq="3" wit="8">mie lema<wit><idno>8</idno></wit></rdg>')]
+        context = 'Gal.1.1'
+        overtext = {'id': 'basetext'}
+        apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'}, {'label': 'b', 'subreadings': {'orthographic': [{'label': 'b', 'suffix': ''}]}}]}]
+        missing = []
+        exp = Exporter()
+        expected_xml = ['<app type="main" n="Gal.1.1" from="2" to="4"><lem wit="basetext">my lemma</lem><rdg n="a" varSeq="1" wit="basetext 6">my lemma<wit><idno>basetext</idno><idno>6</idno></wit></rdg><rdg n="b" varSeq="2" wit="7">my lema<wit><idno>7</idno></wit></rdg><rdg type="subreading" cause="orthographic" n="bo" varSeq="3" wit="8">mie lema<wit><idno>8</idno></wit></rdg></app>']
+        app_units = exp.get_app_units(apparatus, overtext, context, missing)
+        result = []
+        for unit in app_units:
+            result.append(etree.tostring(unit, encoding='UTF-8').decode('UTF-8'))
+        self.assertEqual(result, expected_xml)
 
-        app = [self.test_data['structure']['apparatus'][11]]
-        overtext = self.test_data['structure']['overtext'][0]
-        context = self.test_data['context']
+# TODO: work out what is going on with 'include_lemma_when_no_variants' because False doesn't seem to do anything
 
-        expected_xml = '<app type="main" n="Gal.1.16" from="28" to="28"><lem wit="basetext">οὐ</lem><rdg n="a" varSeq="1" wit="P46 P51 01 02 03 06* 06C2 010* 010C1 012 020 025 044 049 075 0150* 0150C 0278 1 5 6 33 35 38 43 51 61* 61C* 69 81 88 103 104 122 177* 177C 203 206* 206C 218 254 256 263S 326 327 330 336 337 365 378 394 398 424 429 436 442* 442C 451 454 455 459 462 467* 467C 506 582 606 608 620 623 629 630 639 642S 720 886 891 915 935 1069 1105 1108 1115 1127 1175 1241 1245 1251 1267 1319* 1319C 1367* 1367C 1398 1405 1505 1523 1524 1563 1573 1611 1617 1730 1736 1739 1741 1750 1751 1753 1798 1817 1831 1834 1836 1837 1838 1841 1863 1881 1899 1908 1910 1912 1913 1918 1929* 1929C 1930 1935 1942 1943 1947 1950* 1950C 1959 1961 1962 1969 1973 1978 1984 1987 1988 1991 1992 1995 1996 2000 2002 2004 2005 2105 2110 2127 2138 2197 2200 2248 2279 2344 2352 2356 2400 2423 2464 2482 2492 2494 2495 2511 2516 2523 2544 2574-1 2574-2 2576 2596 2659 2674 2733 2805 2815 2865 2892 2899 2936 L23-S3W4D1 L60-S3W3D1 L156-S3W4D1 L169-S3W4D1 L587-S3W4D1 L809-S3W4D1 L1126-MOV12 L1159-S3W4D1 L1178-S3W4D1 L1188-S3W4D1 L1298-S3W4D1 L1440-S3W4D1 L2010-S3W4D1 L2058-M2D23 L2058-MOV12 L2058-S3W4D1 basetext">ου<wit><idno>P46</idno><idno>P51</idno><idno>01</idno><idno>02</idno><idno>03</idno><idno>06*</idno><idno>06C2</idno><idno>010*</idno><idno>010C1</idno><idno>012</idno><idno>020</idno><idno>025</idno><idno>044</idno><idno>049</idno><idno>075</idno><idno>0150*</idno><idno>0150C</idno><idno>0278</idno><idno>1</idno><idno>5</idno><idno>6</idno><idno>33</idno><idno>35</idno><idno>38</idno><idno>43</idno><idno>51</idno><idno>61*</idno><idno>61C*</idno><idno>69</idno><idno>81</idno><idno>88</idno><idno>103</idno><idno>104</idno><idno>122</idno><idno>177*</idno><idno>177C</idno><idno>203</idno><idno>206*</idno><idno>206C</idno><idno>218</idno><idno>254</idno><idno>256</idno><idno>263S</idno><idno>326</idno><idno>327</idno><idno>330</idno><idno>336</idno><idno>337</idno><idno>365</idno><idno>378</idno><idno>394</idno><idno>398</idno><idno>424</idno><idno>429</idno><idno>436</idno><idno>442*</idno><idno>442C</idno><idno>451</idno><idno>454</idno><idno>455</idno><idno>459</idno><idno>462</idno><idno>467*</idno><idno>467C</idno><idno>506</idno><idno>582</idno><idno>606</idno><idno>608</idno><idno>620</idno><idno>623</idno><idno>629</idno><idno>630</idno><idno>639</idno><idno>642S</idno><idno>720</idno><idno>886</idno><idno>891</idno><idno>915</idno><idno>935</idno><idno>1069</idno><idno>1105</idno><idno>1108</idno><idno>1115</idno><idno>1127</idno><idno>1175</idno><idno>1241</idno><idno>1245</idno><idno>1251</idno><idno>1267</idno><idno>1319*</idno><idno>1319C</idno><idno>1367*</idno><idno>1367C</idno><idno>1398</idno><idno>1405</idno><idno>1505</idno><idno>1523</idno><idno>1524</idno><idno>1563</idno><idno>1573</idno><idno>1611</idno><idno>1617</idno><idno>1730</idno><idno>1736</idno><idno>1739</idno><idno>1741</idno><idno>1750</idno><idno>1751</idno><idno>1753</idno><idno>1798</idno><idno>1817</idno><idno>1831</idno><idno>1834</idno><idno>1836</idno><idno>1837</idno><idno>1838</idno><idno>1841</idno><idno>1863</idno><idno>1881</idno><idno>1899</idno><idno>1908</idno><idno>1910</idno><idno>1912</idno><idno>1913</idno><idno>1918</idno><idno>1929*</idno><idno>1929C</idno><idno>1930</idno><idno>1935</idno><idno>1942</idno><idno>1943</idno><idno>1947</idno><idno>1950*</idno><idno>1950C</idno><idno>1959</idno><idno>1961</idno><idno>1962</idno><idno>1969</idno><idno>1973</idno><idno>1978</idno><idno>1984</idno><idno>1987</idno><idno>1988</idno><idno>1991</idno><idno>1992</idno><idno>1995</idno><idno>1996</idno><idno>2000</idno><idno>2002</idno><idno>2004</idno><idno>2005</idno><idno>2105</idno><idno>2110</idno><idno>2127</idno><idno>2138</idno><idno>2197</idno><idno>2200</idno><idno>2248</idno><idno>2279</idno><idno>2344</idno><idno>2352</idno><idno>2356</idno><idno>2400</idno><idno>2423</idno><idno>2464</idno><idno>2482</idno><idno>2492</idno><idno>2494</idno><idno>2495</idno><idno>2511</idno><idno>2516</idno><idno>2523</idno><idno>2544</idno><idno>2574-1</idno><idno>2574-2</idno><idno>2576</idno><idno>2596</idno><idno>2659</idno><idno>2674</idno><idno>2733</idno><idno>2805</idno><idno>2815</idno><idno>2865</idno><idno>2892</idno><idno>2899</idno><idno>2936</idno><idno>L23-S3W4D1</idno><idno>L60-S3W3D1</idno><idno>L156-S3W4D1</idno><idno>L169-S3W4D1</idno><idno>L587-S3W4D1</idno><idno>L809-S3W4D1</idno><idno>L1126-MOV12</idno><idno>L1159-S3W4D1</idno><idno>L1178-S3W4D1</idno><idno>L1188-S3W4D1</idno><idno>L1298-S3W4D1</idno><idno>L1440-S3W4D1</idno><idno>L2010-S3W4D1</idno><idno>L2058-M2D23</idno><idno>L2058-MOV12</idno><idno>L2058-S3W4D1</idno><idno>basetext</idno></wit></rdg><rdg n="b" type="om" cause="commentary fehler" varSeq="2" wit="1985 2102">om<wit><idno>1985</idno><idno>2102</idno></wit></rdg><rdg n="zz" type="lac" varSeq="3" wit="04 015 016 062 075S 0174 0176 0254 0261 1523S1 1523S2 1798S 1947S 1950S 2248S">lac<wit><idno>04</idno><idno>015</idno><idno>016</idno><idno>062</idno><idno>075S</idno><idno>0174</idno><idno>0176</idno><idno>0254</idno><idno>0261</idno><idno>1523S1</idno><idno>1523S2</idno><idno>1798S</idno><idno>1947S</idno><idno>1950S</idno><idno>2248S</idno></wit></rdg></app>'
-        app_units = exp.get_app_units(app, overtext, context, [])
-        self.assertEqual(etree.tostring(app_units[0], encoding='UTF-8').decode('UTF-8'), expected_xml)
-
-    def test_app_units_include_lemma_when_no_variants(self):
-        exp = Exporter(include_lemma_when_no_variants=True)
-        app = [self.test_data['structure']['apparatus'][0]]
-        overtext = self.test_data['structure']['overtext'][0]
-        context = self.test_data['context']
-
-        expected_xml = '<app type="main" n="Gal.1.16" from="1" to="1"><lem wit="basetext" type="om" /><rdg n="a" type="om" varSeq="1" wit="P46 P51 01 02 03 06* 06C2 010* 010C1 012 020 025 044 049 075 0150* 0150C 0278 1 5 33 35 38 43 51 61* 61C* 69 81 88 103 104 122 177* 177C 203 206* 206C 218 254 256 263S 326 327 330 336 337 365 378 394 398 424 429 436 442* 442C 451 454 455 459 462 467* 467C 506 582 606 608 620 623 629 630 639 642S 720 886 891 915 935 1069 1105 1108 1115 1127 1175 1241 1245 1251 1267 1319* 1319C 1367* 1367C 1398 1405 1505 1523 1524 1563 1573 1611 1617 1730 1736 1739 1741 1750 1751 1753 1798 1817 1831 1834 1836 1837 1838 1841 1863 1881 1899 1908 1910 1912 1913 1918 1929* 1929C 1930 1935 1942 1943 1947 1950* 1950C 1959 1961 1962 1969 1973 1978 1984 1985 1987 1988 1991 1992 1995 1996 2000 2002 2004 2005 2102 2105 2110 2127 2138 2197 2200 2248 2279 2344 2352 2356 2400 2423 2464 2482 2492 2494 2495 2511 2516 2523 2544 2574-1 2574-2 2576 2659 2674 2733 2805 2815 2865 2892 2899 2936 L23-S3W4D1 L60-S3W3D1 L156-S3W4D1 L169-S3W4D1 L587-S3W4D1 L809-S3W4D1 L1126-MOV12 L1159-S3W4D1 L1178-S3W4D1 L1188-S3W4D1 L1298-S3W4D1 L1440-S3W4D1 L2010-S3W4D1 L2058-M2D23 L2058-MOV12 L2058-S3W4D1 basetext">om<wit><idno>P46</idno><idno>P51</idno><idno>01</idno><idno>02</idno><idno>03</idno><idno>06*</idno><idno>06C2</idno><idno>010*</idno><idno>010C1</idno><idno>012</idno><idno>020</idno><idno>025</idno><idno>044</idno><idno>049</idno><idno>075</idno><idno>0150*</idno><idno>0150C</idno><idno>0278</idno><idno>1</idno><idno>5</idno><idno>33</idno><idno>35</idno><idno>38</idno><idno>43</idno><idno>51</idno><idno>61*</idno><idno>61C*</idno><idno>69</idno><idno>81</idno><idno>88</idno><idno>103</idno><idno>104</idno><idno>122</idno><idno>177*</idno><idno>177C</idno><idno>203</idno><idno>206*</idno><idno>206C</idno><idno>218</idno><idno>254</idno><idno>256</idno><idno>263S</idno><idno>326</idno><idno>327</idno><idno>330</idno><idno>336</idno><idno>337</idno><idno>365</idno><idno>378</idno><idno>394</idno><idno>398</idno><idno>424</idno><idno>429</idno><idno>436</idno><idno>442*</idno><idno>442C</idno><idno>451</idno><idno>454</idno><idno>455</idno><idno>459</idno><idno>462</idno><idno>467*</idno><idno>467C</idno><idno>506</idno><idno>582</idno><idno>606</idno><idno>608</idno><idno>620</idno><idno>623</idno><idno>629</idno><idno>630</idno><idno>639</idno><idno>642S</idno><idno>720</idno><idno>886</idno><idno>891</idno><idno>915</idno><idno>935</idno><idno>1069</idno><idno>1105</idno><idno>1108</idno><idno>1115</idno><idno>1127</idno><idno>1175</idno><idno>1241</idno><idno>1245</idno><idno>1251</idno><idno>1267</idno><idno>1319*</idno><idno>1319C</idno><idno>1367*</idno><idno>1367C</idno><idno>1398</idno><idno>1405</idno><idno>1505</idno><idno>1523</idno><idno>1524</idno><idno>1563</idno><idno>1573</idno><idno>1611</idno><idno>1617</idno><idno>1730</idno><idno>1736</idno><idno>1739</idno><idno>1741</idno><idno>1750</idno><idno>1751</idno><idno>1753</idno><idno>1798</idno><idno>1817</idno><idno>1831</idno><idno>1834</idno><idno>1836</idno><idno>1837</idno><idno>1838</idno><idno>1841</idno><idno>1863</idno><idno>1881</idno><idno>1899</idno><idno>1908</idno><idno>1910</idno><idno>1912</idno><idno>1913</idno><idno>1918</idno><idno>1929*</idno><idno>1929C</idno><idno>1930</idno><idno>1935</idno><idno>1942</idno><idno>1943</idno><idno>1947</idno><idno>1950*</idno><idno>1950C</idno><idno>1959</idno><idno>1961</idno><idno>1962</idno><idno>1969</idno><idno>1973</idno><idno>1978</idno><idno>1984</idno><idno>1985</idno><idno>1987</idno><idno>1988</idno><idno>1991</idno><idno>1992</idno><idno>1995</idno><idno>1996</idno><idno>2000</idno><idno>2002</idno><idno>2004</idno><idno>2005</idno><idno>2102</idno><idno>2105</idno><idno>2110</idno><idno>2127</idno><idno>2138</idno><idno>2197</idno><idno>2200</idno><idno>2248</idno><idno>2279</idno><idno>2344</idno><idno>2352</idno><idno>2356</idno><idno>2400</idno><idno>2423</idno><idno>2464</idno><idno>2482</idno><idno>2492</idno><idno>2494</idno><idno>2495</idno><idno>2511</idno><idno>2516</idno><idno>2523</idno><idno>2544</idno><idno>2574-1</idno><idno>2574-2</idno><idno>2576</idno><idno>2659</idno><idno>2674</idno><idno>2733</idno><idno>2805</idno><idno>2815</idno><idno>2865</idno><idno>2892</idno><idno>2899</idno><idno>2936</idno><idno>L23-S3W4D1</idno><idno>L60-S3W3D1</idno><idno>L156-S3W4D1</idno><idno>L169-S3W4D1</idno><idno>L587-S3W4D1</idno><idno>L809-S3W4D1</idno><idno>L1126-MOV12</idno><idno>L1159-S3W4D1</idno><idno>L1178-S3W4D1</idno><idno>L1188-S3W4D1</idno><idno>L1298-S3W4D1</idno><idno>L1440-S3W4D1</idno><idno>L2010-S3W4D1</idno><idno>L2058-M2D23</idno><idno>L2058-MOV12</idno><idno>L2058-S3W4D1</idno><idno>basetext</idno></wit></rdg><rdg n="b" varSeq="2" wit="6">και<wit><idno>6</idno></wit></rdg><rdg n="zz" type="lac" varSeq="3" wit="04 015 016 062 075S 0174 0176 0254 0261 1523S1 1523S2 1798S 1947S 1950S 2248S 2596">lac<wit><idno>04</idno><idno>015</idno><idno>016</idno><idno>062</idno><idno>075S</idno><idno>0174</idno><idno>0176</idno><idno>0254</idno><idno>0261</idno><idno>1523S1</idno><idno>1523S2</idno><idno>1798S</idno><idno>1947S</idno><idno>1950S</idno><idno>2248S</idno><idno>2596</idno></wit></rdg></app>'
-        app_units = exp.get_app_units(app, overtext, context, [])
-        self.assertEqual(etree.tostring(app_units[0], encoding='UTF-8').decode('UTF-8'), expected_xml)
-
-    def test_app_units_negative_apparatus(self):
+    @patch('collation.core.exporter.Exporter.make_reading')
+    @patch('collation.core.exporter.Exporter.get_witnesses')
+    @patch('collation.core.exporter.Exporter.get_lemma_text')
+    def test_get_app_units_negative_apparatus(self,
+                                              mocked_get_lemma_text,
+                                              mocked_get_witnesses,
+                                              mocked_make_reading):
+        mocked_get_lemma_text.side_effect = [['my lemma'], ['here'], ['', 'om']]
+        mocked_get_witnesses.side_effect = [['basetext', '6'], ['7', '8'], ['basetext'], ['7', '8'], ['6'], ['basetext', '8'], ['6', '7']]
+        mocked_make_reading.side_effect = [etree.fromstring('<rdg n="a" varSeq="1">my lemma</rdg>'),
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno><idno>8</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="a" varSeq="1">here</rdg>'),
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno><idno>8</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="c" type="om" cause="fehlerMR" varSeq="3" wit="6">om.<wit><idno>6</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="a" varSeq="1">om.</rdg>'),
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="6 7">addition<wit><idno>6</idno><idno>7</idno></wit></rdg>')]
+        context = 'Gal.1.1'
+        overtext = {'id': 'basetext'}
+        # give it just enough to control the loops and stop calls breaking (data seems to be needed even though they are mocked)
+        apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'}, {'label': 'b'}]},
+                     {'start': 6, 'end': 6, 'readings': [{'label': 'a'}, {'label': 'b'}, {'label': 'c', 'reading_classes':['fehlerMR']}]},
+                     {'start': 7, 'end': 7, 'readings': [{'label': 'a'}, {'label': 'b'}]}]
+        missing = []
         exp = Exporter(format='negative_xml')
-        app = [self.test_data['structure']['apparatus'][7]]
-        overtext = self.test_data['structure']['overtext'][0]
-        context = self.test_data['context']
+        expected_xml = ['<app type="main" n="Gal.1.1" from="2" to="4"><lem wit="basetext">my lemma</lem><rdg n="a" varSeq="1">my lemma</rdg><rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno><idno>8</idno></wit></rdg></app>',
+                        '<app type="main" n="Gal.1.1" from="6" to="6"><lem wit="basetext">here</lem><rdg n="a" varSeq="1">here</rdg><rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno><idno>8</idno></wit></rdg><rdg n="c" type="om" cause="fehlerMR" varSeq="3" wit="6">om.<wit><idno>6</idno></wit></rdg></app>',
+                        '<app type="main" n="Gal.1.1" from="7" to="7"><lem wit="basetext" type="om" /><rdg n="a" varSeq="1">om.</rdg><rdg n="b" varSeq="2" wit="6 7">addition<wit><idno>6</idno><idno>7</idno></wit></rdg></app>']
+        app_units = exp.get_app_units(apparatus, overtext, context, missing)
+        result = []
+        for unit in app_units:
+            result.append(etree.tostring(unit, encoding='UTF-8').decode('UTF-8'))
+        self.assertEqual(result, expected_xml)
 
-        expected_xml = '<app type="main" n="Gal.1.16" from="20" to="20"><lem wit="basetext">ἐν</lem><rdg n="a" varSeq="1">εν</rdg><rdg n="b" type="om" varSeq="2" wit="336 582 620 1918">om<wit><idno>336</idno><idno>582</idno><idno>620</idno><idno>1918</idno></wit></rdg><rdg n="zz" type="lac" varSeq="3" wit="P51 04 015 016 062 075S 0174 0176 0254 0261 1523S1 1523S2 1798S 1947S 1950S 2248S 2596">lac<wit><idno>P51</idno><idno>04</idno><idno>015</idno><idno>016</idno><idno>062</idno><idno>075S</idno><idno>0174</idno><idno>0176</idno><idno>0254</idno><idno>0261</idno><idno>1523S1</idno><idno>1523S2</idno><idno>1798S</idno><idno>1947S</idno><idno>1950S</idno><idno>2248S</idno><idno>2596</idno></wit></rdg></app>'
-        app_units = exp.get_app_units(app, overtext, context, [])
-        self.assertEqual(etree.tostring(app_units[0], encoding='UTF-8').decode('UTF-8'), expected_xml)
-
-        app = [self.test_data['structure']['apparatus'][2]]
-        overtext = self.test_data['structure']['overtext'][0]
-        context = self.test_data['context']
-
-        expected_xml = '<app type="main" n="Gal.1.16" from="6" to="8"><lem wit="basetext">υἱὸν αὐτοῦ</lem><rdg n="a" varSeq="1">υιον αυτου</rdg><rdg n="an" type="subreading" cause="abbreviation" varSeq="1" wit="P46 01 020 025 044 049 075 0150* 0150C 1 6 33 81 104 203 398 454 459 506 642S 1739 1834 1836 1908 1910 1912 2004 2138 2464 2511 2733 2805 2865 2892 L60-S3W3D1 L156-S3W4D1 L169-S3W4D1 L1126-MOV12">υν αυτου<wit><idno>P46</idno><idno>01</idno><idno>020</idno><idno>025</idno><idno>044</idno><idno>049</idno><idno>075</idno><idno>0150*</idno><idno>0150C</idno><idno>1</idno><idno>6</idno><idno>33</idno><idno>81</idno><idno>104</idno><idno>203</idno><idno>398</idno><idno>454</idno><idno>459</idno><idno>506</idno><idno>642S</idno><idno>1739</idno><idno>1834</idno><idno>1836</idno><idno>1908</idno><idno>1910</idno><idno>1912</idno><idno>2004</idno><idno>2138</idno><idno>2464</idno><idno>2511</idno><idno>2733</idno><idno>2805</idno><idno>2865</idno><idno>2892</idno><idno>L60-S3W3D1</idno><idno>L156-S3W4D1</idno><idno>L169-S3W4D1</idno><idno>L1126-MOV12</idno></wit></rdg><rdg n="an" type="subreading" cause="abbreviation" varSeq="1" wit="0278 623 886 1913 1942 1962 2105">υιν αυτου<wit><idno>0278</idno><idno>623</idno><idno>886</idno><idno>1913</idno><idno>1942</idno><idno>1962</idno><idno>2105</idno></wit></rdg><rdg n="zz" type="lac" varSeq="3" wit="P51 04 015 016 062 075S 0174 0176 0254 0261 1523S2 1523S1 1798S 1947S 1950S 2248S 2596">lac<wit><idno>P51</idno><idno>04</idno><idno>015</idno><idno>016</idno><idno>062</idno><idno>075S</idno><idno>0174</idno><idno>0176</idno><idno>0254</idno><idno>0261</idno><idno>1523S2</idno><idno>1523S1</idno><idno>1798S</idno><idno>1947S</idno><idno>1950S</idno><idno>2248S</idno><idno>2596</idno></wit></rdg></app>'
-        app_units = exp.get_app_units(app, overtext, context, [])
-        self.assertEqual(etree.tostring(app_units[0], encoding='UTF-8').decode('UTF-8'), expected_xml)
-
-        app = [self.test_data['structure']['apparatus'][11]]
-        overtext = self.test_data['structure']['overtext'][0]
-        context = self.test_data['context']
-
-        expected_xml = '<app type="main" n="Gal.1.16" from="28" to="28"><lem wit="basetext">οὐ</lem><rdg n="a" varSeq="1">ου</rdg><rdg n="b" type="om" cause="commentary fehler" varSeq="2" wit="1985 2102">om<wit><idno>1985</idno><idno>2102</idno></wit></rdg><rdg n="zz" type="lac" varSeq="3" wit="04 015 016 062 075S 0174 0176 0254 0261 1523S1 1523S2 1798S 1947S 1950S 2248S">lac<wit><idno>04</idno><idno>015</idno><idno>016</idno><idno>062</idno><idno>075S</idno><idno>0174</idno><idno>0176</idno><idno>0254</idno><idno>0261</idno><idno>1523S1</idno><idno>1523S2</idno><idno>1798S</idno><idno>1947S</idno><idno>1950S</idno><idno>2248S</idno></wit></rdg></app>'
-        app_units = exp.get_app_units(app, overtext, context, [])
-        self.assertEqual(etree.tostring(app_units[0], encoding='UTF-8').decode('UTF-8'), expected_xml)
-
-    def test_get_unit_xml_default(self):
-        exp = Exporter()
-        app = self.test_data
-        # reduce length of apparatus
-        app['structure']['apparatus'] = app['structure']['apparatus'][:5]
-        expected_xml = '<ab xml:id="Gal.1.16-APP"><app type="lac" n="Gal.1.16"><lem wit="editorial">Whole verse</lem><rdg type="lac" wit="075S 0174 0176 0254 0261 1523S1 1523S2 1798S 1947S 1950S 2248S">Def.<wit><idno>075S</idno><idno>0174</idno><idno>0176</idno><idno>0254</idno><idno>0261</idno><idno>1523S1</idno><idno>1523S2</idno><idno>1798S</idno><idno>1947S</idno><idno>1950S</idno><idno>2248S</idno></wit></rdg><rdg type="lac" wit="04 015 016 062">Om.<wit><idno>04</idno><idno>015</idno><idno>016</idno><idno>062</idno></wit></rdg></app><app type="main" n="Gal.1.16" from="1" to="1"><lem wit="basetext" type="om" /><rdg n="a" type="om" varSeq="1" wit="P46 P51 01 02 03 06* 06C2 010* 010C1 012 020 025 044 049 075 0150* 0150C 0278 1 5 33 35 38 43 51 61* 61C* 69 81 88 103 104 122 177* 177C 203 206* 206C 218 254 256 263S 326 327 330 336 337 365 378 394 398 424 429 436 442* 442C 451 454 455 459 462 467* 467C 506 582 606 608 620 623 629 630 639 642S 720 886 891 915 935 1069 1105 1108 1115 1127 1175 1241 1245 1251 1267 1319* 1319C 1367* 1367C 1398 1405 1505 1523 1524 1563 1573 1611 1617 1730 1736 1739 1741 1750 1751 1753 1798 1817 1831 1834 1836 1837 1838 1841 1863 1881 1899 1908 1910 1912 1913 1918 1929* 1929C 1930 1935 1942 1943 1947 1950* 1950C 1959 1961 1962 1969 1973 1978 1984 1985 1987 1988 1991 1992 1995 1996 2000 2002 2004 2005 2102 2105 2110 2127 2138 2197 2200 2248 2279 2344 2352 2356 2400 2423 2464 2482 2492 2494 2495 2511 2516 2523 2544 2574-1 2574-2 2576 2659 2674 2733 2805 2815 2865 2892 2899 2936 L23-S3W4D1 L60-S3W3D1 L156-S3W4D1 L169-S3W4D1 L587-S3W4D1 L809-S3W4D1 L1126-MOV12 L1159-S3W4D1 L1178-S3W4D1 L1188-S3W4D1 L1298-S3W4D1 L1440-S3W4D1 L2010-S3W4D1 L2058-M2D23 L2058-MOV12 L2058-S3W4D1 basetext">om<wit><idno>P46</idno><idno>P51</idno><idno>01</idno><idno>02</idno><idno>03</idno><idno>06*</idno><idno>06C2</idno><idno>010*</idno><idno>010C1</idno><idno>012</idno><idno>020</idno><idno>025</idno><idno>044</idno><idno>049</idno><idno>075</idno><idno>0150*</idno><idno>0150C</idno><idno>0278</idno><idno>1</idno><idno>5</idno><idno>33</idno><idno>35</idno><idno>38</idno><idno>43</idno><idno>51</idno><idno>61*</idno><idno>61C*</idno><idno>69</idno><idno>81</idno><idno>88</idno><idno>103</idno><idno>104</idno><idno>122</idno><idno>177*</idno><idno>177C</idno><idno>203</idno><idno>206*</idno><idno>206C</idno><idno>218</idno><idno>254</idno><idno>256</idno><idno>263S</idno><idno>326</idno><idno>327</idno><idno>330</idno><idno>336</idno><idno>337</idno><idno>365</idno><idno>378</idno><idno>394</idno><idno>398</idno><idno>424</idno><idno>429</idno><idno>436</idno><idno>442*</idno><idno>442C</idno><idno>451</idno><idno>454</idno><idno>455</idno><idno>459</idno><idno>462</idno><idno>467*</idno><idno>467C</idno><idno>506</idno><idno>582</idno><idno>606</idno><idno>608</idno><idno>620</idno><idno>623</idno><idno>629</idno><idno>630</idno><idno>639</idno><idno>642S</idno><idno>720</idno><idno>886</idno><idno>891</idno><idno>915</idno><idno>935</idno><idno>1069</idno><idno>1105</idno><idno>1108</idno><idno>1115</idno><idno>1127</idno><idno>1175</idno><idno>1241</idno><idno>1245</idno><idno>1251</idno><idno>1267</idno><idno>1319*</idno><idno>1319C</idno><idno>1367*</idno><idno>1367C</idno><idno>1398</idno><idno>1405</idno><idno>1505</idno><idno>1523</idno><idno>1524</idno><idno>1563</idno><idno>1573</idno><idno>1611</idno><idno>1617</idno><idno>1730</idno><idno>1736</idno><idno>1739</idno><idno>1741</idno><idno>1750</idno><idno>1751</idno><idno>1753</idno><idno>1798</idno><idno>1817</idno><idno>1831</idno><idno>1834</idno><idno>1836</idno><idno>1837</idno><idno>1838</idno><idno>1841</idno><idno>1863</idno><idno>1881</idno><idno>1899</idno><idno>1908</idno><idno>1910</idno><idno>1912</idno><idno>1913</idno><idno>1918</idno><idno>1929*</idno><idno>1929C</idno><idno>1930</idno><idno>1935</idno><idno>1942</idno><idno>1943</idno><idno>1947</idno><idno>1950*</idno><idno>1950C</idno><idno>1959</idno><idno>1961</idno><idno>1962</idno><idno>1969</idno><idno>1973</idno><idno>1978</idno><idno>1984</idno><idno>1985</idno><idno>1987</idno><idno>1988</idno><idno>1991</idno><idno>1992</idno><idno>1995</idno><idno>1996</idno><idno>2000</idno><idno>2002</idno><idno>2004</idno><idno>2005</idno><idno>2102</idno><idno>2105</idno><idno>2110</idno><idno>2127</idno><idno>2138</idno><idno>2197</idno><idno>2200</idno><idno>2248</idno><idno>2279</idno><idno>2344</idno><idno>2352</idno><idno>2356</idno><idno>2400</idno><idno>2423</idno><idno>2464</idno><idno>2482</idno><idno>2492</idno><idno>2494</idno><idno>2495</idno><idno>2511</idno><idno>2516</idno><idno>2523</idno><idno>2544</idno><idno>2574-1</idno><idno>2574-2</idno><idno>2576</idno><idno>2659</idno><idno>2674</idno><idno>2733</idno><idno>2805</idno><idno>2815</idno><idno>2865</idno><idno>2892</idno><idno>2899</idno><idno>2936</idno><idno>L23-S3W4D1</idno><idno>L60-S3W3D1</idno><idno>L156-S3W4D1</idno><idno>L169-S3W4D1</idno><idno>L587-S3W4D1</idno><idno>L809-S3W4D1</idno><idno>L1126-MOV12</idno><idno>L1159-S3W4D1</idno><idno>L1178-S3W4D1</idno><idno>L1188-S3W4D1</idno><idno>L1298-S3W4D1</idno><idno>L1440-S3W4D1</idno><idno>L2010-S3W4D1</idno><idno>L2058-M2D23</idno><idno>L2058-MOV12</idno><idno>L2058-S3W4D1</idno><idno>basetext</idno></wit></rdg><rdg n="b" varSeq="2" wit="6">και<wit><idno>6</idno></wit></rdg><rdg n="zz" type="lac" varSeq="3" wit="2596">lac<wit><idno>2596</idno></wit></rdg></app><app type="main" n="Gal.1.16" from="2" to="12"><lem wit="basetext">ἀποκαλύψαι τὸν υἱὸν αὐτοῦ ἐν ἐμοί</lem><rdg n="a" varSeq="1" wit="basetext">αποκαλυψαι τον υιον αυτου εν εμοι<wit><idno>basetext</idno></wit></rdg><rdg n="bf" type="om" cause="fehlerMR" varSeq="2" wit="1929*">om<wit><idno>1929*</idno></wit></rdg></app><app type="main" n="Gal.1.16" from="2" to="4"><lem wit="basetext">ἀποκαλύψαι τὸν</lem><rdg n="a" varSeq="1" wit="P46 P51V 01 02 03 06* 06C2 010*r 010C1 012 020 025 044 049 075 0150* 0150C 0278 1 5 6 33 35 38 43 51 61* 61C* 69 81 88 103 104 122 177* 177C 203 206* 206C 218 254 256 263S 326 327 330 336 337 365 378 394 398 424 429 436 442* 442C 451 454 455 459 462 467* 467C 506 582 606 608 620 623 629 630 639 642S 720 886 891 915 935 1069 1105 1108 1115 1127 1175 1241 1245 1251 1267 1319* 1319C 1367* 1367C 1398 1405 1505 1523 1524 1563 1573 1611 1617 1730 1736 1739 1741 1750 1751 1753 1798 1817 1831 1834 1836 1837 1838 1841 1863 1881 1899 1908 1910 1912 1913 1918r 1929Cr 1930 1935 1942 1943 1947 1950*r 1950Cr 1959 1961 1962 1969 1973 1978 1984 1985 1987 1988 1991r 1992 1995 1996 2000 2002 2004 2005 2102 2105 2110 2127 2138 2197 2200 2248 2279 2344 2352 2356 2400 2423 2464r 2482 2492 2494 2495 2511 2516 2523 2544 2574-1 2574-2 2576 2659 2674 2733 2805 2815 2865 2892 2899 2936 L23-S3W4D1 L60-S3W3D1 L156-S3W4D1 L169-S3W4D1 L587-S3W4D1 L809-S3W4D1 L1126-MOV12 L1159-S3W4D1 L1178-S3W4D1 L1188-S3W4D1 L1298-S3W4D1 L1440-S3W4D1 L2010-S3W4D1 L2058-M2D23 L2058-MOV12 L2058-S3W4D1 basetext">αποκαλυψαι τον<wit><idno>P46</idno><idno>P51V</idno><idno>01</idno><idno>02</idno><idno>03</idno><idno>06*</idno><idno>06C2</idno><idno>010*r</idno><idno>010C1</idno><idno>012</idno><idno>020</idno><idno>025</idno><idno>044</idno><idno>049</idno><idno>075</idno><idno>0150*</idno><idno>0150C</idno><idno>0278</idno><idno>1</idno><idno>5</idno><idno>6</idno><idno>33</idno><idno>35</idno><idno>38</idno><idno>43</idno><idno>51</idno><idno>61*</idno><idno>61C*</idno><idno>69</idno><idno>81</idno><idno>88</idno><idno>103</idno><idno>104</idno><idno>122</idno><idno>177*</idno><idno>177C</idno><idno>203</idno><idno>206*</idno><idno>206C</idno><idno>218</idno><idno>254</idno><idno>256</idno><idno>263S</idno><idno>326</idno><idno>327</idno><idno>330</idno><idno>336</idno><idno>337</idno><idno>365</idno><idno>378</idno><idno>394</idno><idno>398</idno><idno>424</idno><idno>429</idno><idno>436</idno><idno>442*</idno><idno>442C</idno><idno>451</idno><idno>454</idno><idno>455</idno><idno>459</idno><idno>462</idno><idno>467*</idno><idno>467C</idno><idno>506</idno><idno>582</idno><idno>606</idno><idno>608</idno><idno>620</idno><idno>623</idno><idno>629</idno><idno>630</idno><idno>639</idno><idno>642S</idno><idno>720</idno><idno>886</idno><idno>891</idno><idno>915</idno><idno>935</idno><idno>1069</idno><idno>1105</idno><idno>1108</idno><idno>1115</idno><idno>1127</idno><idno>1175</idno><idno>1241</idno><idno>1245</idno><idno>1251</idno><idno>1267</idno><idno>1319*</idno><idno>1319C</idno><idno>1367*</idno><idno>1367C</idno><idno>1398</idno><idno>1405</idno><idno>1505</idno><idno>1523</idno><idno>1524</idno><idno>1563</idno><idno>1573</idno><idno>1611</idno><idno>1617</idno><idno>1730</idno><idno>1736</idno><idno>1739</idno><idno>1741</idno><idno>1750</idno><idno>1751</idno><idno>1753</idno><idno>1798</idno><idno>1817</idno><idno>1831</idno><idno>1834</idno><idno>1836</idno><idno>1837</idno><idno>1838</idno><idno>1841</idno><idno>1863</idno><idno>1881</idno><idno>1899</idno><idno>1908</idno><idno>1910</idno><idno>1912</idno><idno>1913</idno><idno>1918r</idno><idno>1929Cr</idno><idno>1930</idno><idno>1935</idno><idno>1942</idno><idno>1943</idno><idno>1947</idno><idno>1950*r</idno><idno>1950Cr</idno><idno>1959</idno><idno>1961</idno><idno>1962</idno><idno>1969</idno><idno>1973</idno><idno>1978</idno><idno>1984</idno><idno>1985</idno><idno>1987</idno><idno>1988</idno><idno>1991r</idno><idno>1992</idno><idno>1995</idno><idno>1996</idno><idno>2000</idno><idno>2002</idno><idno>2004</idno><idno>2005</idno><idno>2102</idno><idno>2105</idno><idno>2110</idno><idno>2127</idno><idno>2138</idno><idno>2197</idno><idno>2200</idno><idno>2248</idno><idno>2279</idno><idno>2344</idno><idno>2352</idno><idno>2356</idno><idno>2400</idno><idno>2423</idno><idno>2464r</idno><idno>2482</idno><idno>2492</idno><idno>2494</idno><idno>2495</idno><idno>2511</idno><idno>2516</idno><idno>2523</idno><idno>2544</idno><idno>2574-1</idno><idno>2574-2</idno><idno>2576</idno><idno>2659</idno><idno>2674</idno><idno>2733</idno><idno>2805</idno><idno>2815</idno><idno>2865</idno><idno>2892</idno><idno>2899</idno><idno>2936</idno><idno>L23-S3W4D1</idno><idno>L60-S3W3D1</idno><idno>L156-S3W4D1</idno><idno>L169-S3W4D1</idno><idno>L587-S3W4D1</idno><idno>L809-S3W4D1</idno><idno>L1126-MOV12</idno><idno>L1159-S3W4D1</idno><idno>L1178-S3W4D1</idno><idno>L1188-S3W4D1</idno><idno>L1298-S3W4D1</idno><idno>L1440-S3W4D1</idno><idno>L2010-S3W4D1</idno><idno>L2058-M2D23</idno><idno>L2058-MOV12</idno><idno>L2058-S3W4D1</idno><idno>basetext</idno></wit></rdg><rdg n="zz" type="lac" varSeq="3" wit="2596">lac<wit><idno>2596</idno></wit></rdg></app><app type="main" n="Gal.1.16" from="6" to="12"><lem wit="basetext">υἱὸν αὐτοῦ ἐν ἐμοί</lem><rdg n="a" varSeq="1" wit="basetext">υιον αυτου εν εμοι<wit><idno>basetext</idno></wit></rdg><rdg n="bf" type="om" cause="fehlerMR" varSeq="2" wit="1751">om<wit><idno>1751</idno></wit></rdg></app><app type="main" n="Gal.1.16" from="6" to="8"><lem wit="basetext">υἱὸν αὐτοῦ</lem><rdg n="a" varSeq="1" wit="02V 03 06* 06C2 010* 010C1 012 5 35 38 43 51 61* 61C* 69 88 103 122 177* 177C 206* 206C 218 254 256 263S 326 327 330 336 337 365 378 394 424 429 436 442* 442C 451 455 462 467* 467C 582 606 608 620 629 630 639 720 891 915 935 1069 1105 1108 1115 1127 1175 1241 1245 1251 1267 1319* 1319C 1367* 1367C 1398 1405 1505 1523 1524 1563 1573 1611 1617 1730 1736 1741 1750 1753 1798 1817 1831 1837 1838 1841 1863 1881 1899 1918 1929C 1930 1935 1943 1947 1950* 1950C 1959 1961 1969 1973 1978 1984 1985 1987 1988 1991 1992 1995 1996 2000 2002 2005 2102 2110 2127 2197 2200 2248 2279 2344 2352 2356 2400 2423 2482 2492 2494 2495 2516 2523 2544 2574-1 2574-2 2576 2659 2674 2815 2899 2936 L23-S3W4D1 L587-S3W4D1 L809-S3W4D1 L1159-S3W4D1 L1178-S3W4D1 L1188-S3W4D1 L1298-S3W4D1 L1440-S3W4D1 L2010-S3W4D1 L2058-M2D23 L2058-MOV12 L2058-S3W4D1 basetext">υιον αυτου<wit><idno>02V</idno><idno>03</idno><idno>06*</idno><idno>06C2</idno><idno>010*</idno><idno>010C1</idno><idno>012</idno><idno>5</idno><idno>35</idno><idno>38</idno><idno>43</idno><idno>51</idno><idno>61*</idno><idno>61C*</idno><idno>69</idno><idno>88</idno><idno>103</idno><idno>122</idno><idno>177*</idno><idno>177C</idno><idno>206*</idno><idno>206C</idno><idno>218</idno><idno>254</idno><idno>256</idno><idno>263S</idno><idno>326</idno><idno>327</idno><idno>330</idno><idno>336</idno><idno>337</idno><idno>365</idno><idno>378</idno><idno>394</idno><idno>424</idno><idno>429</idno><idno>436</idno><idno>442*</idno><idno>442C</idno><idno>451</idno><idno>455</idno><idno>462</idno><idno>467*</idno><idno>467C</idno><idno>582</idno><idno>606</idno><idno>608</idno><idno>620</idno><idno>629</idno><idno>630</idno><idno>639</idno><idno>720</idno><idno>891</idno><idno>915</idno><idno>935</idno><idno>1069</idno><idno>1105</idno><idno>1108</idno><idno>1115</idno><idno>1127</idno><idno>1175</idno><idno>1241</idno><idno>1245</idno><idno>1251</idno><idno>1267</idno><idno>1319*</idno><idno>1319C</idno><idno>1367*</idno><idno>1367C</idno><idno>1398</idno><idno>1405</idno><idno>1505</idno><idno>1523</idno><idno>1524</idno><idno>1563</idno><idno>1573</idno><idno>1611</idno><idno>1617</idno><idno>1730</idno><idno>1736</idno><idno>1741</idno><idno>1750</idno><idno>1753</idno><idno>1798</idno><idno>1817</idno><idno>1831</idno><idno>1837</idno><idno>1838</idno><idno>1841</idno><idno>1863</idno><idno>1881</idno><idno>1899</idno><idno>1918</idno><idno>1929C</idno><idno>1930</idno><idno>1935</idno><idno>1943</idno><idno>1947</idno><idno>1950*</idno><idno>1950C</idno><idno>1959</idno><idno>1961</idno><idno>1969</idno><idno>1973</idno><idno>1978</idno><idno>1984</idno><idno>1985</idno><idno>1987</idno><idno>1988</idno><idno>1991</idno><idno>1992</idno><idno>1995</idno><idno>1996</idno><idno>2000</idno><idno>2002</idno><idno>2005</idno><idno>2102</idno><idno>2110</idno><idno>2127</idno><idno>2197</idno><idno>2200</idno><idno>2248</idno><idno>2279</idno><idno>2344</idno><idno>2352</idno><idno>2356</idno><idno>2400</idno><idno>2423</idno><idno>2482</idno><idno>2492</idno><idno>2494</idno><idno>2495</idno><idno>2516</idno><idno>2523</idno><idno>2544</idno><idno>2574-1</idno><idno>2574-2</idno><idno>2576</idno><idno>2659</idno><idno>2674</idno><idno>2815</idno><idno>2899</idno><idno>2936</idno><idno>L23-S3W4D1</idno><idno>L587-S3W4D1</idno><idno>L809-S3W4D1</idno><idno>L1159-S3W4D1</idno><idno>L1178-S3W4D1</idno><idno>L1188-S3W4D1</idno><idno>L1298-S3W4D1</idno><idno>L1440-S3W4D1</idno><idno>L2010-S3W4D1</idno><idno>L2058-M2D23</idno><idno>L2058-MOV12</idno><idno>L2058-S3W4D1</idno><idno>basetext</idno></wit></rdg><rdg n="an" type="subreading" cause="abbreviation" varSeq="1" wit="P46 01 020 025 044 049 075 0150* 0150C 1 6 33 81 104 203 398 454 459 506 642S 1739 1834 1836 1908 1910 1912 2004 2138 2464 2511 2733 2805 2865 2892 L60-S3W3D1 L156-S3W4D1 L169-S3W4D1 L1126-MOV12">υν αυτου<wit><idno>P46</idno><idno>01</idno><idno>020</idno><idno>025</idno><idno>044</idno><idno>049</idno><idno>075</idno><idno>0150*</idno><idno>0150C</idno><idno>1</idno><idno>6</idno><idno>33</idno><idno>81</idno><idno>104</idno><idno>203</idno><idno>398</idno><idno>454</idno><idno>459</idno><idno>506</idno><idno>642S</idno><idno>1739</idno><idno>1834</idno><idno>1836</idno><idno>1908</idno><idno>1910</idno><idno>1912</idno><idno>2004</idno><idno>2138</idno><idno>2464</idno><idno>2511</idno><idno>2733</idno><idno>2805</idno><idno>2865</idno><idno>2892</idno><idno>L60-S3W3D1</idno><idno>L156-S3W4D1</idno><idno>L169-S3W4D1</idno><idno>L1126-MOV12</idno></wit></rdg><rdg n="an" type="subreading" cause="abbreviation" varSeq="1" wit="0278 623 886 1913 1942 1962 2105">υιν αυτου<wit><idno>0278</idno><idno>623</idno><idno>886</idno><idno>1913</idno><idno>1942</idno><idno>1962</idno><idno>2105</idno></wit></rdg><rdg n="zz" type="lac" varSeq="3" wit="P51 2596">lac<wit><idno>P51</idno><idno>2596</idno></wit></rdg></app><app type="main" n="Gal.1.16" from="10" to="12"><lem wit="basetext">ἐν ἐμοί</lem><rdg n="a" varSeq="1" wit="P46 01 02 03 06* 06C2 010* 010C1 012 020 025 044 049 075 0150* 0150C 0278 1 5 6 33 35 38 43 51 61* 61C* 69 81 88 103 104 122 177* 177C 203 206* 206C 218 254 256 263S 326 327 330 336 337 365 378 394 398 424 429 436 442* 442C 451 454 455 459 462 467* 467C 506 582 606 608 620 623 629 630 639 642S 720 886 891 915 935 1069 1105 1108 1115 1127 1175 1241 1245 1251 1267 1319* 1319C 1367* 1367C 1398 1405 1505 1523 1524 1563 1573 1611 1617 1730 1736 1739 1741 1750 1753 1798 1817 1831 1834 1836 1837 1841 1863 1881 1899 1908 1910 1912 1913 1918 1929C 1930 1935 1942 1943 1947 1950* 1950C 1959 1961 1962 1969 1973 1978 1984 1985 1987 1988 1991 1992 1995 1996 2000 2002 2004 2005 2102 2105 2110 2127 2138 2197 2200 2248 2279 2344 2352 2356 2400 2423 2464 2482 2492 2494 2495 2511 2516 2523 2544 2574-1 2574-2 2576 2659 2674 2733 2805 2815 2865 2892 2899 2936 L23-S3W4D1 L60-S3W3D1 L156-S3W4D1 L169-S3W4D1 L587-S3W4D1 L809-S3W4D1 L1126-MOV12 L1159-S3W4D1 L1178-S3W4D1 L1188-S3W4D1 L1298-S3W4D1 L1440-S3W4D1 L2010-S3W4D1 L2058-M2D23 L2058-MOV12 L2058-S3W4D1 basetext">εν εμοι<wit><idno>P46</idno><idno>01</idno><idno>02</idno><idno>03</idno><idno>06*</idno><idno>06C2</idno><idno>010*</idno><idno>010C1</idno><idno>012</idno><idno>020</idno><idno>025</idno><idno>044</idno><idno>049</idno><idno>075</idno><idno>0150*</idno><idno>0150C</idno><idno>0278</idno><idno>1</idno><idno>5</idno><idno>6</idno><idno>33</idno><idno>35</idno><idno>38</idno><idno>43</idno><idno>51</idno><idno>61*</idno><idno>61C*</idno><idno>69</idno><idno>81</idno><idno>88</idno><idno>103</idno><idno>104</idno><idno>122</idno><idno>177*</idno><idno>177C</idno><idno>203</idno><idno>206*</idno><idno>206C</idno><idno>218</idno><idno>254</idno><idno>256</idno><idno>263S</idno><idno>326</idno><idno>327</idno><idno>330</idno><idno>336</idno><idno>337</idno><idno>365</idno><idno>378</idno><idno>394</idno><idno>398</idno><idno>424</idno><idno>429</idno><idno>436</idno><idno>442*</idno><idno>442C</idno><idno>451</idno><idno>454</idno><idno>455</idno><idno>459</idno><idno>462</idno><idno>467*</idno><idno>467C</idno><idno>506</idno><idno>582</idno><idno>606</idno><idno>608</idno><idno>620</idno><idno>623</idno><idno>629</idno><idno>630</idno><idno>639</idno><idno>642S</idno><idno>720</idno><idno>886</idno><idno>891</idno><idno>915</idno><idno>935</idno><idno>1069</idno><idno>1105</idno><idno>1108</idno><idno>1115</idno><idno>1127</idno><idno>1175</idno><idno>1241</idno><idno>1245</idno><idno>1251</idno><idno>1267</idno><idno>1319*</idno><idno>1319C</idno><idno>1367*</idno><idno>1367C</idno><idno>1398</idno><idno>1405</idno><idno>1505</idno><idno>1523</idno><idno>1524</idno><idno>1563</idno><idno>1573</idno><idno>1611</idno><idno>1617</idno><idno>1730</idno><idno>1736</idno><idno>1739</idno><idno>1741</idno><idno>1750</idno><idno>1753</idno><idno>1798</idno><idno>1817</idno><idno>1831</idno><idno>1834</idno><idno>1836</idno><idno>1837</idno><idno>1841</idno><idno>1863</idno><idno>1881</idno><idno>1899</idno><idno>1908</idno><idno>1910</idno><idno>1912</idno><idno>1913</idno><idno>1918</idno><idno>1929C</idno><idno>1930</idno><idno>1935</idno><idno>1942</idno><idno>1943</idno><idno>1947</idno><idno>1950*</idno><idno>1950C</idno><idno>1959</idno><idno>1961</idno><idno>1962</idno><idno>1969</idno><idno>1973</idno><idno>1978</idno><idno>1984</idno><idno>1985</idno><idno>1987</idno><idno>1988</idno><idno>1991</idno><idno>1992</idno><idno>1995</idno><idno>1996</idno><idno>2000</idno><idno>2002</idno><idno>2004</idno><idno>2005</idno><idno>2102</idno><idno>2105</idno><idno>2110</idno><idno>2127</idno><idno>2138</idno><idno>2197</idno><idno>2200</idno><idno>2248</idno><idno>2279</idno><idno>2344</idno><idno>2352</idno><idno>2356</idno><idno>2400</idno><idno>2423</idno><idno>2464</idno><idno>2482</idno><idno>2492</idno><idno>2494</idno><idno>2495</idno><idno>2511</idno><idno>2516</idno><idno>2523</idno><idno>2544</idno><idno>2574-1</idno><idno>2574-2</idno><idno>2576</idno><idno>2659</idno><idno>2674</idno><idno>2733</idno><idno>2805</idno><idno>2815</idno><idno>2865</idno><idno>2892</idno><idno>2899</idno><idno>2936</idno><idno>L23-S3W4D1</idno><idno>L60-S3W3D1</idno><idno>L156-S3W4D1</idno><idno>L169-S3W4D1</idno><idno>L587-S3W4D1</idno><idno>L809-S3W4D1</idno><idno>L1126-MOV12</idno><idno>L1159-S3W4D1</idno><idno>L1178-S3W4D1</idno><idno>L1188-S3W4D1</idno><idno>L1298-S3W4D1</idno><idno>L1440-S3W4D1</idno><idno>L2010-S3W4D1</idno><idno>L2058-M2D23</idno><idno>L2058-MOV12</idno><idno>L2058-S3W4D1</idno><idno>basetext</idno></wit></rdg><rdg n="b" type="om" varSeq="2" wit="1838">om<wit><idno>1838</idno></wit></rdg><rdg n="zz" type="lac" varSeq="4" wit="P51 2596">lac<wit><idno>P51</idno><idno>2596</idno></wit></rdg></app><app type="main" n="Gal.1.16" from="14" to="14"><lem wit="basetext">ἵνα</lem><rdg n="a" varSeq="1" wit="P46 P51V 01 02 03 06* 06C2 010* 010C1 012 020 025 044 049 075 0150* 0150C 0278 1 5 6 33 35 38 43 51 61* 61C* 69 81 88 103 104 122 177* 177C 203 206* 206C 218 254 256 263S 326 327 330 336 337 365 378 394 398 424 429 436 442* 442C 451 454 455 459 462 467* 467C 506 582 606 608 620 623 629 630 639 642S 720 886 891r 915 935 1069 1105 1108 1115 1127 1175 1241 1245 1251 1267 1319* 1319C 1367* 1367C 1398 1405 1505 1523 1524 1563 1573 1611 1617 1730 1736 1739 1741 1750 1751 1753 1798 1817 1831 1834 1836 1837 1838 1841 1863 1881 1899 1908 1910 1912 1913 1918 1929* 1929C 1930 1935 1942 1943 1947 1950* 1950C 1959 1961 1962 1969 1973 1978 1984 1985 1987 1988 1991 1992 1995 1996 2000 2002 2004 2005 2102 2105 2110 2127 2138 2197 2200 2248 2279 2344 2352 2356 2400 2423 2464 2482 2492 2494 2495 2511 2516 2523 2544 2574-1 2574-2 2576 2659 2674 2733 2805 2815 2865 2892 2899 2936 L23-S3W4D1 L60-S3W3D1 L156-S3W4D1 L169-S3W4D1 L587-S3W4D1 L809-S3W4D1 L1126-MOV12 L1159-S3W4D1 L1178-S3W4D1 L1188-S3W4D1 L1298-S3W4D1 L1440-S3W4D1 L2010-S3W4D1 L2058-M2D23 L2058-MOV12 L2058-S3W4D1 basetext">ινα<wit><idno>P46</idno><idno>P51V</idno><idno>01</idno><idno>02</idno><idno>03</idno><idno>06*</idno><idno>06C2</idno><idno>010*</idno><idno>010C1</idno><idno>012</idno><idno>020</idno><idno>025</idno><idno>044</idno><idno>049</idno><idno>075</idno><idno>0150*</idno><idno>0150C</idno><idno>0278</idno><idno>1</idno><idno>5</idno><idno>6</idno><idno>33</idno><idno>35</idno><idno>38</idno><idno>43</idno><idno>51</idno><idno>61*</idno><idno>61C*</idno><idno>69</idno><idno>81</idno><idno>88</idno><idno>103</idno><idno>104</idno><idno>122</idno><idno>177*</idno><idno>177C</idno><idno>203</idno><idno>206*</idno><idno>206C</idno><idno>218</idno><idno>254</idno><idno>256</idno><idno>263S</idno><idno>326</idno><idno>327</idno><idno>330</idno><idno>336</idno><idno>337</idno><idno>365</idno><idno>378</idno><idno>394</idno><idno>398</idno><idno>424</idno><idno>429</idno><idno>436</idno><idno>442*</idno><idno>442C</idno><idno>451</idno><idno>454</idno><idno>455</idno><idno>459</idno><idno>462</idno><idno>467*</idno><idno>467C</idno><idno>506</idno><idno>582</idno><idno>606</idno><idno>608</idno><idno>620</idno><idno>623</idno><idno>629</idno><idno>630</idno><idno>639</idno><idno>642S</idno><idno>720</idno><idno>886</idno><idno>891r</idno><idno>915</idno><idno>935</idno><idno>1069</idno><idno>1105</idno><idno>1108</idno><idno>1115</idno><idno>1127</idno><idno>1175</idno><idno>1241</idno><idno>1245</idno><idno>1251</idno><idno>1267</idno><idno>1319*</idno><idno>1319C</idno><idno>1367*</idno><idno>1367C</idno><idno>1398</idno><idno>1405</idno><idno>1505</idno><idno>1523</idno><idno>1524</idno><idno>1563</idno><idno>1573</idno><idno>1611</idno><idno>1617</idno><idno>1730</idno><idno>1736</idno><idno>1739</idno><idno>1741</idno><idno>1750</idno><idno>1751</idno><idno>1753</idno><idno>1798</idno><idno>1817</idno><idno>1831</idno><idno>1834</idno><idno>1836</idno><idno>1837</idno><idno>1838</idno><idno>1841</idno><idno>1863</idno><idno>1881</idno><idno>1899</idno><idno>1908</idno><idno>1910</idno><idno>1912</idno><idno>1913</idno><idno>1918</idno><idno>1929*</idno><idno>1929C</idno><idno>1930</idno><idno>1935</idno><idno>1942</idno><idno>1943</idno><idno>1947</idno><idno>1950*</idno><idno>1950C</idno><idno>1959</idno><idno>1961</idno><idno>1962</idno><idno>1969</idno><idno>1973</idno><idno>1978</idno><idno>1984</idno><idno>1985</idno><idno>1987</idno><idno>1988</idno><idno>1991</idno><idno>1992</idno><idno>1995</idno><idno>1996</idno><idno>2000</idno><idno>2002</idno><idno>2004</idno><idno>2005</idno><idno>2102</idno><idno>2105</idno><idno>2110</idno><idno>2127</idno><idno>2138</idno><idno>2197</idno><idno>2200</idno><idno>2248</idno><idno>2279</idno><idno>2344</idno><idno>2352</idno><idno>2356</idno><idno>2400</idno><idno>2423</idno><idno>2464</idno><idno>2482</idno><idno>2492</idno><idno>2494</idno><idno>2495</idno><idno>2511</idno><idno>2516</idno><idno>2523</idno><idno>2544</idno><idno>2574-1</idno><idno>2574-2</idno><idno>2576</idno><idno>2659</idno><idno>2674</idno><idno>2733</idno><idno>2805</idno><idno>2815</idno><idno>2865</idno><idno>2892</idno><idno>2899</idno><idno>2936</idno><idno>L23-S3W4D1</idno><idno>L60-S3W3D1</idno><idno>L156-S3W4D1</idno><idno>L169-S3W4D1</idno><idno>L587-S3W4D1</idno><idno>L809-S3W4D1</idno><idno>L1126-MOV12</idno><idno>L1159-S3W4D1</idno><idno>L1178-S3W4D1</idno><idno>L1188-S3W4D1</idno><idno>L1298-S3W4D1</idno><idno>L1440-S3W4D1</idno><idno>L2010-S3W4D1</idno><idno>L2058-M2D23</idno><idno>L2058-MOV12</idno><idno>L2058-S3W4D1</idno><idno>basetext</idno></wit></rdg><rdg n="zz" type="lac" varSeq="2" wit="2596">lac<wit><idno>2596</idno></wit></rdg></app></ab>'
-        xml = exp.get_unit_xml(app)
-        self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
-
-    def test_get_unit_xml_non_default(self):
-        exp = Exporter(ignore_basetext=True)
-        app = self.test_data
-        # reduce length of apparatus
-        app['structure']['apparatus'] = app['structure']['apparatus'][:5]
-        expected_xml = '<ab xml:id="Gal.1.16-APP"><app type="lac" n="Gal.1.16"><lem wit="editorial">Whole verse</lem><rdg type="lac" wit="075S 0174 0176 0254 0261 1523S1 1523S2 1798S 1947S 1950S 2248S">Def.<wit><idno>075S</idno><idno>0174</idno><idno>0176</idno><idno>0254</idno><idno>0261</idno><idno>1523S1</idno><idno>1523S2</idno><idno>1798S</idno><idno>1947S</idno><idno>1950S</idno><idno>2248S</idno></wit></rdg><rdg type="lac" wit="04 015 016 062">Om.<wit><idno>04</idno><idno>015</idno><idno>016</idno><idno>062</idno></wit></rdg></app><app type="main" n="Gal.1.16" from="1" to="1"><lem wit="basetext" type="om" /><rdg n="a" type="om" varSeq="1" wit="P46 P51 01 02 03 06* 06C2 010* 010C1 012 020 025 044 049 075 0150* 0150C 0278 1 5 33 35 38 43 51 61* 61C* 69 81 88 103 104 122 177* 177C 203 206* 206C 218 254 256 263S 326 327 330 336 337 365 378 394 398 424 429 436 442* 442C 451 454 455 459 462 467* 467C 506 582 606 608 620 623 629 630 639 642S 720 886 891 915 935 1069 1105 1108 1115 1127 1175 1241 1245 1251 1267 1319* 1319C 1367* 1367C 1398 1405 1505 1523 1524 1563 1573 1611 1617 1730 1736 1739 1741 1750 1751 1753 1798 1817 1831 1834 1836 1837 1838 1841 1863 1881 1899 1908 1910 1912 1913 1918 1929* 1929C 1930 1935 1942 1943 1947 1950* 1950C 1959 1961 1962 1969 1973 1978 1984 1985 1987 1988 1991 1992 1995 1996 2000 2002 2004 2005 2102 2105 2110 2127 2138 2197 2200 2248 2279 2344 2352 2356 2400 2423 2464 2482 2492 2494 2495 2511 2516 2523 2544 2574-1 2574-2 2576 2659 2674 2733 2805 2815 2865 2892 2899 2936 L23-S3W4D1 L60-S3W3D1 L156-S3W4D1 L169-S3W4D1 L587-S3W4D1 L809-S3W4D1 L1126-MOV12 L1159-S3W4D1 L1178-S3W4D1 L1188-S3W4D1 L1298-S3W4D1 L1440-S3W4D1 L2010-S3W4D1 L2058-M2D23 L2058-MOV12 L2058-S3W4D1">om<wit><idno>P46</idno><idno>P51</idno><idno>01</idno><idno>02</idno><idno>03</idno><idno>06*</idno><idno>06C2</idno><idno>010*</idno><idno>010C1</idno><idno>012</idno><idno>020</idno><idno>025</idno><idno>044</idno><idno>049</idno><idno>075</idno><idno>0150*</idno><idno>0150C</idno><idno>0278</idno><idno>1</idno><idno>5</idno><idno>33</idno><idno>35</idno><idno>38</idno><idno>43</idno><idno>51</idno><idno>61*</idno><idno>61C*</idno><idno>69</idno><idno>81</idno><idno>88</idno><idno>103</idno><idno>104</idno><idno>122</idno><idno>177*</idno><idno>177C</idno><idno>203</idno><idno>206*</idno><idno>206C</idno><idno>218</idno><idno>254</idno><idno>256</idno><idno>263S</idno><idno>326</idno><idno>327</idno><idno>330</idno><idno>336</idno><idno>337</idno><idno>365</idno><idno>378</idno><idno>394</idno><idno>398</idno><idno>424</idno><idno>429</idno><idno>436</idno><idno>442*</idno><idno>442C</idno><idno>451</idno><idno>454</idno><idno>455</idno><idno>459</idno><idno>462</idno><idno>467*</idno><idno>467C</idno><idno>506</idno><idno>582</idno><idno>606</idno><idno>608</idno><idno>620</idno><idno>623</idno><idno>629</idno><idno>630</idno><idno>639</idno><idno>642S</idno><idno>720</idno><idno>886</idno><idno>891</idno><idno>915</idno><idno>935</idno><idno>1069</idno><idno>1105</idno><idno>1108</idno><idno>1115</idno><idno>1127</idno><idno>1175</idno><idno>1241</idno><idno>1245</idno><idno>1251</idno><idno>1267</idno><idno>1319*</idno><idno>1319C</idno><idno>1367*</idno><idno>1367C</idno><idno>1398</idno><idno>1405</idno><idno>1505</idno><idno>1523</idno><idno>1524</idno><idno>1563</idno><idno>1573</idno><idno>1611</idno><idno>1617</idno><idno>1730</idno><idno>1736</idno><idno>1739</idno><idno>1741</idno><idno>1750</idno><idno>1751</idno><idno>1753</idno><idno>1798</idno><idno>1817</idno><idno>1831</idno><idno>1834</idno><idno>1836</idno><idno>1837</idno><idno>1838</idno><idno>1841</idno><idno>1863</idno><idno>1881</idno><idno>1899</idno><idno>1908</idno><idno>1910</idno><idno>1912</idno><idno>1913</idno><idno>1918</idno><idno>1929*</idno><idno>1929C</idno><idno>1930</idno><idno>1935</idno><idno>1942</idno><idno>1943</idno><idno>1947</idno><idno>1950*</idno><idno>1950C</idno><idno>1959</idno><idno>1961</idno><idno>1962</idno><idno>1969</idno><idno>1973</idno><idno>1978</idno><idno>1984</idno><idno>1985</idno><idno>1987</idno><idno>1988</idno><idno>1991</idno><idno>1992</idno><idno>1995</idno><idno>1996</idno><idno>2000</idno><idno>2002</idno><idno>2004</idno><idno>2005</idno><idno>2102</idno><idno>2105</idno><idno>2110</idno><idno>2127</idno><idno>2138</idno><idno>2197</idno><idno>2200</idno><idno>2248</idno><idno>2279</idno><idno>2344</idno><idno>2352</idno><idno>2356</idno><idno>2400</idno><idno>2423</idno><idno>2464</idno><idno>2482</idno><idno>2492</idno><idno>2494</idno><idno>2495</idno><idno>2511</idno><idno>2516</idno><idno>2523</idno><idno>2544</idno><idno>2574-1</idno><idno>2574-2</idno><idno>2576</idno><idno>2659</idno><idno>2674</idno><idno>2733</idno><idno>2805</idno><idno>2815</idno><idno>2865</idno><idno>2892</idno><idno>2899</idno><idno>2936</idno><idno>L23-S3W4D1</idno><idno>L60-S3W3D1</idno><idno>L156-S3W4D1</idno><idno>L169-S3W4D1</idno><idno>L587-S3W4D1</idno><idno>L809-S3W4D1</idno><idno>L1126-MOV12</idno><idno>L1159-S3W4D1</idno><idno>L1178-S3W4D1</idno><idno>L1188-S3W4D1</idno><idno>L1298-S3W4D1</idno><idno>L1440-S3W4D1</idno><idno>L2010-S3W4D1</idno><idno>L2058-M2D23</idno><idno>L2058-MOV12</idno><idno>L2058-S3W4D1</idno></wit></rdg><rdg n="b" varSeq="2" wit="6">και<wit><idno>6</idno></wit></rdg><rdg n="zz" type="lac" varSeq="3" wit="2596">lac<wit><idno>2596</idno></wit></rdg></app><app type="main" n="Gal.1.16" from="2" to="12"><lem wit="basetext">ἀποκαλύψαι τὸν υἱὸν αὐτοῦ ἐν ἐμοί</lem><rdg n="a" varSeq="1">αποκαλυψαι τον υιον αυτου εν εμοι</rdg><rdg n="bf" type="om" cause="fehlerMR" varSeq="2" wit="1929*">om<wit><idno>1929*</idno></wit></rdg></app><app type="main" n="Gal.1.16" from="2" to="4"><lem wit="basetext">ἀποκαλύψαι τὸν</lem><rdg n="a" varSeq="1" wit="P46 P51V 01 02 03 06* 06C2 010*r 010C1 012 020 025 044 049 075 0150* 0150C 0278 1 5 6 33 35 38 43 51 61* 61C* 69 81 88 103 104 122 177* 177C 203 206* 206C 218 254 256 263S 326 327 330 336 337 365 378 394 398 424 429 436 442* 442C 451 454 455 459 462 467* 467C 506 582 606 608 620 623 629 630 639 642S 720 886 891 915 935 1069 1105 1108 1115 1127 1175 1241 1245 1251 1267 1319* 1319C 1367* 1367C 1398 1405 1505 1523 1524 1563 1573 1611 1617 1730 1736 1739 1741 1750 1751 1753 1798 1817 1831 1834 1836 1837 1838 1841 1863 1881 1899 1908 1910 1912 1913 1918r 1929Cr 1930 1935 1942 1943 1947 1950*r 1950Cr 1959 1961 1962 1969 1973 1978 1984 1985 1987 1988 1991r 1992 1995 1996 2000 2002 2004 2005 2102 2105 2110 2127 2138 2197 2200 2248 2279 2344 2352 2356 2400 2423 2464r 2482 2492 2494 2495 2511 2516 2523 2544 2574-1 2574-2 2576 2659 2674 2733 2805 2815 2865 2892 2899 2936 L23-S3W4D1 L60-S3W3D1 L156-S3W4D1 L169-S3W4D1 L587-S3W4D1 L809-S3W4D1 L1126-MOV12 L1159-S3W4D1 L1178-S3W4D1 L1188-S3W4D1 L1298-S3W4D1 L1440-S3W4D1 L2010-S3W4D1 L2058-M2D23 L2058-MOV12 L2058-S3W4D1">αποκαλυψαι τον<wit><idno>P46</idno><idno>P51V</idno><idno>01</idno><idno>02</idno><idno>03</idno><idno>06*</idno><idno>06C2</idno><idno>010*r</idno><idno>010C1</idno><idno>012</idno><idno>020</idno><idno>025</idno><idno>044</idno><idno>049</idno><idno>075</idno><idno>0150*</idno><idno>0150C</idno><idno>0278</idno><idno>1</idno><idno>5</idno><idno>6</idno><idno>33</idno><idno>35</idno><idno>38</idno><idno>43</idno><idno>51</idno><idno>61*</idno><idno>61C*</idno><idno>69</idno><idno>81</idno><idno>88</idno><idno>103</idno><idno>104</idno><idno>122</idno><idno>177*</idno><idno>177C</idno><idno>203</idno><idno>206*</idno><idno>206C</idno><idno>218</idno><idno>254</idno><idno>256</idno><idno>263S</idno><idno>326</idno><idno>327</idno><idno>330</idno><idno>336</idno><idno>337</idno><idno>365</idno><idno>378</idno><idno>394</idno><idno>398</idno><idno>424</idno><idno>429</idno><idno>436</idno><idno>442*</idno><idno>442C</idno><idno>451</idno><idno>454</idno><idno>455</idno><idno>459</idno><idno>462</idno><idno>467*</idno><idno>467C</idno><idno>506</idno><idno>582</idno><idno>606</idno><idno>608</idno><idno>620</idno><idno>623</idno><idno>629</idno><idno>630</idno><idno>639</idno><idno>642S</idno><idno>720</idno><idno>886</idno><idno>891</idno><idno>915</idno><idno>935</idno><idno>1069</idno><idno>1105</idno><idno>1108</idno><idno>1115</idno><idno>1127</idno><idno>1175</idno><idno>1241</idno><idno>1245</idno><idno>1251</idno><idno>1267</idno><idno>1319*</idno><idno>1319C</idno><idno>1367*</idno><idno>1367C</idno><idno>1398</idno><idno>1405</idno><idno>1505</idno><idno>1523</idno><idno>1524</idno><idno>1563</idno><idno>1573</idno><idno>1611</idno><idno>1617</idno><idno>1730</idno><idno>1736</idno><idno>1739</idno><idno>1741</idno><idno>1750</idno><idno>1751</idno><idno>1753</idno><idno>1798</idno><idno>1817</idno><idno>1831</idno><idno>1834</idno><idno>1836</idno><idno>1837</idno><idno>1838</idno><idno>1841</idno><idno>1863</idno><idno>1881</idno><idno>1899</idno><idno>1908</idno><idno>1910</idno><idno>1912</idno><idno>1913</idno><idno>1918r</idno><idno>1929Cr</idno><idno>1930</idno><idno>1935</idno><idno>1942</idno><idno>1943</idno><idno>1947</idno><idno>1950*r</idno><idno>1950Cr</idno><idno>1959</idno><idno>1961</idno><idno>1962</idno><idno>1969</idno><idno>1973</idno><idno>1978</idno><idno>1984</idno><idno>1985</idno><idno>1987</idno><idno>1988</idno><idno>1991r</idno><idno>1992</idno><idno>1995</idno><idno>1996</idno><idno>2000</idno><idno>2002</idno><idno>2004</idno><idno>2005</idno><idno>2102</idno><idno>2105</idno><idno>2110</idno><idno>2127</idno><idno>2138</idno><idno>2197</idno><idno>2200</idno><idno>2248</idno><idno>2279</idno><idno>2344</idno><idno>2352</idno><idno>2356</idno><idno>2400</idno><idno>2423</idno><idno>2464r</idno><idno>2482</idno><idno>2492</idno><idno>2494</idno><idno>2495</idno><idno>2511</idno><idno>2516</idno><idno>2523</idno><idno>2544</idno><idno>2574-1</idno><idno>2574-2</idno><idno>2576</idno><idno>2659</idno><idno>2674</idno><idno>2733</idno><idno>2805</idno><idno>2815</idno><idno>2865</idno><idno>2892</idno><idno>2899</idno><idno>2936</idno><idno>L23-S3W4D1</idno><idno>L60-S3W3D1</idno><idno>L156-S3W4D1</idno><idno>L169-S3W4D1</idno><idno>L587-S3W4D1</idno><idno>L809-S3W4D1</idno><idno>L1126-MOV12</idno><idno>L1159-S3W4D1</idno><idno>L1178-S3W4D1</idno><idno>L1188-S3W4D1</idno><idno>L1298-S3W4D1</idno><idno>L1440-S3W4D1</idno><idno>L2010-S3W4D1</idno><idno>L2058-M2D23</idno><idno>L2058-MOV12</idno><idno>L2058-S3W4D1</idno></wit></rdg><rdg n="zz" type="lac" varSeq="3" wit="2596">lac<wit><idno>2596</idno></wit></rdg></app><app type="main" n="Gal.1.16" from="6" to="12"><lem wit="basetext">υἱὸν αὐτοῦ ἐν ἐμοί</lem><rdg n="a" varSeq="1">υιον αυτου εν εμοι</rdg><rdg n="bf" type="om" cause="fehlerMR" varSeq="2" wit="1751">om<wit><idno>1751</idno></wit></rdg></app><app type="main" n="Gal.1.16" from="6" to="8"><lem wit="basetext">υἱὸν αὐτοῦ</lem><rdg n="a" varSeq="1" wit="02V 03 06* 06C2 010* 010C1 012 5 35 38 43 51 61* 61C* 69 88 103 122 177* 177C 206* 206C 218 254 256 263S 326 327 330 336 337 365 378 394 424 429 436 442* 442C 451 455 462 467* 467C 582 606 608 620 629 630 639 720 891 915 935 1069 1105 1108 1115 1127 1175 1241 1245 1251 1267 1319* 1319C 1367* 1367C 1398 1405 1505 1523 1524 1563 1573 1611 1617 1730 1736 1741 1750 1753 1798 1817 1831 1837 1838 1841 1863 1881 1899 1918 1929C 1930 1935 1943 1947 1950* 1950C 1959 1961 1969 1973 1978 1984 1985 1987 1988 1991 1992 1995 1996 2000 2002 2005 2102 2110 2127 2197 2200 2248 2279 2344 2352 2356 2400 2423 2482 2492 2494 2495 2516 2523 2544 2574-1 2574-2 2576 2659 2674 2815 2899 2936 L23-S3W4D1 L587-S3W4D1 L809-S3W4D1 L1159-S3W4D1 L1178-S3W4D1 L1188-S3W4D1 L1298-S3W4D1 L1440-S3W4D1 L2010-S3W4D1 L2058-M2D23 L2058-MOV12 L2058-S3W4D1">υιον αυτου<wit><idno>02V</idno><idno>03</idno><idno>06*</idno><idno>06C2</idno><idno>010*</idno><idno>010C1</idno><idno>012</idno><idno>5</idno><idno>35</idno><idno>38</idno><idno>43</idno><idno>51</idno><idno>61*</idno><idno>61C*</idno><idno>69</idno><idno>88</idno><idno>103</idno><idno>122</idno><idno>177*</idno><idno>177C</idno><idno>206*</idno><idno>206C</idno><idno>218</idno><idno>254</idno><idno>256</idno><idno>263S</idno><idno>326</idno><idno>327</idno><idno>330</idno><idno>336</idno><idno>337</idno><idno>365</idno><idno>378</idno><idno>394</idno><idno>424</idno><idno>429</idno><idno>436</idno><idno>442*</idno><idno>442C</idno><idno>451</idno><idno>455</idno><idno>462</idno><idno>467*</idno><idno>467C</idno><idno>582</idno><idno>606</idno><idno>608</idno><idno>620</idno><idno>629</idno><idno>630</idno><idno>639</idno><idno>720</idno><idno>891</idno><idno>915</idno><idno>935</idno><idno>1069</idno><idno>1105</idno><idno>1108</idno><idno>1115</idno><idno>1127</idno><idno>1175</idno><idno>1241</idno><idno>1245</idno><idno>1251</idno><idno>1267</idno><idno>1319*</idno><idno>1319C</idno><idno>1367*</idno><idno>1367C</idno><idno>1398</idno><idno>1405</idno><idno>1505</idno><idno>1523</idno><idno>1524</idno><idno>1563</idno><idno>1573</idno><idno>1611</idno><idno>1617</idno><idno>1730</idno><idno>1736</idno><idno>1741</idno><idno>1750</idno><idno>1753</idno><idno>1798</idno><idno>1817</idno><idno>1831</idno><idno>1837</idno><idno>1838</idno><idno>1841</idno><idno>1863</idno><idno>1881</idno><idno>1899</idno><idno>1918</idno><idno>1929C</idno><idno>1930</idno><idno>1935</idno><idno>1943</idno><idno>1947</idno><idno>1950*</idno><idno>1950C</idno><idno>1959</idno><idno>1961</idno><idno>1969</idno><idno>1973</idno><idno>1978</idno><idno>1984</idno><idno>1985</idno><idno>1987</idno><idno>1988</idno><idno>1991</idno><idno>1992</idno><idno>1995</idno><idno>1996</idno><idno>2000</idno><idno>2002</idno><idno>2005</idno><idno>2102</idno><idno>2110</idno><idno>2127</idno><idno>2197</idno><idno>2200</idno><idno>2248</idno><idno>2279</idno><idno>2344</idno><idno>2352</idno><idno>2356</idno><idno>2400</idno><idno>2423</idno><idno>2482</idno><idno>2492</idno><idno>2494</idno><idno>2495</idno><idno>2516</idno><idno>2523</idno><idno>2544</idno><idno>2574-1</idno><idno>2574-2</idno><idno>2576</idno><idno>2659</idno><idno>2674</idno><idno>2815</idno><idno>2899</idno><idno>2936</idno><idno>L23-S3W4D1</idno><idno>L587-S3W4D1</idno><idno>L809-S3W4D1</idno><idno>L1159-S3W4D1</idno><idno>L1178-S3W4D1</idno><idno>L1188-S3W4D1</idno><idno>L1298-S3W4D1</idno><idno>L1440-S3W4D1</idno><idno>L2010-S3W4D1</idno><idno>L2058-M2D23</idno><idno>L2058-MOV12</idno><idno>L2058-S3W4D1</idno></wit></rdg><rdg n="an" type="subreading" cause="abbreviation" varSeq="1" wit="P46 01 020 025 044 049 075 0150* 0150C 1 6 33 81 104 203 398 454 459 506 642S 1739 1834 1836 1908 1910 1912 2004 2138 2464 2511 2733 2805 2865 2892 L60-S3W3D1 L156-S3W4D1 L169-S3W4D1 L1126-MOV12">υν αυτου<wit><idno>P46</idno><idno>01</idno><idno>020</idno><idno>025</idno><idno>044</idno><idno>049</idno><idno>075</idno><idno>0150*</idno><idno>0150C</idno><idno>1</idno><idno>6</idno><idno>33</idno><idno>81</idno><idno>104</idno><idno>203</idno><idno>398</idno><idno>454</idno><idno>459</idno><idno>506</idno><idno>642S</idno><idno>1739</idno><idno>1834</idno><idno>1836</idno><idno>1908</idno><idno>1910</idno><idno>1912</idno><idno>2004</idno><idno>2138</idno><idno>2464</idno><idno>2511</idno><idno>2733</idno><idno>2805</idno><idno>2865</idno><idno>2892</idno><idno>L60-S3W3D1</idno><idno>L156-S3W4D1</idno><idno>L169-S3W4D1</idno><idno>L1126-MOV12</idno></wit></rdg><rdg n="an" type="subreading" cause="abbreviation" varSeq="1" wit="0278 623 886 1913 1942 1962 2105">υιν αυτου<wit><idno>0278</idno><idno>623</idno><idno>886</idno><idno>1913</idno><idno>1942</idno><idno>1962</idno><idno>2105</idno></wit></rdg><rdg n="zz" type="lac" varSeq="3" wit="P51 2596">lac<wit><idno>P51</idno><idno>2596</idno></wit></rdg></app><app type="main" n="Gal.1.16" from="10" to="12"><lem wit="basetext">ἐν ἐμοί</lem><rdg n="a" varSeq="1" wit="P46 01 02 03 06* 06C2 010* 010C1 012 020 025 044 049 075 0150* 0150C 0278 1 5 6 33 35 38 43 51 61* 61C* 69 81 88 103 104 122 177* 177C 203 206* 206C 218 254 256 263S 326 327 330 336 337 365 378 394 398 424 429 436 442* 442C 451 454 455 459 462 467* 467C 506 582 606 608 620 623 629 630 639 642S 720 886 891 915 935 1069 1105 1108 1115 1127 1175 1241 1245 1251 1267 1319* 1319C 1367* 1367C 1398 1405 1505 1523 1524 1563 1573 1611 1617 1730 1736 1739 1741 1750 1753 1798 1817 1831 1834 1836 1837 1841 1863 1881 1899 1908 1910 1912 1913 1918 1929C 1930 1935 1942 1943 1947 1950* 1950C 1959 1961 1962 1969 1973 1978 1984 1985 1987 1988 1991 1992 1995 1996 2000 2002 2004 2005 2102 2105 2110 2127 2138 2197 2200 2248 2279 2344 2352 2356 2400 2423 2464 2482 2492 2494 2495 2511 2516 2523 2544 2574-1 2574-2 2576 2659 2674 2733 2805 2815 2865 2892 2899 2936 L23-S3W4D1 L60-S3W3D1 L156-S3W4D1 L169-S3W4D1 L587-S3W4D1 L809-S3W4D1 L1126-MOV12 L1159-S3W4D1 L1178-S3W4D1 L1188-S3W4D1 L1298-S3W4D1 L1440-S3W4D1 L2010-S3W4D1 L2058-M2D23 L2058-MOV12 L2058-S3W4D1">εν εμοι<wit><idno>P46</idno><idno>01</idno><idno>02</idno><idno>03</idno><idno>06*</idno><idno>06C2</idno><idno>010*</idno><idno>010C1</idno><idno>012</idno><idno>020</idno><idno>025</idno><idno>044</idno><idno>049</idno><idno>075</idno><idno>0150*</idno><idno>0150C</idno><idno>0278</idno><idno>1</idno><idno>5</idno><idno>6</idno><idno>33</idno><idno>35</idno><idno>38</idno><idno>43</idno><idno>51</idno><idno>61*</idno><idno>61C*</idno><idno>69</idno><idno>81</idno><idno>88</idno><idno>103</idno><idno>104</idno><idno>122</idno><idno>177*</idno><idno>177C</idno><idno>203</idno><idno>206*</idno><idno>206C</idno><idno>218</idno><idno>254</idno><idno>256</idno><idno>263S</idno><idno>326</idno><idno>327</idno><idno>330</idno><idno>336</idno><idno>337</idno><idno>365</idno><idno>378</idno><idno>394</idno><idno>398</idno><idno>424</idno><idno>429</idno><idno>436</idno><idno>442*</idno><idno>442C</idno><idno>451</idno><idno>454</idno><idno>455</idno><idno>459</idno><idno>462</idno><idno>467*</idno><idno>467C</idno><idno>506</idno><idno>582</idno><idno>606</idno><idno>608</idno><idno>620</idno><idno>623</idno><idno>629</idno><idno>630</idno><idno>639</idno><idno>642S</idno><idno>720</idno><idno>886</idno><idno>891</idno><idno>915</idno><idno>935</idno><idno>1069</idno><idno>1105</idno><idno>1108</idno><idno>1115</idno><idno>1127</idno><idno>1175</idno><idno>1241</idno><idno>1245</idno><idno>1251</idno><idno>1267</idno><idno>1319*</idno><idno>1319C</idno><idno>1367*</idno><idno>1367C</idno><idno>1398</idno><idno>1405</idno><idno>1505</idno><idno>1523</idno><idno>1524</idno><idno>1563</idno><idno>1573</idno><idno>1611</idno><idno>1617</idno><idno>1730</idno><idno>1736</idno><idno>1739</idno><idno>1741</idno><idno>1750</idno><idno>1753</idno><idno>1798</idno><idno>1817</idno><idno>1831</idno><idno>1834</idno><idno>1836</idno><idno>1837</idno><idno>1841</idno><idno>1863</idno><idno>1881</idno><idno>1899</idno><idno>1908</idno><idno>1910</idno><idno>1912</idno><idno>1913</idno><idno>1918</idno><idno>1929C</idno><idno>1930</idno><idno>1935</idno><idno>1942</idno><idno>1943</idno><idno>1947</idno><idno>1950*</idno><idno>1950C</idno><idno>1959</idno><idno>1961</idno><idno>1962</idno><idno>1969</idno><idno>1973</idno><idno>1978</idno><idno>1984</idno><idno>1985</idno><idno>1987</idno><idno>1988</idno><idno>1991</idno><idno>1992</idno><idno>1995</idno><idno>1996</idno><idno>2000</idno><idno>2002</idno><idno>2004</idno><idno>2005</idno><idno>2102</idno><idno>2105</idno><idno>2110</idno><idno>2127</idno><idno>2138</idno><idno>2197</idno><idno>2200</idno><idno>2248</idno><idno>2279</idno><idno>2344</idno><idno>2352</idno><idno>2356</idno><idno>2400</idno><idno>2423</idno><idno>2464</idno><idno>2482</idno><idno>2492</idno><idno>2494</idno><idno>2495</idno><idno>2511</idno><idno>2516</idno><idno>2523</idno><idno>2544</idno><idno>2574-1</idno><idno>2574-2</idno><idno>2576</idno><idno>2659</idno><idno>2674</idno><idno>2733</idno><idno>2805</idno><idno>2815</idno><idno>2865</idno><idno>2892</idno><idno>2899</idno><idno>2936</idno><idno>L23-S3W4D1</idno><idno>L60-S3W3D1</idno><idno>L156-S3W4D1</idno><idno>L169-S3W4D1</idno><idno>L587-S3W4D1</idno><idno>L809-S3W4D1</idno><idno>L1126-MOV12</idno><idno>L1159-S3W4D1</idno><idno>L1178-S3W4D1</idno><idno>L1188-S3W4D1</idno><idno>L1298-S3W4D1</idno><idno>L1440-S3W4D1</idno><idno>L2010-S3W4D1</idno><idno>L2058-M2D23</idno><idno>L2058-MOV12</idno><idno>L2058-S3W4D1</idno></wit></rdg><rdg n="b" type="om" varSeq="2" wit="1838">om<wit><idno>1838</idno></wit></rdg><rdg n="zz" type="lac" varSeq="4" wit="P51 2596">lac<wit><idno>P51</idno><idno>2596</idno></wit></rdg></app><app type="main" n="Gal.1.16" from="14" to="14"><lem wit="basetext">ἵνα</lem><rdg n="a" varSeq="1" wit="P46 P51V 01 02 03 06* 06C2 010* 010C1 012 020 025 044 049 075 0150* 0150C 0278 1 5 6 33 35 38 43 51 61* 61C* 69 81 88 103 104 122 177* 177C 203 206* 206C 218 254 256 263S 326 327 330 336 337 365 378 394 398 424 429 436 442* 442C 451 454 455 459 462 467* 467C 506 582 606 608 620 623 629 630 639 642S 720 886 891r 915 935 1069 1105 1108 1115 1127 1175 1241 1245 1251 1267 1319* 1319C 1367* 1367C 1398 1405 1505 1523 1524 1563 1573 1611 1617 1730 1736 1739 1741 1750 1751 1753 1798 1817 1831 1834 1836 1837 1838 1841 1863 1881 1899 1908 1910 1912 1913 1918 1929* 1929C 1930 1935 1942 1943 1947 1950* 1950C 1959 1961 1962 1969 1973 1978 1984 1985 1987 1988 1991 1992 1995 1996 2000 2002 2004 2005 2102 2105 2110 2127 2138 2197 2200 2248 2279 2344 2352 2356 2400 2423 2464 2482 2492 2494 2495 2511 2516 2523 2544 2574-1 2574-2 2576 2659 2674 2733 2805 2815 2865 2892 2899 2936 L23-S3W4D1 L60-S3W3D1 L156-S3W4D1 L169-S3W4D1 L587-S3W4D1 L809-S3W4D1 L1126-MOV12 L1159-S3W4D1 L1178-S3W4D1 L1188-S3W4D1 L1298-S3W4D1 L1440-S3W4D1 L2010-S3W4D1 L2058-M2D23 L2058-MOV12 L2058-S3W4D1">ινα<wit><idno>P46</idno><idno>P51V</idno><idno>01</idno><idno>02</idno><idno>03</idno><idno>06*</idno><idno>06C2</idno><idno>010*</idno><idno>010C1</idno><idno>012</idno><idno>020</idno><idno>025</idno><idno>044</idno><idno>049</idno><idno>075</idno><idno>0150*</idno><idno>0150C</idno><idno>0278</idno><idno>1</idno><idno>5</idno><idno>6</idno><idno>33</idno><idno>35</idno><idno>38</idno><idno>43</idno><idno>51</idno><idno>61*</idno><idno>61C*</idno><idno>69</idno><idno>81</idno><idno>88</idno><idno>103</idno><idno>104</idno><idno>122</idno><idno>177*</idno><idno>177C</idno><idno>203</idno><idno>206*</idno><idno>206C</idno><idno>218</idno><idno>254</idno><idno>256</idno><idno>263S</idno><idno>326</idno><idno>327</idno><idno>330</idno><idno>336</idno><idno>337</idno><idno>365</idno><idno>378</idno><idno>394</idno><idno>398</idno><idno>424</idno><idno>429</idno><idno>436</idno><idno>442*</idno><idno>442C</idno><idno>451</idno><idno>454</idno><idno>455</idno><idno>459</idno><idno>462</idno><idno>467*</idno><idno>467C</idno><idno>506</idno><idno>582</idno><idno>606</idno><idno>608</idno><idno>620</idno><idno>623</idno><idno>629</idno><idno>630</idno><idno>639</idno><idno>642S</idno><idno>720</idno><idno>886</idno><idno>891r</idno><idno>915</idno><idno>935</idno><idno>1069</idno><idno>1105</idno><idno>1108</idno><idno>1115</idno><idno>1127</idno><idno>1175</idno><idno>1241</idno><idno>1245</idno><idno>1251</idno><idno>1267</idno><idno>1319*</idno><idno>1319C</idno><idno>1367*</idno><idno>1367C</idno><idno>1398</idno><idno>1405</idno><idno>1505</idno><idno>1523</idno><idno>1524</idno><idno>1563</idno><idno>1573</idno><idno>1611</idno><idno>1617</idno><idno>1730</idno><idno>1736</idno><idno>1739</idno><idno>1741</idno><idno>1750</idno><idno>1751</idno><idno>1753</idno><idno>1798</idno><idno>1817</idno><idno>1831</idno><idno>1834</idno><idno>1836</idno><idno>1837</idno><idno>1838</idno><idno>1841</idno><idno>1863</idno><idno>1881</idno><idno>1899</idno><idno>1908</idno><idno>1910</idno><idno>1912</idno><idno>1913</idno><idno>1918</idno><idno>1929*</idno><idno>1929C</idno><idno>1930</idno><idno>1935</idno><idno>1942</idno><idno>1943</idno><idno>1947</idno><idno>1950*</idno><idno>1950C</idno><idno>1959</idno><idno>1961</idno><idno>1962</idno><idno>1969</idno><idno>1973</idno><idno>1978</idno><idno>1984</idno><idno>1985</idno><idno>1987</idno><idno>1988</idno><idno>1991</idno><idno>1992</idno><idno>1995</idno><idno>1996</idno><idno>2000</idno><idno>2002</idno><idno>2004</idno><idno>2005</idno><idno>2102</idno><idno>2105</idno><idno>2110</idno><idno>2127</idno><idno>2138</idno><idno>2197</idno><idno>2200</idno><idno>2248</idno><idno>2279</idno><idno>2344</idno><idno>2352</idno><idno>2356</idno><idno>2400</idno><idno>2423</idno><idno>2464</idno><idno>2482</idno><idno>2492</idno><idno>2494</idno><idno>2495</idno><idno>2511</idno><idno>2516</idno><idno>2523</idno><idno>2544</idno><idno>2574-1</idno><idno>2574-2</idno><idno>2576</idno><idno>2659</idno><idno>2674</idno><idno>2733</idno><idno>2805</idno><idno>2815</idno><idno>2865</idno><idno>2892</idno><idno>2899</idno><idno>2936</idno><idno>L23-S3W4D1</idno><idno>L60-S3W3D1</idno><idno>L156-S3W4D1</idno><idno>L169-S3W4D1</idno><idno>L587-S3W4D1</idno><idno>L809-S3W4D1</idno><idno>L1126-MOV12</idno><idno>L1159-S3W4D1</idno><idno>L1178-S3W4D1</idno><idno>L1188-S3W4D1</idno><idno>L1298-S3W4D1</idno><idno>L1440-S3W4D1</idno><idno>L2010-S3W4D1</idno><idno>L2058-M2D23</idno><idno>L2058-MOV12</idno><idno>L2058-S3W4D1</idno></wit></rdg><rdg n="zz" type="lac" varSeq="2" wit="2596">lac<wit><idno>2596</idno></wit></rdg></app></ab>'
-        xml = exp.get_unit_xml(app)
-        self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
+    @patch('collation.core.exporter.Exporter.make_reading')
+    @patch('collation.core.exporter.Exporter.get_witnesses')
+    @patch('collation.core.exporter.Exporter.get_lemma_text')
+    def test_get_app_units_negative_apparatus_subreading(self,
+                                                         mocked_get_lemma_text,
+                                                         mocked_get_witnesses,
+                                                         mocked_make_reading):
+        mocked_get_lemma_text.side_effect = [['my lemma']]
+        mocked_get_witnesses.side_effect = [['basetext', '6'], ['7'], ['8']]
+        mocked_make_reading.side_effect = [etree.fromstring('<rdg n="a" varSeq="1">my lemma</rdg>'),
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7">my lema<wit><idno>7</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg type="subreading" cause="orthographic" n="bo" varSeq="3" wit="8">mie lema<wit><idno>8</idno></wit></rdg>')]
+        context = 'Gal.1.1'
+        overtext = {'id': 'basetext'}
+        apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'}, {'label': 'b', 'subreadings': {'orthographic': [{'label': 'b', 'suffix': ''}]}}]}]
+        missing = []
+        exp = Exporter(format='negative_xml')
+        expected_xml = ['<app type="main" n="Gal.1.1" from="2" to="4"><lem wit="basetext">my lemma</lem><rdg n="a" varSeq="1">my lemma</rdg><rdg n="b" varSeq="2" wit="7">my lema<wit><idno>7</idno></wit></rdg><rdg type="subreading" cause="orthographic" n="bo" varSeq="3" wit="8">mie lema<wit><idno>8</idno></wit></rdg></app>']
+        app_units = exp.get_app_units(apparatus, overtext, context, missing)
+        result = []
+        for unit in app_units:
+            result.append(etree.tostring(unit, encoding='UTF-8').decode('UTF-8'))
+        self.assertEqual(result, expected_xml)

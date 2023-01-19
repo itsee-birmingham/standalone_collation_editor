@@ -96,12 +96,12 @@ class Exporter(object):
                 if 'details' in reading.keys():
                     text = [reading['details'], reading['type']]
                 else:
-                    text = ['om', reading['type']]
+                    text = ['om.', reading['type']]
             elif 'type' in reading.keys() and reading['type'] in ['lac_verse', 'lac']:
                 if 'details' in reading.keys():
                     text = [reading['details'], reading['type']]
                 else:
-                    text = ['lac', reading['type']]
+                    text = ['lac.', reading['type']]
         return text
 
     def get_lemma_text(self, overtext, start, end):

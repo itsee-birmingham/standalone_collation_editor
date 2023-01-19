@@ -1443,3 +1443,5 @@ Catena Dev branch changes
 * In exporter.py there is a breaking change in the ```get_text()```, ```make_reading()``` and ```get_label()``` function arguments. The argument 'type' which used to be the string 'subreading' or None is now a boolean called 'is_subreading'. All calls to this function in exporters which inherit from this will need to be changed accordingly.
 
 * Exported XML apparatus uses the n attribute for the identifier of ```<ab>``` elements rather than xml:id. The value of the attribute remains unchanged.
+
+* In exporter.py ```get_text()``` when om and lac are returned their string value is always returned with the full stop eg. ```om.``` 
