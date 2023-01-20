@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import patch, call
 import xml.etree.ElementTree as etree
 from collation.core.exporter import Exporter
 
@@ -1043,6 +1043,26 @@ class ExporterUnitTests(TestCase):
         result = []
         for unit in app_units:
             result.append(etree.tostring(unit, encoding='UTF-8').decode('UTF-8'))
+        # check the right things are passed to the mocked functions
+        mocked_get_lemma_text.assert_has_calls([call(overtext, 2, 4), call(overtext, 6, 6), call(overtext, 7, 7)])
+        mocked_get_witnesses.assert_has_calls([call({'label': 'a'}, missing),
+                                               call({'label': 'b'}, missing),
+                                               call({'label': 'a'}, missing),
+                                               call({'label': 'b'}, missing),
+                                               call({'label': 'c', 'reading_classes': ['fehlerMR']}, missing),
+                                               call({'label': 'a'}, missing),
+                                               call({'label': 'b'}, missing)
+                                               ])
+        mocked_make_reading.assert_has_calls([call({'label': 'a'}, 0, 'a', ['basetext', '6'], subtype=None),
+                                              call({'label': 'b'}, 1, 'b', ['7', '8'], subtype=None),
+                                              call({'label': 'a'}, 0, 'a', ['basetext'], subtype=None),
+                                              call({'label': 'b'}, 1, 'b', ['7', '8'], subtype=None),
+                                              call({'label': 'c', 'reading_classes': ['fehlerMR']}, 2, 'c', ['6'],
+                                              subtype='fehlerMR'),
+                                              call({'label': 'a'}, 0, 'a', ['basetext', '8'], subtype=None),
+                                              call({'label': 'b'}, 1, 'b', ['6', '7'], subtype=None)
+                                              ])
+        # check the result
         self.assertEqual(result, expected_xml)
 
     @patch('collation.core.exporter.Exporter.make_reading')
@@ -1059,7 +1079,8 @@ class ExporterUnitTests(TestCase):
                                            etree.fromstring('<rdg type="subreading" cause="orthographic" n="bo" varSeq="3" wit="8">mie lema<wit><idno>8</idno></wit></rdg>')]
         context = 'Gal.1.1'
         overtext = {'id': 'basetext'}
-        apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'}, {'label': 'b', 'subreadings': {'orthographic': [{'label': 'b', 'suffix': ''}]}}]}]
+        apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'},
+                     {'label': 'b', 'subreadings': {'orthographic': [{'label': 'b', 'suffix': ''}]}}]}]
         missing = []
         exp = Exporter()
         expected_xml = ['<app type="main" n="Gal.1.1" from="2" to="4"><lem wit="basetext">my lemma</lem><rdg n="a" varSeq="1" wit="basetext 6">my lemma<wit><idno>basetext</idno><idno>6</idno></wit></rdg><rdg n="b" varSeq="2" wit="7">my lema<wit><idno>7</idno></wit></rdg><rdg type="subreading" cause="orthographic" n="bo" varSeq="3" wit="8">mie lema<wit><idno>8</idno></wit></rdg></app>']
@@ -1067,9 +1088,18 @@ class ExporterUnitTests(TestCase):
         result = []
         for unit in app_units:
             result.append(etree.tostring(unit, encoding='UTF-8').decode('UTF-8'))
+        # check the right things are passed to the mocked functions
+        mocked_get_lemma_text.assert_has_calls([call(overtext, 2, 4)])
+        mocked_get_witnesses.assert_has_calls([call({'label': 'a'}, missing),
+                                               call({'label': 'b', 'subreadings': {'orthographic': [{'label': 'b', 'suffix': ''}]}}, missing),
+                                               call({'label': 'b', 'suffix': ''}, missing)
+                                               ])
+        mocked_make_reading.assert_has_calls([call({'label': 'a'}, 0, 'a', ['basetext', '6'], subtype=None),
+                                              call({'label': 'b', 'subreadings': {'orthographic': [{'label': 'b', 'suffix': ''}]}}, 1, 'b', ['7'], subtype=None),
+                                              call({'label': 'b', 'suffix': ''}, 1, 'b', ['8'], True, 'orthographic')
+                                              ])
+        # check the result
         self.assertEqual(result, expected_xml)
-
-# TODO: work out what is going on with 'include_lemma_when_no_variants' because False doesn't seem to do anything
 
     @patch('collation.core.exporter.Exporter.make_reading')
     @patch('collation.core.exporter.Exporter.get_witnesses')
@@ -1102,6 +1132,27 @@ class ExporterUnitTests(TestCase):
         result = []
         for unit in app_units:
             result.append(etree.tostring(unit, encoding='UTF-8').decode('UTF-8'))
+        # check the right calls are made - only make_reading should differ from positive version as it should always
+        # get an empty list for the witnesses in the a reading calls.
+        mocked_get_lemma_text.assert_has_calls([call(overtext, 2, 4), call(overtext, 6, 6), call(overtext, 7, 7)])
+        mocked_get_witnesses.assert_has_calls([call({'label': 'a'}, missing),
+                                               call({'label': 'b'}, missing),
+                                               call({'label': 'a'}, missing),
+                                               call({'label': 'b'}, missing),
+                                               call({'label': 'c', 'reading_classes': ['fehlerMR']}, missing),
+                                               call({'label': 'a'}, missing),
+                                               call({'label': 'b'}, missing)
+                                               ])
+        mocked_make_reading.assert_has_calls([call({'label': 'a'}, 0, 'a', [], subtype=None),
+                                              call({'label': 'b'}, 1, 'b', ['7', '8'], subtype=None),
+                                              call({'label': 'a'}, 0, 'a', [], subtype=None),
+                                              call({'label': 'b'}, 1, 'b', ['7', '8'], subtype=None),
+                                              call({'label': 'c', 'reading_classes': ['fehlerMR']}, 2, 'c', ['6'],
+                                              subtype='fehlerMR'),
+                                              call({'label': 'a'}, 0, 'a', [], subtype=None),
+                                              call({'label': 'b'}, 1, 'b', ['6', '7'], subtype=None)
+                                              ])
+        # check the result
         self.assertEqual(result, expected_xml)
 
     @patch('collation.core.exporter.Exporter.make_reading')
@@ -1126,4 +1177,176 @@ class ExporterUnitTests(TestCase):
         result = []
         for unit in app_units:
             result.append(etree.tostring(unit, encoding='UTF-8').decode('UTF-8'))
+        # check the right things are passed to the mocked functions - only make_reading should differ from positive
+        # version as it should always get an empty list for the witnesses in the a reading calls.
+        mocked_get_lemma_text.assert_has_calls([call(overtext, 2, 4)])
+        mocked_get_witnesses.assert_has_calls([call({'label': 'a'}, missing),
+                                               call({'label': 'b',
+                                                     'subreadings': {'orthographic': [{'label': 'b',
+                                                                                       'suffix': ''}]}},
+                                                    missing),
+                                               call({'label': 'b', 'suffix': ''}, missing)
+                                               ])
+        mocked_make_reading.assert_has_calls([call({'label': 'a'}, 0, 'a', [], subtype=None),
+                                              call({'label': 'b',
+                                                    'subreadings': {'orthographic': [{'label': 'b',
+                                                                                      'suffix': ''}]}},
+                                                   1, 'b', ['7'], subtype=None),
+                                              call({'label': 'b', 'suffix': ''}, 1, 'b', ['8'], True, 'orthographic')
+                                              ])
+        # check the result
         self.assertEqual(result, expected_xml)
+
+# TODO: work out what is going on with 'include_lemma_when_no_variants' because False doesn't seem to do anything
+
+    @patch('collation.core.exporter.Exporter.get_app_units')
+    def test_get_unit_xml_defaults(self, mocked_get_app_units):
+        mocked_get_app_units.return_value = [etree.fromstring('<app type="main" n="Gal.1.1" from="2" to="8"></app>'),
+                                             etree.fromstring('<app type="main" n="Gal.1.1" from="2" to="4"></app>'),
+                                             etree.fromstring('<app type="main" n="Gal.1.1" from="6" to="8"></app>')]
+        self.maxDiff = None
+        # data included in lac and om readings to check the default settings works on consolidating
+        app = {'context': 'Gal.1.1',
+               'structure': {'overtext': [{'id': 'basetext'}],
+                             'apparatus': [],
+                             'lac_readings': ['6', '8'],
+                             'om_readings': ['7']}
+               }
+        exp = Exporter()
+        expected_missing = ['6', '8', '7']
+        expected_xml = '<ab n="Gal.1.1-APP"><app type="lac" n="Gal.1.1"><lem wit="editorial">Whole verse</lem><rdg type="lac" wit="6 8">Def.<wit><idno>6</idno><idno>8</idno></wit></rdg><rdg type="lac" wit="7">Om.<wit><idno>7</idno></wit></rdg></app><app type="main" n="Gal.1.1" from="2" to="8" /><app type="main" n="Gal.1.1" from="2" to="4" /><app type="main" n="Gal.1.1" from="6" to="8" /></ab>'
+        xml = exp.get_unit_xml(app)
+        mocked_get_app_units.assert_called_with([], {'id': 'basetext'}, 'Gal.1.1', expected_missing)
+        self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
+
+    @patch('collation.core.exporter.Exporter.get_app_units')
+    def test_get_unit_xml_no_consolidate_lac(self, mocked_get_app_units):
+        mocked_get_app_units.return_value = [etree.fromstring('<app type="main" n="Gal.1.1" from="2" to="8"></app>'),
+                                             etree.fromstring('<app type="main" n="Gal.1.1" from="2" to="4"></app>'),
+                                             etree.fromstring('<app type="main" n="Gal.1.1" from="6" to="8"></app>')]
+        self.maxDiff = None
+        # data included in lac and om readings to check the settings works on consolidating
+        app = {'context': 'Gal.1.1',
+               'structure': {'overtext': [{'id': 'basetext'}],
+                             'apparatus': [],
+                             'lac_readings': ['6', '8'],
+                             'om_readings': ['7']}
+               }
+        exp = Exporter(consolidate_lac_verse=False)
+        expected_missing = ['7']
+        expected_xml = '<ab n="Gal.1.1-APP"><app type="lac" n="Gal.1.1"><lem wit="editorial">Whole verse</lem><rdg type="lac" wit="7">Om.<wit><idno>7</idno></wit></rdg></app><app type="main" n="Gal.1.1" from="2" to="8" /><app type="main" n="Gal.1.1" from="2" to="4" /><app type="main" n="Gal.1.1" from="6" to="8" /></ab>'
+        xml = exp.get_unit_xml(app)
+        mocked_get_app_units.assert_called_with([], {'id': 'basetext'}, 'Gal.1.1', expected_missing)
+        self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
+
+    @patch('collation.core.exporter.Exporter.get_app_units')
+    def test_get_unit_xml_no_consolidate_om(self, mocked_get_app_units):
+        mocked_get_app_units.return_value = [etree.fromstring('<app type="main" n="Gal.1.1" from="2" to="8"></app>'),
+                                             etree.fromstring('<app type="main" n="Gal.1.1" from="2" to="4"></app>'),
+                                             etree.fromstring('<app type="main" n="Gal.1.1" from="6" to="8"></app>')]
+        self.maxDiff = None
+        # data included in lac and om readings to check the settings works on consolidating
+        app = {'context': 'Gal.1.1',
+               'structure': {'overtext': [{'id': 'basetext'}],
+                             'apparatus': [],
+                             'lac_readings': ['6', '8'],
+                             'om_readings': ['7']}
+               }
+        exp = Exporter(consolidate_om_verse=False)
+        expected_missing = ['6', '8']
+        expected_xml = '<ab n="Gal.1.1-APP"><app type="lac" n="Gal.1.1"><lem wit="editorial">Whole verse</lem><rdg type="lac" wit="6 8">Def.<wit><idno>6</idno><idno>8</idno></wit></rdg></app><app type="main" n="Gal.1.1" from="2" to="8" /><app type="main" n="Gal.1.1" from="2" to="4" /><app type="main" n="Gal.1.1" from="6" to="8" /></ab>'
+        xml = exp.get_unit_xml(app)
+        mocked_get_app_units.assert_called_with([], {'id': 'basetext'}, 'Gal.1.1', expected_missing)
+        self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
+
+    @patch('collation.core.exporter.Exporter.get_app_units')
+    def test_get_unit_xml_no_consolidate_lac_or_om(self, mocked_get_app_units):
+        mocked_get_app_units.return_value = [etree.fromstring('<app type="main" n="Gal.1.1" from="2" to="8"></app>'),
+                                             etree.fromstring('<app type="main" n="Gal.1.1" from="2" to="4"></app>'),
+                                             etree.fromstring('<app type="main" n="Gal.1.1" from="6" to="8"></app>')]
+        self.maxDiff = None
+        # data included in lac and om readings to check the settings works on consolidating
+        app = {'context': 'Gal.1.1',
+               'structure': {'overtext': [{'id': 'basetext'}],
+                             'apparatus': [],
+                             'lac_readings': ['6', '8'],
+                             'om_readings': ['7']}
+               }
+        exp = Exporter(consolidate_om_verse=False, consolidate_lac_verse=False)
+        expected_missing = []
+        expected_xml = '<ab n="Gal.1.1-APP"><app type="main" n="Gal.1.1" from="2" to="8" /><app type="main" n="Gal.1.1" from="2" to="4" /><app type="main" n="Gal.1.1" from="6" to="8" /></ab>'
+        xml = exp.get_unit_xml(app)
+        mocked_get_app_units.assert_called_with([], {'id': 'basetext'}, 'Gal.1.1', expected_missing)
+        self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
+
+    @patch('collation.core.exporter.Exporter.get_app_units')
+    def test_get_unit_xml_ignore_basetext(self, mocked_get_app_units):
+        mocked_get_app_units.return_value = [etree.fromstring('<app type="main" n="Gal.1.1" from="2" to="8"></app>'),
+                                             etree.fromstring('<app type="main" n="Gal.1.1" from="2" to="4"></app>'),
+                                             etree.fromstring('<app type="main" n="Gal.1.1" from="6" to="8"></app>')]
+        app = {'context': 'Gal.1.1',
+               'structure': {'overtext': [{'id': 'basetext'}],
+                             'apparatus': [],
+                             'lac_readings': ['6', '8'],
+                             'om_readings': ['7']}
+               }
+        exp = Exporter(consolidate_om_verse=False, consolidate_lac_verse=False, ignore_basetext=True)
+        # no point testing export just test the call is correct
+        expected_missing = ['basetext']
+        exp.get_unit_xml(app)
+        mocked_get_app_units.assert_called_with([], {'id': 'basetext'}, 'Gal.1.1', expected_missing)
+
+    @patch('collation.core.exporter.Exporter.get_app_units')
+    def test_get_unit_xml_unit_sorting(self, mocked_get_app_units):
+        mocked_get_app_units.return_value = [etree.fromstring('<app type="main" n="Gal.1.1" from="2" to="8"></app>'),
+                                             etree.fromstring('<app type="main" n="Gal.1.1" from="2" to="4"></app>'),
+                                             etree.fromstring('<app type="main" n="Gal.1.1" from="6" to="8"></app>')]
+        # give it some units to sort
+        original_ordered_units = [{'start': 6, 'end': 8},
+                                  {'start': 2, 'end': 4},
+                                  {'start': 9, 'end': 9},
+                                  {'start': 2, 'end': 8}]
+        expected_ordered_units = [{'start': 2, 'end': 8},
+                                  {'start': 2, 'end': 4},
+                                  {'start': 6, 'end': 8},
+                                  {'start': 9, 'end': 9}]
+        original_app = {'context': 'Gal.1.1',
+                        'structure': {'overtext': [{'id': 'basetext'}],
+                                      'apparatus': original_ordered_units,
+                                      'lac_readings': [],
+                                      'om_readings': []}
+                        }
+        exp = Exporter()
+        exp.get_unit_xml(original_app)
+        mocked_get_app_units.assert_called_with(expected_ordered_units, {'id': 'basetext'}, 'Gal.1.1', [])
+
+    # test units from all app lines are included
+    @patch('collation.core.exporter.Exporter.get_app_units')
+    def test_get_unit_apparatus_line_sorting(self, mocked_get_app_units):
+        mocked_get_app_units.return_value = [etree.fromstring('<app type="main" n="Gal.1.1" from="2" to="8"></app>'),
+                                             etree.fromstring('<app type="main" n="Gal.1.1" from="2" to="4"></app>'),
+                                             etree.fromstring('<app type="main" n="Gal.1.1" from="6" to="8"></app>')]
+        app = {'context': 'Gal.1.1',
+               'structure': {'overtext': [{'id': 'basetext'}],
+                             'apparatus': [{'start': 2, 'end': 4}],
+                             'apparatus2': [{'start': 9, 'end': 9}],
+                             'apparatus3': [{'start': 2, 'end': 8}],
+                             'lac_readings': [],
+                             'om_readings': []}
+               }
+        exp = Exporter()
+        expected_app_order = [{'start': 2, 'end': 8}, {'start': 2, 'end': 4}, {'start': 9, 'end': 9}]
+        exp.get_unit_xml(app)
+        mocked_get_app_units.assert_called_with(expected_app_order, {'id': 'basetext'}, 'Gal.1.1', [])
+
+    @patch('collation.core.exporter.Exporter.get_unit_xml')
+    def test_export_data(self, mocked_get_unit_xml):
+        mocked_get_unit_xml.side_effect = [etree.fromstring('<ab n="Gal.1.1-APP" />'),
+                                           etree.fromstring('<ab n="Gal.1.2-APP" />')]
+        # just enough to get the loops working
+        data = [{}, {}]
+        expected_xml = '<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0"><ab n="Gal.1.1-APP" />\n<ab n="Gal.1.2-APP" /></TEI>'
+        exp = Exporter()
+        xml = exp.export_data(data)
+        self.assertEqual(xml, expected_xml)
+
