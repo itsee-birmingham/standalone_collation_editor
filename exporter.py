@@ -351,15 +351,10 @@ class Exporter(object):
 
         apparatus = entry['structure']['apparatus'][:]
 
-        # make sure we append lines in order
-        ordered_keys = []
+        # add all the apparatus line data into one line (order doesn't matter as we sort the units later)
         for key in entry['structure']:
             if re.match(r'apparatus\d+', key) is not None:
-                ordered_keys.append(int(key.replace('apparatus', '')))
-        ordered_keys.sort()
-
-        for num in ordered_keys:
-            apparatus.extend(entry['structure']['apparatus{}'.format(num)])
+                apparatus.extend(entry['structure'][key])
 
         vtree = etree.fromstring('<ab n="{}-APP"></ab>'.format(context))
         # here deal with the whole verse lac and om and only use witnesses elsewhere not in these lists
@@ -368,9 +363,11 @@ class Exporter(object):
             app = etree.fromstring('<app type="lac" n="{}">'
                                    '<lem wit="editorial">Whole verse</lem>'
                                    '</app>'.format(context))
+            add_whole_verse_app = False
 
             if self.consolidate_lac_verse:
                 if len(entry['structure']['lac_readings']) > 0:
+                    add_whole_verse_app = True
                     rdg = etree.Element('rdg')
 
                     rdg.set('type', 'lac')
@@ -388,6 +385,7 @@ class Exporter(object):
 
             if self.consolidate_om_verse:
                 if len(entry['structure']['om_readings']) > 0:
+                    add_whole_verse_app = True
                     rdg = etree.Element('rdg')
                     rdg.set('type', 'lac')
                     rdg.text = 'Om.'
@@ -401,8 +399,8 @@ class Exporter(object):
                     rdg.append(wit)
                     app.append(rdg)
                 missing.extend(entry['structure']['om_readings'])
-
-            vtree.append(app)
+            if add_whole_verse_app:
+                vtree.append(app)
 
         # if we are ignoring the basetext add it to our missing list so it isn't listed (except in lemma)
         if self.ignore_basetext:
