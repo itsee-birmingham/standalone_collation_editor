@@ -113,7 +113,7 @@ class Exporter(object):
             end (int): The end index for the current lemma required.
 
         Returns:
-            list: A list of up to two items, the first is the string representing the overtext for this range, 
+            list: A list of up to two items, the first is the string representing the overtext for this range,
                 the optional second item is the string 'om' if the first item is an empty string.
         """
         if start == end and start % 2 == 1:
@@ -259,6 +259,19 @@ class Exporter(object):
                 new_label.append(char)
         return ''.join(new_label)
 
+    def get_required_end(self, unit, context):
+        """This is a function which is not important when working on a single unit where the end value is taken
+        directly from the unit. It is a separate function so inheriting classes, which may be joining readings
+        over multiple units, can overwrite it to provide the end value required.
+
+        Args:
+            unit (JSON): The current apparatus unit being processed.
+
+        Returns:
+            string: The string to use for the end value in the apparatus <app> tag.
+        """
+        return unit['end']
+
     def get_app_units(self, apparatus, overtext, context, missing):
         """Function to take the JSON apparatus and turn it into a list of ElementTree.Elements with each entry 
         representing one variant unit in TEI XML.
@@ -276,7 +289,8 @@ class Exporter(object):
         for unit in apparatus:
             start = unit['start']
             end = unit['end']
-            app = etree.fromstring('<app type="main" n="%s" from="%s" to="%s"></app>' % (context, start, end))
+            display_end = self.get_required_end(unit, context)
+            app = etree.fromstring('<app type="main" n="%s" from="%s" to="%s"></app>' % (context, start, display_end))
             lem = etree.Element('lem')
             lem.set('wit', overtext['id'])
             text = self.get_lemma_text(overtext, int(start), int(end))
