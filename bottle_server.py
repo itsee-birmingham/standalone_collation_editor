@@ -1,40 +1,44 @@
 import sys
 import os
-import imp
 import json
 import bottle
-from bottle import run, route, static_file, request, abort, get, post, response, redirect
+from bottle import run, route, static_file, request, abort, response, redirect
 from collation.store import Store
-from io import StringIO
 from collation.core.preprocessor import PreProcessor
 from collation.core.exporter_factory import ExporterFactory
 
+
 bottle.BaseRequest.MEMFILE_MAX = 1024 * 1024
+
+
 @route('/')
 def start_point():
     redirect('/collation')
 
+
 @route('/<app>', method=['GET', 'POST'])
 @route('/<app>/', method=['GET', 'POST'])
 def home(app):
-    #print('%s/%s/static' % (basedir, app))
+    # print('%s/%s/static' % (basedir, app))
     return static_file('index.html', root='%s/%s/static' % (basedir, app))
+
 
 @route('/<app>/<core:re:CE_core>/<static_type>/<filename:re:.*(js|css|html)>', method=['GET', 'POST'])
 def core_static_files(app, core, static_type, filename):
     return static_file(filename, root='%s/%s/core/static/CE_core/%s/' % (basedir, app, static_type))
 
+
 @route('/<app>/<static_type>/<filename:re:.*(js|css)>', method=['GET', 'POST'])
 def static_files(app, static_type, filename):
     return static_file(filename, root='%s/%s/static/%s/' % (basedir, app, static_type))
+
 
 # @route('/sitedomain.js')
 # def site_domain():
 #     return static_file('sitedomain.js', root='%s/static/' % (basedir))
 
 
-
-#the Store handler
+# the Store handler
 @route('/<app>/datastore', method=['GET', 'POST'])
 @route('/<app>/datastore/', method=['GET', 'POST'])
 def datastore(app):
@@ -44,7 +48,7 @@ def datastore(app):
     resource_type = request.params.resource_type
     if not resource_type:
         abort(400, "Bad Request")
-    #TODO: put this in settings somehow
+    # TODO: put this in settings somehow
     data_root = '%s/collation/data' % (basedir)
     if action == 'put':
         resource = request.params.resource
@@ -64,9 +68,10 @@ def datastore(app):
         so = Store()
         result = so.list_child_directories_and_files(path)
         response.content_type = 'application/json'
-        return json.dumps(result)#, default=json_util.default)
+        return json.dumps(result)  # , default=json_util.default)
     else:
         abort(400, "Bad Request")
+
 
 @route('/<app>/collationserver/<context>/', method=['POST'])
 @route('<app>/collationserver/<context>', method=['POST'])
@@ -99,7 +104,7 @@ def collation(app, context):
         if 'distance' in params['algorithm_settings']:
             collate_settings['tokenComparator']['distance'] = params['algorithm_settings']['distance']
         else:
-            #default to 2
+            # default to 2
             collate_settings['tokenComparator']['distance'] = 2
     else:
         collate_settings['tokenComparator']['type'] = 'equality'
@@ -126,7 +131,7 @@ def collation(app, context):
     except:
         abort(500, "Data Input Exception")
     response.content_type = 'application/json'
-    return json.dumps(output)#, default=json_util.default)
+    return json.dumps(output)  # , default=json_util.default)
 
 
 @route('/collation/apparatus', method=['POST'])
@@ -153,11 +158,11 @@ def apparatus():
     response.set_cookie('fileDownload', 'true')
     return app
 
+
 @route('/<filename:path>', method=['GET', 'POST'])
 @route('/<filename:path>/', method=['GET', 'POST'])
 def static_data_files(filename):
     return static_file(filename, root='%s/'% (basedir))
-
 
 
 args = sys.argv
