@@ -67,7 +67,7 @@ SV = (function() {
    * 			message - a string containing a message to display in the header bar
    *              		(used for warnings and errors)
    *              	highlighted_wit - the witness to highlight in display
-   *              	highlighted_unit - the unit which needs to be highlighted as an error*/
+   *              	error_unit - the unit which needs to be highlighted as an error*/
   showSetVariants = function(options) {
     var footerHtml, preselectedAddedHighlight;
     console.log(CL.data);
@@ -308,8 +308,8 @@ SV = (function() {
     if (options.hasOwnProperty('highlighted_added_wits')) {
       overlapOptions.highlighted_added_wits = options.highlighted_added_wits;
     }
-    if (options.hasOwnProperty('highlighted_unit')) {
-      overlapOptions.highlighted_unit = options.highlighted_unit;
+    if (options.hasOwnProperty('error_unit')) {
+      overlapOptions.error_unit = options.error_unit;
     }
     appIds = CL.getOrderedAppLines();
     for (let i = 0; i < appIds.length; i += 1) {
@@ -515,14 +515,14 @@ SV = (function() {
    * 		col_length - int - the expected column width based on other table rows
    * 		highlighted_wit - the witness to highlight
    * 		highlighted_added_wits - the witnesses to highlight of those that have been added CL.witnessAddingMode only
-   * 		highlighted_unit - the unit to highlight (used for showing which units have errors I think)
+   * 		error_unit - the unit to highlight (used for showing which units have errors I think)
    * 		created - boolean (is this a specially created gap element)
    * 		overlapping_ids - a list of ids for any overlapping readings realted to this top line reading
    * 		td_id - the id for the cell (used in overlap rows to allow readings to be moved between rows))
    *    overlap_units - the overlap_units object as recorded on the unit (for working out overlap witnesses)*/
   getUnitData = function(data, id, start, end, options) {
     var html, decisions, rows, cells, rowList, temp, events, colspan, rowId, text, splitClass, highlightedHand,
-      	highlightedUnit, highlightedClasses, svRules, readingSuffix, readingLabel, allOverlappedWitnesses;
+      	errorUnit, highlightedClasses, svRules, readingSuffix, readingLabel, allOverlappedWitnesses;
     html = [];
     rowList = [];
     if (typeof options === 'undefined') {
@@ -552,10 +552,10 @@ SV = (function() {
     }
 
     // is the unit highlighted? used for showing errors
-    if (options.hasOwnProperty('highlighted_unit') && parseInt(id) === options.highlighted_unit[1]) {
-      highlightedUnit = ' highlighted_unit';
+    if (options.hasOwnProperty('error_unit') && parseInt(id) === options.error_unit[1]) {
+      errorUnit = ' error_unit';
     } else {
-      highlightedUnit = '';
+      errorUnit = '';
     }
 
     allOverlappedWitnesses = [];
@@ -626,11 +626,11 @@ SV = (function() {
       } else {
         if (i === 0) {
           if (options.hasOwnProperty('overlap') && options.overlap === true) {
-            html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag overlap_unit' + highlightedUnit + '">');
+            html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag overlap_unit' + errorUnit + '">');
           } else if (options.hasOwnProperty('gap_unit') && options.gap_unit === true) {
-            html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag gap_unit' + highlightedUnit + '">');
+            html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag gap_unit' + errorUnit + '">');
           } else {
-            html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag unit' + highlightedUnit + '">');
+            html.push('<div id="' + 'drag_unit_' + id + '" class="redips-drag unit' + errorUnit + '">');
           }
           if (data.length > 1) {
             html.push('<ul class="variant_unit" id="variant_unit_' + id + '"><span id="toggle_variant_' + id + '" class="triangle">&#9660;</span><br/>');
@@ -2431,7 +2431,7 @@ SV = (function() {
             'type': 'warning',
             'message': warningMess
           },
-          'highlighted_unit': warningUnit
+          'error_unit': warningUnit
         });
       } else {
         showSetVariantsData({});

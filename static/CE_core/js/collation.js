@@ -692,7 +692,7 @@ CL = (function() {
    * 			sort - boolean - do the readings need sorting (default = false)
    * 			highlighted_wit - the witness to highlight
    *      highlighted_added_wits - the added wit/s that should be highlighted
-   * 			highlighted_unit - a unit to mark as having an error
+   * 			error_unit - a unit to mark as having an error
    * 			column_lengths - dictionary detailing widths of columns in top apparatus
    * 			overlap_details - a dictionary keyed by id of overlapping reading giving column width for that unit
    *      getUnitDataFunction - a function to be used for getUnitData when the hard coded ones are not good enough
@@ -717,10 +717,10 @@ CL = (function() {
     }
     rows.push('<tr><td></td>'); //the extra ones for navigation arrows
     //only care about highlighted unit if we are in the right apparatus
-    if (options.hasOwnProperty('highlighted_unit') &&
-              options.highlighted_unit !== undefined &&
-                options.highlighted_unit[0] !== 'apparatus' + app) {
-      delete options.highlighted_unit;
+    if (options.hasOwnProperty('error_unit') &&
+              options.error_unit !== undefined &&
+                options.error_unit[0] !== 'apparatus' + app) {
+      delete options.error_unit;
     }
     while (i <= overtextLength) {
       tdId = app + '_' + i;
@@ -797,8 +797,8 @@ CL = (function() {
           if (options.hasOwnProperty('highlighted_version')) {
             unitDataOptions.highlighted_version = options.highlighted_version;
           }
-          if (options.hasOwnProperty('highlighted_unit')) {
-            unitDataOptions.highlighted_unit = options.highlighted_unit;
+          if (options.hasOwnProperty('error_unit')) {
+            unitDataOptions.error_unit = options.error_unit;
           }
           if (unit.hasOwnProperty('split_readings') && unit.split_readings === true) {
             unitDataOptions.split = true;
@@ -1017,7 +1017,7 @@ CL = (function() {
    * 			sort - boolean - do the readings need sorting (default = false)
    * 			highlighted_wit - the witness to highlight
    * 			highlighted_version - a versional witness to highlight (version editor only)
-   * 			highlighted_unit - a unit to mark as having an error
+   * 			error_unit - a unit to mark as having an error
    *      getUnitDataFunction - a function to be used for getUnitData when the hard coded ones are not good enough
    *      getUnitDataOptions - this allows options to be passed into the getUnitData function 
    * */
@@ -1038,10 +1038,10 @@ CL = (function() {
     }
     rows.push('<tr><td></td>');
     // only care about highlighted unit if we are in the right apparatus
-    if (options.hasOwnProperty('highlighted_unit') &&
-              options.highlighted_unit !== undefined &&
-                options.highlighted_unit[0] !== 'apparatus' + app) {
-      delete options.highlighted_unit;
+    if (options.hasOwnProperty('error_unit') &&
+              options.error_unit !== undefined &&
+                options.error_unit[0] !== 'apparatus' + app) {
+      delete options.error_unit;
     }
     j = 0;
     i = 1;
@@ -1081,14 +1081,6 @@ CL = (function() {
           } else {
             unitDataOptions = {'unit_id': unit._id};
           }
-          // if (CL.project.allowJoiningAcrossCollationUnits) {
-          //   if (j === 0) {
-          //     unitDataOptions.joinable_backwards = true;
-          //   }
-          //   if (j === apparatus.length - 1) {
-          //     unitDataOptions.joinable_forwards = true;
-          //   }
-          // }
           if (app > 1) {
             unitDataOptions.app_id = 'apparatus' + app;
           } else {
@@ -1103,8 +1095,8 @@ CL = (function() {
           if (options.hasOwnProperty('highlighted_version')) {
             unitDataOptions.highlighted_version = options.highlighted_version;
           }
-          if (options.hasOwnProperty('highlighted_unit')) {
-            unitDataOptions.highlighted_unit = options.highlighted_unit;
+          if (options.hasOwnProperty('error_unit')) {
+            unitDataOptions.error_unit = options.error_unit;
           }
           if (unit.hasOwnProperty('split_readings') && unit.split_readings === true) {
             unitDataOptions.split = true;

@@ -132,8 +132,8 @@ OR = (function() {
     if (options.hasOwnProperty('highlighted_wit')) {
       overlapOptions.highlighted_wit = options.highlighted_wit;
     }
-    if (options.hasOwnProperty('highlighted_unit')) {
-      overlapOptions.highlighted_unit = options.highlighted_unit;
+    if (options.hasOwnProperty('error_unit')) {
+      overlapOptions.error_unit = options.error_unit;
     }
     overlapOptions.firstUnitOverlaps = {};
     overlapOptions.lastUnitOverlaps = {};
@@ -279,8 +279,8 @@ OR = (function() {
     if (options.hasOwnProperty('highlighted_wit')) {
       overlapOptions.highlighted_wit = options.highlighted_wit;
     }
-    if (options.hasOwnProperty('highlighted_unit')) {
-      overlapOptions.highlighted_unit = options.highlighted_unit;
+    if (options.hasOwnProperty('error_unit')) {
+      overlapOptions.error_unit = options.error_unit;
     }
     appIds = CL.getOrderedAppLines();
     for (let i = 0; i < appIds.length; i += 1) {
