@@ -693,6 +693,7 @@ CL = (function() {
    * 			highlighted_wit - the witness to highlight
    *      highlighted_added_wits - the added wit/s that should be highlighted
    * 			error_unit - a unit to mark as having an error
+   *      highlighted_units - a list of units (by start or start and end number) which should be highlighed
    * 			column_lengths - dictionary detailing widths of columns in top apparatus
    * 			overlap_details - a dictionary keyed by id of overlapping reading giving column width for that unit
    *      getUnitDataFunction - a function to be used for getUnitData when the hard coded ones are not good enough
@@ -799,6 +800,9 @@ CL = (function() {
           }
           if (options.hasOwnProperty('error_unit')) {
             unitDataOptions.error_unit = options.error_unit;
+          }
+          if (options.hasOwnProperty('highlighted_units')) {
+            unitDataOptions.highlighted_units = options.highlighted_units;
           }
           if (unit.hasOwnProperty('split_readings') && unit.split_readings === true) {
             unitDataOptions.split = true;
@@ -1018,6 +1022,7 @@ CL = (function() {
    * 			highlighted_wit - the witness to highlight
    * 			highlighted_version - a versional witness to highlight (version editor only)
    * 			error_unit - a unit to mark as having an error
+   *      highlighted_units - a list of units (by start or start and end number) which should be highlighed
    *      getUnitDataFunction - a function to be used for getUnitData when the hard coded ones are not good enough
    *      getUnitDataOptions - this allows options to be passed into the getUnitData function 
    * */
@@ -1097,6 +1102,9 @@ CL = (function() {
           }
           if (options.hasOwnProperty('error_unit')) {
             unitDataOptions.error_unit = options.error_unit;
+          }
+          if (options.hasOwnProperty('highlighted_units')) {
+            unitDataOptions.highlighted_units = options.highlighted_units;
           }
           if (unit.hasOwnProperty('split_readings') && unit.split_readings === true) {
             unitDataOptions.split = true;
