@@ -140,7 +140,7 @@ var SimpleContextMenu = {
 
   // private method. Shows context menu
   _show: function(e) {
-    var menuElementId, m, s, element, div, row_elem, row, type, subrow;
+    var menuElementId, m, s, element;
     SimpleContextMenu._hide();
     menuElementId = SimpleContextMenu._getMenuElementId(e);
     if (menuElementId !== null) {
@@ -150,12 +150,14 @@ var SimpleContextMenu = {
         s = SimpleContextMenu._getScrollPosition(e);
         SimpleContextMenu._menuElement = document.getElementById(menuElementId);
         SimpleContextMenu._menuElement.style.left = (m.x - 10) + s.x + 'px';
-        //110 here is the hard coded width set in simplecontextmenu in css
-        if (parseInt(SimpleContextMenu._menuElement.style.left) - document.getElementById('scroller').scrollLeft +
-                                                                  110 > window.innerWidth) {
-          SimpleContextMenu._menuElement.style.left = window.innerWidth +
-                                                      document.getElementById('scroller').scrollLeft -
-                                                      (110 + 35) + 'px';
+        if (document.getElementById('scroller')) {
+          // 110 here is the hard coded width set in simplecontextmenu in css
+          if (parseInt(SimpleContextMenu._menuElement.style.left) - document.getElementById('scroller').scrollLeft +
+                                                                    110 > window.innerWidth) {
+            SimpleContextMenu._menuElement.style.left = window.innerWidth +
+                                                        document.getElementById('scroller').scrollLeft -
+                                                        (110 + 35) + 'px';
+          }
         }
         SimpleContextMenu._menuElement.style.top = (m.y - 70) + s.y + 'px';
         element = document.elementFromPoint(m.x, m.y);
