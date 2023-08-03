@@ -1594,7 +1594,7 @@ OR = (function() {
 
   /** add an om category to an om reading */
   _categoriseOm = function(readingDetails, menuPos) {
-    var reading, scrollOffset, witnessList, data, newReadingId;
+    var reading, scrollOffset, witnessList, data, newReadingId, selectData;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
       							document.getElementById('scroller').scrollTop];
 
@@ -1602,11 +1602,22 @@ OR = (function() {
     CL.showSplitWitnessMenu(reading, menuPos, {
       'type': 'categoriseOm',
       'header': 'Select witnesses to categorise',
-      'button': 'Add category',
+      'button': 'Save',
       'form_size': 'small'
     });
     // populate om categories
-    cforms.populateSelect(CL.project.omCategories, document.getElementById('om_category'));
+    selectData = [];
+    for (let i = 0; i < CL.project.omCategories.length; i += 1) {
+      selectData.push({'value': CL.project.omCategories[i], 'label': CL.project.omCategories[i]});
+    }
+    if (reading.type === 'om_verse') {
+      selectData.push({'value': 'om_verse', 'label': '&lt;om verse&gt;'});
+    } else {
+      selectData.push({'value': 'om', 'label': 'om.'});
+    }
+    cforms.populateSelect(selectData,
+                          document.getElementById('om_category'),
+                          {'value_key': 'value', 'text_keys': 'label'});
     $('#select_button').on('click', function() {
       witnessList = [];
       data = cforms.serialiseForm('select_wit_form');
@@ -1634,7 +1645,13 @@ OR = (function() {
         reading = unit.readings[i];
       }
     }
-    reading.details = document.getElementById('om_category').value;
+    if (document.getElementById('om_category').value == 'om') {
+      delete reading.details;
+    } else if (document.getElementById('om_category').value == 'om_verse') {
+      reading.details = 'om verse';
+    } else {
+      reading.details = document.getElementById('om_category').value;
+    }
     OR.relabelReadings(CL.data[apparatus][unitNumber].readings, true);
     showOrderReadings({'container': CL.container});
     document.getElementById('scroller').scrollLeft = scrollOffset[0];
