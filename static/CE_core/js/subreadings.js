@@ -33,7 +33,7 @@ SR = (function() {
    * 					if not supplied then subreadings of all rule classes will be extracted
    * */
   findSubreadings = function(findOptions) {
-    var parent, child, apparatus, readings, subreadings, forDeletion, options,
+    var parent, child, childPos, apparatus, readings, subreadings, forDeletion, options,
         markedReading, ruleClasses, appId, unit, unitPos, readingPos;
     _subreadingsAre = 'found';
     if (_test) {
@@ -64,8 +64,14 @@ SR = (function() {
                   if (markedReading.apparatus === key) { //if in right apparatus row
                     if (markedReading.start === apparatus[i].start &&
                               markedReading.end === apparatus[i].end) { //if unit extent is correct
+                      // find the child reading
+                      [child, childPos] = _findChildReading(apparatus[i], markedReading, _test);
+                      if (_test) {
+                        console.log('child is...');
+                        console.log(child);
+                      }
                       // get the parent
-                      parent = _findParentReading(apparatus[i], key, markedReading, true);
+                      parent = _findParentReading(apparatus[i], key, markedReading, true, childPos);
                       if (_test) {
                         console.log('parent is...');
                         console.log(parent);
@@ -75,12 +81,6 @@ SR = (function() {
                           subreadings = parent.subreadings;
                         } else {
                           subreadings = {};
-                        }
-                        // then find the child reading
-                        child = _findChildReading(apparatus[i], markedReading, _test);
-                        if (_test) {
-                          console.log('child is...');
-                          console.log(child);
                         }
                         if (child !== null) {
                           markedReading.applied = true;
@@ -104,6 +104,9 @@ SR = (function() {
                           }
                           if (typeof markedReading.combined_gap_before_details !== 'undefined') {
                             options.combined_gap_before_details = markedReading.combined_gap_before_details;
+                          }
+                          if (child.hasOwnProperty('parents')) {
+                            parent.parents = child.parents;
                           }
                           if (_test) {
                             console.log(options);
@@ -355,7 +358,7 @@ SR = (function() {
             'witness': standoffReading.witness,
             'reading_type': 'subreading'
           })) {
-          return unit.readings[i];
+          return [unit.readings[i], i];
         }
       } else if (unit.readings[i].hasOwnProperty('subreadings')) {
         for (let key in unit.readings[i].subreadings) {
@@ -366,7 +369,7 @@ SR = (function() {
                     'witness': standoffReading.witness,
                     'reading_type': 'subreading'
                   })) {
-                  return unit.readings[i];
+                  return [unit.readings[i], i];
                 }
               }
             }
@@ -374,7 +377,7 @@ SR = (function() {
         }
       }
     }
-    return null;
+    return [null, -1];
   };
 
   _isSeparatedReading = function(appId, unitId, witness) {
@@ -393,7 +396,7 @@ SR = (function() {
 
   /** we want this to find genuine readings so never give extractWitnessText the unit id otherwise it will
   * find non-existent readings */
-  _findParentReading = function(unit, appId, standoffReading, createParent) {
+  _findParentReading = function(unit, appId, standoffReading, createParent, createPosition) {
     var readings, separatedWitnesses, temp;
     readings = [];
     if (_test) {
@@ -435,11 +438,11 @@ SR = (function() {
         console.log('creating new parent');
       }
       if (standoffReading.hasOwnProperty('om_details')) {
-        CL.createNewReading(unit, 'gap', standoffReading.om_details);
+        CL.createNewReading(unit, 'gap', standoffReading.om_details, createPosition);
       } else if (standoffReading.parent_text === 'om.') {
-        CL.createNewReading(unit, 'om');
+        CL.createNewReading(unit, 'om', undefined, createPosition);
       } else {
-        CL.createNewReading(unit, 'other', standoffReading.parent_text);
+        CL.createNewReading(unit, 'other', standoffReading.parent_text, createPosition);
       }
       for (let i = 0; i < unit.readings.length; i += 1) {
         if (CL.extractWitnessText(unit.readings[i]) === standoffReading.parent_text) {

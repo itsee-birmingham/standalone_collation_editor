@@ -545,6 +545,7 @@ CL = (function() {
   };
 
   getRuleClasses = function(testKey, testValue, key, data) {
+    //
     var classes, list, ruleClasses;
     classes = {};
     ruleClasses = CL.ruleClasses;
@@ -1903,18 +1904,15 @@ CL = (function() {
           if (readingDetails.app_id === 'apparatus' ||
                     (readingDetails.app_id !== 'apparatus' &&
                       extraDetails.trim() !== extractWitnessText(unit.readings[0]))) {
-            data.parent_reading = createNewReading(unit,
-                                                   data.parent_reading, extraDetails);
+            data.parent_reading = createNewReading(unit, data.parent_reading, extraDetails);
           } else {
             alert('The reading you have entered is the same as the a reading. This is not allowed in overlapped units.');
             return;
           }
         } else if (data.parent_reading === 'gap') {
-          data.parent_reading = createNewReading(unit,
-                                                 data.parent_reading, extraDetails);
+          data.parent_reading = createNewReading(unit, data.parent_reading, extraDetails);
         } else if (data.parent_reading === 'om') {
-          data.parent_reading = createNewReading(unit,
-                                                 data.parent_reading);
+          data.parent_reading = createNewReading(unit, data.parent_reading);
         }
 
         newReadingId = SV.doSplitReadingWitnesses(readingDetails.unit_pos, readingDetails.reading_pos,
@@ -2063,7 +2061,6 @@ CL = (function() {
     }
     options.display_settings = displaySettings;
     options.display_settings_config = CL.displaySettingsDetails;
-
     if (skipSettings === false) {
         resultCallback = function(data) {
           var baseReadingsWithSettingsApplied;
@@ -2298,6 +2295,11 @@ CL = (function() {
     newReadings = [];
     for (let j = 0; j < witnesses.length; j += 1) {
       newReading = {'witnesses': [witnesses[j]], 'text': JSON.parse(JSON.stringify(text))};
+      
+      if (parent.hasOwnProperty('parents')) {
+        newReading.parents = parent.parents;
+        newReading.label = parent.label;
+      }
       if (subreading.hasOwnProperty('type')) {
         newReading.type = subreading.type;
       }
@@ -2796,7 +2798,7 @@ CL = (function() {
     return details;
   };
 
-  createNewReading = function(unit, readingType, extraDetails) {
+  createNewReading = function(unit, readingType, extraDetails, createPosition) {
     var newReading, text, origReadingDetails, readingDetails, index, id, timeStamp, joiningMode, joined;
     // check it's not already a reading and if it is just return the id of that reading
     for (let i = 0; i < unit.readings.length; i += 1) {
@@ -2869,7 +2871,11 @@ CL = (function() {
                     'text': text,
                     'witnesses': []};
     }
-    unit.readings.push(newReading);
+    if (createPosition !== undefined && createPosition !== -1) {
+      unit.readings.splice(createPosition, 0, newReading);
+    } else {
+      unit.readings.push(newReading);
+    }
     return newReading._id;
   };
 

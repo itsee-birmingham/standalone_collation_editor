@@ -486,7 +486,7 @@ OR = (function() {
   };
 
   relabelReadings = function(readings, overwrite) {
-    var label, labels;
+    var label, labels, allPotentialParents, potentialParents;
     // first do a pass through the regular readings
     for (let i = 0; i < readings.length; i += 1) {
       if (readings[i].hasOwnProperty('type') && (readings[i].type === 'lac' || readings[i].type === 'lac_verse')) {
@@ -508,9 +508,21 @@ OR = (function() {
       }
     }
     if (CL.project.storeMultipleSupportLabelsAsParents === true) {
+      allPotentialParents = [];
+      for (let i = 0; i < readings.length; i += 1) {
+        if (readings[i].label !== 'zz' && readings[i].label !== 'zu' && 
+                readings[i].label !== 'zv' && readings[i].label.indexOf('/') === -1) {
+          allPotentialParents.push(i);
+        }
+      }
       // now check the ones with parents
       for (let i = 0; i < readings.length; i += 1) {
         labels = [];
+        potentialParents = allPotentialParents.slice();
+        let pos = potentialParents.indexOf(i);
+        if (pos !== -1) {
+          potentialParents.splice(pos, 1);
+        }
         if (readings[i].hasOwnProperty('parents') && readings[i].parents.length > 1) {
           for (let j = 0; j < readings.length; j += 1) {
             if (readings[i].parents.indexOf(readings[j].text_string) !== -1) {
@@ -518,8 +530,8 @@ OR = (function() {
             }
           }
           if (labels.length > 1) {
-            if (CL.project.useZvForAllReadingsSupport == true && readings[i].label == 'zv') {
-              // then just leave the reading as zv
+            if (CL.project.useZvForAllReadingsSupport == true && labels.length === potentialParents.length) {
+              readings[i].label ='zv';
             } else {
               readings[i].label = labels.join('/');
             }      
@@ -1014,7 +1026,7 @@ OR = (function() {
       unitReadings = [];
       for (let i = 0; i < CL.data[rdgDetails[1]][rdgDetails[0]].readings.length; i += 1) {
         label = CL.data[rdgDetails[1]][rdgDetails[0]].readings[i].label;
-        if (i !== rdgDetails[2] && label !== 'zz' && label !== 'zu' && label.indexOf('/') === -1) {
+        if (i !== rdgDetails[2] && label !== 'zz' && label !== 'zu' && label !== 'zv' && label.indexOf('/') === -1) {
           unitReadings.push({'label': label,
                              'reading': CL.data[rdgDetails[1]][rdgDetails[0]].readings[i].text_string});
         }
