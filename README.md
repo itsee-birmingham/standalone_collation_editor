@@ -352,6 +352,12 @@ This variable should be a string and should be the text the collation editor nee
 
 This variable should be an array of strings. If provided the editor will be give the option to categorise om readings using the labels in the array in the Order Readings screen.
 
+- #### ```allowCommentsOnRegRules```
+
+**This variable can be overwritten in individual project settings**
+
+This variable is a boolean which determines whether or not to show the comments text box in the regularisation rule menu. Nothing happens to these comments appart from them being saved along with the rule so the default is false. This setting should only be set to true if the platform using the collation editor has a mecahnism for using these comments in some way.
+
 
 - #### ```showCollapseAllUnitsButton```
 
@@ -1439,6 +1445,8 @@ Catena Dev branch changes
 * Optional services and project setting *omCategories* added which allows the user to specificy a set of labels as strings to use as subcategories for om readings.
 
 * Optional services and project setting *allowJoiningAcrossCollationUnits* added which, if set to true, allows readings to be joined across collation unit boundaries. The collation editor itself only sets a flag on the reading to identify the join. It is up to all exporters to respect this in the export. There is no sanity checking on the flags, they rely on the editor being accurate.
+
+* Optional services and project setting *allowCommentsOnRegRules* added. This is a boolean which determines whether or not to show the comments box in the regularisation rule menu. This also involves a change in the default behaviour which will not show the comments box by default. To maintain existing beaviour this boolean should be set to true.
 
 * In exporter.py there is a breaking change in the ```get_text()```, ```make_reading()``` and ```get_label()``` function arguments. The argument 'type' which used to be the string 'subreading' or None is now a boolean called 'is_subreading'. All calls to this function in exporters which inherit from this will need to be changed accordingly.
 

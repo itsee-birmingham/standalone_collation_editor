@@ -1200,7 +1200,9 @@ RG = (function() {
                             CL.project.prepareDisplayString(normalisedText).replace(/</g, '&lt;').replace(/>/g, '&gt;'));
         regMenu.innerHTML = html;
         document.getElementsByTagName('body')[0].appendChild(regMenu);
-
+        if (CL.project.allowCommentsOnRegRules === true) {
+          document.getElementById('reg_rules_comments_div').style.display = 'block';
+        }
         regRules = CL.getRuleClasses('create_in_RG', true, 'value', ['identifier', 'name', 'RG_default']);
         newRegRules = [];
         selected = 'none';

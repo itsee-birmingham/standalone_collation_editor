@@ -3100,13 +3100,22 @@ CL = (function() {
       };
     }
 
+    if (project.hasOwnProperty('allowCommentsOnRegRules')) {
+      CL.project.allowCommentsOnRegRules = project.allowCommentsOnRegRules;
+    } else if (CL.services.hasOwnProperty('allowCommentsOnRegRules')) {
+      CL.project.allowCommentsOnRegRules = CL.services.allowCommentsOnRegRules;
+    } else {
+      // default is false
+      CL.project.allowCommentsOnRegRules = false;
+    }
+
     // settings for collapse all button (rarely used so allowing as option to keep footer clean)
     if (project.hasOwnProperty('showCollapseAllUnitsButton')) {
       CL.project.showCollapseAllUnitsButton = project.showCollapseAllUnitsButton;
     } else if (CL.services.hasOwnProperty('showCollapseAllUnitsButton')) {
       CL.project.showCollapseAllUnitsButton = CL.services.showCollapseAllUnitsButton;
     } else {
-      //default is false
+      // default is false
       CL.project.showCollapseAllUnitsButton = false;
     }
 
