@@ -1643,7 +1643,7 @@ OR = (function() {
           }
         }
       }
-      newReadingId = SV.doSplitReadingWitnesses(readingDetails[0], readingDetails[2], witnessList, readingDetails[1], true);
+      newReadingId = SV.doSplitReadingWitnesses(readingDetails[0], readingDetails[2], witnessList, readingDetails[1]);
       _doCategoriseOm(readingDetails[0], newReadingId, readingDetails[1], scrollOffset);
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
     });

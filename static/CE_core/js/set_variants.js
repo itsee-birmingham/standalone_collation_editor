@@ -692,7 +692,8 @@ SV = (function() {
     }
   };
 
-  /** this assumes combined gap details for subreadings are correct and simply checks to see if the one in the text tokens of the main reading are required or not */
+  /** this assumes combined gap details for subreadings are correct and simply checks to see if the one in the text 
+   * tokens of the main reading are required or not */
   checkCombinedGapFlags = function(reading) {
     if (reading.text.length > 0) {
       if (reading.text[0].hasOwnProperty('combined_gap_before')) {
@@ -713,7 +714,7 @@ SV = (function() {
   };
 
   /** split supplied witnesses away from others in the reading */
-  doSplitReadingWitnesses = function(unitNum, readingPos, witnessList, apparatus, log, idForNewReading) {
+  doSplitReadingWitnesses = function(unitNum, readingPos, witnessList, apparatus, justSplit, idForNewReading) {
     var originalUnit, aReading, reading, newReading, newWitnessList, originalRemoved;
     if (apparatus === undefined) {
       apparatus = 'apparatus';
@@ -721,6 +722,12 @@ SV = (function() {
     originalUnit = CL.data[apparatus][unitNum];
     aReading = originalUnit.readings[0];
     reading = originalUnit.readings[readingPos];
+    if (justSplit) {
+      if (witnessList.length === reading.witnesses.length) {
+        // then there is no need to make any changes so just return the existing reading id
+        return reading._id;
+      }   
+    }
     // copy the original reading to make a the new one
     newReading = JSON.parse(JSON.stringify(reading));
     // remove readings on witnessList from the original reading
@@ -760,10 +767,6 @@ SV = (function() {
       CL.addReadingId(newReading, originalUnit.start, originalUnit.end);
       originalUnit.readings.splice(readingPos + 1, 0, newReading);  // add the new reading into the unit
       return newReading._id;
-    }
-    if (log) {
-      checkBugStatus('split witnesses', 'in ' + apparatus + ' unit ' + unitNum + ' reading ' + readingPos +
-										 ' witnesses ' + witnessList.join(',') + '.');
     }
   };
 
@@ -875,7 +878,8 @@ SV = (function() {
         'type': 'duplicate',
         'header': 'Select witnesses',
         'button': 'Split witnesses',
-        'form_size': 'small'
+        'form_size': 'small',
+        'just_split': true
       });
       $('#select_button').on('click', function(event) {
         witnessList = [];
@@ -1771,7 +1775,7 @@ SV = (function() {
           if (toSplit.length > 0) {
             toAdd = _separateIndividualOverlapWitnesses(toSplit, unit.overlap_units);
             for (let j = 0; j < toAdd.length; j += 1) {
-              newReadingId = doSplitReadingWitnesses(unitNum, i, toAdd[j][0], 'apparatus', false);
+              newReadingId = doSplitReadingWitnesses(unitNum, i, toAdd[j][0], 'apparatus');
               newReading = CL.findReadingById(unit, newReadingId);
               if (toAdd[j][1].hasOwnProperty('type')) {
                 newReading.type = toAdd[j][1].type;
@@ -2408,7 +2412,7 @@ SV = (function() {
         for (let i = 0; i < CL.data[appId][index].readings.length; i += 1) {
           if (CL.data[appId][index].readings[i].witnesses.indexOf(CL.dataSettings.base_text_siglum) !== -1) {
             //split it out
-            doSplitReadingWitnesses(index, i, [CL.dataSettings.base_text_siglum], appId, false);
+            doSplitReadingWitnesses(index, i, [CL.dataSettings.base_text_siglum], appId);
             CL.sortReadings(CL.data[appId][index].readings);
             break;
           }
@@ -2642,7 +2646,7 @@ SV = (function() {
 		// go backwards so you don't screw up positions by adding readings
     for (let i = readingsToAdd.length - 1; i >= 0; i -= 1) {
       newReadingId = doSplitReadingWitnesses(readingsToAdd[i][0], readingsToAdd[i][1],
-																						 readingsToAdd[i][2], readingsToAdd[i][3], false);
+																						 readingsToAdd[i][2], readingsToAdd[i][3]);
       reading = CL.findReadingById(CL.data[appId][textUnitPos], newReadingId);
       if (reading.text.length > 0) {
         if (gapPosition === 'before') {
@@ -3660,7 +3664,7 @@ SV = (function() {
       if (appId !== 'apparatus') {
         for (let j = 0; j < unit.readings.length; j += 1) {
           if (unit.readings[j].witnesses.indexOf(CL.dataSettings.base_text_siglum) !== -1) {
-            doSplitReadingWitnesses(index, 0, [CL.dataSettings.base_text_siglum], appId, false);
+            doSplitReadingWitnesses(index, 0, [CL.dataSettings.base_text_siglum], appId);
             break;
           }
         }
@@ -3826,7 +3830,7 @@ SV = (function() {
                 }
               }
             }
-            newReadingId = doSplitReadingWitnesses(unitNum, readingNum, witnessList, 'apparatus', true);
+            newReadingId = doSplitReadingWitnesses(unitNum, readingNum, witnessList, 'apparatus');
             _makeOverlappingReading(unitNum, newReadingId, duplicate);
             document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
           });

@@ -1744,7 +1744,10 @@ CL = (function() {
     witnessHtml.push(CL.extractWitnessText(reading));
     witnessHtml.push('</span>');
     if (witnesses.length > 1 && (!details.hasOwnProperty('witness_select') || details.witness_select !== false)) {
-      witnessHtml.push('<div id="wit_scroller"><input type="checkbox" id="wit_select_all">Select All</input><br/>');
+      witnessHtml.push('<div id="wit_scroller">');
+      if (!details.hasOwnProperty('just_split') || details.just_split !== true ) {
+        witnessHtml.push('<input type="checkbox" id="wit_select_all">Select All</input><br/>');
+      }
       for (let i = 0; i < witnesses.length; i += 1) {
         if (witnesses[i] !== CL.dataSettings.base_text_siglum) {
           witnessHtml.push('<input type="checkbox" id="' + witnesses[i] + '" name="' + witnesses[i] + '" value="' +
@@ -1916,7 +1919,7 @@ CL = (function() {
         }
 
         newReadingId = SV.doSplitReadingWitnesses(readingDetails.unit_pos, readingDetails.reading_pos,
-                                                  witnessList, readingDetails.app_id, true);
+                                                  witnessList, readingDetails.app_id);
         readingDetails.reading_id = newReadingId;
         //record it in the separated_witnesses structure if we didn't select all witnesses in the reading
         if (witnessList.length < totalReadingWitnesses) {

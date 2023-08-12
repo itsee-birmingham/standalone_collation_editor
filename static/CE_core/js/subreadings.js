@@ -166,7 +166,7 @@ SR = (function() {
           }
         }
         SV.doSplitReadingWitnesses(unitPos, readingPos, CL.data.separated_witnesses[i].witnesses, 
-                                   CL.data.separated_witnesses[i].app_id, undefined, 
+                                   CL.data.separated_witnesses[i].app_id, false,
                                    CL.data.separated_witnesses[i].reading_id);
       }
     }
