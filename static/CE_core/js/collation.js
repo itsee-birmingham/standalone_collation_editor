@@ -2713,12 +2713,12 @@ CL = (function() {
     url = staticUrl;
     // the form not always used but the default will always have a form value and if implementations are skipping
     // it then that is fine because they will deal with the form themselves.
-    if (_contextInput && contextInput.hasOwnProperty('form') && contextInput.form !== null) {
+    if (_contextInput && _contextInput.hasOwnProperty('form') && _contextInput.form !== null) {
       url += _contextInput.form;
     }
     if (url === staticUrl) {
       alert('The location of the form has not been specified so the page cannot be loaded.');
-      console.log('The form url should be specified contextInput.form in either the services file or project configuration.');
+      console.log('The form url should be specified _contextInput.form in either the services file or project configuration.');
       return;
     }
     $.get(url, function(html) {
