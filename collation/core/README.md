@@ -33,7 +33,7 @@ Terminology
 ---
 
 For the purposes of this documentation the Documents/Works/Texts model will be used.
-(See David C. Parker, *Textual Scholarship and the making of the New Testament* Oxford: OUP (2011), pp. 10-14,29)
+(See David C. Parker, *Textual Scholarship and the making of the New Testament* Oxford: OUP (2011), pp. 10-14,29, Peter M. W. Robinson, 'The Concept of the Work in the Digital Age', *Ecdotica* 1/2013, pp. 13-42 and Peter M. W. Robinson, An approach to complex texts in multiple documents, *Digital Scholarship in the Humanities*, Volume 37, Issue 4, December 2022, Pages 1179–1196)
 
 - **Document** - The physical artefact on which the text of a work is preserved
 - **Work** - The work which is distilled from the texts that exist of it
