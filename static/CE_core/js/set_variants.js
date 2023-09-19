@@ -1148,8 +1148,10 @@ SV = (function() {
         if (CL.project.combineAllOmsInOR === true) {
           OR.mergeAllOms();
         }
-
         OR.addLabels(true); // this adds the reading labels to the datastructure itself - still required so they can be edited
+        // make sure lac readings are always last
+        OR.putLacLast();
+
         // log that we have moved to OR in the event_list
         if (CL.data.hasOwnProperty('event_list')) {
           CL.data.event_list.push('moved to order readings');

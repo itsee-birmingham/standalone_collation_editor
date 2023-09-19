@@ -23,7 +23,7 @@ OR = (function() {
       _getApparatusForContext, _compareOverlaps, _throughNumberApps, _repositionOverlaps,
       _getPotentialConflicts, _unitCanMoveTo, _findLeadUnit, _deleteUnit, _undo,
       _findOverlapApparatusAndUnitById, _horizontalCombineOverlaps, _updateLabel,
-      _mergeAllSuppliedEmptyReadings, _categoriseOm, _doCategoriseOm;
+      _mergeAllSuppliedEmptyReadings, _categoriseOm, _doCategoriseOm, putLacLast, _compareLabels;
 
   //*********  public functions *********
 
@@ -540,6 +540,30 @@ OR = (function() {
           }
         }
       }
+    }
+  };
+
+  putLacLast = function() {
+    for (let key in CL.data) {
+      if (CL.data.hasOwnProperty(key)) {
+        if (key.match(/apparatus\d?/) !== null) {
+          for (let i = 0; i < CL.data[key].length; i += 1) {
+            CL.data[key][i].readings.sort(_compareLabels);
+          }
+        }
+      }
+    }
+  };
+
+  _compareLabels = function(a, b) {
+    if (a.label !== 'zz' && b.label !== 'zz') {
+      return 0;
+    }
+    if (a.label === 'zz') {
+      return 1;
+    }
+    if (b.label === 'zz') {
+      return -1;
     }
   };
 
@@ -2130,7 +2154,7 @@ OR = (function() {
                       matchedReadings[unit._id].length > 0) ||
                         matchedReadings[unit._id].length > 1) {
               for (let j = 0; j < matchedReadings[unit._id].length; j += 1) {
-                newParent = JSON.parse(JSON.stringify(parentBlueprint)); //copy our blueprint
+                newParent = JSON.parse(JSON.stringify(parentBlueprint));  // copy our blueprint
                 parentId = CL.addReadingId(newParent, unit.start, unit.end);
                 unit.readings.push(newParent);
                 reading = CL.findReadingById(unit, matchedReadings[unit._id][j].reading_id);
@@ -2183,6 +2207,8 @@ OR = (function() {
       redipsInitOrderReadings: redipsInitOrderReadings,
       reorderRows: reorderRows,
       editLabel: editLabel,
+      putLacLast: putLacLast,
+      _compareLabels: _compareLabels,
 
 
       // private for testing
@@ -2212,6 +2238,7 @@ OR = (function() {
       redipsInitOrderReadings: redipsInitOrderReadings,
       reorderRows: reorderRows,
       editLabel: editLabel,
+      putLacLast: putLacLast
 
     };
   }
