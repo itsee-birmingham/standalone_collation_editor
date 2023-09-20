@@ -8,8 +8,10 @@ local_services = (function() {
 
   //compulsory settings
 
-	supportedRuleScopes = {'once': 'This place, these wits',
-	    			'always': 'Everywhere, all wits'};
+	const supportedRuleScopes = {'once': 'This place, these wits',
+	    			                   'always': 'Everywhere, all wits'};
+
+  const allowWitnessChangesInSavedCollations = true;
 
   getUserInfo = function (success_callback) {
     success_callback(_local_user);
@@ -261,7 +263,11 @@ local_services = (function() {
 	      // if exists
 	      if (status === 200) {
 	        if (overwrite_allowed) {
-	          var confirmed = confirm(confirm_message);
+            if (confirm_message === undefined) {
+              confirmed = true;
+            } else {
+              confirmed = confirm(confirm_message);
+            }
 	          if (confirmed === true) {
 	            _put_resource(resource_type, collation, function(result) {
 	              return result_callback(true);
@@ -576,7 +582,8 @@ local_services = (function() {
     loadSavedCollation: loadSavedCollation,
     getSavedStageIds: getSavedStageIds,
     getApparatusForContext: getApparatusForContext,
-    applySettings: applySettings
+    applySettings: applySettings,
+    allowWitnessChangesInSavedCollations: allowWitnessChangesInSavedCollations
 
   };
 
