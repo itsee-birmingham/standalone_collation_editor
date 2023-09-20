@@ -6,6 +6,7 @@ from bottle import run, route, static_file, request, abort, response, redirect
 from collation.store import Store
 from collation.core.preprocessor import PreProcessor
 from collation.core.exporter_factory import ExporterFactory
+from collation.core.settings_applier import SettingsApplier
 
 
 bottle.BaseRequest.MEMFILE_MAX = 1024 * 1024
@@ -23,7 +24,7 @@ def home(app):
     return static_file('index.html', root='%s/%s/static' % (basedir, app))
 
 
-@route('/<app>/<core:re:CE_core>/<static_type>/<filename:re:.*(js|css|html)>', method=['GET', 'POST'])
+@route('/<app>/<core:re:CE_core>/<static_type>/<filename:re:.*(js|css|html|png|gif)>', method=['GET', 'POST'])
 def core_static_files(app, core, static_type, filename):
     return static_file(filename, root='%s/%s/core/static/CE_core/%s/' % (basedir, app, static_type))
 
@@ -68,91 +69,67 @@ def datastore(app):
         so = Store()
         result = so.list_child_directories_and_files(path)
         response.content_type = 'application/json'
-        return json.dumps(result)  # , default=json_util.default)
+        return json.dumps(result)
     else:
         abort(400, "Bad Request")
 
 
-@route('/<app>/collationserver/<context>/', method=['POST'])
-@route('<app>/collationserver/<context>', method=['POST'])
-def collation(app, context):
+@route('/<app>/collationserver/', method=['POST'])
+@route('<app>/collationserver', method=['POST'])
+def collation(app):
     params = json.loads(request.params.options)
-    requested_witnesses = params['data_settings']['witness_list']
-    data_input = params['data_input']
-    rules = params['rules']
-
-    if request.params.accept:
-        accept = request.params.accept
-    else:
-        accept = 'lcs'
-
-    if 'project' in params:
-        project = params['project']
-    else:
-        project = None
-
-    if 'base_text' in params['data_settings']:
-        basetext_transcription = params['data_settings']['base_text']
-
-    collate_settings = {}
-    collate_settings['host'] = 'localhost:7369'
-    if 'algorithm' in params['algorithm_settings']:
-        collate_settings['algorithm'] = params['algorithm_settings']['algorithm']
-    collate_settings['tokenComparator'] = {}
-    if 'fuzzy_match' in params['algorithm_settings']:
-        collate_settings['tokenComparator']['type'] = 'levenshtein'
-        if 'distance' in params['algorithm_settings']:
-            collate_settings['tokenComparator']['distance'] = params['algorithm_settings']['distance']
-        else:
-            # default to 2
-            collate_settings['tokenComparator']['distance'] = 2
-    else:
-        collate_settings['tokenComparator']['type'] = 'equality'
-
-    if 'display_settings_config' in params:
-        display_settings_config = params['display_settings_config']
-
-    if 'display_settings' in params:
-        display_settings = params['display_settings']
-
-    if 'local_python_functions' in params:
-        local_python_functions = params['local_python_functions']
-    else:
-        local_python_functions = None
-
-    if 'rule_conditions_config' in params:
-        rule_conditions_config = params['rule_conditions_config']
-    else:
-        rule_conditions_config = None
-
-    p = PreProcessor(display_settings_config, local_python_functions, rule_conditions_config)
+    p = PreProcessor(params['configs'])
     try:
-        output = p.process_witness_list(data_input, requested_witnesses, rules, basetext_transcription, project, display_settings, collate_settings, accept)
-    except:
+        output = p.process_witness_list(params['data'])
+    except Exception:
         abort(500, "Data Input Exception")
     response.content_type = 'application/json'
-    return json.dumps(output)  # , default=json_util.default)
+    return json.dumps(output)
+
+
+@route('/collation/applysettings', method=['POST'])
+@route('/collation/applysettings/', method=['POST'])
+def apply_settings():
+    data = json.loads(request.params.data)
+    applier = SettingsApplier(data['options'])
+    tokens = applier.apply_settings_to_token_list(data['tokens'])
+    response.content_type = 'application/json'
+    return json.dumps({'tokens': tokens})
 
 
 @route('/collation/apparatus', method=['POST'])
 @route('/collation/apparatus/', method=['POST'])
 def apparatus():
     data = json.loads(request.params.data)
-    format = request.params.format
-    if not format:
-        format = 'xml'
-    if format == 'xml':
-        file_ext = 'xml'
-    else:
-        file_ext = 'txt'
+    print(data)
     exporter_settings = request.params.settings
     print(exporter_settings)
-    if exporter_settings != 'null':
-        exf = ExporterFactory(exporter_settings)
-    else:
+    options = request.params.options
+    print(options)
+    if exporter_settings == 'null':
         exf = ExporterFactory()
+        # assume default from core exporter
+        format = 'positive_xml'
+        file_ext = 'xml'
+    else:
+        exporter_settings = json.loads(exporter_settings)
+        if 'options' in exporter_settings:
+            options = exporter_settings['options']
+        else:
+            options = {'format': 'positive_xml'}
+        if 'format' in options:
+            format = options['format']
+            if 'xml' in options['format']:
+                file_ext = 'xml'
+            else:
+                file_ext = 'txt'
+        else:
+            # assume default from core exporter
+            format = 'positive_xml'
+            file_ext = 'xml'
+        exf = ExporterFactory(exporter_settings, options=options)
 
-    app = exf.export_data(data, format)
+    app = exf.export_data(data)
     response.content_type = 'text/plain'
     response.headers['Content-Disposition'] = 'attachment; filename="%s-apparatus.%s"' % (format, file_ext)
     response.set_cookie('fileDownload', 'true')
@@ -162,7 +139,7 @@ def apparatus():
 @route('/<filename:path>', method=['GET', 'POST'])
 @route('/<filename:path>/', method=['GET', 'POST'])
 def static_data_files(filename):
-    return static_file(filename, root='%s/'% (basedir))
+    return static_file(filename, root='%s/' % (basedir))
 
 
 args = sys.argv

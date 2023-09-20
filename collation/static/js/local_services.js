@@ -1,7 +1,6 @@
 local_services = (function() {
 
 
-
   //function called on document ready
   $(function () {
     CL.setServiceProvider(local_services);
@@ -29,13 +28,12 @@ local_services = (function() {
 	   });
   };
 
-  //TODO: remove private stuff from here if we stick with a single model
-  getVerseData = function(context, witnesses, private_witnesses, success_callback) {
-    if (private_witnesses) {
-      return success_callback([], RG.calculate_lac_wits);
-    }
+  getUnitData = function(context, witnesses, success_callback) {
     _load_witnesses(context, witnesses, function(results) {
-      success_callback(results, RG.calculate_lac_wits);
+      success_callback({results:results}, RG.calculate_lac_wits);
+
+    // _load_witnesses(context, witnesses, function(results) {
+    //   success_callback(results, RG.calculate_lac_wits);
     });
   };
 
@@ -149,6 +147,7 @@ local_services = (function() {
       });
       return;
     }
+    console.log(resource_types)
     if (i >= resource_types.length) {
       return result_callback(rules);
     }
@@ -214,7 +213,7 @@ local_services = (function() {
     if (typeof options === "undefined") {
       options = {};
     }
-    url = staticUrl + 'collationserver/' + verse + '/';
+    url = staticUrl + 'collationserver/';
     if (options.hasOwnProperty('accept')) {
       url += options.accept;
     }
@@ -227,9 +226,24 @@ local_services = (function() {
     });
   };
 
-  getAdjoiningVerse = function (verse, is_previous, result_callback) {
+  getAdjoiningUnit = function (verse, is_previous, result_callback) {
 	    return result_callback(null);
 	};
+
+  applySettings = function (data, resultCallback) {
+    var url;
+    url = staticUrl + 'applysettings/';
+    $.ajax({
+      type: 'POST',
+      url: url,
+      data: {'data' :JSON.stringify(data)},
+      success: function(data){
+        resultCallback(data);
+      }}).fail(function(o) {
+        resultCallback(null);
+    });
+  };
+
 
   // save a collation to local datastore
 	saveCollation = function(verse, collation, confirm_message, overwrite_allowed, no_overwrite_message, result_callback) {
@@ -485,26 +499,59 @@ local_services = (function() {
     });
   };
 
-  getApparatusForContext = function() {
-      var url;
-      SPN.show_loading_overlay();
-      url = staticUrl + 'apparatus';
-      console.log(url)
-      $.fileDownload(url, {
-        httpMethod: "POST",
-        data: {
-          settings: CL.getExporterSettings(),
-          data: JSON.stringify([{
-            "context": CL.context,
-            "structure": CL.data
-          }])
-        },
-        successCallback: function() {
-          SPN.remove_loading_overlay();
-        }
-        //can also add a failCallback here if you want
-      });
 
+  getApparatusForContext = function() {
+      spinner.showLoadingOverlay();
+      CL.services.getUserInfo(function(user) {
+        let resource_type, format, url, approved, settings;
+        resource_type = 'project/' + CL.project.id + '/user/' + user.id + '/collation/approved/' + CL.context + '.json';
+        _get_resource(resource_type, function(result, status) {
+          if (status === 200) {
+            approved = JSON.parse(result);
+          }
+          console.log(approved);
+          
+
+          url = staticUrl + 'apparatus';
+         
+          settings = JSON.parse(CL.getExporterSettings());
+          if (!settings.hasOwnProperty('options')) {
+            settings.options = {};
+          }
+          settings.options.rule_classes = CL.ruleClasses;
+          settings.options.witness_decorators = CL.project.witnessDecorators;
+          format = settings.options.format;
+          if (format === undefined) {
+            // use the default
+            format = 'xml';
+          }
+          data = {settings: JSON.stringify(settings),
+                  data: JSON.stringify([{'context': CL.context,
+                                         'structure': approved.structure}])};
+          $.post(url, data).then(function (response) {
+              var blob, filename, downloadUrl, hiddenLink;
+              if (format.indexOf('xml') !== -1) {
+                blob = new Blob([response], {'type': 'text/xml'});
+                filename = CL.context + '_' + format + '_apparatus.xml';
+              } else {
+                blob = new Blob([response], {'type': 'text/txt'});
+                filename = CL.context + '_' + format + '_apparatus.txt';
+              }
+              downloadUrl = window.URL.createObjectURL(blob);
+              hiddenLink = document.createElement('a');
+              hiddenLink.style.display = 'none';
+              hiddenLink.href = downloadUrl;
+              hiddenLink.download = filename;
+              document.body.appendChild(hiddenLink);
+              hiddenLink.click();
+              window.URL.revokeObjectURL(downloadUrl);
+              spinner.removeLoadingOverlay();
+          }).fail(function (response) {
+            alert('This unit cannot be exported. First try reapproving the unit. If the problem persists please ' +
+                  'recollate the unit from the collation home page.');
+          });
+      });
+    });
   };
 
 
@@ -512,14 +559,14 @@ local_services = (function() {
 
     getCurrentEditingProject: getCurrentEditingProject,
     initialiseEditor: initialiseEditor,
-    getVerseData: getVerseData,
+    getUnitData: getUnitData,
     getSiglumMap: getSiglumMap,
     getRulesByIds: getRulesByIds,
     updateRules: updateRules,
     updateRuleset: updateRuleset,
     getRules: getRules,
     doCollation: doCollation,
-    getAdjoiningVerse: getAdjoiningVerse,
+    getAdjoiningUnit: getAdjoiningUnit,
     supportedRuleScopes: supportedRuleScopes,
     getUserInfo: getUserInfo,
     getRuleExceptions: getRuleExceptions,
@@ -529,8 +576,7 @@ local_services = (function() {
     loadSavedCollation: loadSavedCollation,
     getSavedStageIds: getSavedStageIds,
     getApparatusForContext: getApparatusForContext,
-
-
+    applySettings: applySettings
 
   };
 
