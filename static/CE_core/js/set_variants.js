@@ -1170,7 +1170,9 @@ SV = (function() {
         if (CL.showSubreadings === true) {
           SR.findSubreadings();
         }
-        alert(extraResults[1]);
+        if (extraResults[1] !== null) {
+          alert(extraResults[1]);
+        }
         spinner.removeLoadingOverlay();
       }
     } else if (!allComplete) {

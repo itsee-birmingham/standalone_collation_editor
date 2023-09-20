@@ -1455,3 +1455,5 @@ Catena Dev branch changes
 * In exporter.py ```get_text()``` when om and lac are returned their string value is always returned with the full stop eg. ```om.``` 
 
 * In exporter.py there is a new function ```get_required_end()```. This is irrelevant in this particular exporter but is important in exporters which build on this one and which are required to make joins across collation unit boundaries. This function can be overwritten in inheriting exporters to allow the correct data for the end of the unit to be set in the XML.
+
+* A very small change to the way pre-stage checks are implemented. If no message is provided in the configuration then no alert will be displayed, the result of the check will still be followed so if a test fails the unit will not progress to the next stage. This was done so that confirm boxes can be used in the code of the check itself to use warnings that can be overridden by the user, in these cases it should be the result of the confirmation which is passed back as the results of the checks.
