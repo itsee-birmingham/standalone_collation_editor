@@ -404,7 +404,7 @@ CL = (function() {
       }
     }
     // deal with text and internal gaps
-    for (let i = 0; i < witnessText.length; i += 1) {
+    for (let i = 0; witnessText && i < witnessText.length; i += 1) {
       foundWord = undefined;
       if (readingType === 'subreading' && witnessText[i][witness].hasOwnProperty('decision_details')) {
         // loop backwards and only use t of rules that match your list of supplied types
