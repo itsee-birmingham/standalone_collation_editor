@@ -440,7 +440,8 @@ SR = (function() {
       }
       if (standoffReading.hasOwnProperty('om_details')) {
         CL.createNewReading(unit, 'gap', standoffReading.om_details, createPosition);
-      } else if (standoffReading.parent_text === 'om.') {
+      } else if (standoffReading.parent_text === 'om.' ||
+                  CL.project.omCategories.indexOf(standoffReading.parent_text) != -1) {
         CL.createNewReading(unit, 'om', undefined, createPosition);
       } else {
         CL.createNewReading(unit, 'other', standoffReading.parent_text, createPosition);
@@ -844,7 +845,8 @@ SR = (function() {
     return {
       findSubreadings: findSubreadings,
       loseSubreadings: loseSubreadings,
-      updateMarkedReadingData: updateMarkedReadingData
+      updateMarkedReadingData: updateMarkedReadingData,
+      _getMatchingStandoffReading: _getMatchingStandoffReading
     };
   }
 }());

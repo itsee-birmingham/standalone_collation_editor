@@ -1674,7 +1674,7 @@ OR = (function() {
   };
 
   _doCategoriseOm = function(unitNumber, readingId, apparatus, scrollOffset) {
-    let unit, reading;
+    let unit, reading, standoffEntry;
     unit = CL.data[apparatus][unitNumber];
     for (let i = 0; i < unit.readings.length; i += 1) {
       if (unit.readings[i]._id === readingId) {
@@ -1687,6 +1687,16 @@ OR = (function() {
       reading.details = 'om verse';
     } else {
       reading.details = document.getElementById('om_category').value;
+    }
+    // now we need to check if we have a standoff marked reading which needs the om details changing
+    if (reading.hasOwnProperty('created') && reading.created == true &&
+          reading.hasOwnProperty('standoff_subreadings')) {
+        // find the standoff reading entries (there may be several, use the standoff_subreadings list to navigate)
+        for (let i = 0; i < reading.standoff_subreadings.length; i += 1) {
+          standoffEntry = SR._getMatchingStandoffReading(reading.standoff_subreadings[i], unit);
+          // change the parent_text value
+          standoffEntry.parent_text = '&lt;' + document.getElementById('om_category').value +'&gt;';
+        }
     }
     OR.relabelReadings(CL.data[apparatus][unitNumber].readings, true);
     showOrderReadings({'container': CL.container});
