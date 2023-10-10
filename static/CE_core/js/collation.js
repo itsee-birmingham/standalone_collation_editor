@@ -2833,7 +2833,7 @@ CL = (function() {
                     'type': 'lac',
                     'details': extraDetails};
     } else if (readingType === 'other') {
-      // readings created here will always be fake (i.e. not be the reading of any witness.
+      // readings created here will always be fake (i.e. not be the reading of any witness).
       // we cannot deal with gaps using gap_after because we have no 'witness' to this reading before the current unit as we are making the reading up
       // even so it is probably best that the gap counts as a single token so we will rejoin anything between < and > into a single token.
       // I think that is the best we can do with these fake readings
