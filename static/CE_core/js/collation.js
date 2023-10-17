@@ -1181,7 +1181,7 @@ CL = (function() {
    * */
   unitHasText = function(unit) {
     for (let i = 0; i < unit.readings.length; i += 1) {
-      if (unit.readings[i].text.length > 0) {
+      if (unit.readings[i].hasOwnProperty('text') && unit.readings[i].text.length > 0) {
         return true;
       }
       if (unit.readings[i].hasOwnProperty('subreadings')) {

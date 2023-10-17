@@ -285,6 +285,7 @@ class Exporter(object):
         Returns:
             list: A list of XML elements which make up the apparatus for this unit.
         """
+        print(context)
         app_list = []
         for unit in apparatus:
             start = unit['start']
@@ -307,6 +308,8 @@ class Exporter(object):
                     if ((len(wits) > 0 or reading['label'] == 'a' or 'subreadings' in reading)
                             and ('overlap_status' not in reading
                                  or reading['overlap_status'] not in self.overlap_status_to_ignore)):
+                        if 'label' not in reading:
+                            print(f'{start}-{end} - {reading}')
                         if reading['label'] == 'a':
                             wits = []
                         if len(wits) > 0:
