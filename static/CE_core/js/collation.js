@@ -64,7 +64,7 @@ CL = (function() {
       loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses,
       calculatePosition, removeWitness, checkWitnessesAgainstProject, setUpRemoveWitnessesForm,
       removeWitnesses, getRemoveWitnessDataFromForm, returnToSummaryTable, prepareAdditionalCollation,
-      removeSpecialWitnesses, runFunction, setOverlappedOptions, setRuleClasses, expandWitnessDecorators;
+      removeSpecialWitnesses, runFunction, setOverlappedOptions, setRuleClasses, expandWitnessDecorators, pad2;
 
   //private function declarations
   let _initialiseEditor, _initialiseProject, _setProjectConfig, _setDisplaySettings,
@@ -1605,7 +1605,7 @@ CL = (function() {
   };
 
   saveCollation = function(status, successCallback) {
-    var collation, confirmed, confirmMessage, successMessage, approvalSettings;
+    var collation, confirmed, confirmMessage, successMessage, approvalSettings, currentDate;
     spinner.showLoadingOverlay();
     CL.services.getUserInfo(function(user) {
       if (user) {
@@ -1638,7 +1638,9 @@ CL = (function() {
             confirmMessage = 'You already have this verse saved at this stage in this environment.\n' +
               'Are you sure you want to overwrite the currently saved version with this one?';
           }
-          successMessage = 'Save successful';
+          currentDate = new Date();
+          successMessage = 'Last saved:' + pad2(currentDate.getHours()) + ':' +
+                           pad2(currentDate.getMinutes());
         }
         if (CL.project.hasOwnProperty('id')) {
           collation.project = CL.project.id;
@@ -5761,6 +5763,13 @@ CL = (function() {
     }
   };
 
+  pad2 = function (number) {
+    if (number < 10) {
+      return '0' + number;
+    }
+    return number;
+  };
+
 
   if (testing) {
     return {
@@ -5794,6 +5803,7 @@ CL = (function() {
       savedAlgorithmSettings: savedAlgorithmSettings,
       savedDataSettings: savedDataSettings,
       existingCollation: existingCollation,
+      pad2: pad2,
 
       setServiceProvider: setServiceProvider,
       expandFillPageClients: expandFillPageClients,
@@ -6063,6 +6073,7 @@ CL = (function() {
       removeSpecialWitnesses: removeSpecialWitnesses,
       runFunction: runFunction,
       expandWitnessDecorators: expandWitnessDecorators,
+      pad2: pad2,
 
       //deprecated function mapping for calls from older services
       set_service_provider: setServiceProvider,
