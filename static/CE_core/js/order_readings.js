@@ -1574,6 +1574,10 @@ OR = (function() {
         readingPos = rdgDetails[2];
         unit = CL.data[appId][unitPos];
         reading = unit.readings[readingPos];
+        // this ensures if we are storing labels as parents we remove those links before making this a subreading
+        if (reading.hasOwnProperty('parents')) {
+          delete reading.parents;
+        }
         readingDetails = {'app_id': appId,
                           'unit_id': unit._id,
                           'unit_pos': unitPos,
@@ -1607,6 +1611,11 @@ OR = (function() {
                 readingPos = rdgDetails[2];
                 unit = CL.data[appId][unitPos];
                 reading = unit.readings[readingPos];
+                // this ensures if we are storing labels as parents we remove those links before making this a
+                // subreading
+                if (reading.hasOwnProperty('parents')) {
+                  delete reading.parents;
+                }
                 readingDetails = {'app_id': appId,
                                   'unit_id': unit._id,
                                   'unit_pos': unitPos,
