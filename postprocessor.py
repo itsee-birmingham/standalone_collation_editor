@@ -71,14 +71,14 @@ class PostProcessor(Regulariser, SettingsApplier):
             new['text'].append(new_word)
         return new
 
-    def merge_extra_reading(self, text_list, witness, reading):
-        reading['witnesses'].append(witness)
-        for token in text_list:
-            if witness in token:
-                new_word[witness] = token[witness]
-            new_word['reading'].append(witness)
-            token['reading'].remove(witness)
-        return reading
+    # def merge_extra_reading(self, text_list, witness, reading):
+    #     reading['witnesses'].append(witness)
+    #     for token in text_list:
+    #         if witness in token:
+    #             new_word[witness] = token[witness]
+    #         new_word['reading'].append(witness)
+    #         token['reading'].remove(witness)
+    #     return reading
 
     # in the python we only care about embedded gaps not the ones at the edge of each unit
     # so we don't need to worry about gap_before as they are always before the first word and never embedded
