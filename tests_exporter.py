@@ -597,7 +597,7 @@ class ExporterUnitTests(TestCase):
         expected_text = ['υιον αυτου']
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
-    
+
     def test_get_text_default_settings_subreading(self):
         exp = Exporter()
         reading = self.BASE_UNIT['readings'][0]['subreadings']['abbreviation'][0]
@@ -726,7 +726,7 @@ class ExporterUnitTests(TestCase):
     def test_get_lemma_text_defaults(self):
         exp = Exporter()
         overtext = self.OVERTEXT[0]
-    
+
         # test a few ranges where there is data
         expected_text = ['ἀποκαλύψαι τὸν υἱὸν']
         generated_text = exp.get_lemma_text(overtext, 2, 6)
@@ -978,7 +978,8 @@ class ExporterUnitTests(TestCase):
         subreading = True
         subreading_subtype = 'fehler'
         exp = Exporter()
-        expected_xml = '<rdg n="af" type="subreading" cause="fehler" varSeq="2" wit="206*">om.<wit><idno>206*</idno></wit></rdg>'
+        expected_xml = ('<rdg n="af" type="subreading" cause="fehler" varSeq="2" wit="206*">om.<wit>'
+                        '<idno>206*</idno></wit></rdg>')
         xml = exp.make_reading(reading, index_position, reading_label, witnesses, subreading, subreading_subtype)
         # check the right things are passed to the mocked functions
         mocked_get_label.assert_called_with(reading_label, subreading, subreading_subtype, reading)
@@ -1020,25 +1021,46 @@ class ExporterUnitTests(TestCase):
                                               mocked_get_witnesses,
                                               mocked_make_reading):
         mocked_get_lemma_text.side_effect = [['my lemma'], ['here'], ['', 'om']]
-        mocked_get_witnesses.side_effect = [['basetext', '6'], ['7', '8'], ['basetext'], ['7', '8'], ['6'], ['basetext', '8'], ['6', '7']]
-        mocked_make_reading.side_effect = [etree.fromstring('<rdg n="a" varSeq="1" wit="basetext 6">my lemma<wit><idno>basetext</idno><idno>6</idno></wit></rdg>'), 
-                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno><idno>8</idno></wit></rdg>'),
-                                           etree.fromstring('<rdg n="a" varSeq="1" wit="basetext">here<wit><idno>basetext</idno></wit></rdg>'),
-                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno><idno>8</idno></wit></rdg>'),
-                                           etree.fromstring('<rdg n="c" type="om" cause="fehlerMR" varSeq="3" wit="6">om.<wit><idno>6</idno></wit></rdg>'),
-                                           etree.fromstring('<rdg n="a" varSeq="1" wit="basetext 8">om.<wit><idno>basetext</idno><idno>8</idno></wit></rdg>'),
-                                           etree.fromstring('<rdg n="b" varSeq="2" wit="6 7">addition<wit><idno>6</idno><idno>7</idno></wit></rdg>')]
+        mocked_get_witnesses.side_effect = [['basetext', '6'], ['7', '8'], ['basetext'], ['7', '8'],
+                                            ['6'], ['basetext', '8'], ['6', '7']]
+        mocked_make_reading.side_effect = [etree.fromstring('<rdg n="a" varSeq="1" wit="basetext 6">my lemma<wit>'
+                                                            '<idno>basetext</idno><idno>6</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7 8">my lema<wit>'
+                                                            '<idno>7</idno><idno>8</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="a" varSeq="1" wit="basetext">here<wit>'
+                                                            '<idno>basetext</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7 8">my lema<wit>'
+                                                            '<idno>7</idno><idno>8</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="c" type="om" cause="fehlerMR" varSeq="3" '
+                                                            'wit="6">om.<wit><idno>6</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="a" varSeq="1" wit="basetext 8">om.<wit>'
+                                                            '<idno>basetext</idno><idno>8</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="6 7">addition<wit>'
+                                                            '<idno>6</idno><idno>7</idno></wit></rdg>')]
         context = 'Gal.1.1'
         overtext = {'id': 'basetext'}
-        # give it just enough to control the loops and stop calls breaking (data seems to be needed even though they are mocked)
+        # give it just enough to control the loops and stop calls breaking (data seems to be needed even though they
+        # are mocked)
         apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'}, {'label': 'b'}]},
-                     {'start': 6, 'end': 6, 'readings': [{'label': 'a'}, {'label': 'b'}, {'label': 'c', 'reading_classes':['fehlerMR']}]},
+                     {'start': 6, 'end': 6, 'readings': [{'label': 'a'}, {'label': 'b'}, {'label': 'c',
+                                                                                          'reading_classes': ['fehlerMR']  # NoQA
+                                                                                          }]},
                      {'start': 7, 'end': 7, 'readings': [{'label': 'a'}, {'label': 'b'}]}]
         missing = []
         exp = Exporter()
-        expected_xml = ['<app type="main" n="Gal.1.1" from="2" to="4"><lem wit="basetext">my lemma</lem><rdg n="a" varSeq="1" wit="basetext 6">my lemma<wit><idno>basetext</idno><idno>6</idno></wit></rdg><rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno><idno>8</idno></wit></rdg></app>',
-                        '<app type="main" n="Gal.1.1" from="6" to="6"><lem wit="basetext">here</lem><rdg n="a" varSeq="1" wit="basetext">here<wit><idno>basetext</idno></wit></rdg><rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno><idno>8</idno></wit></rdg><rdg n="c" type="om" cause="fehlerMR" varSeq="3" wit="6">om.<wit><idno>6</idno></wit></rdg></app>',
-                        '<app type="main" n="Gal.1.1" from="7" to="7"><lem wit="basetext" type="om" /><rdg n="a" varSeq="1" wit="basetext 8">om.<wit><idno>basetext</idno><idno>8</idno></wit></rdg><rdg n="b" varSeq="2" wit="6 7">addition<wit><idno>6</idno><idno>7</idno></wit></rdg></app>']
+        expected_xml = [('<app type="main" n="Gal.1.1" from="2" to="4"><lem wit="basetext">my lemma</lem>'
+                         '<rdg n="a" varSeq="1" wit="basetext 6">my lemma<wit><idno>basetext</idno><idno>6</idno></wit>'
+                         '</rdg><rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno><idno>8</idno></wit>'
+                         '</rdg></app>'),
+                        ('<app type="main" n="Gal.1.1" from="6" to="6"><lem wit="basetext">here</lem>'
+                         '<rdg n="a" varSeq="1" wit="basetext">here<wit><idno>basetext</idno></wit></rdg>'
+                         '<rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno><idno>8</idno></wit></rdg>'
+                         '<rdg n="c" type="om" cause="fehlerMR" varSeq="3" wit="6">om.<wit><idno>6</idno></wit>'
+                         '</rdg></app>'),
+                        ('<app type="main" n="Gal.1.1" from="7" to="7"><lem wit="basetext" type="om" />'
+                         '<rdg n="a" varSeq="1" wit="basetext 8">om.<wit><idno>basetext</idno><idno>8</idno></wit>'
+                         '</rdg><rdg n="b" varSeq="2" wit="6 7">addition<wit><idno>6</idno><idno>7</idno></wit>'
+                         '</rdg></app>')]
         app_units = exp.get_app_units(apparatus, overtext, context, missing)
         result = []
         for unit in app_units:
@@ -1074,16 +1096,23 @@ class ExporterUnitTests(TestCase):
                                                          mocked_make_reading):
         mocked_get_lemma_text.side_effect = [['my lemma']]
         mocked_get_witnesses.side_effect = [['basetext', '6'], ['7'], ['8']]
-        mocked_make_reading.side_effect = [etree.fromstring('<rdg n="a" varSeq="1" wit="basetext 6">my lemma<wit><idno>basetext</idno><idno>6</idno></wit></rdg>'),
-                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7">my lema<wit><idno>7</idno></wit></rdg>'),
-                                           etree.fromstring('<rdg type="subreading" cause="orthographic" n="bo" varSeq="3" wit="8">mie lema<wit><idno>8</idno></wit></rdg>')]
+        mocked_make_reading.side_effect = [etree.fromstring('<rdg n="a" varSeq="1" wit="basetext 6">my lemma<wit>'
+                                                            '<idno>basetext</idno><idno>6</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7">my lema<wit><idno>7</idno>'
+                                                            '</wit></rdg>'),
+                                           etree.fromstring('<rdg type="subreading" cause="orthographic" n="bo" '
+                                                            'varSeq="3" wit="8">mie lema<wit><idno>8</idno></wit></rdg>')]  # NoQA
         context = 'Gal.1.1'
         overtext = {'id': 'basetext'}
         apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'},
                      {'label': 'b', 'subreadings': {'orthographic': [{'label': 'b', 'suffix': ''}]}}]}]
         missing = []
         exp = Exporter()
-        expected_xml = ['<app type="main" n="Gal.1.1" from="2" to="4"><lem wit="basetext">my lemma</lem><rdg n="a" varSeq="1" wit="basetext 6">my lemma<wit><idno>basetext</idno><idno>6</idno></wit></rdg><rdg n="b" varSeq="2" wit="7">my lema<wit><idno>7</idno></wit></rdg><rdg type="subreading" cause="orthographic" n="bo" varSeq="3" wit="8">mie lema<wit><idno>8</idno></wit></rdg></app>']
+        expected_xml = [('<app type="main" n="Gal.1.1" from="2" to="4"><lem wit="basetext">my lemma</lem>'
+                         '<rdg n="a" varSeq="1" wit="basetext 6">my lemma<wit><idno>basetext</idno><idno>6</idno>'
+                         '</wit></rdg><rdg n="b" varSeq="2" wit="7">my lema<wit><idno>7</idno></wit></rdg>'
+                         '<rdg type="subreading" cause="orthographic" n="bo" varSeq="3" wit="8">mie lema<wit>'
+                         '<idno>8</idno></wit></rdg></app>')]
         app_units = exp.get_app_units(apparatus, overtext, context, missing)
         result = []
         for unit in app_units:
@@ -1091,11 +1120,15 @@ class ExporterUnitTests(TestCase):
         # check the right things are passed to the mocked functions
         mocked_get_lemma_text.assert_has_calls([call(overtext, 2, 4)])
         mocked_get_witnesses.assert_has_calls([call({'label': 'a'}, missing),
-                                               call({'label': 'b', 'subreadings': {'orthographic': [{'label': 'b', 'suffix': ''}]}}, missing),
+                                               call({'label': 'b',
+                                                     'subreadings': {'orthographic': [{'label': 'b',
+                                                                                       'suffix': ''}]}}, missing),
                                                call({'label': 'b', 'suffix': ''}, missing)
                                                ])
         mocked_make_reading.assert_has_calls([call({'label': 'a'}, 0, 'a', ['basetext', '6'], subtype=None),
-                                              call({'label': 'b', 'subreadings': {'orthographic': [{'label': 'b', 'suffix': ''}]}}, 1, 'b', ['7'], subtype=None),
+                                              call({'label': 'b',
+                                                    'subreadings': {'orthographic': [{'label': 'b',
+                                                                                      'suffix': ''}]}}, 1, 'b', ['7'], subtype=None),  # NoQA
                                               call({'label': 'b', 'suffix': ''}, 1, 'b', ['8'], True, 'orthographic')
                                               ])
         # check the result
@@ -1109,25 +1142,39 @@ class ExporterUnitTests(TestCase):
                                               mocked_get_witnesses,
                                               mocked_make_reading):
         mocked_get_lemma_text.side_effect = [['my lemma'], ['here'], ['', 'om']]
-        mocked_get_witnesses.side_effect = [['basetext', '6'], ['7', '8'], ['basetext'], ['7', '8'], ['6'], ['basetext', '8'], ['6', '7']]
+        mocked_get_witnesses.side_effect = [['basetext', '6'], ['7', '8'], ['basetext'], ['7', '8'],
+                                            ['6'], ['basetext', '8'], ['6', '7']]
         mocked_make_reading.side_effect = [etree.fromstring('<rdg n="a" varSeq="1">my lemma</rdg>'),
-                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno><idno>8</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7 8">my lema<wit>'
+                                                            '<idno>7</idno><idno>8</idno></wit></rdg>'),
                                            etree.fromstring('<rdg n="a" varSeq="1">here</rdg>'),
-                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno><idno>8</idno></wit></rdg>'),
-                                           etree.fromstring('<rdg n="c" type="om" cause="fehlerMR" varSeq="3" wit="6">om.<wit><idno>6</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno>'
+                                                            '<idno>8</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="c" type="om" cause="fehlerMR" varSeq="3" '
+                                                            'wit="6">om.<wit><idno>6</idno></wit></rdg>'),
                                            etree.fromstring('<rdg n="a" varSeq="1">om.</rdg>'),
-                                           etree.fromstring('<rdg n="b" varSeq="2" wit="6 7">addition<wit><idno>6</idno><idno>7</idno></wit></rdg>')]
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="6 7">addition<wit>'
+                                                            '<idno>6</idno><idno>7</idno></wit></rdg>')]
         context = 'Gal.1.1'
         overtext = {'id': 'basetext'}
-        # give it just enough to control the loops and stop calls breaking (data seems to be needed even though they are mocked)
+        # give it just enough to control the loops and stop calls breaking (data seems to be needed even though they
+        # are mocked)
         apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'}, {'label': 'b'}]},
-                     {'start': 6, 'end': 6, 'readings': [{'label': 'a'}, {'label': 'b'}, {'label': 'c', 'reading_classes':['fehlerMR']}]},
+                     {'start': 6, 'end': 6, 'readings': [{'label': 'a'}, {'label': 'b'},
+                                                         {'label': 'c', 'reading_classes': ['fehlerMR']}]},
                      {'start': 7, 'end': 7, 'readings': [{'label': 'a'}, {'label': 'b'}]}]
         missing = []
         exp = Exporter(format='negative_xml')
-        expected_xml = ['<app type="main" n="Gal.1.1" from="2" to="4"><lem wit="basetext">my lemma</lem><rdg n="a" varSeq="1">my lemma</rdg><rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno><idno>8</idno></wit></rdg></app>',
-                        '<app type="main" n="Gal.1.1" from="6" to="6"><lem wit="basetext">here</lem><rdg n="a" varSeq="1">here</rdg><rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno><idno>8</idno></wit></rdg><rdg n="c" type="om" cause="fehlerMR" varSeq="3" wit="6">om.<wit><idno>6</idno></wit></rdg></app>',
-                        '<app type="main" n="Gal.1.1" from="7" to="7"><lem wit="basetext" type="om" /><rdg n="a" varSeq="1">om.</rdg><rdg n="b" varSeq="2" wit="6 7">addition<wit><idno>6</idno><idno>7</idno></wit></rdg></app>']
+        expected_xml = [('<app type="main" n="Gal.1.1" from="2" to="4"><lem wit="basetext">my lemma</lem>'
+                         '<rdg n="a" varSeq="1">my lemma</rdg><rdg n="b" varSeq="2" wit="7 8">my lema<wit>'
+                         '<idno>7</idno><idno>8</idno></wit></rdg></app>'),
+                        ('<app type="main" n="Gal.1.1" from="6" to="6"><lem wit="basetext">here</lem>'
+                         '<rdg n="a" varSeq="1">here</rdg><rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno>'
+                         '<idno>8</idno></wit></rdg><rdg n="c" type="om" cause="fehlerMR" varSeq="3" wit="6">om.<wit>'
+                         '<idno>6</idno></wit></rdg></app>'),
+                        ('<app type="main" n="Gal.1.1" from="7" to="7"><lem wit="basetext" type="om" />'
+                         '<rdg n="a" varSeq="1">om.</rdg><rdg n="b" varSeq="2" wit="6 7">addition<wit><idno>6</idno>'
+                         '<idno>7</idno></wit></rdg></app>')]
         app_units = exp.get_app_units(apparatus, overtext, context, missing)
         result = []
         for unit in app_units:
@@ -1165,14 +1212,23 @@ class ExporterUnitTests(TestCase):
         mocked_get_lemma_text.side_effect = [['my lemma']]
         mocked_get_witnesses.side_effect = [['basetext', '6'], ['7'], ['8']]
         mocked_make_reading.side_effect = [etree.fromstring('<rdg n="a" varSeq="1">my lemma</rdg>'),
-                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7">my lema<wit><idno>7</idno></wit></rdg>'),
-                                           etree.fromstring('<rdg type="subreading" cause="orthographic" n="bo" varSeq="3" wit="8">mie lema<wit><idno>8</idno></wit></rdg>')]
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7">my lema<wit><idno>7</idno>'
+                                                            '</wit></rdg>'),
+                                           etree.fromstring('<rdg type="subreading" cause="orthographic" n="bo" '
+                                                            'varSeq="3" wit="8">mie lema<wit><idno>8</idno>'
+                                                            '</wit></rdg>')]
         context = 'Gal.1.1'
         overtext = {'id': 'basetext'}
-        apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'}, {'label': 'b', 'subreadings': {'orthographic': [{'label': 'b', 'suffix': ''}]}}]}]
+        apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'},
+                                                         {'label': 'b',
+                                                          'subreadings': {'orthographic': [{'label': 'b',
+                                                                                            'suffix': ''}]}}]}]
         missing = []
         exp = Exporter(format='negative_xml')
-        expected_xml = ['<app type="main" n="Gal.1.1" from="2" to="4"><lem wit="basetext">my lemma</lem><rdg n="a" varSeq="1">my lemma</rdg><rdg n="b" varSeq="2" wit="7">my lema<wit><idno>7</idno></wit></rdg><rdg type="subreading" cause="orthographic" n="bo" varSeq="3" wit="8">mie lema<wit><idno>8</idno></wit></rdg></app>']
+        expected_xml = [('<app type="main" n="Gal.1.1" from="2" to="4"><lem wit="basetext">my lemma</lem>'
+                         '<rdg n="a" varSeq="1">my lemma</rdg><rdg n="b" varSeq="2" wit="7">my lema<wit>'
+                         '<idno>7</idno></wit></rdg><rdg type="subreading" cause="orthographic" n="bo" varSeq="3" '
+                         'wit="8">mie lema<wit><idno>8</idno></wit></rdg></app>')]
         app_units = exp.get_app_units(apparatus, overtext, context, missing)
         result = []
         for unit in app_units:
@@ -1214,7 +1270,11 @@ class ExporterUnitTests(TestCase):
                }
         exp = Exporter()
         expected_missing = ['6', '8', '7']
-        expected_xml = '<ab n="Gal.1.1-APP"><app type="lac" n="Gal.1.1"><lem wit="editorial">Whole verse</lem><rdg type="lac" wit="6 8">Def.<wit><idno>6</idno><idno>8</idno></wit></rdg><rdg type="lac" wit="7">Om.<wit><idno>7</idno></wit></rdg></app><app type="main" n="Gal.1.1" from="2" to="8" /><app type="main" n="Gal.1.1" from="2" to="4" /><app type="main" n="Gal.1.1" from="6" to="8" /></ab>'
+        expected_xml = ('<ab n="Gal.1.1-APP"><app type="lac" n="Gal.1.1"><lem wit="editorial">Whole verse</lem>'
+                        '<rdg type="lac" wit="6 8">Def.<wit><idno>6</idno><idno>8</idno></wit></rdg>'
+                        '<rdg type="lac" wit="7">Om.<wit><idno>7</idno></wit></rdg></app>'
+                        '<app type="main" n="Gal.1.1" from="2" to="8" /><app type="main" n="Gal.1.1" from="2" to="4" />'
+                        '<app type="main" n="Gal.1.1" from="6" to="8" /></ab>')
         xml = exp.get_unit_xml(app)
         mocked_get_app_units.assert_called_with([], {'id': 'basetext'}, 'Gal.1.1', expected_missing)
         self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
@@ -1234,7 +1294,10 @@ class ExporterUnitTests(TestCase):
                }
         exp = Exporter(consolidate_lac_verse=False)
         expected_missing = ['7']
-        expected_xml = '<ab n="Gal.1.1-APP"><app type="lac" n="Gal.1.1"><lem wit="editorial">Whole verse</lem><rdg type="lac" wit="7">Om.<wit><idno>7</idno></wit></rdg></app><app type="main" n="Gal.1.1" from="2" to="8" /><app type="main" n="Gal.1.1" from="2" to="4" /><app type="main" n="Gal.1.1" from="6" to="8" /></ab>'
+        expected_xml = ('<ab n="Gal.1.1-APP"><app type="lac" n="Gal.1.1"><lem wit="editorial">Whole verse</lem>'
+                        '<rdg type="lac" wit="7">Om.<wit><idno>7</idno></wit></rdg></app>'
+                        '<app type="main" n="Gal.1.1" from="2" to="8" /><app type="main" n="Gal.1.1" from="2" to="4" />'
+                        '<app type="main" n="Gal.1.1" from="6" to="8" /></ab>')
         xml = exp.get_unit_xml(app)
         mocked_get_app_units.assert_called_with([], {'id': 'basetext'}, 'Gal.1.1', expected_missing)
         self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
@@ -1254,7 +1317,10 @@ class ExporterUnitTests(TestCase):
                }
         exp = Exporter(consolidate_om_verse=False)
         expected_missing = ['6', '8']
-        expected_xml = '<ab n="Gal.1.1-APP"><app type="lac" n="Gal.1.1"><lem wit="editorial">Whole verse</lem><rdg type="lac" wit="6 8">Def.<wit><idno>6</idno><idno>8</idno></wit></rdg></app><app type="main" n="Gal.1.1" from="2" to="8" /><app type="main" n="Gal.1.1" from="2" to="4" /><app type="main" n="Gal.1.1" from="6" to="8" /></ab>'
+        expected_xml = ('<ab n="Gal.1.1-APP"><app type="lac" n="Gal.1.1"><lem wit="editorial">Whole verse</lem>'
+                        '<rdg type="lac" wit="6 8">Def.<wit><idno>6</idno><idno>8</idno></wit></rdg></app>'
+                        '<app type="main" n="Gal.1.1" from="2" to="8" /><app type="main" n="Gal.1.1" from="2" to="4" />'
+                        '<app type="main" n="Gal.1.1" from="6" to="8" /></ab>')
         xml = exp.get_unit_xml(app)
         mocked_get_app_units.assert_called_with([], {'id': 'basetext'}, 'Gal.1.1', expected_missing)
         self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
@@ -1274,7 +1340,9 @@ class ExporterUnitTests(TestCase):
                }
         exp = Exporter(consolidate_om_verse=False, consolidate_lac_verse=False)
         expected_missing = []
-        expected_xml = '<ab n="Gal.1.1-APP"><app type="main" n="Gal.1.1" from="2" to="8" /><app type="main" n="Gal.1.1" from="2" to="4" /><app type="main" n="Gal.1.1" from="6" to="8" /></ab>'
+        expected_xml = ('<ab n="Gal.1.1-APP"><app type="main" n="Gal.1.1" from="2" to="8" />'
+                        '<app type="main" n="Gal.1.1" from="2" to="4" />'
+                        '<app type="main" n="Gal.1.1" from="6" to="8" /></ab>')
         xml = exp.get_unit_xml(app)
         mocked_get_app_units.assert_called_with([], {'id': 'basetext'}, 'Gal.1.1', expected_missing)
         self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
@@ -1345,8 +1413,8 @@ class ExporterUnitTests(TestCase):
                                            etree.fromstring('<ab n="Gal.1.2-APP" />')]
         # just enough to get the loops working
         data = [{}, {}]
-        expected_xml = '<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0"><ab n="Gal.1.1-APP" />\n<ab n="Gal.1.2-APP" /></TEI>'
+        expected_xml = ('<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0">'
+                        '<ab n="Gal.1.1-APP" />\n<ab n="Gal.1.2-APP" /></TEI>')
         exp = Exporter()
         xml = exp.export_data(data)
         self.assertEqual(xml, expected_xml)
-

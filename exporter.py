@@ -20,7 +20,7 @@ class Exporter(object):
             that should be ignored in the export. Defaults to ['overlapped','deleted'].
         consolidate_om_verse (bool, optional): Indicates whether or not witnesses omitted in the entire collation
             unit are listed once at the start of the apparatus or indicated in each variant unit. Defaults to True.
-        consolidate_lac_verse (bool, optional): Indicates whether or not witnesses which are lac for the entire 
+        consolidate_lac_verse (bool, optional): Indicates whether or not witnesses which are lac for the entire
             collation unit are listed once at the start of the apparatus or indicated in each variant unit.
             Defaults to True.
         include_lemma_when_no_variants (bool, optional): Indicates whether ot not to include the lemma in the export
@@ -273,7 +273,7 @@ class Exporter(object):
         return unit['end']
 
     def get_app_units(self, apparatus, overtext, context, missing):
-        """Function to take the JSON apparatus and turn it into a list of ElementTree.Elements with each entry 
+        """Function to take the JSON apparatus and turn it into a list of ElementTree.Elements with each entry
         representing one variant unit in TEI XML.
 
         Args:

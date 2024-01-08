@@ -2,13 +2,9 @@
 """Algorithm for post-collate processing.
 
 """
-from functools import partial
-from .exceptions import DataInputException
 import copy
-import decimal
-import re
 import sys
-import importlib
+from .exceptions import DataInputException
 from collation.core.regulariser import Regulariser
 from collation.core.settings_applier import SettingsApplier
 
@@ -243,7 +239,6 @@ class PostProcessor(Regulariser, SettingsApplier):
                 if row[0] != '_' and row[0] is not None:
                     lowest = min(len(row), lowest)
         if highest > 1:  # if at least one reading has more than one word
-            lengths = []
             # return self.split_unit_into_single_words(readings_list, matrix, highest)
             # TODO: remove this condition once split unit into single words works with differing lengths
             if lowest == highest:
@@ -262,8 +257,6 @@ class PostProcessor(Regulariser, SettingsApplier):
 
     def check_unit_splits(self, readings):
         """Works out whether any units need further splitting and sends them off to restructure_unit"""
-        token_matches = []
-        base_text = None
         # if we have at least two actual readings (not including empty readings)
         if ((len(readings.keys()) > 1 and ('_' not in readings.keys())) or
                 (len(readings.keys()) > 2 and ('_' in readings.keys()))):
@@ -294,14 +287,14 @@ class PostProcessor(Regulariser, SettingsApplier):
                     new_readings.append(saved[0])
                     saved = []
                 elif len(saved) > 0:
-                    new_readings.append(horizontal_combine(saved))
+                    new_readings.append(self.horizontal_combine(saved))
                     saved = []
                 new_readings.append(reading)
         if len(saved) == 1:
             new_readings.append(saved[0])
             saved = []
         elif len(saved) > 0:
-            new_readings.append(horizontal_combine(saved))
+            new_readings.append(self.horizontal_combine(saved))
             saved = []
         return new_readings
 
