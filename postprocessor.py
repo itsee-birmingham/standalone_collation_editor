@@ -420,7 +420,9 @@ class PostProcessor(Regulariser, SettingsApplier):
                 'hand_id_map': self.hand_id_map}
 
     def process_witness_tokens(self, witness):
-        if not isinstance(witness, list):
+        if witness is None:
+            return []
+        elif not isinstance(witness, list):  # not sure what this one does but don't want to break anything
             return witness
         else:
             new_witness = []
