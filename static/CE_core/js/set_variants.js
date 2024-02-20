@@ -4471,12 +4471,12 @@ SV = (function() {
   };
 
   // needs to be in prepare/unprepare sandwich because of unsplitUnitWitnesses
-  _removeReadingFlag = function(readingDetails) {
+  _removeReadingFlag = function(readingDetails, reading) {
     var scrollOffset;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
                     document.getElementById('scroller').scrollTop];
     _addToUndoStack(CL.data);
-    delete CL.data[readingDetails[1]][readingDetails[0]].readings[readingDetails[2]].overlap_status;
+    delete reading.overlap_status;
     unsplitUnitWitnesses(readingDetails[0], readingDetails[1]);
     showSetVariantsData();
     document.getElementById('scroller').scrollLeft = scrollOffset[0];
@@ -4703,8 +4703,11 @@ SV = (function() {
           return true;
         });
         readingDetails = CL.getUnitAppReading(div.id);
+        // because we need to use prepareForOperation we need to get the reading itself before we do that as positions
+        // will change once that is run
+        const reading = CL.data[readingDetails[1]][readingDetails[0]].readings[readingDetails[2]];
         prepareForOperation();
-        _removeReadingFlag(readingDetails);
+        _removeReadingFlag(readingDetails, reading);
         unprepareForOperation();
       });
       $('#treat_as_main').on('mouseover.tam_mo', function(event) {
