@@ -693,6 +693,8 @@ CL = (function() {
    * 			sort - boolean - do the readings need sorting (default = false)
    * 			highlighted_wit - the witness to highlight
    *      highlighted_added_wits - the added wit/s that should be highlighted
+   *      highlighted_version - a versional witness to highlight (version editor only)
+   *      highlighted_author - a patristic author to highlight (patristics editor only)
    * 			error_unit - a unit to mark as having an error
    *      highlighted_units - a list of units (by start or start and end number) which should be highlighed
    * 			column_lengths - dictionary detailing widths of columns in top apparatus
@@ -798,6 +800,9 @@ CL = (function() {
           }
           if (options.hasOwnProperty('highlighted_version')) {
             unitDataOptions.highlighted_version = options.highlighted_version;
+          }
+          if (options.hasOwnProperty('highlighted_author')) {
+            unitDataOptions.highlighted_author = options.highlighted_author;
           }
           if (options.hasOwnProperty('error_unit')) {
             unitDataOptions.error_unit = options.error_unit;
@@ -1022,6 +1027,7 @@ CL = (function() {
    * 			sort - boolean - do the readings need sorting (default = false)
    * 			highlighted_wit - the witness to highlight
    * 			highlighted_version - a versional witness to highlight (version editor only)
+   *      highlighted_author - a patristic author to highlight (patristics editor only)
    * 			error_unit - a unit to mark as having an error
    *      highlighted_units - a list of units (by start or start and end number) which should be highlighed
    *      getUnitDataFunction - a function to be used for getUnitData when the hard coded ones are not good enough
@@ -1100,6 +1106,9 @@ CL = (function() {
           }
           if (options.hasOwnProperty('highlighted_version')) {
             unitDataOptions.highlighted_version = options.highlighted_version;
+          }
+          if (options.hasOwnProperty('highlighted_author')) {
+            unitDataOptions.highlighted_author = options.highlighted_author;
           }
           if (options.hasOwnProperty('error_unit')) {
             unitDataOptions.error_unit = options.error_unit;
