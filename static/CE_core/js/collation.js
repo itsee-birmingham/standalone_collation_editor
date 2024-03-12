@@ -58,12 +58,12 @@ var CL = (function() {
       addStageLinks, addExtraFooterButtons, makeVerseLinks, getUnitAppReading, setList,
       getActiveUnitWitnesses, getExporterSettings, saveCollation, sortWitnesses,
       getSpecifiedAncestor, hideTooltip, addHoverEvents, markReading, showSplitWitnessMenu, markStandoffReading,
-      findUnitPosById, findReadingById, findReadingByText, findReadingPosById, applyPreStageChecks,
+      findUnitPosById, findReadingById, findReadingByText, applyPreStageChecks,
       makeStandoffReading, doMakeStandoffReading, makeMainReading, getOrderedAppLines,
       loadIndexPage, addIndexHandlers, getHandsAndSigla, createNewReading, getReadingWitnesses,
       calculatePosition, removeWitness, checkWitnessesAgainstProject, setUpRemoveWitnessesForm,
       removeWitnesses, getRemoveWitnessDataFromForm, returnToSummaryTable, prepareAdditionalCollation,
-      removeSpecialWitnesses, runFunction, setOverlappedOptions, setRuleClasses, expandWitnessDecorators, pad2;
+      removeSpecialWitnesses, setOverlappedOptions, setRuleClasses, expandWitnessDecorators;
 
   //private function declarations
   let _initialiseEditor, _initialiseProject, _setProjectConfig, _setDisplaySettings,
@@ -80,14 +80,12 @@ var CL = (function() {
       _addNavEvent, _findLatestStageVerse, _loadLatestStageVerse, _removeOverlappedReadings,
       _getApprovalSettings, _compareReadings,
       _disableEventPropagation, _showCollationSettings, _checkWitnesses, _getScrollPosition,
-      _getMousePosition, _displayWitnessesHover, _getWitnessesForReading,
-      _findStandoffWitness, _getPreStageChecks, _makeRegDecisionsStandoff,
-      _contextInputOnload, _removeWitnessFromUnit, _addToSavedCollation,
+      _getMousePosition, 
+      _removeWitnessFromUnit, _addToSavedCollation,
       _displaySavedCollation, _mergeCollationObjects, _separateOverlapsInAddedUnits,
       _getUnitsByStartIndex, _mergeNewLacOmVerseReadings, _mergeNewReading,
-      _getReadingHistory, _getNextTargetRuleInfo, _removeAppliedRules,
-      _getHistoricalReading, _extractAllTValuesForRGAppliedRules,
-      _makeStandoffReading2, _extractWordsForHeader, _getFunctionFromString;
+      _extractAllTValuesForRGAppliedRules,
+      _makeStandoffReading2, _extractWordsForHeader;
 
 
   //*********  public functions *********
@@ -1648,8 +1646,8 @@ var CL = (function() {
               'Are you sure you want to overwrite the currently saved version with this one?';
           }
           currentDate = new Date();
-          successMessage = 'Last saved:' + pad2(currentDate.getHours()) + ':' +
-                           pad2(currentDate.getMinutes());
+          successMessage = 'Last saved:' + CL.pad2(currentDate.getHours()) + ':' +
+                           CL.pad2(currentDate.getMinutes());
         }
         if (Object.prototype.hasOwnProperty.call(CL.project, 'id')) {
           collation.project = CL.project.id;
@@ -1678,10 +1676,10 @@ var CL = (function() {
   sortWitnesses = function(witnesses) {
     if (Object.prototype.hasOwnProperty.call(CL.project, 'witnessSort')) {
       //use a project function if there is one
-      runFunction(CL.project.witnessSort, [witnesses]);
+      CL.runFunction(CL.project.witnessSort, [witnesses]);
     } else if (CL.services && Object.prototype.hasOwnProperty.call(CL.services, 'witnessSort')) {
       //or use the default for the services if there is one
-      runFunction(CL.services.witnessSort, [witnesses]);
+      CL.runFunction(CL.services.witnessSort, [witnesses]);
     } else {
       //or just use regular sort
       witnesses.sort();
@@ -1714,7 +1712,7 @@ var CL = (function() {
 
   addHoverEvents = function(row, witnesses) {
     $(row).on('mouseover', function(event) {
-      _displayWitnessesHover(event, witnesses);
+      CL._displayWitnessesHover(event, witnesses);
     });
     $(row).on('mouseout', function() {
       hideTooltip();
@@ -1826,7 +1824,7 @@ var CL = (function() {
     unit = CL.data[readingDetails.app_id][readingDetails.unit_pos];
     reading = unit.readings[readingDetails.reading_pos];
     totalReadingWitnesses = reading.witnesses.length;
-    //show the menu to identify the parent reading and split the witnesses if necessary
+    // show the menu to identify the parent reading and split the witnesses if necessary
     if (reading.witnesses.length > 1 || Object.prototype.hasOwnProperty.call(reading, 'subreadings')) {
       showSplitWitnessMenu(reading, menuPos, {
         'type': type,
@@ -1844,10 +1842,10 @@ var CL = (function() {
     parents = [];
     for (let i = 0; i < unit.readings.length; i += 1) {
       // if the reading is:
-      //	not the reading being made a subreading
-      //	not an empty reading (doesn't have a type attribute)
-      //	an empty reading but isn't lac verse or om verse (probably should change this and deal with them differently)
-      //	in a unit that is an overlap and i != 0 (which means this reading is not the a reading)
+      // not the reading being made a subreading
+      // not an empty reading (doesn't have a type attribute)
+      // an empty reading but isn't lac verse or om verse (probably should change this and deal with them differently)
+      // in a unit that is an overlap and i != 0 (which means this reading is not the a reading)
       if (i !== readingDetails.reading_pos &&
             (!Object.prototype.hasOwnProperty.call(unit.readings[i], 'type') || (Object.prototype.hasOwnProperty.call(unit.readings[i], 'type') &&
                                                           unit.readings[i].type !== 'om_verse' &&
@@ -1998,9 +1996,9 @@ var CL = (function() {
 
   applyPreStageChecks = function(stage) {
     var preStageChecks, result;
-    preStageChecks = _getPreStageChecks(stage);
+    preStageChecks = CL._getPreStageChecks(stage);
     for (let i = 0; i < preStageChecks.length; i += 1) {
-      result = runFunction(preStageChecks[i]['function']);
+      result = CL.runFunction(preStageChecks[i]['function']);
       if (result !== preStageChecks[i].pass_condition) {
         return [false, preStageChecks[i].fail_message];
       }
@@ -2119,8 +2117,8 @@ var CL = (function() {
                         i < reading.subreadings[key].length && k >= 0) {
               witness = reading.subreadings[key][i].witnesses[k];
               if (findStandoffRegularisation(unit, witness, apparatus) === null) {
-                _makeRegDecisionsStandoff(type, apparatus, unit, reading, parent,
-                                          reading.subreadings[key][i], witness, baseReadingsWithSettingsApplied);
+                CL._makeRegDecisionsStandoff(type, apparatus, unit, reading, parent, reading.subreadings[key][i],
+                                             witness, baseReadingsWithSettingsApplied);
                 makeMainReading(unit, reading, key, i, {'witnesses': [witness]});
               } else {  // if we get here we must already have dealt with any regulaisations made in RG for this reading
                 ids = makeMainReading(unit, reading, key, i, {'witnesses': [witness]});
@@ -2184,7 +2182,7 @@ var CL = (function() {
        *  if we already have this witness in our marked with the same type label and unit start and end then replace the stored data
        *  if we have it with a different type label but the same start and end then merge the data
        *  */
-      existingStandoff = _findStandoffWitness(reading.witnesses[i], unit.start, unit.end, unit.first_word_index);
+      existingStandoff = CL._findStandoffWitness(reading.witnesses[i], unit.start, unit.end, unit.first_word_index);
       if (existingStandoff !== null) {
         //then we need to merge the data this will occur if we have applied a standoff to a parent that already has standoff children!
         details = existingStandoff[0];
@@ -2274,7 +2272,7 @@ var CL = (function() {
     if (typeof options === 'undefined') {
       options = {};
     }
-    parentPos = findReadingPosById(unit, parent._id);
+    parentPos = CL.findReadingPosById(unit, parent._id);
     subreading = parent.subreadings[subtype][subreadingPos];
 
     if (typeof options.witnesses !== 'undefined') {
@@ -2736,10 +2734,10 @@ var CL = (function() {
       CL.container.innerHTML = html;
       document.getElementById('project_name').innerHTML = CL.project.name;
       if (_contextInput && Object.prototype.hasOwnProperty.call(_contextInput, 'onload_function') && _contextInput.onload_function !== null) {
-        runFunction(_contextInput.onload_function, [CL.project]);
+        CL.runFunction(_contextInput.onload_function, [CL.project]);
       } else {
         //run the default function to populate hideen form elements
-        _contextInputOnload(project);
+        CL._contextInputOnload(project);
       }
       const footer = [];
       if (Object.prototype.hasOwnProperty.call(CL.services, 'switchProject')) {
@@ -3075,7 +3073,7 @@ var CL = (function() {
       CL.project.useVForSupplied = project.useVForSupplied;
     }
     if (Object.prototype.hasOwnProperty.call(project, 'extractWordsForHeader') && typeof project.extractWordsForHeader === 'string') {
-      CL.project.extractWordsForHeader = _getFunctionFromString(project.extractWordsForHeader);
+      CL.project.extractWordsForHeader = CL._getFunctionFromString(project.extractWordsForHeader);
     }
     if (Object.prototype.hasOwnProperty.call(project, 'witnessDecorators')) {
       CL.project.witnessDecorators = project.witnessDecorators;
@@ -3092,7 +3090,7 @@ var CL = (function() {
     }
 
     if (Object.prototype.hasOwnProperty.call(project, 'prepareDisplayString') && typeof project.prepareDisplayString === 'string') {
-      CL.project.prepareDisplayString = _getFunctionFromString(project.prepareDisplayString);
+      CL.project.prepareDisplayString = CL._getFunctionFromString(project.prepareDisplayString);
     } else if (Object.prototype.hasOwnProperty.call(CL.services, 'prepareDisplayString')) {
       CL.project.prepareDisplayString = CL.services.prepareDisplayString;
     } else {
@@ -3102,7 +3100,7 @@ var CL = (function() {
     }
 
     if (Object.prototype.hasOwnProperty.call(project, 'prepareNormalisedString') && typeof project.prepareNormalisedString === 'string') {
-      CL.project.prepareNormalisedString = _getFunctionFromString(project.prepareNormalisedString);
+      CL.project.prepareNormalisedString = CL._getFunctionFromString(project.prepareNormalisedString);
     } else if (Object.prototype.hasOwnProperty.call(CL.services, 'prepareNormalisedString')) {
       CL.project.prepareNormalisedString = CL.services.prepareNormalisedString;
     } else {
@@ -3417,7 +3415,7 @@ var CL = (function() {
   _getContextFromInputForm = function() {
     var context;
     if (_contextInput && Object.prototype.hasOwnProperty.call(_contextInput, 'result_provider') && _contextInput.result_provider !== null) {
-      context = runFunction(_contextInput.result_provider);
+      context = CL.runFunction(_contextInput.result_provider);
     } else {
       context = document.getElementById('context').value;
     }
@@ -5429,356 +5427,10 @@ var CL = (function() {
     element.style.top = (position.y + scrollPosition.y) + "px";
   };
 
-  _displayWitnessesHover = function(event, witnesses) {
-    var element;
-    element = document.getElementById('tool_tip');
-    if (witnesses === undefined) {
-      if (event.target.tagName === 'LI') {
-        witnesses = _getWitnessesForReading(event.target.id);
-      } else if (event.target.parentNode.tagName === 'LI') {
-        witnesses = _getWitnessesForReading(event.target.parentNode.id);
-      } else if (event.target.tagName.id === 'TR') {
-        witnesses = _getWitnessesForReading(event.target.id);
-      } else if (event.target.parentNode.tagName === 'TR') {
-        witnesses = _getWitnessesForReading(event.target.parentNode.id);
-      } else {
-        witnesses = _getWitnessesForReading(event.target.parentNode.parentNode.id);
-      }
-    }
-    if (witnesses !== null) {
-      element.innerHTML = witnesses;
-    } else {
-      return;
-    }
-    calculatePosition(event, element);
-    element.style.display = "block";
-    event.stopPropagation();
-  };
 
-  _getWitnessesForReading = function(idString) {
-    var unit, reading, app, type, subrow;
-    if (idString.indexOf('_app_') !== -1) {
-      app = 'apparatus' + idString.substring(idString.indexOf('app_') + 4, idString.indexOf('_row'));
-    } else {
-      app = 'apparatus';
-    }
-    if (idString.indexOf('variant_unit') !== -1) {
-      unit = parseInt(idString.substring(0, idString.indexOf('_row')).replace('variant_unit_', ''), 10);
-      reading = parseInt(idString.substring(idString.indexOf('row_') + 4), 10);
-      if (!isNaN(unit) && !isNaN(reading)) {
-        return getReadingWitnesses(CL.data[app][unit].readings[reading], app, CL.data[app][unit].start,
-                                   CL.data[app][unit].end, CL.data[app][unit].first_word_index).join(', ');
-      }
-      return null;
-    }
-    unit = parseInt(idString.substring(0, idString.indexOf('_row')).replace('subreading_unit_', ''), 10);
-    reading = parseInt(idString.substring(idString.indexOf('row_') + 4, idString.indexOf('_type_')), 10);
-    type = idString.substring(idString.indexOf('type_') + 5, idString.indexOf('_subrow_'));
-    subrow = parseInt(idString.substring(idString.indexOf('subrow_') + 7), 10);
-    if (!isNaN(unit) && !isNaN(reading) && !isNaN(subrow)) {
-      return getReadingWitnesses(CL.data[app][unit].readings[reading].subreadings[type][subrow], app,
-                                 CL.data[app][unit].start, CL.data[app][unit].end,
-                                 CL.data[app][unit].first_word_index).join(', ');
-    }
-    return null;
-  };
 
-  /** check to see if the given witness has an entry in the standoff marked_readings
-   * if it does return the reading
-   * if it does not return null */
-  _findStandoffWitness = function(witness, start, end, firstWordIndex) {
-    var entry;
-    for (const key in CL.data.marked_readings) {
-      if (Object.prototype.hasOwnProperty.call(CL.data.marked_readings, key)) {
-        for (let i = CL.data.marked_readings[key].length - 1; i >= 0; i -= 1) {
-          if (CL.data.marked_readings[key][i].witness === witness &&
-            CL.data.marked_readings[key][i].start === start &&
-            CL.data.marked_readings[key][i].end === end) {
-            if (Object.prototype.hasOwnProperty.call(CL.data.marked_readings[key][i], 'first_word_index')) {
-              if (CL.data.marked_readings[key][i].first_word_index === firstWordIndex) {
-                entry = JSON.parse(JSON.stringify(CL.data.marked_readings[key][i]));
-                CL.data.marked_readings[key].splice(i, 1);
-                return [entry, key];
-              }
-            } else {
-              entry = JSON.parse(JSON.stringify(CL.data.marked_readings[key][i]));
-              CL.data.marked_readings[key].splice(i, 1);
-              return [entry, key];
-            }
-          }
-        }
-      }
-    }
-    return null;
-  };
 
-  findReadingPosById = function(unit, id) {
-    for (let i = 0; i < unit.readings.length; i += 1) {
-      if (Object.prototype.hasOwnProperty.call(unit.readings[i], '_id') && unit.readings[i]._id === id) {
-        return i;
-      }
-    }
-    return null;
-  };
 
-  // I considered making these cumulative but decided against so that projects can always override services
-  // if they have different editorial practices (can be overridden on a stage by stage basis)
-  _getPreStageChecks = function(stage) {
-    if (Object.prototype.hasOwnProperty.call(CL.project, 'preStageChecks') && Object.prototype.hasOwnProperty.call(CL.project.preStageChecks, stage)) {
-      return CL.project.preStageChecks[stage];
-    }
-    if (Object.prototype.hasOwnProperty.call(CL.services, 'preStageChecks') && Object.prototype.hasOwnProperty.call(CL.services.preStageChecks, stage)) {
-      return CL.services.preStageChecks[stage];
-    }
-    return [];
-  };
-
-  _makeRegDecisionsStandoff = function(type, apparatus, unit, reading, parent,
-                                       subreading, witness, baseReadingsWithSettingsApplied) {
-    var ruleDetails, standoffReading, values, classes, details, decisionDetails, subreadingTypes;
-
-    // get all the possible rules
-    ruleDetails = getRuleClasses(undefined, undefined, 'value', ['suffixed_sigla', 'identifier', 'name',
-                                                                  'subreading', 'suffixed_label']);
-    subreadingTypes = [];
-    for (const key in ruleDetails) {
-      if (Object.prototype.hasOwnProperty.call(ruleDetails, key) && ruleDetails[key][3] === true) {
-        subreadingTypes.push(key);
-      }
-    }
-    // now for each witness construct its regularisation history and make a standoff entry for it
-    standoffReading = {'start': unit.start,
-                       'end': unit.end,
-                       'unit_id': unit._id,
-                       'first_word_index': unit.first_word_index,
-                       'witness': witness,
-                       'apparatus': apparatus,
-                       'parent_text': extractWitnessText(parent, {'app_id': apparatus,
-                                                                  'unit_id': unit._id}),
-                       'identifier': [],
-                       'suffixed_sigla': [],
-                       'suffixed_label': [],
-                       'reading_history': [extractWitnessText(reading, {'witness': witness,
-                                                                        'reading_type': 'subreading'})],
-                       'subreading': [],
-                       'name': [],
-                       'values': []};
-
-    //now get all the words and their decisions or an empty list if no decisions
-    classes = [];
-    details = [];
-
-    //loop through the words and get the decisions for each word
-    for (let i = 0; i < subreading.text.length; i += 1) {
-      if (Object.prototype.hasOwnProperty.call(subreading.text[i][witness], 'decision_class')) {
-        classes.push(JSON.parse(JSON.stringify(subreading.text[i][witness].decision_class)));
-      } else {
-        classes.push([]);
-      }
-      if (Object.prototype.hasOwnProperty.call(subreading.text[i][witness], 'decision_details')) {
-        decisionDetails = JSON.parse(JSON.stringify(subreading.text[i][witness].decision_details));
-
-        decisionDetails[0].base_reading = baseReadingsWithSettingsApplied[decisionDetails[0].t]['interface'];
-        details.push(decisionDetails);
-      } else {
-        details.push([{
-          'n': subreading.text[i]['interface']
-        }]);
-      }
-    }
-
-    // now implement your algorithm and push each result to the standoff reading
-    // work out the text at this stage as part of that - text should be before the rules are applied so
-    // first one has none applied etc.
-    standoffReading = _getReadingHistory(classes, details, standoffReading, ruleDetails, type,
-                                         subreadingTypes, reading, witness, subreading);
-    standoffReading.value = standoffReading.values.join('|');
-    delete standoffReading.values;
-    if (!Object.prototype.hasOwnProperty.call(CL.data.marked_readings, standoffReading.value)) {
-      CL.data.marked_readings[standoffReading.value] = [];
-    }
-    if (reading.text.length > 0 && Object.prototype.hasOwnProperty.call(reading.text[reading.text.length - 1], 'combined_gap_after')) {
-      standoffReading.combined_gap_after = true;
-    }
-    if (reading.text.length > 0 && Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before')) {
-      standoffReading.combined_gap_before = true;
-      if (Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before_details')) {
-        standoffReading.combined_gap_before_details = reading.text[0].combined_gap_before_details;
-      }
-    }
-    CL.data.marked_readings[standoffReading.value].push(standoffReading);
-  };
-
-  _contextInputOnload = function(project) {
-    //TODO: check we need language - I think it is optional
-    document.getElementById('language').value = project.language;
-    document.getElementById('base_text').value = project.base_text;
-    document.getElementById('project').value = project._id;
-    document.getElementById('preselected_witnesses').value = project.witnesses.join();
-  };
-
-  _getReadingHistory = function(classes, details, standoffReading, ruleDetails, type,
-                                subreadingTypes, originalReading, witness, subreading) {
-    var position, temp, ruleType, lowestRulePositions, allDone, reading;
-    // position is how far through the decision lists we are
-    position = 0;
-    allDone = false;
-    while (!allDone) {
-      temp = _getNextTargetRuleInfo(classes, subreadingTypes);
-      ruleType = temp[0];
-      lowestRulePositions = temp[1];
-      if (!ruleType) {
-        allDone = true;
-      } else {
-        // ['suffixed_sigla', 'identifier', 'name', 'subreading', 'suffixed_label']
-        standoffReading.suffixed_sigla.push(ruleDetails[ruleType][0]);
-        standoffReading.identifier.push(ruleDetails[ruleType][1]);
-        standoffReading.name.push(ruleDetails[ruleType][2]);
-        standoffReading.subreading.push(ruleDetails[ruleType][3]);
-        standoffReading.suffixed_label.push(ruleDetails[ruleType][4]);
-        standoffReading.values.push(ruleType);
-        standoffReading.reading_history.push(_getHistoricalReading(ruleType, lowestRulePositions, classes, details,
-                                                                   originalReading, witness, subreading));
-        classes = _removeAppliedRules(ruleType, lowestRulePositions, classes);
-      }
-    }
-    // now add the current one
-    standoffReading.suffixed_sigla.push(ruleDetails[type][0]);
-    standoffReading.identifier.push(ruleDetails[type][1]);
-    standoffReading.name.push(ruleDetails[type][2]);
-    standoffReading.subreading.push(ruleDetails[type][3]);
-    standoffReading.suffixed_label.push(ruleDetails[type][4]);
-    standoffReading.values.push(type);
-    standoffReading.reading_text = standoffReading.reading_history[0];
-    return standoffReading;
-  };
-
-  _getNextTargetRuleInfo = function(classes, subreadingTypes) {
-    var ruleType, positions, lowestPosition;
-    positions = [];
-    lowestPosition = 1000000000;
-    for (let i = 0; i < classes.length; i += 1) {
-      positions[i] = null;
-      for (let j = 0; j < classes[i].length; j += 1) {
-        if (classes[i][j] && positions[i] === null) {
-          positions[i] = j;
-          if (j < lowestPosition) {
-            lowestPosition = j;
-          }
-        }
-      }
-    }
-    // put a rule type in to start off with so we always have one - overwrite if needed in the loop
-    ruleType = classes[0][lowestPosition];
-    for (let i = 1; i < classes.length; i += 1) {
-      if (classes[i][lowestPosition] !== null && typeof classes[i][lowestPosition] !== 'undefined' &&
-        (typeof ruleType === 'undefined' || ruleType === null || subreadingTypes.indexOf(ruleType) !== -1)) {
-        ruleType = classes[i][lowestPosition];
-      }
-    }
-    if (subreadingTypes.indexOf(ruleType) !== -1) {
-      for (let i = 0; i < positions.length; i += 1) {
-        if (classes[i][positions[i]] !== null && typeof classes[i][positions[i]] !== 'undefined' &&
-          subreadingTypes.indexOf(classes[i][positions[i]]) === -1) {
-          ruleType = classes[i][positions[i]];
-          break;
-        }
-      }
-    }
-    return [ruleType, positions];
-  };
-
-  _removeAppliedRules = function(ruleType, positions, classes) {
-    for (let i = 0; i < classes.length; i += 1) {
-      if (classes[i][positions[i]] === ruleType) {
-        classes[i][positions[i]] = null;
-      }
-    }
-    return classes;
-  };
-
-  _getHistoricalReading = function(ruleType, positions, classes, details, reading, witness, subreading) {
-    var newReading;
-    newReading = [];
-    if (Object.prototype.hasOwnProperty.call(reading, 'combined_gap_before_subreadings') &&
-            reading.combined_gap_before_subreadings.indexOf(witness) !== -1 &&
-            Object.prototype.hasOwnProperty.call(reading, 'combined_gap_before_subreadings_details') &&
-            Object.prototype.hasOwnProperty.call(reading.combined_gap_before_subreadings_details, witness)) {
-      newReading.push('&lt;' + reading.combined_gap_before_subreadings_details[witness] + '&gt;');
-    } else if (reading.text.length > 0 && Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before') &&
-                  (!Object.prototype.hasOwnProperty.call(reading, 'SR_text') || !Object.prototype.hasOwnProperty.call(reading.SR_text, witness))) {
-      if (Object.prototype.hasOwnProperty.call(reading.text[0], witness) &&
-            Object.prototype.hasOwnProperty.call(reading.text[0][witness], 'gap_before')) {
-        // first unit in verse this might actually work like the others now
-        newReading.push('&lt;' + reading.text[0][witness].gap_before_details + '&gt;');
-      } else if (Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before') &&
-                      reading.text[0].combined_gap_before.length > 0 &&
-                        Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before_details')) {
-        //subsequent units in verse
-        //this may be the only condition ever hit here
-        newReading.push('&lt;' + reading.text[0].combined_gap_before_details + '&gt;');
-      }
-    }
-    for (let i = 0; i < positions.length; i += 1) {
-      if (positions[i] !== null) {
-        if (classes[i][positions[i]] === ruleType) {
-          newReading.push(details[i][positions[i]].n);
-        } else {
-          if (positions[i] > 0) {
-            newReading.push(details[i][positions[i] - 1].n);
-          } else {
-            newReading.push(details[i][0].base_reading);
-          }
-        }
-      } else if (details[i].length > 0) {
-        newReading.push(details[i][details[i].length - 1].n);
-      } else {
-        newReading.push(details[i][0].n);
-      }
-      if (i === positions.length - 1 && Object.prototype.hasOwnProperty.call(reading.text[i], 'combined_gap_after') &&
-        reading.text[i].combined_gap_after.indexOf(witness) !== -1) {
-        if (Object.prototype.hasOwnProperty.call(subreading.text[i][witness], 'gap_after')) {
-          newReading.push('&lt;' + subreading.text[i][witness].gap_details + '&gt;');
-        }
-      } else if (i !== positions.length - 1) {
-        if (Object.prototype.hasOwnProperty.call(subreading.text[i][witness], 'gap_after')) {
-          newReading.push('&lt;' + subreading.text[i][witness].gap_details + '&gt;');
-        }
-      }
-    }
-    return newReading.join(' ');
-  };
-
-  _getFunctionFromString = function(functionString) {
-    var scope, scopeList;
-    scope = window;
-    scopeList = functionString.split('.');
-    for (let i = 0; i < scopeList.length - 1; i += 1) {
-      scope = scope[scopeList[i]];
-      if (scope == undefined) return;
-    }
-    return scope[scopeList[scopeList.length - 1]];
-  };
-
-  runFunction = function(functionRef, args) {
-    var fn;
-    if (typeof args === 'undefined') {
-      args = [];
-    }
-    if (typeof functionRef === 'string') {
-      fn = _getFunctionFromString(functionRef);
-      return fn(args);
-    } else {
-      return functionRef.apply(this, args);
-    }
-  };
-
-  pad2 = function (number) {
-    if (number < 10) {
-      return '0' + number;
-    }
-    return number;
-  };
 
   return {
 
@@ -5811,7 +5463,6 @@ var CL = (function() {
     savedAlgorithmSettings: savedAlgorithmSettings,
     savedDataSettings: savedDataSettings,
     existingCollation: existingCollation,
-    findReadingPosById: findReadingPosById,
     setServiceProvider: setServiceProvider,
     expandFillPageClients: expandFillPageClients,
     getHeaderHtml: getHeaderHtml,
@@ -5881,9 +5532,365 @@ var CL = (function() {
     returnToSummaryTable: returnToSummaryTable,
     prepareAdditionalCollation: prepareAdditionalCollation,
     removeSpecialWitnesses: removeSpecialWitnesses,
-    runFunction: runFunction,
     expandWitnessDecorators: expandWitnessDecorators,
-    pad2: pad2,
+
+
+    findReadingPosById: function (unit, id) {
+      for (let i = 0; i < unit.readings.length; i += 1) {
+        if (Object.prototype.hasOwnProperty.call(unit.readings[i], '_id') && unit.readings[i]._id === id) {
+          return i;
+        }
+      }
+      return null;
+    },
+
+    runFunction: function (functionRef, args) {
+      let fn;
+      if (typeof args === 'undefined') {
+        args = [];
+      }
+      if (typeof functionRef === 'string') {
+        fn = CL._getFunctionFromString(functionRef);
+        return fn(args);
+      } else {
+        return functionRef.apply(this, args);
+      }
+    },
+
+    pad2: function (number) {
+      if (number < 10) {
+        return '0' + number;
+      }
+      return number;
+    },
+
+
+
+
+
+
+    _displayWitnessesHover: function(event, witnesses) {
+      const element = document.getElementById('tool_tip');
+      if (witnesses === undefined) {
+        if (event.target.tagName === 'LI') {
+          witnesses = CL._getWitnessesForReading(event.target.id);
+        } else if (event.target.parentNode.tagName === 'LI') {
+          witnesses = CL._getWitnessesForReading(event.target.parentNode.id);
+        } else if (event.target.tagName.id === 'TR') {
+          witnesses = CL._getWitnessesForReading(event.target.id);
+        } else if (event.target.parentNode.tagName === 'TR') {
+          witnesses = CL._getWitnessesForReading(event.target.parentNode.id);
+        } else {
+          witnesses = CL._getWitnessesForReading(event.target.parentNode.parentNode.id);
+        }
+      }
+      if (witnesses !== null) {
+        element.innerHTML = witnesses;
+      } else {
+        return;
+      }
+      calculatePosition(event, element);
+      element.style.display = "block";
+      event.stopPropagation();
+    },
+
+    _getWitnessesForReading: function(idString) {
+      let unit, reading, app;
+      if (idString.indexOf('_app_') !== -1) {
+        app = 'apparatus' + idString.substring(idString.indexOf('app_') + 4, idString.indexOf('_row'));
+      } else {
+        app = 'apparatus';
+      }
+      if (idString.indexOf('variant_unit') !== -1) {
+        unit = parseInt(idString.substring(0, idString.indexOf('_row')).replace('variant_unit_', ''), 10);
+        reading = parseInt(idString.substring(idString.indexOf('row_') + 4), 10);
+        if (!isNaN(unit) && !isNaN(reading)) {
+          return getReadingWitnesses(CL.data[app][unit].readings[reading], app, CL.data[app][unit].start,
+                                     CL.data[app][unit].end, CL.data[app][unit].first_word_index).join(', ');
+        }
+        return null;
+      }
+      unit = parseInt(idString.substring(0, idString.indexOf('_row')).replace('subreading_unit_', ''), 10);
+      reading = parseInt(idString.substring(idString.indexOf('row_') + 4, idString.indexOf('_type_')), 10);
+      const type = idString.substring(idString.indexOf('type_') + 5, idString.indexOf('_subrow_'));
+      const subrow = parseInt(idString.substring(idString.indexOf('subrow_') + 7), 10);
+      if (!isNaN(unit) && !isNaN(reading) && !isNaN(subrow)) {
+        return getReadingWitnesses(CL.data[app][unit].readings[reading].subreadings[type][subrow], app,
+                                   CL.data[app][unit].start, CL.data[app][unit].end,
+                                   CL.data[app][unit].first_word_index).join(', ');
+      }
+      return null;
+    },
+
+    /** check to see if the given witness has an entry in the standoff marked_readings
+     * if it does return the reading
+     * if it does not return null */
+    _findStandoffWitness: function (witness, start, end, firstWordIndex) {
+      let entry;
+      for (const key in CL.data.marked_readings) {
+        if (Object.prototype.hasOwnProperty.call(CL.data.marked_readings, key)) {
+          for (let i = CL.data.marked_readings[key].length - 1; i >= 0; i -= 1) {
+            if (CL.data.marked_readings[key][i].witness === witness &&
+              CL.data.marked_readings[key][i].start === start &&
+              CL.data.marked_readings[key][i].end === end) {
+              if (Object.prototype.hasOwnProperty.call(CL.data.marked_readings[key][i], 'first_word_index')) {
+                if (CL.data.marked_readings[key][i].first_word_index === firstWordIndex) {
+                  entry = JSON.parse(JSON.stringify(CL.data.marked_readings[key][i]));
+                  CL.data.marked_readings[key].splice(i, 1);
+                  return [entry, key];
+                }
+              } else {
+                entry = JSON.parse(JSON.stringify(CL.data.marked_readings[key][i]));
+                CL.data.marked_readings[key].splice(i, 1);
+                return [entry, key];
+              }
+            }
+          }
+        }
+      }
+      return null;
+    },
+
+    // I considered making these cumulative but decided against so that projects can always override services
+    // if they have different editorial practices (can be overridden on a stage by stage basis)
+    _getPreStageChecks: function (stage) {
+      if (Object.prototype.hasOwnProperty.call(CL.project, 'preStageChecks') &&
+        Object.prototype.hasOwnProperty.call(CL.project.preStageChecks, stage)) {
+        return CL.project.preStageChecks[stage];
+      }
+      if (Object.prototype.hasOwnProperty.call(CL.services, 'preStageChecks') &&
+        Object.prototype.hasOwnProperty.call(CL.services.preStageChecks, stage)) {
+        return CL.services.preStageChecks[stage];
+      }
+      return [];
+    },
+
+    _makeRegDecisionsStandoff: function (type, apparatus, unit, reading, parent, subreading, witness,
+      baseReadingsWithSettingsApplied) {
+      let standoffReading, decisionDetails;
+      // get all the possible rules
+      const ruleDetails = getRuleClasses(undefined, undefined, 'value', ['suffixed_sigla', 'identifier', 'name',
+        'subreading', 'suffixed_label']);
+      const subreadingTypes = [];
+      for (const key in ruleDetails) {
+        if (Object.prototype.hasOwnProperty.call(ruleDetails, key) && ruleDetails[key][3] === true) {
+          subreadingTypes.push(key);
+        }
+      }
+      // now for each witness construct its regularisation history and make a standoff entry for it
+      standoffReading = {
+        'start': unit.start,
+        'end': unit.end,
+        'unit_id': unit._id,
+        'first_word_index': unit.first_word_index,
+        'witness': witness,
+        'apparatus': apparatus,
+        'parent_text': extractWitnessText(parent, {
+          'app_id': apparatus,
+          'unit_id': unit._id
+        }),
+        'identifier': [],
+        'suffixed_sigla': [],
+        'suffixed_label': [],
+        'reading_history': [extractWitnessText(reading, {
+          'witness': witness,
+          'reading_type': 'subreading'
+        })],
+        'subreading': [],
+        'name': [],
+        'values': []
+      };
+      //now get all the words and their decisions or an empty list if no decisions
+      const classes = [];
+      const details = [];
+
+      //loop through the words and get the decisions for each word
+      for (let i = 0; i < subreading.text.length; i += 1) {
+        if (Object.prototype.hasOwnProperty.call(subreading.text[i][witness], 'decision_class')) {
+          classes.push(JSON.parse(JSON.stringify(subreading.text[i][witness].decision_class)));
+        } else {
+          classes.push([]);
+        }
+        if (Object.prototype.hasOwnProperty.call(subreading.text[i][witness], 'decision_details')) {
+          decisionDetails = JSON.parse(JSON.stringify(subreading.text[i][witness].decision_details));
+          decisionDetails[0].base_reading = baseReadingsWithSettingsApplied[decisionDetails[0].t]['interface'];
+          details.push(decisionDetails);
+        } else {
+          details.push([{
+            'n': subreading.text[i]['interface']
+          }]);
+        }
+      }
+      // now implement your algorithm and push each result to the standoff reading
+      // work out the text at this stage as part of that - text should be before the rules are applied so
+      // first one has none applied etc.
+      standoffReading = CL._getReadingHistory(classes, details, standoffReading, ruleDetails, type,
+        subreadingTypes, reading, witness, subreading);
+      standoffReading.value = standoffReading.values.join('|');
+      delete standoffReading.values;
+      if (!Object.prototype.hasOwnProperty.call(CL.data.marked_readings, standoffReading.value)) {
+        CL.data.marked_readings[standoffReading.value] = [];
+      }
+      if (reading.text.length > 0 && Object.prototype.hasOwnProperty.call(reading.text[reading.text.length - 1], 'combined_gap_after')) {
+        standoffReading.combined_gap_after = true;
+      }
+      if (reading.text.length > 0 && Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before')) {
+        standoffReading.combined_gap_before = true;
+        if (Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before_details')) {
+          standoffReading.combined_gap_before_details = reading.text[0].combined_gap_before_details;
+        }
+      }
+      CL.data.marked_readings[standoffReading.value].push(standoffReading);
+    },
+
+    _contextInputOnload: function (project) {
+      //TODO: check we need language - I think it is optional
+      document.getElementById('language').value = project.language;
+      document.getElementById('base_text').value = project.base_text;
+      document.getElementById('project').value = project._id;
+      document.getElementById('preselected_witnesses').value = project.witnesses.join();
+    },
+
+    _getReadingHistory: function (classes, details, standoffReading, ruleDetails, type, subreadingTypes,
+      originalReading, witness, subreading) {
+      let temp, ruleType, lowestRulePositions, allDone;
+      allDone = false;
+      while (!allDone) {
+        temp = CL._getNextTargetRuleInfo(classes, subreadingTypes);
+        ruleType = temp[0];
+        lowestRulePositions = temp[1];
+        if (!ruleType) {
+          allDone = true;
+        } else {
+          // ['suffixed_sigla', 'identifier', 'name', 'subreading', 'suffixed_label']
+          standoffReading.suffixed_sigla.push(ruleDetails[ruleType][0]);
+          standoffReading.identifier.push(ruleDetails[ruleType][1]);
+          standoffReading.name.push(ruleDetails[ruleType][2]);
+          standoffReading.subreading.push(ruleDetails[ruleType][3]);
+          standoffReading.suffixed_label.push(ruleDetails[ruleType][4]);
+          standoffReading.values.push(ruleType);
+          standoffReading.reading_history.push(CL._getHistoricalReading(ruleType, lowestRulePositions, classes, details,
+            originalReading, witness, subreading));
+          classes = CL._removeAppliedRules(ruleType, lowestRulePositions, classes);
+        }
+      }
+      // now add the current one
+      standoffReading.suffixed_sigla.push(ruleDetails[type][0]);
+      standoffReading.identifier.push(ruleDetails[type][1]);
+      standoffReading.name.push(ruleDetails[type][2]);
+      standoffReading.subreading.push(ruleDetails[type][3]);
+      standoffReading.suffixed_label.push(ruleDetails[type][4]);
+      standoffReading.values.push(type);
+      standoffReading.reading_text = standoffReading.reading_history[0];
+      return standoffReading;
+    },
+
+    _getNextTargetRuleInfo: function (classes, subreadingTypes) {
+      let ruleType, lowestPosition;
+      const positions = [];
+      lowestPosition = 1000000000;
+      for (let i = 0; i < classes.length; i += 1) {
+        positions[i] = null;
+        for (let j = 0; j < classes[i].length; j += 1) {
+          if (classes[i][j] && positions[i] === null) {
+            positions[i] = j;
+            if (j < lowestPosition) {
+              lowestPosition = j;
+            }
+          }
+        }
+      }
+      // put a rule type in to start off with so we always have one - overwrite if needed in the loop
+      ruleType = classes[0][lowestPosition];
+      for (let i = 1; i < classes.length; i += 1) {
+        if (classes[i][lowestPosition] !== null && typeof classes[i][lowestPosition] !== 'undefined' &&
+          (typeof ruleType === 'undefined' || ruleType === null || subreadingTypes.indexOf(ruleType) !== -1)) {
+          ruleType = classes[i][lowestPosition];
+        }
+      }
+      if (subreadingTypes.indexOf(ruleType) !== -1) {
+        for (let i = 0; i < positions.length; i += 1) {
+          if (classes[i][positions[i]] !== null && typeof classes[i][positions[i]] !== 'undefined' &&
+            subreadingTypes.indexOf(classes[i][positions[i]]) === -1) {
+            ruleType = classes[i][positions[i]];
+            break;
+          }
+        }
+      }
+      return [ruleType, positions];
+    },
+
+    _removeAppliedRules: function (ruleType, positions, classes) {
+      for (let i = 0; i < classes.length; i += 1) {
+        if (classes[i][positions[i]] === ruleType) {
+          classes[i][positions[i]] = null;
+        }
+      }
+      return classes;
+    },
+
+    _getHistoricalReading: function (ruleType, positions, classes, details, reading, witness, subreading) {
+      const newReading = [];
+      if (Object.prototype.hasOwnProperty.call(reading, 'combined_gap_before_subreadings') &&
+        reading.combined_gap_before_subreadings.indexOf(witness) !== -1 &&
+        Object.prototype.hasOwnProperty.call(reading, 'combined_gap_before_subreadings_details') &&
+        Object.prototype.hasOwnProperty.call(reading.combined_gap_before_subreadings_details, witness)) {
+        newReading.push('&lt;' + reading.combined_gap_before_subreadings_details[witness] + '&gt;');
+      } else if (reading.text.length > 0 && Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before') &&
+        (!Object.prototype.hasOwnProperty.call(reading, 'SR_text') || !Object.prototype.hasOwnProperty.call(reading.SR_text, witness))) {
+        if (Object.prototype.hasOwnProperty.call(reading.text[0], witness) &&
+          Object.prototype.hasOwnProperty.call(reading.text[0][witness], 'gap_before')) {
+          // first unit in verse this might actually work like the others now
+          newReading.push('&lt;' + reading.text[0][witness].gap_before_details + '&gt;');
+        } else if (Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before') &&
+          reading.text[0].combined_gap_before.length > 0 &&
+          Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before_details')) {
+          //subsequent units in verse
+          //this may be the only condition ever hit here
+          newReading.push('&lt;' + reading.text[0].combined_gap_before_details + '&gt;');
+        }
+      }
+      for (let i = 0; i < positions.length; i += 1) {
+        if (positions[i] !== null) {
+          if (classes[i][positions[i]] === ruleType) {
+            newReading.push(details[i][positions[i]].n);
+          } else {
+            if (positions[i] > 0) {
+              newReading.push(details[i][positions[i] - 1].n);
+            } else {
+              newReading.push(details[i][0].base_reading);
+            }
+          }
+        } else if (details[i].length > 0) {
+          newReading.push(details[i][details[i].length - 1].n);
+        } else {
+          newReading.push(details[i][0].n);
+        }
+        if (i === positions.length - 1 && Object.prototype.hasOwnProperty.call(reading.text[i], 'combined_gap_after') &&
+          reading.text[i].combined_gap_after.indexOf(witness) !== -1) {
+          if (Object.prototype.hasOwnProperty.call(subreading.text[i][witness], 'gap_after')) {
+            newReading.push('&lt;' + subreading.text[i][witness].gap_details + '&gt;');
+          }
+        } else if (i !== positions.length - 1) {
+          if (Object.prototype.hasOwnProperty.call(subreading.text[i][witness], 'gap_after')) {
+            newReading.push('&lt;' + subreading.text[i][witness].gap_details + '&gt;');
+          }
+        }
+      }
+      return newReading.join(' ');
+    },
+
+    _getFunctionFromString: function (functionString) {
+      let scope;
+      scope = window;
+      const scopeList = functionString.split('.');
+      for (let i = 0; i < scopeList.length - 1; i += 1) {
+        scope = scope[scopeList[i]];
+        if (scope == undefined) return;
+      }
+      return scope[scopeList[scopeList.length - 1]];
+    },
+
 
     //deprecated function mapping for calls from older services
     set_service_provider: setServiceProvider,
