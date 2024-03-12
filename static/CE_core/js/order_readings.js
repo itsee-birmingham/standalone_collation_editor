@@ -1,7 +1,6 @@
-/*jshint esversion: 6 */
-var testing;
-OR = (function() {
-  "use strict";
+/* exported OR */
+/* global CL, SimpleContextMenu, spinner, cforms, SR, SV, drag, REDIPS */
+var OR = (function() {
 
   // public variable declarations
   let undoStack = [];
@@ -46,7 +45,7 @@ OR = (function() {
       options = {};
     }
     //make sure we have a container to put things in
-    if (!options.hasOwnProperty('container') || options.container === null) {
+    if (!Object.prototype.hasOwnProperty.call(options, 'container') || options.container === null) {
       container = document.getElementsByTagName('body')[0];
     } else {
       container = options.container;
@@ -55,7 +54,7 @@ OR = (function() {
       CL.expandWitnessDecorators();
     }
     //sort out options and get layout
-    if (!options.hasOwnProperty('highlighted_wit') && CL.highlighted !== 'none') {
+    if (!Object.prototype.hasOwnProperty.call(options, 'highlighted_wit') && CL.highlighted !== 'none') {
       options.highlighted_wit = CL.highlighted;
     }
     //attach right click menus
@@ -129,18 +128,18 @@ OR = (function() {
     highestUnit = header[1];
     html.push.apply(html, temp[0]);
     overlapOptions = {'column_lengths': temp[1]};
-    if (options.hasOwnProperty('highlighted_wit')) {
+    if (Object.prototype.hasOwnProperty.call(options, 'highlighted_wit')) {
       overlapOptions.highlighted_wit = options.highlighted_wit;
     }
-    if (options.hasOwnProperty('error_unit')) {
+    if (Object.prototype.hasOwnProperty.call(options, 'error_unit')) {
       overlapOptions.error_unit = options.error_unit;
     }
     overlapOptions.firstUnitOverlaps = {};
     overlapOptions.lastUnitOverlaps = {};
-    if (CL.data.apparatus[0].hasOwnProperty('overlap_units')) {
+    if (Object.prototype.hasOwnProperty.call(CL.data.apparatus[0], 'overlap_units')) {
       overlapOptions.firstUnitOverlaps = CL.data.apparatus[0].overlap_units;
     }
-    if (CL.data.apparatus[CL.data.apparatus.length - 1].hasOwnProperty('overlap_units')) {
+    if (Object.prototype.hasOwnProperty.call(CL.data.apparatus[CL.data.apparatus.length - 1], 'overlap_units')) {
       overlapOptions.lastUnitOverlaps = CL.data.apparatus[CL.data.apparatus.length - 1].overlap_units;
     }
     appIds = CL.getOrderedAppLines();
@@ -153,7 +152,7 @@ OR = (function() {
     }
     html.push('<ul id="context_menu" class="SimpleContextMenu"></ul>');
     document.getElementById('header').innerHTML = CL.getHeaderHtml('Order Readings', CL.context);
-    if (CL.services.hasOwnProperty('showLoginStatus')) {
+    if (Object.prototype.hasOwnProperty.call(CL.services, 'showLoginStatus')) {
       CL.services.showLoginStatus();
     }
     document.getElementById('header').className = 'reorder_header';
@@ -172,7 +171,7 @@ OR = (function() {
       showHideSubreadingsButtonText = 'show non-edition subreadings';
     }
     footerHtml = [];
-    if (CL.project.hasOwnProperty('showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
+    if (Object.prototype.hasOwnProperty.call(CL.project, 'showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
       footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
     }
     footerHtml.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">' +
@@ -207,7 +206,7 @@ OR = (function() {
       _highlightWitness(event.target.value);
     });
     if (document.getElementById('save')) {
-      $('#save').on('click', function(event) {
+      $('#save').on('click', function() {
         CL.saveCollation('ordered');
       });
     }
@@ -222,8 +221,8 @@ OR = (function() {
         redipsInitOrderReadings('drag_unit_' + i);
       }
     }
-    for (let key in CL.data) {
-      if (CL.data.hasOwnProperty(key)) {
+    for (const key in CL.data) {
+      if (Object.prototype.hasOwnProperty.call(CL.data, key)) {
         if (key.match(/apparatus\d/g) !== null) {
           for (let i = 0; i < CL.data[key].length; i += 1) {
             if (document.getElementById('drag_unit_' + i + '_app_' + key.replace('apparatus', '')) !== null) {
@@ -234,7 +233,7 @@ OR = (function() {
       }
     }
     if (document.getElementById('undo_button')) {
-      $('#undo_button').on('click', function(event) {
+      $('#undo_button').on('click', function() {
         spinner.showLoadingOverlay();
         _undo();
       });
@@ -251,14 +250,14 @@ OR = (function() {
   };
 
   showApprovedVersion = function(options) {
-    var html, highestUnit, header, row, overlaps, appIds, footerHtml, num, temp, eventRows,
+    var html, header, row, overlaps, appIds, footerHtml, num, temp, eventRows,
         overlapOptions, newOverlapOptions, container, showHideSubreadingsButtonText;
     if (typeof options === 'undefined') {
       options = {};
     }
     CL.stage = 'approved';
     //make sure we have a container to put things in
-    if (!options.hasOwnProperty('container') || options.container === null) {
+    if (!Object.prototype.hasOwnProperty.call(options, 'container') || options.container === null) {
       container = document.getElementsByTagName('body')[0];
     } else {
       container = options.container;
@@ -267,19 +266,18 @@ OR = (function() {
       CL.expandWitnessDecorators();
     }
     //sort out options and get layout
-    if (!options.hasOwnProperty('highlighted_wit') && CL.highlighted !== 'none') {
+    if (!Object.prototype.hasOwnProperty.call(options, 'highlighted_wit') && CL.highlighted !== 'none') {
       options.highlighted_wit = CL.highlighted;
     }
     temp = CL.getUnitLayout(CL.data.apparatus, 1, 'approved', options);
     header = CL.getCollationHeader(CL.data, temp[1], false);
     html = header[0];
-    highestUnit = header[1];
     html.push.apply(html, temp[0]);
     overlapOptions = {'column_lengths': temp[1]};
-    if (options.hasOwnProperty('highlighted_wit')) {
+    if (Object.prototype.hasOwnProperty.call(options, 'highlighted_wit')) {
       overlapOptions.highlighted_wit = options.highlighted_wit;
     }
-    if (options.hasOwnProperty('error_unit')) {
+    if (Object.prototype.hasOwnProperty.call(options, 'error_unit')) {
       overlapOptions.error_unit = options.error_unit;
     }
     appIds = CL.getOrderedAppLines();
@@ -291,7 +289,7 @@ OR = (function() {
       temp[2].push.apply(temp[2], overlaps[1]);
     }
     document.getElementById('header').innerHTML = CL.getHeaderHtml('Approved', CL.context);
-    if (CL.services.hasOwnProperty('showLoginStatus')) {
+    if (Object.prototype.hasOwnProperty.call(CL.services, 'showLoginStatus')) {
       CL.services.showLoginStatus();
     }
     document.getElementById('header').className = 'approved_header';
@@ -305,7 +303,7 @@ OR = (function() {
       showHideSubreadingsButtonText = 'show non-edition subreadings';
     }
     footerHtml = [];
-    if (CL.project.hasOwnProperty('showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
+    if (Object.prototype.hasOwnProperty.call(CL.project, 'showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
       footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
     }
     footerHtml.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">' +
@@ -360,24 +358,24 @@ OR = (function() {
     if (id.indexOf('_app_') !== -1) {
       overlap = true;
     }
-    if (options.hasOwnProperty('highlighted_wit')) {
+    if (Object.prototype.hasOwnProperty.call(options, 'highlighted_wit')) {
       hand = options.highlighted_wit.split('|')[1];
     } else {
       hand = null;
     }
-    if (options.hasOwnProperty('col_length')) {
+    if (Object.prototype.hasOwnProperty.call(options, 'col_length')) {
       colspan = options.col_length;
     } else {
       colspan = end - start + 1;
     }
     orRules = CL.getRuleClasses(undefined, undefined, 'value', ['identifier', 'keep_as_main_reading',
                                                                 'suffixed_label', 'suffixed_reading']);
-    for (let key in orRules) {
-      if (orRules.hasOwnProperty(key) && orRules[key][1] === false) {
+    for (const key in orRules) {
+      if (Object.prototype.hasOwnProperty.call(orRules, key) && orRules[key][1] === false) {
         delete orRules[key];
       }
     }
-    if (_areAllEmptyReadings(data) && !options.hasOwnProperty('created')) {
+    if (_areAllEmptyReadings(data) && !Object.prototype.hasOwnProperty.call(options, 'created')) {
       html.push('<td class="redips-mark start_' + start + ' " colspan="' + colspan + '">' +
                 '<div class="drag_div deletable" id="drag_unit_' + id + '">');
     } else {
@@ -445,31 +443,31 @@ OR = (function() {
           readingClass.push('om');
         }
         if (i > 0) {
-          if (options.hasOwnProperty('joinable_backwards') && options.joinable_backwards === true) {
+          if (Object.prototype.hasOwnProperty.call(options, 'joinable_backwards') && options.joinable_backwards === true) {
             readingClass.push('joinable_backwards');
           }
-          if (options.hasOwnProperty('joinable_forwards') && options.joinable_forwards === true) {
+          if (Object.prototype.hasOwnProperty.call(options, 'joinable_forwards') && options.joinable_forwards === true) {
             readingClass.push('joinable_forwards');
           }
         }
       }
       html.push('<td class="redips-mark ' + readingClass.join('_') + '">');
       html.push('<div class="spanlike">');
-      if (data[i].hasOwnProperty('join_backwards') && data[i].join_backwards === true) {
+      if (Object.prototype.hasOwnProperty.call(data[i], 'join_backwards') && data[i].join_backwards === true) {
         html.push('⇇&nbsp;');
       }
       html.push(text);
       if (readingSuffix !== '') {
         html.push(' ' + readingSuffix);
       }
-      if (data[i].hasOwnProperty('join_forwards') && data[i].join_forwards === true) {
+      if (Object.prototype.hasOwnProperty.call(data[i], 'join_forwards') && data[i].join_forwards === true) {
         html.push('&nbsp;⇉');
       }
       html.push('</div>');
-      if (data[i].hasOwnProperty('subreadings')) {
+      if (Object.prototype.hasOwnProperty.call(data[i], 'subreadings')) {
         html.push('<table class="subreading_unit" id="subreading_unit_' + id + '_row_' + i + '">');
         overlapped = false;
-        if (data[i].hasOwnProperty('overlap_status')) {
+        if (Object.prototype.hasOwnProperty.call(data[i], 'overlap_status')) {
           overlapped = true;
         }
         temp = _getSubunitData(data[i].subreadings, i, id, data[i].label, 'subreading', hand, overlapped);
@@ -489,9 +487,9 @@ OR = (function() {
     var label, labels, allPotentialParents, potentialParents;
     // first do a pass through the regular readings
     for (let i = 0; i < readings.length; i += 1) {
-      if (readings[i].hasOwnProperty('type') && (readings[i].type === 'lac' || readings[i].type === 'lac_verse')) {
+      if (Object.prototype.hasOwnProperty.call(readings[i], 'type') && (readings[i].type === 'lac' || readings[i].type === 'lac_verse')) {
         label = 'zz';
-      } else if (readings[i].hasOwnProperty('overlap_status')) {
+      } else if (Object.prototype.hasOwnProperty.call(readings[i], 'overlap_status')) {
         for (let j = 0; j < CL.overlappedOptions.length; j += 1) {
           if (CL.overlappedOptions[j].reading_flag === readings[i].overlap_status) {
             label = CL.overlappedOptions[j].reading_label;
@@ -500,8 +498,8 @@ OR = (function() {
       } else {
         label = CL.getAlphaId(i);
       }
-      if (overwrite || !readings[i].hasOwnProperty('label')) {
-        if (!readings[i].hasOwnProperty('parents') || readings[i].parents.length <= 1 || 
+      if (overwrite || !Object.prototype.hasOwnProperty.call(readings[i], 'label')) {
+        if (!Object.prototype.hasOwnProperty.call(readings[i], 'parents') || readings[i].parents.length <= 1 || 
               CL.project.storeMultipleSupportLabelsAsParents === false || (CL.project.useZvForAllReadingsSupport == true && readings[i].label != 'zv')) {
           readings[i].label = label;
         }
@@ -523,7 +521,7 @@ OR = (function() {
         if (pos !== -1) {
           potentialParents.splice(pos, 1);
         }
-        if (readings[i].hasOwnProperty('parents') && readings[i].parents.length > 1) {
+        if (Object.prototype.hasOwnProperty.call(readings[i], 'parents') && readings[i].parents.length > 1) {
           for (let j = 0; j < readings.length; j += 1) {
             if (readings[i].parents.indexOf(readings[j].text_string) !== -1) {
               labels.push(readings[j].label);
@@ -545,7 +543,7 @@ OR = (function() {
 
   putLacLast = function() {
     for (let key in CL.data) {
-      if (CL.data.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(CL.data, key)) {
         if (key.match(/apparatus\d?/) !== null) {
           for (let i = 0; i < CL.data[key].length; i += 1) {
             CL.data[key][i].readings.sort(_compareLabels);
@@ -569,7 +567,7 @@ OR = (function() {
 
   addLabels = function(overwrite) {
     for (let key in CL.data) {
-      if (CL.data.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(CL.data, key)) {
         if (key.match(/apparatus\d?/) !== null) {
           for (let i = 0; i < CL.data[key].length; i += 1) {
             relabelReadings(CL.data[key][i].readings, overwrite);
@@ -608,7 +606,7 @@ OR = (function() {
   removeSplits = function() {
     var apparatus;
     for (let key in CL.data) {
-      if (CL.data.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(CL.data, key)) {
         if (key.match(/apparatus\d?/g) !== null) {
           apparatus = CL.data[key];
           for (let i = 0; i < apparatus.length; i += 1) {
@@ -628,8 +626,8 @@ OR = (function() {
     overlapLineNumbers = [];
     overlapIndexes = {};
     sharedOverlaps = {};
-    for (let key in CL.data) {
-      if (CL.data.hasOwnProperty(key)) {
+    for (const key in CL.data) {
+      if (Object.prototype.hasOwnProperty.call(CL.data, key)) {
         if (key.match(/apparatus\d+/) !== null) {
           match = key.match(/apparatus(\d+)/);
           overlapLineNumbers.push(parseInt(match[1]));
@@ -642,10 +640,10 @@ OR = (function() {
       // create a dictionary with each overlapped unit as key to a 2 entry list.
       // by the end the first index will be pos 0 and the final pos 1
       for (let i = 0; i < CL.data.apparatus.length; i += 1) {
-        if (CL.data.apparatus[i].hasOwnProperty('overlap_units')) {
-          for (let key in CL.data.apparatus[i].overlap_units) {
-            if (CL.data.apparatus[i].overlap_units.hasOwnProperty(key)) {
-              if (!overlapIndexes.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(CL.data.apparatus[i], 'overlap_units')) {
+          for (const key in CL.data.apparatus[i].overlap_units) {
+            if (Object.prototype.hasOwnProperty.call(CL.data.apparatus[i].overlap_units, key)) {
+              if (!Object.prototype.hasOwnProperty.call(overlapIndexes, key)) {
                 overlapIndexes[key] = [i, i];
               } else {
                 overlapIndexes[key][1] = i;
@@ -656,10 +654,10 @@ OR = (function() {
       }
     }
     // now switch the dictionary round so each set of index points are key to unit ids
-    for (let key in overlapIndexes) {
-      if (overlapIndexes.hasOwnProperty(key)) {
+    for (const key in overlapIndexes) {
+      if (Object.prototype.hasOwnProperty.call(overlapIndexes, key)) {
         newKey = overlapIndexes[key].join('-');
-        if (sharedOverlaps.hasOwnProperty(newKey)) {
+        if (Object.prototype.hasOwnProperty.call(sharedOverlaps, newKey)) {
           sharedOverlaps[newKey].push(key);
         } else {
           sharedOverlaps[newKey] = [key];
@@ -667,8 +665,8 @@ OR = (function() {
       }
     }
     // now see if any have more than one unit at each pair of indexes and therefore need combining
-    for (let key in sharedOverlaps) {
-      if (sharedOverlaps.hasOwnProperty(key)) {
+    for (const key in sharedOverlaps) {
+      if (Object.prototype.hasOwnProperty.call(sharedOverlaps, key)) {
         if (sharedOverlaps[key].length > 1) {
           leadUnit = _findLeadUnit(sharedOverlaps[key], overlapLineNumbers);
           _horizontalCombineOverlaps(key, sharedOverlaps[key], leadUnit);
@@ -676,8 +674,8 @@ OR = (function() {
       }
     }
     // now delete any apparatus keys which are empty
-    for (let key in CL.data) {
-      if (CL.data.hasOwnProperty(key)) {
+    for (const key in CL.data) {
+      if (Object.prototype.hasOwnProperty.call(CL.data, key)) {
         if (key.match(/apparatus\d+/) !== null) {
           if (CL.data[key].length === 0) {
             toDelete.push(key);
@@ -702,8 +700,8 @@ OR = (function() {
     var match, overlapLineNumbers;
     SV.prepareForOperation();
     overlapLineNumbers = [];
-    for (let key in CL.data) {
-      if (CL.data.hasOwnProperty(key)) {
+    for (const key in CL.data) {
+      if (Object.prototype.hasOwnProperty.call(CL.data, key)) {
         if (key.match(/apparatus\d+/) !== null) {
           match = key.match(/apparatus(\d+)/);
           overlapLineNumbers.push(parseInt(match[1]));
@@ -726,7 +724,7 @@ OR = (function() {
     if (conflictUnits.length === 0) {
       return true;
     }
-    if (!CL.data.hasOwnProperty('apparatus' + newAppRow)) {
+    if (!Object.prototype.hasOwnProperty.call(CL.data, 'apparatus' + newAppRow)) {
       return false;
     }
     for (let i = 0; i < CL.data['apparatus' + newAppRow].length; i += 1) {
@@ -756,7 +754,7 @@ OR = (function() {
     for (let i = 0; i < CL.data.apparatus.length; i += 1) {
       for (let j = 0; j < CL.data.apparatus[i].readings.length; j += 1) {
         reading = CL.data.apparatus[i].readings[j];
-        if (reading.text.length === 1 && reading.text[0].hasOwnProperty('was_gap')) {
+        if (reading.text.length === 1 && Object.prototype.hasOwnProperty.call(reading.text[0], 'was_gap')) {
           //make it a real gap again
           reading.type = 'lac';
           reading.details = reading.text[0]['interface'].replace('&gt;', '').replace('&lt;', '');
@@ -795,8 +793,8 @@ OR = (function() {
   _uniqueifyIds = function() {
     var idList, extra;
     idList = [];
-    for (let key in CL.data) {
-      if (CL.data.hasOwnProperty(key) && key.indexOf('apparatus') != -1) {
+    for (const key in CL.data) {
+      if (Object.prototype.hasOwnProperty.call(CL.data, key) && key.indexOf('apparatus') != -1) {
         for (let i = 0; i < CL.data[key].length; i += 1) {
           //we are assuming units already have unique ids
           //if we start changing them we need to keep the overlapped_units ids in synch
@@ -881,25 +879,25 @@ OR = (function() {
     if ($.isEmptyObject(ruleClasses)) {
         return;
     }
-    for (let key in CL.data) {
-      if (CL.data.hasOwnProperty(key)) {
+    for (const key in CL.data) {
+      if (Object.prototype.hasOwnProperty.call(CL.data, key)) {
         if (key.indexOf('apparatus') != -1) {
           for (let i = 0; i < CL.data[key].length; i += 1) {
             unit = CL.data[key][i];
             for (let j = 0; j < unit.readings.length; j += 1) {
               reading = unit.readings[j];
-              if (reading.hasOwnProperty('reading_classes') && reading.reading_classes.length > 0) {
+              if (Object.prototype.hasOwnProperty.call(reading, 'reading_classes') && reading.reading_classes.length > 0) {
                 for (let k = 0; k < reading.reading_classes.length; k += 1) {
-                  if (ruleClasses.hasOwnProperty(reading.reading_classes[k])) {
+                  if (Object.prototype.hasOwnProperty.call(ruleClasses, reading.reading_classes[k])) {
                     if (ruleClasses[reading.reading_classes[k]][1] === true) {
-                      if (reading.hasOwnProperty('label_suffix')) {
+                      if (Object.prototype.hasOwnProperty.call(reading, 'label_suffix')) {
                         reading.label_suffix = reading.label_suffix + ruleClasses[reading.reading_classes[k]][0];
                       } else {
                         reading.label_suffix = ruleClasses[reading.reading_classes[k]][0];
                       }
                     }
                     if (ruleClasses[reading.reading_classes[k]][2] === true) {
-                      if (reading.hasOwnProperty('reading_suffix')) {
+                      if (Object.prototype.hasOwnProperty.call(reading, 'reading_suffix')) {
                         reading.reading_suffix = reading.reading_suffix + ruleClasses[reading.reading_classes[k]][0];
                       } else {
                         reading.reading_suffix = ruleClasses[reading.reading_classes[k]][0];
@@ -917,15 +915,15 @@ OR = (function() {
 
   _getSiglaSuffixes = function() {
     var unit, reading, subreading;
-    for (let key in CL.data) {
-      if (CL.data.hasOwnProperty(key)) {
+    for (const key in CL.data) {
+      if (Object.prototype.hasOwnProperty.call(CL.data, key)) {
         if (key.indexOf('apparatus') != -1) {
           for (let i = 0; i < CL.data[key].length; i += 1) {
             unit = CL.data[key][i];
             for (let j = 0; j < unit.readings.length; j += 1) {
               reading = unit.readings[j];
               reading.suffixes = _doGetSiglaSuffixes(reading, key, unit.start, unit.end, unit.first_word_index);
-              if (reading.hasOwnProperty('subreadings')) {
+              if (Object.prototype.hasOwnProperty.call(reading, 'subreadings')) {
                 for (let type in reading.subreadings) {
                   for (let k = 0; k < reading.subreadings[type].length; k += 1) {
                     subreading = reading.subreadings[type][k];
@@ -953,16 +951,16 @@ OR = (function() {
 
   _orderWitnessesForOutput = function() {
     var unit, reading, subreading;
-    for (let key in CL.data) {
-      if (CL.data.hasOwnProperty(key)) {
+    for (const key in CL.data) {
+      if (Object.prototype.hasOwnProperty.call(CL.data, key)) {
         if (key.indexOf('apparatus') != -1) {
           for (let i = 0; i < CL.data[key].length; i += 1) {
             unit = CL.data[key][i];
             for (let j = 0; j < unit.readings.length; j += 1) {
               reading = unit.readings[j];
               reading.witnesses = CL.sortWitnesses(reading.witnesses);
-              if (reading.hasOwnProperty('subreadings')) {
-                for (let type in reading.subreadings) {
+              if (Object.prototype.hasOwnProperty.call(reading, 'subreadings')) {
+                for (const type in reading.subreadings) {
                   for (let k = 0; k < reading.subreadings[type].length; k += 1) {
                     subreading = reading.subreadings[type][k];
                     subreading.witnesses = CL.sortWitnesses(subreading.witnesses);
@@ -992,8 +990,8 @@ OR = (function() {
     rowList = [];
     html = [];
     rowTypeId = 'subrow';
-    for (let type in data) {
-      if (data.hasOwnProperty(type)) {
+    for (const type in data) {
+      if (Object.prototype.hasOwnProperty.call(data, type)) {
         for (let i = 0; i < data[type].length; i += 1) {
           subRowId = 'subreading_unit_' + parentId + '_row_' + parentIndex + '_type_' + type + '_' +
                      rowTypeId + '_' + i;
@@ -1030,7 +1028,7 @@ OR = (function() {
     labelForm = document.createElement('div');
     reading = CL.data[rdgDetails[1]][rdgDetails[0]].readings[rdgDetails[2]];
     currentLabel = reading.label;
-    currentParents = reading.hasOwnProperty('parents') ? reading.parents : [];
+    currentParents = Object.prototype.hasOwnProperty.call(reading, 'parents') ? reading.parents : [];
     labelForm.setAttribute('id', 'label_form');
     labelForm.setAttribute('class', 'label_form');
     html = [];
@@ -1103,15 +1101,15 @@ OR = (function() {
     document.getElementById('label_form').style.top = top + 'px';
 
     drag.initDraggable('label_form', true, true);
-    $('#close_label_button').on('click', function(event) {
+    $('#close_label_button').on('click', function() {
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('label_form'));
     });
     if (saveFunction !== undefined) {
-      $('#save_label_button').on('click', function(event) {
+      $('#save_label_button').on('click', function() {
         saveFunction();
       });
     } else {
-      $('#save_label_button').on('click', function(event) {
+      $('#save_label_button').on('click', function() {
         let data, newLabel, newParents;
         data = cforms.serialiseForm('label_change_form');
         newParents = data.parent_select;
@@ -1207,8 +1205,8 @@ OR = (function() {
       subreadings = [];
       orRules = CL.getRuleClasses('create_in_OR', true, 'name', ['subreading', 'value', 'identifier',
                                                                  'keep_as_main_reading']);
-      for (let key in orRules) {
-        if (orRules.hasOwnProperty(key)) {
+      for (const key in orRules) {
+        if (Object.prototype.hasOwnProperty.call(orRules, key)) {
           if (orRules[key][3]) {
             menu.push('<li id="mark_as_' + orRules[key][1] + '"><span>Mark/Unmark as ' + key + '</span></li>');
           } else {
@@ -1320,7 +1318,7 @@ OR = (function() {
       }
     }
     CL.removeNullItems(CL.data['apparatus' + currentLoc]);
-    for (let key in CL.data) {
+    for (const key in CL.data) {
       if (key.indexOf('apparatus') !== -1) {
         if (CL.data[key].length === 0) {
           delete CL.data[key];
@@ -1350,7 +1348,7 @@ OR = (function() {
     currentLoc = appNum;
     newLoc = appNum + 1;
     // if there is no line there add one now
-    if (!CL.data.hasOwnProperty('apparatus' + newLoc)) {
+    if (!Object.prototype.hasOwnProperty.call(CL.data, 'apparatus' + newLoc)) {
       CL.data['apparatus' + newLoc] = [];
     }
     isSpace = canUnitMoveTo(id, currentLoc, newLoc);
@@ -1368,7 +1366,7 @@ OR = (function() {
       }
     }
     CL.removeNullItems(CL.data['apparatus' + currentLoc]);
-    for (let key in CL.data) {
+    for (const key in CL.data) {
       if (key.indexOf('apparatus') !== -1) {
         if (CL.data[key].length === 0) {
           delete CL.data[key];
@@ -1388,20 +1386,20 @@ OR = (function() {
     if (document.getElementById('unmark_sub')) {
       $('#unmark_sub').off('click.ums_c');
       $('#unmark_sub').off('mouseover.ums_mo');
-      $('#unmark_sub').on('click.ums_c', function(event) {
+      $('#unmark_sub').on('click.ums_c', function() {
         var element, rowElem;
         element = SimpleContextMenu._target_element;
         rowElem = CL.getSpecifiedAncestor(element, 'TR');
         _makeMainReading(rowElem.id);
       });
-      $('#unmark_sub').on('mouseover.ums_mo', function(event) {
+      $('#unmark_sub').on('mouseover.ums_mo', function() {
         CL.hideTooltip();
       });
     }
     if (document.getElementById('split_witnesses')) {
       $('#split_witnesses').off('click.sw_c');
       $('#split_witnesses').off('mouseover.sw_mo');
-      $('#split_witnesses').on('click.sw_c', function(event) {
+      $('#split_witnesses').on('click.sw_c', function() {
         var element, div, readingDetails;
         element = SimpleContextMenu._target_element;
         div = CL.getSpecifiedAncestor(element, 'TR');
@@ -1411,14 +1409,14 @@ OR = (function() {
           'left': SimpleContextMenu._menuElement.style.left
         });
       });
-      $('#split_witnesses').on('mouseover.sw_mo', function(event) {
+      $('#split_witnesses').on('mouseover.sw_mo', function() {
         CL.hideTooltip();
       });
     }
     if (document.getElementById('categorise_om')) {
       $('#categorise_om').off('click.co_c');
       $('#categorise_om').off('mouseover.co_mo');
-      $('#categorise_om').on('click.co_c', function(event) {
+      $('#categorise_om').on('click.co_c', function() {
         var element, div, readingDetails;
         element = SimpleContextMenu._target_element;
         div = CL.getSpecifiedAncestor(element, 'TR');
@@ -1428,20 +1426,20 @@ OR = (function() {
           'left': SimpleContextMenu._menuElement.style.left
         });
       });
-      $('#categorise_om').on('mouseover.co_mo', function(event) {
+      $('#categorise_om').on('mouseover.co_mo', function() {
         CL.hideTooltip();
       });
     }
     if (document.getElementById('backwards_join')) {
       $('#backwards_join').off('click.bj_c');
       $('#backwards_join').off('mouseover.bj_mo');
-      $('#backwards_join').on('click.bj_c', function(event) {
+      $('#backwards_join').on('click.bj_c', function() {
         var element, div, rdgDetails, reading;
         element = SimpleContextMenu._target_element;
         div = CL.getSpecifiedAncestor(element, 'TR');
         rdgDetails = CL.getUnitAppReading(div.id);
         reading = CL.data[rdgDetails[1]][rdgDetails[0]].readings[rdgDetails[2]];
-        if (reading.hasOwnProperty('join_backwards') && reading.join_backwards === true) {
+        if (Object.prototype.hasOwnProperty.call(reading, 'join_backwards') && reading.join_backwards === true) {
           reading.join_backwards = false;
         } else {
           reading.join_backwards = true;
@@ -1450,20 +1448,20 @@ OR = (function() {
           'container': CL.container
         });
       });
-      $('#backwards_join').on('mouseover.bj_mo', function(event) {
+      $('#backwards_join').on('mouseover.bj_mo', function() {
         CL.hideTooltip();
       });
     }
     if (document.getElementById('forwards_join')) {
       $('#forwards_join').off('click.fj_c');
       $('#forwards_join').off('mouseover.fj_mo');
-      $('#forwards_join').on('click.fj_c', function(event) {
+      $('#forwards_join').on('click.fj_c', function() {
         var element, div, rdgDetails, reading;
         element = SimpleContextMenu._target_element;
         div = CL.getSpecifiedAncestor(element, 'TR');
         rdgDetails = CL.getUnitAppReading(div.id);
         reading = CL.data[rdgDetails[1]][rdgDetails[0]].readings[rdgDetails[2]];
-        if (reading.hasOwnProperty('join_forwards') && reading.join_forwards === true) {
+        if (Object.prototype.hasOwnProperty.call(reading, 'join_forwards') && reading.join_forwards === true) {
           reading.join_forwards = false;
         } else {
           reading.join_forwards = true;
@@ -1472,14 +1470,14 @@ OR = (function() {
           'container': CL.container
         });
       });
-      $('#forwards_join').on('mouseover.fj_mo', function(event) {
+      $('#forwards_join').on('mouseover.fj_mo', function() {
         CL.hideTooltip();
       });
     }
     if (document.getElementById('move_up')) {
       $('#move_up').off('click.mu_c');
       $('#move_up').off('mouseover.mu_mo');
-      $('#move_up').on('click.mu_c', function(event) {
+      $('#move_up').on('click.mu_c', function() {
         var element, div;
         element = SimpleContextMenu._target_element;
         div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
@@ -1490,14 +1488,14 @@ OR = (function() {
         });
         _moveOverlapUp(div);
       });
-      $('#move_up').on('mouseover.mu_mo', function(event) {
+      $('#move_up').on('mouseover.mu_mo', function() {
         CL.hideTooltip();
       });
     }
     if (document.getElementById('move_down')) {
       $('#move_down').off('click.md_c');
       $('#move_down').off('mouseover.md_mo');
-      $('#move_down').on('click.md_c', function(event) {
+      $('#move_down').on('click.md_c', function() {
         var element, div;
         element = SimpleContextMenu._target_element;
         div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
@@ -1508,14 +1506,14 @@ OR = (function() {
         });
         _moveOverlapDown(div);
       });
-      $('#move_down').on('mouseover.md_mo', function(event) {
+      $('#move_down').on('mouseover.md_mo', function() {
         CL.hideTooltip();
       });
     }
     if (document.getElementById('edit_label')) {
       $('#edit_label').off('click.el_c');
       $('#edit_label').off('mouseover.el_mo');
-      $('#edit_label').on('click.el_c', function(event) {
+      $('#edit_label').on('click.el_c', function() {
         var element, labelCell, rdgDetails;
         element = SimpleContextMenu._target_element;
         labelCell = CL.getSpecifiedAncestor(element, 'TD');
@@ -1525,14 +1523,14 @@ OR = (function() {
           'left': SimpleContextMenu._menuElement.style.left
         });
       });
-      $('#edit_label').on('mouseover.el_mo', function(event) {
+      $('#edit_label').on('mouseover.el_mo', function() {
         CL.hideTooltip();
       });
     }
     if (document.getElementById('delete_unit')) {
       $('#delete_unit').off('click.du_c');
       $('#delete_unit').off('mouseover.du_mo');
-      $('#delete_unit').on('click.du_c', function(event) {
+      $('#delete_unit').on('click.du_c', function() {
         var element, div;
         element = SimpleContextMenu._target_element;
         div = CL.getSpecifiedAncestor(element, 'DIV', function(e) {
@@ -1543,15 +1541,15 @@ OR = (function() {
         });
         _getDeleteUnit(div);
       });
-      $('#delete_unit').on('mouseover.du_mo', function(event) {
+      $('#delete_unit').on('mouseover.du_mo', function() {
         CL.hideTooltip();
       });
     }
     //special added for OR
     orRules = CL.getRuleClasses('create_in_OR', true, 'name', ['subreading', 'value', 'identifier',
                                                                'keep_as_main_reading']);
-    for (let key in orRules) {
-      if (orRules.hasOwnProperty(key)) {
+    for (const key in orRules) {
+      if (Object.prototype.hasOwnProperty.call(orRules, key)) {
         if (!orRules[key][0]) {
           if (document.getElementById('mark_as_' + orRules[key][1])) {
             _addEvent(orRules, key);
@@ -1564,7 +1562,7 @@ OR = (function() {
       key = 'ORsubreading';
       $('#mark_as_' + key).off('click.' + key + '_c');
       $('#mark_as_' + key).off('mouseover.' + key + '_mo');
-      $('#mark_as_' + key).on('click.' + key + '_c', function(event) {
+      $('#mark_as_' + key).on('click.' + key + '_c', function() {
         var element, appId, div, unit, unitPos, rdgDetails, readingPos, reading, readingDetails;
         element = SimpleContextMenu._target_element;
         div = CL.getSpecifiedAncestor(element, 'TR');
@@ -1575,7 +1573,7 @@ OR = (function() {
         unit = CL.data[appId][unitPos];
         reading = unit.readings[readingPos];
         // this ensures if we are storing labels as parents we remove those links before making this a subreading
-        if (reading.hasOwnProperty('parents')) {
+        if (Object.prototype.hasOwnProperty.call(reading, 'parents')) {
           delete reading.parents;
         }
         readingDetails = {'app_id': appId,
@@ -1588,12 +1586,12 @@ OR = (function() {
           'left': SimpleContextMenu._menuElement.style.left
         });
       });
-      $('#mark_as_' + key).on('mouseover.' + key + '_mo', function(event) {
+      $('#mark_as_' + key).on('mouseover.' + key + '_mo', function() {
         CL.hideTooltip();
       });
     } else {
-      for (let key in orRules) {
-        if (orRules.hasOwnProperty(key)) {
+      for (const key in orRules) {
+        if (Object.prototype.hasOwnProperty.call(orRules, key)) {
           if (orRules[key][0]) {
             if (document.getElementById('mark_as_' + orRules[key][1])) {
               rule = JSON.parse(JSON.stringify(orRules[key]));
@@ -1601,7 +1599,7 @@ OR = (function() {
               //mark the reading as subreading
               $('#mark_as_' + orRules[key][1]).off('click.' + key + '_c');
               $('#mark_as_' + orRules[key][1]).off('mouseover.' + key + '_mo');
-              $('#mark_as_' + orRules[key][1]).on('click.' + key + '_c', function(event) {
+              $('#mark_as_' + orRules[key][1]).on('click.' + key + '_c', function() {
                 var element, div, unit, unitPos, rdgDetails, readingPos, reading, readingDetails, appId;
                 element = SimpleContextMenu._target_element;
                 div = CL.getSpecifiedAncestor(element, 'TR');
@@ -1613,7 +1611,7 @@ OR = (function() {
                 reading = unit.readings[readingPos];
                 // this ensures if we are storing labels as parents we remove those links before making this a
                 // subreading
-                if (reading.hasOwnProperty('parents')) {
+                if (Object.prototype.hasOwnProperty.call(reading, 'parents')) {
                   delete reading.parents;
                 }
                 readingDetails = {'app_id': appId,
@@ -1626,7 +1624,7 @@ OR = (function() {
                   'left': SimpleContextMenu._menuElement.style.left
                 });
               });
-              $('#mark_as_' + orRules[key][1]).on('mouseover.' + key + '_mo', function(event) {
+              $('#mark_as_' + orRules[key][1]).on('mouseover.' + key + '_mo', function() {
                 CL.hideTooltip();
               });
             }
@@ -1641,7 +1639,7 @@ OR = (function() {
   _categoriseOm = function(readingDetails, menuPos) {
     var reading, scrollOffset, witnessList, data, newReadingId, selectData;
     scrollOffset = [document.getElementById('scroller').scrollLeft,
-      							document.getElementById('scroller').scrollTop];
+                    document.getElementById('scroller').scrollTop];
 
     reading = CL.data[readingDetails[1]][readingDetails[0]].readings[readingDetails[2]];
     CL.showSplitWitnessMenu(reading, menuPos, {
@@ -1668,8 +1666,8 @@ OR = (function() {
       data = cforms.serialiseForm('select_wit_form');
       if (!$.isEmptyObject(data)) {
         witnessList = [];
-        for (let key in data) {
-          if (data.hasOwnProperty(key)) {
+        for (const key in data) {
+          if (Object.prototype.hasOwnProperty.call(data, key)) {
             if (data[key] !== null) {
               witnessList.push(key);
             }
@@ -1698,8 +1696,8 @@ OR = (function() {
       reading.details = document.getElementById('om_category').value;
     }
     // now we need to check if we have a standoff marked reading which needs the om details changing
-    if (reading.hasOwnProperty('created') && reading.created == true &&
-          reading.hasOwnProperty('standoff_subreadings')) {
+    if (Object.prototype.hasOwnProperty.call(reading, 'created') && reading.created == true &&
+            Object.prototype.hasOwnProperty.call(reading, 'standoff_subreadings')) {
         // find the standoff reading entries (there may be several, use the standoff_subreadings list to navigate)
         for (let i = 0; i < reading.standoff_subreadings.length; i += 1) {
           standoffEntry = SR._getMatchingStandoffReading(reading.standoff_subreadings[i], unit);
@@ -1719,7 +1717,7 @@ OR = (function() {
     if (!orRules[key][3]) {
       $('#mark_as_' + orRules[key][1]).off('click.' + key + '_c');
       $('#mark_as_' + orRules[key][1]).off('mouseover.' + key + '_mo');
-      $('#mark_as_' + orRules[key][1]).on('click.' + key + '_c', function(event) {
+      $('#mark_as_' + orRules[key][1]).on('click.' + key + '_c', function() {
         var element, div, rdgDetails, unitPos, appId, readingPos, unit, reading, readingDetails;
         element = SimpleContextMenu._target_element;
         div = CL.getSpecifiedAncestor(element, 'TR');
@@ -1739,14 +1737,14 @@ OR = (function() {
           'left': SimpleContextMenu._menuElement.style.left
         });
       });
-      $('#mark_as_' + orRules[key][1]).on('mouseover.' + key + '_mo', function(event) {
+      $('#mark_as_' + orRules[key][1]).on('mouseover.' + key + '_mo', function() {
         CL.hideTooltip();
       });
     } else {
       //else just add the marker and allow its removal
       $('#mark_as_' + orRules[key][1]).off('click.' + key + '_c');
       $('#mark_as_' + orRules[key][1]).off('mouseover.' + key + '_mo');
-      $('#mark_as_' + orRules[key][1]).on('click.' + key + '_c', function(event) {
+      $('#mark_as_' + orRules[key][1]).on('click.' + key + '_c', function() {
         var element, div, rdgDetails, unitPos, appId, readingPos, reading;
         element = SimpleContextMenu._target_element;
         div = CL.getSpecifiedAncestor(element, 'TR');
@@ -1757,7 +1755,7 @@ OR = (function() {
         reading = CL.data[appId][unitPos].readings[readingPos];
         _markReading(orRules[key][1], reading);
       });
-      $('#mark_as_' + orRules[key][1]).on('mouseover.' + key + '_mo', function(event) {
+      $('#mark_as_' + orRules[key][1]).on('mouseover.' + key + '_mo', function() {
         CL.hideTooltip();
       });
     }
@@ -1780,7 +1778,7 @@ OR = (function() {
       rd.event.rowDropped = onDropFunction;
     } else {
       rd.event.rowDropped = function() {
-        var scrollOffset
+        var scrollOffset;
         addToUndoStack(CL.data);
         reorderRows(rd);
         scrollOffset = document.getElementById('scroller').scrollLeft;
@@ -1832,14 +1830,14 @@ OR = (function() {
   };
 
   _getApparatusForContext = function() {
-    if (CL.services.hasOwnProperty('getApparatusForContext')) {
+    if (Object.prototype.hasOwnProperty.call(CL.services, 'getApparatusForContext')) {
       CL.services.getApparatusForContext(function() {
         spinner.removeLoadingOverlay();
       });
     } else {
       var url, settings, callback;
       settings = JSON.parse(CL.getExporterSettings());
-      if (!settings.hasOwnProperty('options')) {
+      if (!Object.prototype.hasOwnProperty.call(settings, 'options')) {
         settings.options = {};
       }
       settings.options.rule_classes = CL.ruleClasses;
@@ -1870,7 +1868,7 @@ OR = (function() {
                   hiddenLink.click();
                   window.URL.revokeObjectURL(downloadUrl);
                   spinner.removeLoadingOverlay();
-              }).fail(function (response) {
+              }).fail(function () {
                   alert('This unit cannot be exported 2. First try reapproving the unit. If the problem persists please ' +
                         'recollate the unit from the collation home page.');
                   spinner.removeLoadingOverlay();
@@ -1885,10 +1883,10 @@ OR = (function() {
   /** prep stuff for loading into order readings */
   _compareOverlaps = function(a, b) {
     // always put overlap readings at the bottom (of their parent reading)
-    if (a.hasOwnProperty('overlap')) {
+    if (Object.prototype.hasOwnProperty.call(a, 'overlap')) {
       return 1;
     }
-    if (b.hasOwnProperty('overlap')) {
+    if (Object.prototype.hasOwnProperty.call(b, 'overlap')) {
       return -1;
     }
   };
@@ -1905,8 +1903,8 @@ OR = (function() {
       startRow = 0;
     }
     overlapLines = [];
-    for (let key in CL.data) {
-      if (CL.data.hasOwnProperty(key)) {
+    for (const key in CL.data) {
+      if (Object.prototype.hasOwnProperty.call(CL.data, key)) {
         if (key.match(/apparatus\d+/) !== null) {
           m = key.match(/apparatus(\d+)/);
           overlapLines.push(parseInt(m[1]));
@@ -1929,7 +1927,7 @@ OR = (function() {
       if (renumber === true) {
         //rename all the apparatus keys so we won't accidentally overwrite anything
         for (let i = startRow; i < overlapLines.length; i += 1) {
-          if (CL.data.hasOwnProperty('apparatus' + overlapLines[i])) {
+          if (Object.prototype.hasOwnProperty.call(CL.data, 'apparatus' + overlapLines[i])) {
             CL.data['old_apparatus' + overlapLines[i]] = CL.data['apparatus' + overlapLines[i]];
             delete CL.data['apparatus' + overlapLines[i]];
           }
@@ -1937,7 +1935,7 @@ OR = (function() {
         j = startIndex;
         //now through number them as we want
         for (let i = startRow; i < overlapLines.length; i += 1) {
-          if (CL.data.hasOwnProperty('old_apparatus' + overlapLines[i])) {
+          if (Object.prototype.hasOwnProperty.call(CL.data, 'old_apparatus' + overlapLines[i])) {
             CL.data['apparatus' + j] = CL.data['old_apparatus' + overlapLines[i]];
             for (let k = 0; k < CL.data['apparatus' + j].length; k += 1) {
               unit = CL.data['apparatus' + j][k];
@@ -1957,10 +1955,10 @@ OR = (function() {
   //by this point we have added accurate start and end values for each unit so we can rely on them for testing overlaps
   //we added the correct start an end values in _horizontalCombineOverlaps
   _repositionOverlaps = function() {
-    var m, overlapLines, movingStart, movingEnd, moveTo, apparatusLine;
+    var m, overlapLines, moveTo, apparatusLine;
     overlapLines = [];
-    for (let key in CL.data) {
-      if (CL.data.hasOwnProperty(key)) {
+    for (const key in CL.data) {
+      if (Object.prototype.hasOwnProperty.call(CL.data, key)) {
         if (key.match(/apparatus\d+/) !== null) {
           m = key.match(/apparatus(\d+)/);
           overlapLines.push(parseInt(m[1]));
@@ -1973,8 +1971,6 @@ OR = (function() {
     for (let i = 1; i < overlapLines.length; i += 1) {
       apparatusLine = CL.data['apparatus' + overlapLines[i]];
       for (let j = 0; j < apparatusLine.length; j += 1) {
-        movingStart = apparatusLine[j].start;
-        movingEnd = apparatusLine[j].end;
         moveTo = _unitCanMoveTo(apparatusLine[j]._id, overlapLines, i);
         if (moveTo !== -1) {
           CL.data['apparatus' + moveTo].push(JSON.parse(JSON.stringify(apparatusLine[j])));
@@ -1988,8 +1984,8 @@ OR = (function() {
       CL.removeNullItems(apparatusLine);
     }
     // now delete any apparatus lines we don't need any more
-    for (let key in CL.data) {
-      if (CL.data.hasOwnProperty(key)) {
+    for (const key in CL.data) {
+      if (Object.prototype.hasOwnProperty.call(CL.data, key)) {
         if (key.match(/apparatus\d+/) !== null) {
           if (CL.data[key].length === 0) {
             delete CL.data[key];
@@ -2003,10 +1999,10 @@ OR = (function() {
     var ids;
     ids = [];
     for (let i = 0; i < CL.data.apparatus.length; i += 1) {
-      if (CL.data.apparatus[i].hasOwnProperty('overlap_units') &&
-        CL.data.apparatus[i].overlap_units.hasOwnProperty(id)) {
-        for (let key in CL.data.apparatus[i].overlap_units) {
-          if (CL.data.apparatus[i].overlap_units.hasOwnProperty(key) &&
+      if (Object.prototype.hasOwnProperty.call(CL.data.apparatus[i], 'overlap_units') &&
+              Object.prototype.hasOwnProperty.call(CL.data.apparatus[i].overlap_units, id)) {
+        for (const key in CL.data.apparatus[i].overlap_units) {
+          if (Object.prototype.hasOwnProperty.call(CL.data.apparatus[i].overlap_units, key) &&
             key !== id) {
             if (ids.indexOf(key) === -1) {
               ids.push(key);
@@ -2065,11 +2061,10 @@ OR = (function() {
   };
 
   _undo = function() {
-    var eventList, scrollOffset;
+    var scrollOffset;
     if (OR.undoStack.length > 0) {
       scrollOffset = [document.getElementById('scroller').scrollLeft,
                       document.getElementById('scroller').scrollTop];
-      eventList = CL.data.event_list;
       CL.data = JSON.parse(OR.undoStack.pop());
       showOrderReadings({
         'container': CL.container
@@ -2116,9 +2111,9 @@ OR = (function() {
     // now combine all the top line data into the lead id (this must be correct for display to work)
     for (let i = parseInt(locations[0]); i <= parseInt(locations[1]); i += 1) {
       witnesses = [];
-      if (CL.data.apparatus[i].hasOwnProperty('overlap_units')) {
+      if (Object.prototype.hasOwnProperty.call(CL.data.apparatus[i], 'overlap_units')) {
         for (let j = 0; j < unitIds.length; j += 1) {
-          if (CL.data.apparatus[i].overlap_units.hasOwnProperty(unitIds[j])) {
+          if (Object.prototype.hasOwnProperty.call(CL.data.apparatus[i].overlap_units, unitIds[j])) {
             witnesses.push.apply(witnesses, CL.data.apparatus[i].overlap_units[unitIds[j]]);
             delete CL.data.apparatus[i].overlap_units[unitIds[j]];
           }
@@ -2133,26 +2128,26 @@ OR = (function() {
   // we make a generic parent which goes in the position of the first found reading with all the others
   // as a special kind of subreading and we give the generic parent a unique id like all other readings
   _mergeAllSuppliedEmptyReadings = function(typeList, parentBlueprint, alwaysCreateNewParent) {
-    var unit, reading, matchedReadings, newParent, witness, type, parentId, rdgDetails;
+    var unit, reading, matchedReadings, newParent, parentId, rdgDetails;
     SR.loseSubreadings();
     SR.findSubreadings();
     matchedReadings = {};
-    for (let key in CL.data) {
+    for (const key in CL.data) {
       if (key.match(/apparatus\d*/g) !== null) {
         for (let i = 0; i < CL.data[key].length; i += 1) {
           unit = CL.data[key][i];
           for (let j = 0; j < CL.data[key][i].readings.length; j += 1) {
             reading = CL.data[key][i].readings[j];
-            if (reading.text.length === 0 && !reading.hasOwnProperty('overlap_status')) {
+            if (reading.text.length === 0 && !Object.prototype.hasOwnProperty.call(reading, 'overlap_status')) {
               if (typeList.indexOf(reading.type) != -1) {
-                if (!matchedReadings.hasOwnProperty(unit._id)) {
+                if (!Object.prototype.hasOwnProperty.call(matchedReadings, unit._id)) {
                   matchedReadings[unit._id] = [];
                 }
                 rdgDetails = {'app_id': key,
                               'unit_id': unit._id,
                               'unit_pos': i,
                               'reading_id': reading._id};
-                if (reading.hasOwnProperty('subreadings')) {
+                if (Object.prototype.hasOwnProperty.call(reading, 'subreadings')) {
                   rdgDetails.subreadings = true;
                 }
                 matchedReadings[unit._id].push(rdgDetails);
@@ -2164,11 +2159,11 @@ OR = (function() {
     }
     //now data is collected
     SR.loseSubreadings();
-    for (let key in CL.data) {
+    for (const key in CL.data) {
       if (key.match(/apparatus\d*/g) !== null) {
         for (let i = 0; i < CL.data[key].length; i += 1) {
           unit = CL.data[key][i];
-          if (matchedReadings.hasOwnProperty(unit._id)) {
+          if (Object.prototype.hasOwnProperty.call(matchedReadings, unit._id)) {
             if ((alwaysCreateNewParent === true &&
                       matchedReadings[unit._id].length > 0) ||
                         matchedReadings[unit._id].length > 1) {
@@ -2180,7 +2175,7 @@ OR = (function() {
                 // sometimes because we have lost subreadings standoff readings might no longer exist in
                 // this pass through. Somehow this still works!
                 if (reading) {
-                  if (matchedReadings[unit._id][j].hasOwnProperty('subreadings')) {
+                  if (Object.prototype.hasOwnProperty.call(matchedReadings[unit._id][j], 'subreadings')) {
                     CL.makeStandoffReading('none',
                                            {'app_id': key,
                                             'unit_id': unit._id,
@@ -2202,63 +2197,30 @@ OR = (function() {
     SR.loseSubreadings();
   };
 
+  return {
+    //variables
+    undoStack: undoStack,
 
-  if (testing) {
-    return {
-      //variables
-      undoStack: undoStack,
+    //functions
+    showOrderReadings: showOrderReadings,
+    showApprovedVersion: showApprovedVersion,
+    getUnitData: getUnitData,
+    relabelReadings: relabelReadings,
+    addLabels: addLabels,
+    makeStandoffReading: makeStandoffReading,
+    removeSplits: removeSplits,
+    mergeSharedExtentOverlaps: mergeSharedExtentOverlaps,
+    mergeSharedOverlapReadings: mergeSharedOverlapReadings,
+    canUnitMoveTo: canUnitMoveTo,
+    addToUndoStack: addToUndoStack,
+    makeWasGapWordsGaps: makeWasGapWordsGaps,
+    mergeAllLacs: mergeAllLacs,
+    mergeAllOms: mergeAllOms,
+    redipsInitOrderReadings: redipsInitOrderReadings,
+    reorderRows: reorderRows,
+    editLabel: editLabel,
+    putLacLast: putLacLast
 
-      //functions
-      showOrderReadings: showOrderReadings,
-      showApprovedVersion: showApprovedVersion,
-      getUnitData: getUnitData,
-      relabelReadings: relabelReadings,
-      addLabels: addLabels,
-      makeStandoffReading: makeStandoffReading,
-      removeSplits: removeSplits,
-      mergeSharedExtentOverlaps: mergeSharedExtentOverlaps,
-      mergeSharedOverlapReadings: mergeSharedOverlapReadings,
-      canUnitMoveTo: canUnitMoveTo,
-      addToUndoStack: addToUndoStack,
-      makeWasGapWordsGaps: makeWasGapWordsGaps,
-      mergeAllLacs: mergeAllLacs,
-      mergeAllOms: mergeAllOms,
-      redipsInitOrderReadings: redipsInitOrderReadings,
-      reorderRows: reorderRows,
-      editLabel: editLabel,
-      putLacLast: putLacLast,
-      _compareLabels: _compareLabels,
-
-
-      // private for testing
-      _mergeAllSuppliedEmptyReadings: _mergeAllSuppliedEmptyReadings,
-
-    };
-  } else {
-    return {
-      //variables
-      undoStack: undoStack,
-
-      //functions
-      showOrderReadings: showOrderReadings,
-      showApprovedVersion: showApprovedVersion,
-      getUnitData: getUnitData,
-      relabelReadings: relabelReadings,
-      addLabels: addLabels,
-      makeStandoffReading: makeStandoffReading,
-      removeSplits: removeSplits,
-      mergeSharedExtentOverlaps: mergeSharedExtentOverlaps,
-      mergeSharedOverlapReadings: mergeSharedOverlapReadings,
-      canUnitMoveTo: canUnitMoveTo,
-      addToUndoStack: addToUndoStack,
-      makeWasGapWordsGaps: makeWasGapWordsGaps,
-      mergeAllLacs: mergeAllLacs,
-      mergeAllOms: mergeAllOms,
-      redipsInitOrderReadings: redipsInitOrderReadings,
-      reorderRows: reorderRows,
-      editLabel: editLabel,
-      putLacLast: putLacLast
-
-    };
-  }
+  };
+  
 }());

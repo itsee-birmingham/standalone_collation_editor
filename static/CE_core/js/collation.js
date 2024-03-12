@@ -1,7 +1,6 @@
-/*jshint esversion: 6 */
-var testing = true;
-CL = (function() {
-  "use strict";
+/* exported CL*/
+/* global MD5, RG, SV, OR, SR, DEF, staticUrl, drag, spinner, cforms */
+var CL = (function() {
 
   //public variable declarations
   let services = null,
@@ -122,7 +121,7 @@ CL = (function() {
     html = '<h1 id="stage_id">' + stage + '</h1>' +
       '<h1 id="verse_ref">' + context +
       '</h1><h1 id="project_name">';
-    if (CL.project.hasOwnProperty('name')) {
+    if (Object.prototype.hasOwnProperty.call(CL.project, 'name')) {
       html += CL.project.name;
     }
     html += '</h1><div id="message_panel"></div><div id="login_status"></div>';
@@ -134,11 +133,11 @@ CL = (function() {
   addUnitAndReadingIds = function() {
     var data;
     data = CL.data;
-    for (let key in data) {
-      if (data.hasOwnProperty(key)) {
+    for (const key in data) {
+      if (Object.prototype.hasOwnProperty.call(data, key)) {
         if (key.indexOf('apparatus') !== -1) {
           for (let i = 0; i < data[key].length; i += 1) {
-            if (!data[key][i].hasOwnProperty('_id')) {
+            if (!Object.prototype.hasOwnProperty.call(data[key][i], '_id')) {
               addUnitId(data[key][i]);
             }
             addReadingIds(data[key][i]);
@@ -212,35 +211,35 @@ CL = (function() {
     text = [];
     witnessText = [];
     // first fix the display of overlapped statuses
-    if (reading.hasOwnProperty('overlap_status') && reading.overlap_status !== 'duplicate') {
+    if (Object.prototype.hasOwnProperty.call(reading, 'overlap_status') && reading.overlap_status !== 'duplicate') {
       if (test === true) {
         console.log('I have been overlapped and ' + reading.overlap_status);
       }
       return 'system_gen_' + reading.overlap_status;
     }
     // now look at options and set flag accordingly
-    if (options.hasOwnProperty('witness')) {
+    if (Object.prototype.hasOwnProperty.call(options, 'witness')) {
       witness = options.witness;
       if (test === true) {
         console.log('I was given the witnesses ' + witness);
       }
     }
-    if (options.hasOwnProperty('reading_type')) {
+    if (Object.prototype.hasOwnProperty.call(options, 'reading_type')) {
       readingType = options.reading_type;
       if (test === true) {
         console.log('I was asked to look for a ' + readingType);
       }
     }
-    if (options.hasOwnProperty('unit_id')) {
+    if (Object.prototype.hasOwnProperty.call(options, 'unit_id')) {
       unitId = options.unit_id;  // unitId and appId needed to recover standoff regularised readings accurately
       if (test === true) {
         console.log('I am from unit ' + unitId);
       }
     }
-    if (options.hasOwnProperty('app_id')) {
+    if (Object.prototype.hasOwnProperty.call(options, 'app_id')) {
       appId = options.app_id;  // unitId and appId needed to recover standoff regularised readings accurately
     }
-    if (options.hasOwnProperty('required_rules')) {
+    if (Object.prototype.hasOwnProperty.call(options, 'required_rules')) {
       requiredRules = options.required_rules;
     }
 
@@ -252,9 +251,9 @@ CL = (function() {
       }
     }
     //if no witness was supplied try to find a main reading witness and if not just return interface reading of all words or lac/om stuff
-    if (typeof witness === 'undefined' && !reading.hasOwnProperty('created')) { //don't do this for created readings as you are overwriting the genuine witness text in these cases
+    if (typeof witness === 'undefined' && !Object.prototype.hasOwnProperty.call(reading, 'created')) { //don't do this for created readings as you are overwriting the genuine witness text in these cases
       for (let i = 0; i < reading.witnesses.length; i += 1) {
-        if (reading.text.length > 0 && reading.text[0].hasOwnProperty(reading.witnesses[i])) {
+        if (reading.text.length > 0 && Object.prototype.hasOwnProperty.call(reading.text[0], reading.witnesses[i])) {
           witness = reading.witnesses[i];
           if (test === true) {
             console.log('I found the witness ' + witness + ' by looping the readings and ' +
@@ -264,8 +263,8 @@ CL = (function() {
         }
       }
     }
-    if (typeof witness === 'undefined' && reading.hasOwnProperty('witnesses') &&
-      getAllReadingWitnesses(reading).length === 1 && !reading.hasOwnProperty('created')) {
+    if (typeof witness === 'undefined' && Object.prototype.hasOwnProperty.call(reading, 'witnesses') &&
+      getAllReadingWitnesses(reading).length === 1 && !Object.prototype.hasOwnProperty.call(reading, 'created')) {
       witness = getAllReadingWitnesses(reading)[0];
       if (test === true) {
         console.log('I found the witness ' + witness + ' because it was the only one in the reading at all');
@@ -286,13 +285,13 @@ CL = (function() {
         }
         return CL.project.prepareDisplayString(text.join(' '));
       }
-      if (reading.hasOwnProperty('details')) {
+      if (Object.prototype.hasOwnProperty.call(reading, 'details')) {
         if (test === true) {
           console.log('The reading is lac - here are the details');
         }
         return '&lt;' + reading.details + '&gt;';
       }
-      if (reading.hasOwnProperty('type') && reading.type === 'om') {
+      if (Object.prototype.hasOwnProperty.call(reading, 'type') && reading.type === 'om') {
         if (test === true) {
           console.log('the reading is om');
         }
@@ -304,13 +303,13 @@ CL = (function() {
       return '';
     }
     //get the text list for the reading and witness combo
-    if (reading.text.length > 0 && reading.text[0].hasOwnProperty(witness)) {
+    if (reading.text.length > 0 && Object.prototype.hasOwnProperty.call(reading.text[0], witness)) {
       witnessText = reading.text;
       if (test === true) {
         console.log('my witness is a main reading so here is the reading text');
         console.log(JSON.parse(JSON.stringify(witnessText)));
       }
-    } else if (reading.hasOwnProperty('SR_text') && reading.SR_text.hasOwnProperty(witness)) {
+    } else if (Object.prototype.hasOwnProperty.call(reading, 'SR_text') && Object.prototype.hasOwnProperty.call(reading.SR_text, witness)) {
       if (reading.SR_text[witness].text.length > 0) {
         witnessText = reading.SR_text[witness].text;
         if (test === true) {
@@ -318,13 +317,13 @@ CL = (function() {
           console.log(witnessText);
         }
       } else {
-        if (reading.SR_text[witness].hasOwnProperty('details')) {
+        if (Object.prototype.hasOwnProperty.call(reading.SR_text[witness], 'details')) {
           if (test === true) {
             console.log('My witness is an SR_text lac');
           }
           return '&lt;' + reading.SR_text[witness].details + '&gt;';
         }
-        if (reading.SR_text[witness].hasOwnProperty('type') && reading.SR_text[witness].type === 'om') {
+        if (Object.prototype.hasOwnProperty.call(reading.SR_text[witness], 'type') && reading.SR_text[witness].type === 'om') {
           if (test === true) {
             console.log('my witness is an SR_text om');
           }
@@ -342,13 +341,13 @@ CL = (function() {
         console.log(witnessText);
       }
     } else { //if its om or lac return reading (they can never have combined gaps) - we've already checked for main reading and subreadings
-      if (reading.hasOwnProperty('details')) {
+      if (Object.prototype.hasOwnProperty.call(reading, 'details')) {
         if (test === true) {
           console.log('my reading is a lac so I returned it');
         }
         return '&lt;' + reading.details + '&gt;';
       }
-      if (reading.hasOwnProperty('type') && reading.type === 'om') {
+      if (Object.prototype.hasOwnProperty.call(reading, 'type') && reading.type === 'om') {
         if (test === true) {
           console.log('my reading is an om so I returned it');
         }
@@ -378,25 +377,25 @@ CL = (function() {
       console.log(text);
     }
     //deal with combined gap before
-    if (reading.hasOwnProperty('combined_gap_before_subreadings') &&
+    if (Object.prototype.hasOwnProperty.call(reading, 'combined_gap_before_subreadings') &&
               reading.combined_gap_before_subreadings.indexOf(witness) !== -1 &&
-                reading.hasOwnProperty('combined_gap_before_subreadings_details') &&
-                  reading.combined_gap_before_subreadings_details.hasOwnProperty(witness)) {
+                Object.prototype.hasOwnProperty.call(reading, 'combined_gap_before_subreadings_details') &&
+                  Object.prototype.hasOwnProperty.call(reading.combined_gap_before_subreadings_details, witness)) {
       text.push('&lt;' + reading.combined_gap_before_subreadings_details[witness] + '&gt;');
       if (test === true) {
         console.log('There was a combined gap before a subreading of the first token in this reading');
       }
     } else if (reading.text.length > 0 &&
-                    reading.text[0].hasOwnProperty('combined_gap_before') &&
-                      (!reading.hasOwnProperty('SR_text') || !reading.SR_text.hasOwnProperty(witness))) {
-      if (reading.text[0].hasOwnProperty(witness) && reading.text[0][witness].hasOwnProperty('gap_before')) { //first unit in verse this might actually work like the others now
+                  Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before') &&
+                      (!Object.prototype.hasOwnProperty.call(reading, 'SR_text') || !Object.prototype.hasOwnProperty.call(reading.SR_text, witness))) {
+      if (Object.prototype.hasOwnProperty.call(reading.text[0], witness) && Object.prototype.hasOwnProperty.call(reading.text[0][witness], 'gap_before')) { //first unit in verse this might actually work like the others now
         text.push('&lt;' + reading.text[0][witness].gap_before_details + '&gt;');
         if (test === true) {
           console.log('There was a combined gap before this first token in this reading and this token is also the first word in the verse');
         }
-      } else if (reading.text[0].hasOwnProperty('combined_gap_before') &&
+      } else if (Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before') &&
                         reading.text[0].combined_gap_before.length > 0 &&
-                          reading.text[0].hasOwnProperty('combined_gap_before_details')) { //subsequent units in verse
+                          Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before_details')) { //subsequent units in verse
         text.push('&lt;' + reading.text[0].combined_gap_before_details + '&gt;');
         if (test === true) {
           console.log('There was a combined gap before this first token in this reading');
@@ -406,7 +405,7 @@ CL = (function() {
     // deal with text and internal gaps
     for (let i = 0; witnessText && i < witnessText.length; i += 1) {
       foundWord = undefined;
-      if (readingType === 'subreading' && witnessText[i][witness].hasOwnProperty('decision_details')) {
+      if (readingType === 'subreading' && Object.prototype.hasOwnProperty.call(witnessText[i][witness], 'decision_details')) {
         // loop backwards and only use t of rules that match your list of supplied types
         if (typeof requiredRules === 'undefined') {
           // this gets the first t from the decision details so effectively undoing all regularisations
@@ -434,7 +433,7 @@ CL = (function() {
             }
           }
         }
-      } else if (readingType === 'mainreading' && witnessText[i][witness].hasOwnProperty('decision_details')) {
+      } else if (readingType === 'mainreading' && Object.prototype.hasOwnProperty.call(witnessText[i][witness], 'decision_details')) {
         // TODO: restrict this to list of supplied types as well??
         // this gets the final n from the decision details
         text.push(witnessText[i][witness].decision_details[witnessText[i][witness].decision_details.length - 1].n);
@@ -449,27 +448,27 @@ CL = (function() {
       }
       if (i === witnessText.length - 1 &&
                 reading.text.length > 0 &&
-                  reading.text[reading.text.length - 1].hasOwnProperty('combined_gap_after')) {
+                  Object.prototype.hasOwnProperty.call(reading.text[reading.text.length - 1], 'combined_gap_after')) {
         //this is the last word in our witness so deal with combined_gap_after
         //are we sure this works for all witnesses - what if a subreading does not need combining such as P66 in 16:23
 
-        if (witnessText[i][witness].hasOwnProperty('gap_after')) {
+        if (Object.prototype.hasOwnProperty.call(witnessText[i][witness], 'gap_after')) {
           text.push('&lt;' + witnessText[i][witness].gap_details + '&gt;');
           if (test === true) {
             console.log('I am the last word in the unit and have a combined gap after me');
           }
         }
       } else if (i === witnessText.length - 1 &&
-                        reading.hasOwnProperty('combined_gap_after_subreadings') &&
+                      Object.prototype.hasOwnProperty.call(reading, 'combined_gap_after_subreadings') &&
                           reading.combined_gap_after_subreadings.indexOf(witness) !== -1) {
-        if (witnessText[i][witness].hasOwnProperty('gap_after')) {
+        if (Object.prototype.hasOwnProperty.call(witnessText[i][witness], 'gap_after')) {
           text.push('&lt;' + witnessText[i][witness].gap_details + '&gt;');
           if (test === true) {
             console.log('I am the last word in the unit and have a combined gap after a subreading');
           }
         }
       } else if (i !== witnessText.length - 1) {
-        if (witnessText[i][witness].hasOwnProperty('gap_after')) {
+        if (Object.prototype.hasOwnProperty.call(witnessText[i][witness], 'gap_after')) {
           text.push('&lt;' + witnessText[i][witness].gap_details + '&gt;');
           if (test === true) {
             console.log('I am internal to the reading and have a gap after me so here are the details');
@@ -486,9 +485,9 @@ CL = (function() {
   getAllReadingWitnesses = function(reading) {
     var witnesses;
     witnesses = reading.witnesses.slice(0);  // make a copy
-    if (reading.hasOwnProperty('subreadings')) {
-      for (let key in reading.subreadings) {
-        if (reading.subreadings.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(reading, 'subreadings')) {
+      for (const key in reading.subreadings) {
+        if (Object.prototype.hasOwnProperty.call(reading.subreadings, key)) {
           for (let i = 0; i < reading.subreadings[key].length; i += 1) {
             witnesses.push.apply(witnesses, reading.subreadings[key][i].witnesses);
           }
@@ -496,9 +495,9 @@ CL = (function() {
       }
     }
     //this has been added in to help with the fix_lac_om stuff with om as subreading of existing reading
-    if (reading.hasOwnProperty('SR_text')) {
-      for (let key in reading.SR_text) {
-        if (reading.SR_text.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(reading, 'SR_text')) {
+      for (const key in reading.SR_text) {
+        if (Object.prototype.hasOwnProperty.call(reading.SR_text, key)) {
           if (witnesses.indexOf(key) === -1) {
             witnesses.push(key);
           }
@@ -509,8 +508,7 @@ CL = (function() {
   };
 
   findUnitById = function(appId, unitId) {
-    var data;
-    if (CL.data.hasOwnProperty(appId)) {
+    if (Object.prototype.hasOwnProperty.call(CL.data, appId)) {
       for (let i = 0; i < CL.data[appId].length; i += 1) {
         if (CL.data[appId][i]._id === unitId) {
           return CL.data[appId][i];
@@ -521,15 +519,15 @@ CL = (function() {
   };
 
   findStandoffRegularisation = function(unit, witness, appId) {
-    if (CL.data.hasOwnProperty('marked_readings')) {
-      for (let key in CL.data.marked_readings) {
-        if (CL.data.marked_readings.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(CL.data, 'marked_readings')) {
+      for (const key in CL.data.marked_readings) {
+        if (Object.prototype.hasOwnProperty.call(CL.data.marked_readings, key)) {
           for (let i = 0; i < CL.data.marked_readings[key].length; i += 1) {
             if (CL.data.marked_readings[key][i].apparatus === appId &&
                       CL.data.marked_readings[key][i].start === unit.start &&
                         CL.data.marked_readings[key][i].end === unit.end &&
                           CL.data.marked_readings[key][i].witness === witness) {
-              if (CL.data.marked_readings[key][i].hasOwnProperty('first_word_index')) {
+              if (Object.prototype.hasOwnProperty.call(CL.data.marked_readings[key][i], 'first_word_index')) {
                 if (CL.data.marked_readings[key][i].first_word_index === unit.first_word_index) {
                   return CL.data.marked_readings[key][i];
                 }
@@ -569,24 +567,24 @@ CL = (function() {
     let words, word;
     if (Array.isArray(data.overtext)) {
       // words is a list of lists with the first being the word and the second being the class to add if any or a an empty string
-      if (CL.project.hasOwnProperty('extractWordsForHeader')) {
+      if (Object.prototype.hasOwnProperty.call(CL.project, 'extractWordsForHeader')) {
         words = CL.project.extractWordsForHeader(data.overtext[0].tokens);
-      } else if (CL.services.hasOwnProperty('extractWordsForHeader')) {
+      } else if (Object.prototype.hasOwnProperty.call(CL.services, 'extractWordsForHeader')) {
         words = CL.services.extractWordsForHeader(data.overtext[0].tokens);
       } else {
         //hardcoded default
         words = [];
         for (let i = 0; i < data.overtext[0].tokens.length; i += 1) {
           word = [];
-          if (data.overtext[0].tokens[i].hasOwnProperty('pc_before')) {
+          if (Object.prototype.hasOwnProperty.call(data.overtext[0].tokens[i], 'pc_before')) {
             word.push(data.overtext[0].tokens[i].pc_before);
           }
-          if (data.overtext[0].tokens[i].hasOwnProperty('original')) {
+          if (Object.prototype.hasOwnProperty.call(data.overtext[0].tokens[i], 'original')) {
             word.push(data.overtext[0].tokens[i].original);
           } else {
             word.push(data.overtext[0].tokens[i].t);
           }
-          if (data.overtext[0].tokens[i].hasOwnProperty('pc_after')) {
+          if (Object.prototype.hasOwnProperty.call(data.overtext[0].tokens[i], 'pc_after')) {
             word.push(data.overtext[0].tokens[i].pc_after);
           }
           words.push([word.join(''), '']);
@@ -619,7 +617,7 @@ CL = (function() {
       j = 0;
       // we don't want 0 based indexing so start i at 1
       for (let i = 1; i <= cols; i += 1) {
-        if (colSpans.hasOwnProperty(i)) {
+        if (Object.prototype.hasOwnProperty.call(colSpans, i)) {
           colspan = colSpans[i];
         } else {
           colspan = 1;
@@ -639,7 +637,7 @@ CL = (function() {
       html.push('<tr id="number_row" class="number_row"><td></td>');
       j = 1;
       for (let i = 1; i <= cols; i += 1) {
-        if (colSpans.hasOwnProperty(i)) {
+        if (Object.prototype.hasOwnProperty.call(colSpans, i)) {
           colspan = colSpans[i];
         } else {
           colspan = 1;
@@ -671,13 +669,13 @@ CL = (function() {
       if (_collapsed === true) {
         _collapseAll(format);
         document.getElementById('expand_collapse_button').value = 'expand all';
-        $('#expand_collapse_button').on('click.expand_all', function(event) {
+        $('#expand_collapse_button').on('click.expand_all', function() {
           _expandAll(format);
         });
       } else {
         _expandAll(format);
         document.getElementById('expand_collapse_button').value = 'collapse all';
-        $('#expand_collapse_button').on('click.collapse_all', function(event) {
+        $('#expand_collapse_button').on('click.collapse_all', function() {
           _collapseAll(format);
         });
       }
@@ -721,7 +719,7 @@ CL = (function() {
     }
     rows.push('<tr><td></td>'); //the extra ones for navigation arrows
     //only care about highlighted unit if we are in the right apparatus
-    if (options.hasOwnProperty('error_unit') &&
+    if (Object.prototype.hasOwnProperty.call(options, 'error_unit') &&
               options.error_unit !== undefined &&
                 options.error_unit[0] !== 'apparatus' + app) {
       delete options.error_unit;
@@ -731,14 +729,14 @@ CL = (function() {
       unitIndex = null;
       unit = apparatus[j];
       if (unit !== undefined) {
-        if (unit.hasOwnProperty('extra_start')) {
+        if (Object.prototype.hasOwnProperty.call(unit, 'extra_start')) {
           unitIndex = unit.start + unit.extra_start;
         } else {
           unitIndex = unit.start;
         }
       }
       if (unitIndex === null || i < unitIndex) { //we don't have a variant for this word
-        if (options.hasOwnProperty('column_lengths') && options.column_lengths.hasOwnProperty(i)) {
+        if (Object.prototype.hasOwnProperty.call(options, 'column_lengths') && Object.prototype.hasOwnProperty.call(options.column_lengths, i)) {
           for (let k = 0; k < options.column_lengths[i]; k += 1) {
             rows.push(_getEmptyCell(format, {'dropable': true, 'id': tdId}));
             if (format === 'set_variants') {
@@ -755,11 +753,11 @@ CL = (function() {
       } else if (i === unitIndex) { //we do have a variant for this word
         if (unit.readings.length > 0) {
           //check to see if we need any gaps at this index point before the unit (to account for combined gap before in another reading)
-          if (options.overlap_details[unit._id].hasOwnProperty('gap_before') &&
+          if (Object.prototype.hasOwnProperty.call(options.overlap_details[unit._id], 'gap_before') &&
             options.overlap_details[unit._id].gap_before > 0) {
             rows.push('<td class="mark" colspan="' + options.overlap_details[unit._id].gap_before + '"></td>');
           }
-          if (options.hasOwnProperty('sort') && options.sort === true) {
+          if (Object.prototype.hasOwnProperty.call(options, 'sort') && options.sort === true) {
             unit.readings = sortReadings(unit.readings);
           }
           if (app > 1) {
@@ -767,7 +765,7 @@ CL = (function() {
           } else {
             idString = String(j);
           }
-          if (options.hasOwnProperty('getUnitDataOptions')) {
+          if (Object.prototype.hasOwnProperty.call(options, 'getUnitDataOptions')) {
             unitDataOptions = options.getUnitDataOptions;
             unitDataOptions.overlap = true;
             unitDataOptions.col_length = options.overlap_details[unit._id].col_length;
@@ -780,10 +778,12 @@ CL = (function() {
             };
           }
           if (CL.project.allowJoiningAcrossCollationUnits) {
-            if (j === 0 && options.hasOwnProperty('firstUnitOverlaps') && options.firstUnitOverlaps.hasOwnProperty(unit._id)) {
+            if (j === 0 && Object.prototype.hasOwnProperty.call(options, 'firstUnitOverlaps') &&
+                    Object.prototype.hasOwnProperty.call(options.firstUnitOverlaps, unit._id)) {
               unitDataOptions.joinable_backwards = true;
             }
-            if (j === apparatus.length-1 && options.hasOwnProperty('lastUnitOverlaps') && options.lastUnitOverlaps.hasOwnProperty(unit._id)) {
+            if (j === apparatus.length-1 && Object.prototype.hasOwnProperty.call(options, 'lastUnitOverlaps') &&
+                      Object.prototype.hasOwnProperty.call(options.lastUnitOverlaps, unit._id)) {
               unitDataOptions.joinable_forwards = true;
             }
           }
@@ -792,31 +792,31 @@ CL = (function() {
           } else {
             unitDataOptions.app_id = 'apparatus';
           }
-          if (options.hasOwnProperty('highlighted_wit')) {
+          if (Object.prototype.hasOwnProperty.call(options, 'highlighted_wit')) {
             unitDataOptions.highlighted_wit = options.highlighted_wit;
           }
-          if (options.hasOwnProperty('highlighted_added_wits')) {
+          if (Object.prototype.hasOwnProperty.call(options, 'highlighted_added_wits')) {
             unitDataOptions.highlighted_added_wits = options.highlighted_added_wits;
           }
-          if (options.hasOwnProperty('highlighted_version')) {
+          if (Object.prototype.hasOwnProperty.call(options, 'highlighted_version')) {
             unitDataOptions.highlighted_version = options.highlighted_version;
           }
-          if (options.hasOwnProperty('highlighted_author')) {
+          if (Object.prototype.hasOwnProperty.call(options, 'highlighted_author')) {
             unitDataOptions.highlighted_author = options.highlighted_author;
           }
-          if (options.hasOwnProperty('error_unit')) {
+          if (Object.prototype.hasOwnProperty.call(options, 'error_unit')) {
             unitDataOptions.error_unit = options.error_unit;
           }
-          if (options.hasOwnProperty('highlighted_units')) {
+          if (Object.prototype.hasOwnProperty.call(options, 'highlighted_units')) {
             unitDataOptions.highlighted_units = options.highlighted_units;
           }
-          if (unit.hasOwnProperty('split_readings') && unit.split_readings === true) {
+          if (Object.prototype.hasOwnProperty.call(unit, 'split_readings') && unit.split_readings === true) {
             unitDataOptions.split = true;
           }
-          if (unit.hasOwnProperty('created') && unit.created === true) {
+          if (Object.prototype.hasOwnProperty.call(unit, 'created') && unit.created === true) {
             unitDataOptions.created = true;
           }
-          if (options.hasOwnProperty('getUnitDataFunction')) {
+          if (Object.prototype.hasOwnProperty.call(options, 'getUnitDataFunction')) {
             unitDataOptions.format = format;
             unitData = options.getUnitDataFunction(unit.readings, idString, unit.start, unit.end, unitDataOptions);
           } else if (format === 'regularise') {
@@ -835,7 +835,7 @@ CL = (function() {
           events = _mergeDicts(events, unitData[2]);
         } else {
           emptyCellOptions = {'start': unit.start, 'end': unit.end, 'dropable': true, 'id': tdId};
-          if (options.hasOwnProperty('column_lengths') && options.column_lengths.hasOwnProperty(i)) {
+          if (Object.prototype.hasOwnProperty.call(options, 'column_lengths') && Object.prototype.hasOwnProperty.call(options.column_lengths, i)) {
             for (let k = 0; k < options.column_lengths[i]; k += 1) {
               rows.push(_getEmptyCell(format, emptyCellOptions));
               if (format === 'set_variants') {
@@ -855,18 +855,18 @@ CL = (function() {
         }
         if (j + 1 < apparatus.length) {
           nextStart = apparatus[j + 1].start;
-          if (apparatus[j + 1].hasOwnProperty('extra_start')) {
+          if (Object.prototype.hasOwnProperty.call(apparatus[j + 1], 'extra_start')) {
             nextStart = apparatus[j + 1].start + apparatus[j + 1].extra_start;
           }
           if (nextStart !== unitIndex) {
-            if (unit.hasOwnProperty('extra_start')) {
+            if (Object.prototype.hasOwnProperty.call(unit, 'extra_start')) {
               i += (unit.end - (unit.start + unit.extra_start) + 1);
             } else {
               i += (unit.end - unit.start + 1);
             }
           }
         } else {
-          if (unit.hasOwnProperty('extra_start')) {
+          if (Object.prototype.hasOwnProperty.call(unit, 'extra_start')) {
             i += (unit.end - (unit.start + unit.extra_start) + 1);
           } else {
             i += (unit.end - unit.start + 1);
@@ -904,7 +904,7 @@ CL = (function() {
     readingLabel = '';
     labelSuffix = '';
     alphaId = getAlphaId(readingPos);
-    if (reading.hasOwnProperty('reading_classes')) {
+    if (Object.prototype.hasOwnProperty.call(reading, 'reading_classes')) {
       for (let i = 0; i < reading.reading_classes.length; i += 1) {
         if (rules[reading.reading_classes[i]][2] === true) {
           if (typeof rules[reading.reading_classes[i]][0] !== 'undefined') {
@@ -913,27 +913,27 @@ CL = (function() {
         }
       }
     }
-    if (reading.hasOwnProperty('label') && typeof reading.label !== 'undefined') {
+    if (Object.prototype.hasOwnProperty.call(reading, 'label') && typeof reading.label !== 'undefined') {
       if (reading.label === 'zz') {
         readingLabel = '—';
       } else if (reading.label === 'zv') {
         readingLabel = '?';
       }
     }
-    if (reading.hasOwnProperty('overlap_status')) {
+    if (Object.prototype.hasOwnProperty.call(reading, 'overlap_status')) {
       readingLabel = '';  // this will be the default if it doesn't get replaced
       if (reading.overlap_status === 'duplicate') {
         readingLabel = '↓';
       } else {
         for (let i = 0; i < CL.overlappedOptions.length; i += 1) {
           if (CL.overlappedOptions[i].reading_flag === reading.overlap_status &&
-            CL.overlappedOptions[i].hasOwnProperty('reading_label_display')) {
+            Object.prototype.hasOwnProperty.call(CL.overlappedOptions[i], 'reading_label_display')) {
             readingLabel = CL.overlappedOptions[i].reading_label_display;
           }
         }
       }
     } else if (reading.label !== 'zz' && reading.label !== 'zv') {
-      if (reading.hasOwnProperty('label')) {
+      if (Object.prototype.hasOwnProperty.call(reading, 'label')) {
         readingLabel = reading.label + labelSuffix + '.';
       } else {
         readingLabel = alphaId + labelSuffix + '.';
@@ -952,7 +952,7 @@ CL = (function() {
   getReadingSuffix = function(reading, rules) {
     var readingSuffix;
     readingSuffix = '';
-    if (reading.hasOwnProperty('reading_classes')) {
+    if (Object.prototype.hasOwnProperty.call(reading, 'reading_classes')) {
       for (let i = 0; i < reading.reading_classes.length; i += 1) {
         if (rules[reading.reading_classes[i]][3] === true) {
           if (typeof rules[reading.reading_classes[i]][0] !== 'undefined') {
@@ -972,7 +972,7 @@ CL = (function() {
     if (CL.showSubreadings === true) {
       // hide the subreadings (except the edition ones if we are have supplied baseSubreadingRules)
       if (document.getElementById('show_hide_subreadings_button')) {
-        $('#show_hide_subreadings_button').on('click.hide_subreadings', function(event) {
+        $('#show_hide_subreadings_button').on('click.hide_subreadings', function() {
           scrollOffset = [document.getElementById('scroller').scrollLeft,
             document.getElementById('scroller').scrollTop
           ];
@@ -997,7 +997,7 @@ CL = (function() {
     } else {
       if (document.getElementById('show_hide_subreadings_button')) {
         // show all the subreadings
-        $('#show_hide_subreadings_button').on('click.show_subreadings', function(event) {
+        $('#show_hide_subreadings_button').on('click.show_subreadings', function() {
           scrollOffset = [document.getElementById('scroller').scrollLeft,
                           document.getElementById('scroller').scrollTop];
           $(this).text($(this).text().replace('show', 'hide'));
@@ -1050,7 +1050,7 @@ CL = (function() {
     }
     rows.push('<tr><td></td>');
     // only care about highlighted unit if we are in the right apparatus
-    if (options.hasOwnProperty('error_unit') &&
+    if (Object.prototype.hasOwnProperty.call(options, 'error_unit') &&
               options.error_unit !== undefined &&
                 options.error_unit[0] !== 'apparatus' + app) {
       delete options.error_unit;
@@ -1078,7 +1078,7 @@ CL = (function() {
           format === 'version_additions' ||
           format === 'other_version_additions') {
 
-          if (options.hasOwnProperty('sort') && options.sort === true) {
+          if (Object.prototype.hasOwnProperty.call(options, 'sort') && options.sort === true) {
             unit.readings = sortReadings(unit.readings);
           }
 
@@ -1087,7 +1087,7 @@ CL = (function() {
           } else {
             idString = String(j);
           }
-          if (options.hasOwnProperty('getUnitDataOptions')) {
+          if (Object.prototype.hasOwnProperty.call(options, 'getUnitDataOptions')) {
             unitDataOptions = options.getUnitDataOptions;
             unitDataOptions.unit_id = unit._id;
           } else {
@@ -1098,34 +1098,34 @@ CL = (function() {
           } else {
             unitDataOptions.app_id = 'apparatus';
           }
-          if (options.hasOwnProperty('highlighted_wit')) {
+          if (Object.prototype.hasOwnProperty.call(options, 'highlighted_wit')) {
             unitDataOptions.highlighted_wit = options.highlighted_wit;
           }
-          if (options.hasOwnProperty('highlighted_added_wits')) {
+          if (Object.prototype.hasOwnProperty.call(options, 'highlighted_added_wits')) {
             unitDataOptions.highlighted_added_wits = options.highlighted_added_wits;
           }
-          if (options.hasOwnProperty('highlighted_version')) {
+          if (Object.prototype.hasOwnProperty.call(options, 'highlighted_version')) {
             unitDataOptions.highlighted_version = options.highlighted_version;
           }
-          if (options.hasOwnProperty('highlighted_author')) {
+          if (Object.prototype.hasOwnProperty.call(options, 'highlighted_author')) {
             unitDataOptions.highlighted_author = options.highlighted_author;
           }
-          if (options.hasOwnProperty('error_unit')) {
+          if (Object.prototype.hasOwnProperty.call(options, 'error_unit')) {
             unitDataOptions.error_unit = options.error_unit;
           }
-          if (options.hasOwnProperty('highlighted_units')) {
+          if (Object.prototype.hasOwnProperty.call(options, 'highlighted_units')) {
             unitDataOptions.highlighted_units = options.highlighted_units;
           }
-          if (unit.hasOwnProperty('split_readings') && unit.split_readings === true) {
+          if (Object.prototype.hasOwnProperty.call(unit, 'split_readings') && unit.split_readings === true) {
             unitDataOptions.split = true;
           }
-          if (unit.hasOwnProperty('created') && unit.created === true) {
+          if (Object.prototype.hasOwnProperty.call(unit, 'created') && unit.created === true) {
             unitDataOptions.created = true;
           }
-          if (unit.hasOwnProperty('overlap_units')) {
+          if (Object.prototype.hasOwnProperty.call(unit, 'overlap_units')) {
             unitDataOptions.overlapping_ids = [];
-            for (let key in unit.overlap_units) {
-              if (unit.overlap_units.hasOwnProperty(key)) {
+            for (const key in unit.overlap_units) {
+              if (Object.prototype.hasOwnProperty.call(unit.overlap_units, key)) {
                 unitDataOptions.overlapping_ids.push(key);
               }
             }
@@ -1134,13 +1134,13 @@ CL = (function() {
             unitDataOptions.gap_unit = true;
           }
 
-          if (options.hasOwnProperty('getUnitDataFunction')) {
+          if (Object.prototype.hasOwnProperty.call(options, 'getUnitDataFunction')) {
             unitDataOptions.format = format;
             unitData = options.getUnitDataFunction(unit.readings, idString, unit.start, unit.end, unitDataOptions);
           } else if (format === 'regularise') {
             unitData = RG.getUnitData(unit.readings, idString, unit.start, unit.end, unitDataOptions);
           } else if (format === 'set_variants') {
-            if (unit.hasOwnProperty('overlap_units')) {
+            if (Object.prototype.hasOwnProperty.call(unit, 'overlap_units')) {
               unitDataOptions.overlap_units = unit.overlap_units;
             }
             unitData = SV.getUnitData(unit.readings, idString, unit.start, unit.end, unitDataOptions);
@@ -1162,7 +1162,7 @@ CL = (function() {
         if (j + 1 < apparatus.length && apparatus[j + 1].start !== unitIndex) {
           i += (unit.end - unit.start + 1);
         } else if (j + 1 < apparatus.length) {
-          if (colLenDict.hasOwnProperty(i)) {
+          if (Object.prototype.hasOwnProperty.call(colLenDict, i)) {
             colLenDict[i] += 1;
           } else {
             colLenDict[i] = 2;
@@ -1190,12 +1190,12 @@ CL = (function() {
    * */
   unitHasText = function(unit) {
     for (let i = 0; i < unit.readings.length; i += 1) {
-      if (unit.readings[i].hasOwnProperty('text') && unit.readings[i].text.length > 0) {
+      if (Object.prototype.hasOwnProperty.call(unit.readings[i], 'text') && unit.readings[i].text.length > 0) {
         return true;
       }
-      if (unit.readings[i].hasOwnProperty('subreadings')) {
-        for (let key in unit.readings[i].subreadings) {
-          if (unit.readings[i].subreadings.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(unit.readings[i], 'subreadings')) {
+        for (const key in unit.readings[i].subreadings) {
+          if (Object.prototype.hasOwnProperty.call(unit.readings[i].subreadings, key)) {
             for (let j = 0; j < unit.readings[i].subreadings[key].length; j += 1) {
               if (unit.readings[i].subreadings[key][j].text.length > 0) {
                 return true;
@@ -1204,9 +1204,9 @@ CL = (function() {
           }
         }
       }
-      if (unit.readings[i].hasOwnProperty('SR_text')) {
-        for (let key in unit.readings[i].SR_text) {
-          if (unit.readings[i].SR_text.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(unit.readings[i], 'SR_text')) {
+        for (const key in unit.readings[i].SR_text) {
+          if (Object.prototype.hasOwnProperty.call(unit.readings[i].SR_text, key)) {
             if (unit.readings[i].SR_text[key].text.length > 0) {
               return true;
             }
@@ -1235,21 +1235,21 @@ CL = (function() {
       if (transcriptions.length > 0) {
         for (let i = 0; i < transcriptions.length; i += 1) {
           unit = transcriptions[i];
-          if (unit.hasOwnProperty('witnesses') && unit.witnesses !== null) {
+          if (Object.prototype.hasOwnProperty.call(unit, 'witnesses') && unit.witnesses !== null) {
             for (let j = 0; j < unit.witnesses.length; j += 1) {
               if (unit.witnesses[j].id === hand) {
                 for (let k = 0; k < unit.witnesses[j].tokens.length; k += 1) {
-                  if (unit.witnesses[j].tokens[k].hasOwnProperty('gap_before')) {
+                  if (Object.prototype.hasOwnProperty.call(unit.witnesses[j].tokens[k], 'gap_before')) {
                     text.push('&lt;' + unit.witnesses[j].tokens[k].gap_before_details + '&gt;');
                   }
-                  if (unit.witnesses[j].tokens[k].hasOwnProperty('expanded')) {
+                  if (Object.prototype.hasOwnProperty.call(unit.witnesses[j].tokens[k], 'expanded')) {
                     text.push(unit.witnesses[j].tokens[k].expanded);
-                  } else if (unit.witnesses[j].tokens[k].hasOwnProperty('original')) {
+                  } else if (Object.prototype.hasOwnProperty.call(unit.witnesses[j].tokens[k], 'original')) {
                     text.push(unit.witnesses[j].tokens[k].original);
                   } else {
                     text.push(unit.witnesses[j].tokens[k].t);
                   }
-                  if (unit.witnesses[j].tokens[k].hasOwnProperty('gap_after')) {
+                  if (Object.prototype.hasOwnProperty.call(unit.witnesses[j].tokens[k], 'gap_after')) {
                     text.push('&lt;' + unit.witnesses[j].tokens[k].gap_details + '&gt;');
                   }
                 }
@@ -1279,7 +1279,7 @@ CL = (function() {
   findOverlapUnitById = function(id) {
     var unit;
     unit = null;
-    for (let key in CL.data) {
+    for (const key in CL.data) {
       if (key.match(/apparatus\d*/g) !== null) {
         // This test for length here is in case we have delted a witness and left an empty line
         if (unit === null && CL.data[key].length > 0) {
@@ -1291,12 +1291,12 @@ CL = (function() {
   };
 
   getReading = function(reading, witness) {
-    if (reading.hasOwnProperty('SR_text') && reading.SR_text.hasOwnProperty(witness)) {
+    if (Object.prototype.hasOwnProperty.call(reading, 'SR_text') && Object.prototype.hasOwnProperty.call(reading.SR_text, witness)) {
       return reading.SR_text[witness];
     }
-    if (reading.hasOwnProperty('subreadings')) {
-      for (let key in reading.subreadings) {
-        if (reading.subreadings.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(reading, 'subreadings')) {
+      for (const key in reading.subreadings) {
+        if (Object.prototype.hasOwnProperty.call(reading.subreadings, key)) {
           for (let i = 0; i < reading.subreadings[key].length; i += 1) {
             if (reading.subreadings[key][i].witnesses.indexOf(witness) !== -1) {
               return reading.subreadings[key][i];
@@ -1317,7 +1317,7 @@ CL = (function() {
    *
    *  */
   lacOmFix = function() {
-    var apparatus, witnesses, emptyWitnesses, token, extraReadings, overlap, overlapStatus;
+    var apparatus, witnesses, emptyWitnesses, token, extraReadings, overlapStatus;
     //first strip all the empty units displaying gaps and then recreate the ones we still need
     _cleanExtraGaps();
     _createExtraGaps();
@@ -1330,7 +1330,7 @@ CL = (function() {
                   apparatus[i].readings[j].type !== 'lac_verse' &&
                     apparatus[i].readings[j].type !== 'om_verse') {
           overlapStatus = undefined;
-          if (apparatus[i].readings[j].hasOwnProperty('overlap_status')) {
+          if (Object.prototype.hasOwnProperty.call(apparatus[i].readings[j], 'overlap_status')) {
             overlapStatus = apparatus[i].readings[j].overlap_status;
           }
           // gets all witnesses that have an empty reading including those in subreadings
@@ -1352,9 +1352,9 @@ CL = (function() {
                 extraReadings = _addLacReading(extraReadings, witnesses[k], token[1], overlapStatus);
                 witnesses[k] = null; // just make it null and delete later so you don't change size mid loop
               } else if (apparatus[i].readings[j].witnesses.indexOf(witnesses[k]) !== -1 &&
-                                ((apparatus[i].readings[j].hasOwnProperty('SR_text') &&
-                                  !apparatus[i].readings[j].SR_text.hasOwnProperty(witnesses[k])) ||
-                                    !apparatus[i].readings[j].hasOwnProperty('SR_text'))) {
+                                ((Object.prototype.hasOwnProperty.call(apparatus[i].readings[j], 'SR_text') &&
+                                  !Object.prototype.hasOwnProperty.call(apparatus[i].readings[j].SR_text, witnesses[k])) ||
+                                    !Object.prototype.hasOwnProperty.call(apparatus[i].readings[j], 'SR_text'))) {
                 //if this witness is a genuine main reading
                 //then leave the witness alone and if its text length is 0 ensure it is om not lac (it may have changed when moving readings about)
                 if (apparatus[i].readings[j].text.length === 0) {
@@ -1362,8 +1362,8 @@ CL = (function() {
                   delete apparatus[i].readings[j].details;
                 }
               } else if (apparatus[i].readings[j].witnesses.indexOf(witnesses[k]) !== -1 &&
-                            apparatus[i].readings[j].hasOwnProperty('SR_text') &&
-                              apparatus[i].readings[j].SR_text.hasOwnProperty(witnesses[k]) &&
+                            Object.prototype.hasOwnProperty.call(apparatus[i].readings[j], 'SR_text') &&
+                              Object.prototype.hasOwnProperty.call(apparatus[i].readings[j].SR_text, witnesses[k]) &&
                                 apparatus[i].readings[j].SR_text[witnesses[k]].text.length === 0) {
                 //squelch if this is an om reading which is a subreading of another reading
 
@@ -1388,9 +1388,9 @@ CL = (function() {
   };
 
   getSubreadingOfWitness = function(reading, witness, includeSrTextData) {
-    if (reading.hasOwnProperty('subreadings')) {
-      for (let key in reading.subreadings) {
-        if (reading.subreadings.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(reading, 'subreadings')) {
+      for (const key in reading.subreadings) {
+        if (Object.prototype.hasOwnProperty.call(reading.subreadings, key)) {
           for (let i = 0; i < reading.subreadings[key].length; i += 1) {
             if (reading.subreadings[key][i].witnesses.indexOf(witness) !== -1) {
               return reading.subreadings[key][i];
@@ -1399,7 +1399,7 @@ CL = (function() {
         }
       }
     }
-    if (includeSrTextData === true && reading.hasOwnProperty('SR_text')) {
+    if (includeSrTextData === true && Object.prototype.hasOwnProperty.call(reading, 'SR_text')) {
       for (let key in reading.SR_text) {
         if (key === witness) {
           return reading.SR_text[key];
@@ -1412,8 +1412,8 @@ CL = (function() {
   //if any of the provided ovlerap_units object have an empty reading
   overlapHasEmptyReading = function(overlapUnits) {
     var overlappingUnit;
-    for (let key in overlapUnits) {
-      if (overlapUnits.hasOwnProperty(key)) {
+    for (const key in overlapUnits) {
+      if (Object.prototype.hasOwnProperty.call(overlapUnits, key)) {
         overlappingUnit = findOverlapUnitById(key);
         //the 1 in the next line can be hard coded because overlapped readings only ever have a single reading
         //after the a reading at this point
@@ -1435,7 +1435,7 @@ CL = (function() {
   };
 
   addStageLinks = function() {
-    if (document.getElementById('stage_links') && CL.services.hasOwnProperty('getSavedStageIds')) {
+    if (document.getElementById('stage_links') && Object.prototype.hasOwnProperty.call(CL.services, 'getSavedStageIds')) {
       document.getElementById('stage_links').innerHTML = '<span id="R">Reg</span><span id="S">Set</span>' +
                                                          '<span id="O">Ord</span><span id="A">App</span>';
       CL.services.getSavedStageIds(CL.context, function(reg, set, ord, app) {
@@ -1462,12 +1462,12 @@ CL = (function() {
   addExtraFooterButtons = function(stage) {
     var html;
     html = [];
-    if (CL.project.hasOwnProperty('extraFooterButtons') && CL.project.extraFooterButtons.hasOwnProperty(stage)) {
+    if (Object.prototype.hasOwnProperty.call(CL.project, 'extraFooterButtons') && Object.prototype.hasOwnProperty.call(CL.project.extraFooterButtons, stage)) {
       for (let i = 0; i < CL.project.extraFooterButtons[stage].length; i += 1) {
-        if (CL.project.extraFooterButtons[stage][i].hasOwnProperty('id')) {
+        if (Object.prototype.hasOwnProperty.call(CL.project.extraFooterButtons[stage][i], 'id')) {
           html.push('<input class="pure-button left_foot" type="button" id="' +
                     CL.project.extraFooterButtons[stage][i].id + '" value="');
-          if (CL.project.extraFooterButtons[stage][i].hasOwnProperty('label')) {
+          if (Object.prototype.hasOwnProperty.call(CL.project.extraFooterButtons[stage][i], 'label')) {
             html.push(CL.project.extraFooterButtons[stage][i].label);
           } else {
             html.push(CL.project.extraFooterButtons[stage][i].id);
@@ -1475,13 +1475,13 @@ CL = (function() {
           html.push('"/>');
         }
       }
-    } else if (CL.services.hasOwnProperty('extraFooterButtons') &&
-                    CL.services.extraFooterButtons.hasOwnProperty(stage)) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'extraFooterButtons') &&
+                    Object.prototype.hasOwnProperty.call(CL.services.extraFooterButtons, stage)) {
       for (let i = 0; i < CL.services.extraFooterButtons[stage].length; i += 1) {
-        if (CL.services.extraFooterButtons[stage][i].hasOwnProperty('id')) {
+        if (Object.prototype.hasOwnProperty.call(CL.services.extraFooterButtons[stage][i], 'id')) {
           html.push('<input class="pure-button left_foot" type="button" id="' +
                     CL.services.extraFooterButtons[stage][i].id + '" value="');
-          if (CL.services.extraFooterButtons[stage][i].hasOwnProperty('label')) {
+          if (Object.prototype.hasOwnProperty.call(CL.services.extraFooterButtons[stage][i], 'label')) {
             html.push(CL.services.extraFooterButtons[stage][i].label);
           } else {
             html.push(CL.services.extraFooterButtons[stage][i].id);
@@ -1492,7 +1492,7 @@ CL = (function() {
     }
     if (document.getElementById('extra_buttons')) {
       document.getElementById('extra_buttons').innerHTML = html.join('');
-      if (CL.services.hasOwnProperty('addExtraFooterFunctions')) {
+      if (Object.prototype.hasOwnProperty.call(CL.services, 'addExtraFooterFunctions')) {
         CL.services.addExtraFooterFunctions();
       }
     }
@@ -1500,12 +1500,12 @@ CL = (function() {
   };
 
   makeVerseLinks = function() {
-    var verse, ok;
-    if (document.getElementById('previous_verse') && CL.services.hasOwnProperty('getAdjoiningUnit')) {
+    var ok;
+    if (document.getElementById('previous_verse') && Object.prototype.hasOwnProperty.call(CL.services, 'getAdjoiningUnit')) {
       CL.services.getAdjoiningUnit(CL.context, true, function(verse) { // previous
         if (verse) {
           $('#previous_verse').on('click', function() {
-            if (!RG.hasOwnProperty('_rules') || (RG.hasOwnProperty('_rules') && RG.allRuleStacksEmpty())) {
+            if (!Object.prototype.hasOwnProperty.call(RG, '_rules') || (Object.prototype.hasOwnProperty.call(RG, '_rules') && RG.allRuleStacksEmpty())) {
               _findLatestStageVerse(verse);
             } else {
               ok = confirm('You have unapplied rule changes in this verse. They will be lost if you navigate away.' +
@@ -1522,11 +1522,11 @@ CL = (function() {
         }
       });
     }
-    if (document.getElementById('next_verse') && CL.services.hasOwnProperty('getAdjoiningUnit')) {
+    if (document.getElementById('next_verse') && Object.prototype.hasOwnProperty.call(CL.services, 'getAdjoiningUnit')) {
       CL.services.getAdjoiningUnit(CL.context, false, function(verse) { // next
         if (verse) {
           $('#next_verse').on('click', function() {
-            if (!RG.hasOwnProperty('_rules') || (RG.hasOwnProperty('_rules') && RG.allRuleStacksEmpty())) {
+            if (!Object.prototype.hasOwnProperty.call(RG, '_rules') || (Object.prototype.hasOwnProperty.call(RG, '_rules') && RG.allRuleStacksEmpty())) {
               _findLatestStageVerse(verse);
             } else {
               ok = confirm('You have unapplied rule changes in this verse. They will be lost if you navigate away.' +
@@ -1589,9 +1589,9 @@ CL = (function() {
     }
     for (i; i < unit.readings.length; i += 1) {
       witnesses.push.apply(witnesses, unit.readings[i].witnesses);
-      if (unit.readings[i].hasOwnProperty('subreadings')) {
-        for (let key in unit.readings[i].subreadings) {
-          if (unit.readings[i].subreadings.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(unit.readings[i], 'subreadings')) {
+        for (const key in unit.readings[i].subreadings) {
+          if (Object.prototype.hasOwnProperty.call(unit.readings[i].subreadings, key)) {
             for (let j = 0; j < unit.readings[i].subreadings[key].length; j += 1) {
               witnesses.push.apply(witnesses, unit.readings[i].subreadings[key][j].witnesses);
             }
@@ -1603,10 +1603,10 @@ CL = (function() {
   };
 
   getExporterSettings = function() {
-    if (CL.project.hasOwnProperty('exporterSettings')) {
+    if (Object.prototype.hasOwnProperty.call(CL.project, 'exporterSettings')) {
       return JSON.stringify(CL.project.exporterSettings);
     }
-    if (CL.services.hasOwnProperty('exporterSettings')) {
+    if (Object.prototype.hasOwnProperty.call(CL.services, 'exporterSettings')) {
       return JSON.stringify(CL.services.exporterSettings);
     }
     // exporter factory has its own defaults so no need to have any here
@@ -1614,7 +1614,7 @@ CL = (function() {
   };
 
   saveCollation = function(status, successCallback) {
-    var collation, confirmed, confirmMessage, successMessage, approvalSettings, currentDate;
+    var collation, confirmMessage, successMessage, approvalSettings, currentDate;
     spinner.showLoadingOverlay();
     CL.services.getUserInfo(function(user) {
       if (user) {
@@ -1651,7 +1651,7 @@ CL = (function() {
           successMessage = 'Last saved:' + pad2(currentDate.getHours()) + ':' +
                            pad2(currentDate.getMinutes());
         }
-        if (CL.project.hasOwnProperty('id')) {
+        if (Object.prototype.hasOwnProperty.call(CL.project, 'id')) {
           collation.project = CL.project.id;
           collation.id += '_' + CL.project.id;
         } else {
@@ -1676,10 +1676,10 @@ CL = (function() {
   };
 
   sortWitnesses = function(witnesses) {
-    if (CL.project.hasOwnProperty('witnessSort')) {
+    if (Object.prototype.hasOwnProperty.call(CL.project, 'witnessSort')) {
       //use a project function if there is one
       runFunction(CL.project.witnessSort, [witnesses]);
-    } else if (CL.services && CL.services.hasOwnProperty('witnessSort')) {
+    } else if (CL.services && Object.prototype.hasOwnProperty.call(CL.services, 'witnessSort')) {
       //or use the default for the services if there is one
       runFunction(CL.services.witnessSort, [witnesses]);
     } else {
@@ -1691,7 +1691,7 @@ CL = (function() {
 
   getSpecifiedAncestor = function(element, ancestor, conditionTest) {
     if (typeof conditionTest === 'undefined') {
-      conditionTest = function(e) {
+      conditionTest = function() {
         return true;
       };
     }
@@ -1716,13 +1716,13 @@ CL = (function() {
     $(row).on('mouseover', function(event) {
       _displayWitnessesHover(event, witnesses);
     });
-    $(row).on('mouseout', function(event) {
+    $(row).on('mouseout', function() {
       hideTooltip();
     });
   };
 
   markReading = function(value, reading) {
-    if (reading.hasOwnProperty('reading_classes')) {
+    if (Object.prototype.hasOwnProperty.call(reading, 'reading_classes')) {
       if (reading.reading_classes.indexOf(value) === -1) {
         reading.reading_classes.push(value);
       } else {
@@ -1754,9 +1754,9 @@ CL = (function() {
     witnessHtml.push('<label>Selected reading: </label><span>');
     witnessHtml.push(CL.extractWitnessText(reading));
     witnessHtml.push('</span>');
-    if (witnesses.length > 1 && (!details.hasOwnProperty('witness_select') || details.witness_select !== false)) {
+    if (witnesses.length > 1 && (!Object.prototype.hasOwnProperty.call(details, 'witness_select') || details.witness_select !== false)) {
       witnessHtml.push('<div id="wit_scroller">');
-      if (!details.hasOwnProperty('just_split') || details.just_split !== true ) {
+      if (!Object.prototype.hasOwnProperty.call(details, 'just_split') || details.just_split !== true ) {
         witnessHtml.push('<input type="checkbox" id="wit_select_all">Select All</input><br/>');
       }
       for (let i = 0; i < witnesses.length; i += 1) {
@@ -1800,17 +1800,17 @@ CL = (function() {
     windowHeight = window.innerHeight;
     witFormHeight = document.getElementById('wit_form').offsetHeight - 43;
     document.getElementById('select_wit_form').style.height = witFormHeight + 'px';
-    if (details.hasOwnProperty('form_size') && details.form_size === 'small') {
+    if (Object.prototype.hasOwnProperty.call(details, 'form_size') && details.form_size === 'small') {
       menuHeight = Math.max(witFormHeight - 100, 50);
     } else if (details.type === 'SVsubreading' || details.type === 'ORsubreading') {
       menuHeight = Math.max(witFormHeight - 235, 50);
     } else {
       menuHeight = Math.max(witFormHeight - 173, 50);
     }
-    if (witnesses.length > 1 && (!details.hasOwnProperty('witness_select') || details.witness_select !== false)) {
+    if (witnesses.length > 1 && (!Object.prototype.hasOwnProperty.call(details, 'witness_select') || details.witness_select !== false)) {
       document.getElementById('wit_scroller').style.maxHeight = menuHeight + 'px';
     }
-    $('#close_button').on('click', function(event) {
+    $('#close_button').on('click', function() {
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('wit_form'));
     });
     if (document.getElementById('wit_select_all')) {
@@ -1827,7 +1827,7 @@ CL = (function() {
     reading = unit.readings[readingDetails.reading_pos];
     totalReadingWitnesses = reading.witnesses.length;
     //show the menu to identify the parent reading and split the witnesses if necessary
-    if (reading.witnesses.length > 1 || reading.hasOwnProperty('subreadings')) {
+    if (reading.witnesses.length > 1 || Object.prototype.hasOwnProperty.call(reading, 'subreadings')) {
       showSplitWitnessMenu(reading, menuPos, {
         'type': type,
         'header': 'Select witnesses to mark as ' + name,
@@ -1849,7 +1849,7 @@ CL = (function() {
       //	an empty reading but isn't lac verse or om verse (probably should change this and deal with them differently)
       //	in a unit that is an overlap and i != 0 (which means this reading is not the a reading)
       if (i !== readingDetails.reading_pos &&
-            (!unit.readings[i].hasOwnProperty('type') || (unit.readings[i].hasOwnProperty('type') &&
+            (!Object.prototype.hasOwnProperty.call(unit.readings[i], 'type') || (Object.prototype.hasOwnProperty.call(unit.readings[i], 'type') &&
                                                           unit.readings[i].type !== 'om_verse' &&
                                                           unit.readings[i].type !== 'lac_verse')) &&
             (readingDetails.app_id === 'apparatus' || ( readingDetails.app_id !== 'apparatus' && i !== 0))) {
@@ -1896,20 +1896,20 @@ CL = (function() {
       }
     });
     // Add event handler to do the job
-    $('#select_button').on('click', function(event) {
+    $('#select_button').on('click', function() {
       var extraDetails, data, witnessList, unit, callback;
       unit = CL.data[readingDetails.app_id][readingDetails.unit_pos];
       data = cforms.serialiseForm('select_wit_form');
       if (data.parent_reading !== null) {
         witnessList = [];
-        for (let key in data) {
+        for (const key in data) {
           if (key === 'duplicate') {
             duplicate = true;
           } else if (key === 'subreading_type') {
             type = data[key];
           } else if (key === 'reading_details') {
             extraDetails = data[key].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-          } else if (key !== 'parent_reading' && data.hasOwnProperty(key) && data[key] !== null) {
+          } else if (key !== 'parent_reading' && Object.prototype.hasOwnProperty.call(data, key) && data[key] !== null) {
             witnessList.push(key);
           }
         }
@@ -1934,7 +1934,7 @@ CL = (function() {
         readingDetails.reading_id = newReadingId;
         //record it in the separated_witnesses structure if we didn't select all witnesses in the reading
         if (witnessList.length < totalReadingWitnesses) {
-          if (!CL.data.hasOwnProperty('separated_witnesses')) {
+          if (!Object.prototype.hasOwnProperty.call(CL.data, 'separated_witnesses')) {
             CL.data.separated_witnesses = [];
           }
           CL.data.separated_witnesses.push({'app_id': readingDetails.app_id,
@@ -1958,7 +1958,7 @@ CL = (function() {
     if (data === undefined) {
       data = CL.data;
     }
-    if (data.hasOwnProperty(appId)) {
+    if (Object.prototype.hasOwnProperty.call(data, appId)) {
       for (let i = 0; i < CL.data[appId].length; i += 1) {
         if (data[appId][i]._id === unitId) {
           return i;
@@ -1970,7 +1970,7 @@ CL = (function() {
 
   findReadingById = function(unit, id) {
     for (let i = 0; i < unit.readings.length; i += 1) {
-      if (unit.readings[i].hasOwnProperty('_id') && unit.readings[i]._id === id) {
+      if (Object.prototype.hasOwnProperty.call(unit.readings[i], '_id') && unit.readings[i]._id === id) {
         return unit.readings[i];
       }
     }
@@ -1980,7 +1980,7 @@ CL = (function() {
   findReadingByText = function(unit, text) {
     var tokenList;
     for (let i = 0; i < unit.readings.length; i += 1) {
-      if (unit.readings[i].hasOwnProperty('text_string') && unit.readings[i].text_string === text) {
+      if (Object.prototype.hasOwnProperty.call(unit.readings[i], 'text_string') && unit.readings[i].text_string === text) {
         return unit.readings[i];
       } else {
         tokenList = [];
@@ -2011,16 +2011,16 @@ CL = (function() {
   _extractAllTValuesForRGAppliedRules = function(reading, unit, apparatus) {
     var witness, tValue, tokensForSettings, structuredTokens;
     tokensForSettings = [];
-    if (reading.hasOwnProperty('subreadings')) {
-      for (let key in reading.subreadings) {
-        if (reading.subreadings.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(reading, 'subreadings')) {
+      for (const key in reading.subreadings) {
+        if (Object.prototype.hasOwnProperty.call(reading.subreadings, key)) {
           for (let i = reading.subreadings[key].length - 1; i >= 0; i -= 1) {
             let k = reading.subreadings[key][i].witnesses.length - 1;
             while (k >= 0) {
               witness = reading.subreadings[key][i].witnesses[k];
               if (findStandoffRegularisation(unit, witness, apparatus) === null) {
                 for (let j = 0; j < reading.subreadings[key][i].text.length; j += 1) {
-                  if (reading.subreadings[key][i].text[j][witness].hasOwnProperty('decision_details')) {
+                  if (Object.prototype.hasOwnProperty.call(reading.subreadings[key][i].text[j][witness], 'decision_details')) {
                     tValue = reading.subreadings[key][i].text[j][witness].decision_details[0].t;
                     if (tokensForSettings.indexOf(tValue) === -1) {
                       tokensForSettings.push(tValue);
@@ -2066,8 +2066,8 @@ CL = (function() {
     }
     options = {};
     displaySettings = {};
-    for (let setting in CL.displaySettings) {
-      if (CL.displaySettings.hasOwnProperty(setting)) {
+    for (const setting in CL.displaySettings) {
+      if (Object.prototype.hasOwnProperty.call(CL.displaySettings, setting)) {
         if (CL.displaySettings[setting] === true) {
           displaySettings[setting] = CL.displaySettings[setting];
         }
@@ -2105,17 +2105,17 @@ CL = (function() {
                                    type, unit, apparatus, readingDetails) {
     var ids, newReading, witness;
     // do any existing subreadings
-    if (reading.hasOwnProperty('subreadings')) {
+    if (Object.prototype.hasOwnProperty.call(reading, 'subreadings')) {
       // now here is the tricky bit - if this subreading is a subreading because of work done in the regulariser we
       // need to preserve those decisions in the reading_history of the standoff subreading we are about to create.
       // To do this we need to pretend these are already standoff marked readings and add the data to the standoff
       // marked readings datastructure
-      for (let key in reading.subreadings) {
-        if (reading.subreadings.hasOwnProperty(key)) {
+      for (const key in reading.subreadings) {
+        if (Object.prototype.hasOwnProperty.call(reading.subreadings, key)) {
           for (let i = reading.subreadings[key].length - 1; i >= 0; i -= 1) {
             let k = reading.subreadings[key][i].witnesses.length - 1;
             // TODO: what is this doing and why is it so complicated! i is going backwards anyway so why check i here?
-            while (reading.hasOwnProperty('subreadings') && reading.subreadings.hasOwnProperty(key) &&
+            while (Object.prototype.hasOwnProperty.call(reading, 'subreadings') && Object.prototype.hasOwnProperty.call(reading.subreadings, key) &&
                         i < reading.subreadings[key].length && k >= 0) {
               witness = reading.subreadings[key][i].witnesses[k];
               if (findStandoffRegularisation(unit, witness, apparatus) === null) {
@@ -2189,11 +2189,11 @@ CL = (function() {
         //then we need to merge the data this will occur if we have applied a standoff to a parent that already has standoff children!
         details = existingStandoff[0];
         //Now check if we have already recorded the first_word_index and if not record it now
-        if (!details.hasOwnProperty('first_word_index')) {
+        if (!Object.prototype.hasOwnProperty.call(details, 'first_word_index')) {
           details.first_word_index = unit.first_word_index;
         }
         //first of all add the current parent reading to the history - do this before you change the parent!
-        if (details.hasOwnProperty('reading_history')) {
+        if (Object.prototype.hasOwnProperty.call(details, 'reading_history')) {
           details.reading_history.push(details.parent_text);
         } else { // if we don't have a reading history (this will be for legacy data only) we will need to hash one together!
           details.reading_history = [details.reading_text, details.parent_text];
@@ -2206,26 +2206,26 @@ CL = (function() {
         details.subreading.push(ruleDetails[Object.keys(ruleDetails)[0]][3]);
         details.name.push(ruleDetails[Object.keys(ruleDetails)[0]][2]);
         details.value = typeString;
-        if (parent.text.length === 0 && parent.hasOwnProperty('details')) {
+        if (parent.text.length === 0 && Object.prototype.hasOwnProperty.call(parent, 'details')) {
           details.om_details = parent.details;
         }
-        if (reading.text.length > 0 && reading.text[reading.text.length - 1].hasOwnProperty('combined_gap_after')) {
+        if (reading.text.length > 0 && Object.prototype.hasOwnProperty.call(reading.text[reading.text.length - 1], 'combined_gap_after')) {
           details.combined_gap_after = true;
         }
-        if (reading.text.length > 0 && reading.text[0].hasOwnProperty('combined_gap_before')) {
+        if (reading.text.length > 0 && Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before')) {
           details.combined_gap_before = true;
-          if (reading.text[0].hasOwnProperty('combined_gap_before_details')) {
+          if (Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before_details')) {
             details.combined_gap_before_details = reading.text[0].combined_gap_before_details;
           }
         }
-        if (!CL.data.marked_readings.hasOwnProperty(typeString)) {
+        if (!Object.prototype.hasOwnProperty.call(CL.data.marked_readings, typeString)) {
           CL.data.marked_readings[typeString] = [];
         }
         CL.data.marked_readings[typeString].push(details);
       } else {
         //this is a completely new subreading so make a new one
         //DAVID broken 11:23 here regularising an om to a lac
-        if (!CL.data.marked_readings.hasOwnProperty(type)) {
+        if (!Object.prototype.hasOwnProperty.call(CL.data.marked_readings, type)) {
           CL.data.marked_readings[type] = [];
         }
         details = {'start': unit.start,
@@ -2246,21 +2246,21 @@ CL = (function() {
                    'name': [ruleDetails[Object.keys(ruleDetails)[0]][2]]
                  };
 
-        if (parent.text.length === 0 && parent.hasOwnProperty('details')) {
+        if (parent.text.length === 0 && Object.prototype.hasOwnProperty.call(parent, 'details')) {
           details.om_details = parent.details;
         }
-        if (reading.text.length === 0 && reading.hasOwnProperty('details')) {
+        if (reading.text.length === 0 && Object.prototype.hasOwnProperty.call(reading, 'details')) {
           details.details = reading.details;
         }
-        if (reading.text.length === 0 && reading.hasOwnProperty('type')) {
+        if (reading.text.length === 0 && Object.prototype.hasOwnProperty.call(reading, 'type')) {
           details.type = reading.type;
         }
-        if (reading.text.length > 0 && reading.text[reading.text.length - 1].hasOwnProperty('combined_gap_after')) {
+        if (reading.text.length > 0 && Object.prototype.hasOwnProperty.call(reading.text[reading.text.length - 1], 'combined_gap_after')) {
           details.combined_gap_after = true;
         }
-        if (reading.text.length > 0 && reading.text[0].hasOwnProperty('combined_gap_before')) {
+        if (reading.text.length > 0 && Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before')) {
           details.combined_gap_before = true;
-          if (reading.text[0].hasOwnProperty('combined_gap_before_details')) {
+          if (Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before_details')) {
             details.combined_gap_before_details = reading.text[0].combined_gap_before_details;
           }
         }
@@ -2292,7 +2292,7 @@ CL = (function() {
         subreading.witnesses.splice(subreading.witnesses.indexOf(witnesses[i]), 1);
         for (let j = 0; j < subreading.text.length; j += 1) {
           subreading.text[j].reading.splice(subreading.text[j].reading.indexOf(witnesses[i]), 1);
-          if (subreading.text[j].hasOwnProperty(witnesses[i])) {
+          if (Object.prototype.hasOwnProperty.call(subreading.text[j], witnesses[i])) {
             delete subreading.text[j][witnesses[i]];
           }
         }
@@ -2310,27 +2310,27 @@ CL = (function() {
     for (let j = 0; j < witnesses.length; j += 1) {
       newReading = {'witnesses': [witnesses[j]], 'text': JSON.parse(JSON.stringify(text))};
       
-      if (parent.hasOwnProperty('parents')) {
+      if (Object.prototype.hasOwnProperty.call(parent, 'parents')) {
         newReading.parents = parent.parents;
         newReading.label = parent.label;
       }
-      if (subreading.hasOwnProperty('type')) {
+      if (Object.prototype.hasOwnProperty.call(subreading, 'type')) {
         newReading.type = subreading.type;
       }
-      if (subreading.hasOwnProperty('details')) {
+      if (Object.prototype.hasOwnProperty.call(subreading, 'details')) {
         newReading.details = subreading.details;
       }
       for (let i = 0; i < newReading.text.length; i += 1) {
         // all witness selected will have the same subreading by now even if they have been created via different
         // routes because they are showing as subreadings
-        if (newReading.text[i].hasOwnProperty(witnesses[j]) &&
-                  newReading.text[i][witnesses[j]].hasOwnProperty('decision_details')) {
+        if (Object.prototype.hasOwnProperty.call(newReading.text[i], witnesses[j]) &&
+                  Object.prototype.hasOwnProperty.call(newReading.text[i][witnesses[j]], 'decision_details')) {
           newReading.text[i]['interface'] = newReading.text[i][witnesses[j]].decision_details[0].t;
-        } else if (newReading.text[i].hasOwnProperty('t')) {
+        } else if (Object.prototype.hasOwnProperty.call(newReading.text[i], 't')) {
           newReading.text[i]['interface'] = newReading.text[i].t;
         } else {
           //ALERT: this line used to say witnesses.length === 1 need to be sure that multiple witnesses always have the same value????
-          if (newReading.text[i].hasOwnProperty([witnesses[j]]) &&
+          if (Object.prototype.hasOwnProperty.call(newReading.text[i], [witnesses[j]]) &&
                   typeof(newReading.text[i][witnesses[j]]['interface']) !== 'undefined') {
             newReading.text[i]['interface'] = newReading.text[i][witnesses[j]]['interface'];
           } else {
@@ -2338,13 +2338,13 @@ CL = (function() {
           }
         }
         // delete decisions if there are any
-        if (newReading.text[i].hasOwnProperty(witnesses[j])) {
+        if (Object.prototype.hasOwnProperty.call(newReading.text[i], witnesses[j])) {
           delete newReading.text[i][witnesses[j]].decision_class;
           delete newReading.text[i][witnesses[j]].decision_details;
         }
         for (let k = 0; k < newReading.text[i].reading.length; k += 1) {
           if (newReading.text[i].reading[k] !== witnesses[j]) {
-            if (newReading.text[i].hasOwnProperty(newReading.text[i].reading[k])) {
+            if (Object.prototype.hasOwnProperty.call(newReading.text[i], newReading.text[i].reading[k])) {
               delete newReading.text[i][newReading.text[i].reading[k]];
             }
             newReading.text[i].reading[k] = null;
@@ -2356,7 +2356,7 @@ CL = (function() {
       // note that the information is stored in different places depending on whether this is a standoff subreading or
       // one created in the regulariser (this is not especially sensible but it is how it is at present and working
       // with it is easier and less dangerous than trying to change it!) In version 2 I would fix this!
-      if (parent.text.length > 0 && parent.text[0].hasOwnProperty('combined_gap_before') &&
+      if (parent.text.length > 0 && Object.prototype.hasOwnProperty.call(parent.text[0], 'combined_gap_before') &&
                   parent.text[0].combined_gap_before.indexOf(witnesses[j]) !== -1) {
         newReading.text[0].combined_gap_before = [witnesses[j]];
         newReading.text[0].combined_gap_before_details = parent.text[0].combined_gap_before_details;
@@ -2365,7 +2365,7 @@ CL = (function() {
         // we do not need to remove the details here because it is a simple string (because this only happens when
         // they all read the same)
       }
-      if (parent.hasOwnProperty('combined_gap_before_subreadings') &&
+      if (Object.prototype.hasOwnProperty.call(parent, 'combined_gap_before_subreadings') &&
                     parent.combined_gap_before_subreadings.indexOf(witnesses[j]) !== -1) {
         newReading.text[0].combined_gap_before = [witnesses[j]];
         newReading.text[0].combined_gap_before_details = parent.combined_gap_before_subreadings_details[witnesses[j]];
@@ -2378,50 +2378,50 @@ CL = (function() {
       // places depending on whether this is a standoff subreading or one created in the regulariser (this is not
       //especially sensible but it is how it is at present and working with it is easier and less dangerous than
       // trying to change it!) In version 2 I would fix this!
-      if (parent.text.length > 0 && parent.text[parent.text.length - 1].hasOwnProperty('combined_gap_after') &&
+      if (parent.text.length > 0 && Object.prototype.hasOwnProperty.call(parent.text[parent.text.length - 1], 'combined_gap_after') &&
                   parent.text[parent.text.length - 1].combined_gap_after.indexOf(witnesses[j]) !== -1) {
         newReading.text[text.length - 1].combined_gap_after = [witnesses[j]];
         parent.text[parent.text.length - 1].combined_gap_after.splice(parent.text[parent.text.length - 1].combined_gap_after.indexOf(witnesses[j]), 1);
       }
-      if (parent.hasOwnProperty('combined_gap_after_subreadings') &&
+      if (Object.prototype.hasOwnProperty.call(parent, 'combined_gap_after_subreadings') &&
                   parent.combined_gap_after_subreadings.indexOf(witnesses[j]) !== -1) {
         newReading.text[text.length - 1].combined_gap_after = [witnesses[j]];
         //now remove the details for this witness from the parent
         parent.combined_gap_after_subreadings.splice(parent.combined_gap_after_subreadings.indexOf(witnesses[j]), 1);
       }
       //remove witnesses from SR_text in parent (if present)
-      if (parent.hasOwnProperty('SR_text') && parent.SR_text.hasOwnProperty(witnesses[j])) {
+      if (Object.prototype.hasOwnProperty.call(parent, 'SR_text') && Object.prototype.hasOwnProperty.call(parent.SR_text, witnesses[j])) {
         delete parent.SR_text[witnesses[j]];
       }
       //remove witnesses from standoff_subreadings in parent (if present)
-      if (parent.hasOwnProperty('standoff_subreadings') && parent.standoff_subreadings.indexOf(witnesses[j]) !== -1) {
+      if (Object.prototype.hasOwnProperty.call(parent, 'standoff_subreadings') && parent.standoff_subreadings.indexOf(witnesses[j]) !== -1) {
         parent.standoff_subreadings.splice(parent.standoff_subreadings.indexOf(witnesses[j]), 1);
       }
       newReadings.push(newReading);
     }
     //check whether the parent has any empty combined gap infomation which needs removing
-    if (parent.hasOwnProperty('combined_gap_before_subreadings') &&
+    if (Object.prototype.hasOwnProperty.call(parent, 'combined_gap_before_subreadings') &&
                 parent.combined_gap_before_subreadings.length === 0) {
       delete parent.combined_gap_before_subreadings;
       delete parent.combined_gap_before_subreadings_details;
     }
-    if (parent.text.length > 0 && parent.text[0].hasOwnProperty('combined_gap_before') &&
+    if (parent.text.length > 0 && Object.prototype.hasOwnProperty.call(parent.text[0], 'combined_gap_before') &&
               parent.text[0].combined_gap_before.length === 0) {
       delete parent.text[0].combined_gap_before;
       delete parent.text[0].combined_gap_before_details;
     }
-    if (parent.hasOwnProperty('combined_gap_after_subreadings') &&
+    if (Object.prototype.hasOwnProperty.call(parent, 'combined_gap_after_subreadings') &&
                 parent.combined_gap_after_subreadings.length === 0) {
       delete parent.combined_gap_after_subreadings;
     }
-    if (parent.text.length > 0 && parent.text[parent.text.length - 1].hasOwnProperty('combined_gap_after') &&
+    if (parent.text.length > 0 && Object.prototype.hasOwnProperty.call(parent.text[parent.text.length - 1], 'combined_gap_after') &&
                 parent.text[parent.text.length - 1].combined_gap_after.length === 0) {
       delete parent.text[parent.text.length - 1].combined_gap_after;
     }
-    if (parent.hasOwnProperty('SR_text') && $.isEmptyObject(parent.SR_text)) {
+    if (Object.prototype.hasOwnProperty.call(parent, 'SR_text') && $.isEmptyObject(parent.SR_text)) {
       delete parent.SR_text;
     }
-    if (parent.hasOwnProperty('standoff_subreadings') && parent.standoff_subreadings.length === 0) {
+    if (Object.prototype.hasOwnProperty.call(parent, 'standoff_subreadings') && parent.standoff_subreadings.length === 0) {
       delete parent.standoff_subreadings;
     }
     //check here to see if parent still needs its combined gap before.
@@ -2443,13 +2443,13 @@ CL = (function() {
     }
 
     //now check the parent is still required and if not remove it
-    if (parent.witnesses.length === 0 && !parent.hasOwnProperty('subreadings')) {
+    if (parent.witnesses.length === 0 && !Object.prototype.hasOwnProperty.call(parent, 'subreadings')) {
       unit.readings.splice(parentPos, 1);
     }
     //now if this was a standoff marked reading delete the entry in marked_readings unless this is part of prepare_for_operation
-    if (options.hasOwnProperty('delete_offset') && options.delete_offset === true) {
-      for (let key in CL.data.marked_readings) {
-        if (CL.data.marked_readings.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(options, 'delete_offset') && options.delete_offset === true) {
+      for (const key in CL.data.marked_readings) {
+        if (Object.prototype.hasOwnProperty.call(CL.data.marked_readings, key)) {
           for (let i = 0; i < CL.data.marked_readings[key].length; i += 1) {
             if (CL.data.marked_readings[key][i].start === unit.start && //needs to use unit id
                     CL.data.marked_readings[key][i].end === unit.end) { //if this is the right unit
@@ -2472,8 +2472,8 @@ CL = (function() {
     var numbers, appIds;
     numbers = [];
     appIds = [];
-    for (let key in CL.data) {
-      if (CL.data.hasOwnProperty(key)) {
+    for (const key in CL.data) {
+      if (Object.prototype.hasOwnProperty.call(CL.data, key)) {
         if (key.match(/apparatus\d/g) !== null) {
           numbers.push(parseInt(key.replace('apparatus', '')));
         }
@@ -2504,18 +2504,18 @@ CL = (function() {
           }
         }
       }
-      if (reading.hasOwnProperty('SR_text') && reading.SR_text.hasOwnProperty(hand)) {
+      if (Object.prototype.hasOwnProperty.call(reading, 'SR_text') && Object.prototype.hasOwnProperty.call(reading.SR_text, hand)) {
         delete reading.SR_text[hand];
       }
-      if (reading.hasOwnProperty('SR_text') && $.isEmptyObject(reading.SR_text)) {
+      if (Object.prototype.hasOwnProperty.call(reading, 'SR_text') && $.isEmptyObject(reading.SR_text)) {
         delete reading.SR_text;
       }
     }
     removeNullItems(unit.readings);
     // this part removes the any references to a deleted overlap reading in the top line
     overlapIdsForDeletion = [];
-    if (unit.hasOwnProperty('overlap_units')) {
-      for (let key in unit.overlap_units) {
+    if (Object.prototype.hasOwnProperty.call(unit, 'overlap_units')) {
+      for (const key in unit.overlap_units) {
         if (unit.overlap_units[key].indexOf(hand) !== -1) {
           unit.overlap_units[key].splice(unit.overlap_units[key].indexOf(hand), 1);
           if (unit.overlap_units[key].length === 0) {
@@ -2536,9 +2536,9 @@ CL = (function() {
       document.getElementById('remove_witnesses_div').offsetWidth - 15 + 'px';
     transcriptionIds = {};
     for (let i = 0; i < wits.length; i += 1) {
-      for (let key in data.hand_id_map) {
-        if (data.hand_id_map.hasOwnProperty(key) && data.hand_id_map[key] === wits[i]) {
-          if (transcriptionIds.hasOwnProperty(wits[i])) {
+      for (const key in data.hand_id_map) {
+        if (Object.prototype.hasOwnProperty.call(data.hand_id_map, key) && data.hand_id_map[key] === wits[i]) {
+          if (Object.prototype.hasOwnProperty.call(transcriptionIds, wits[i])) {
             transcriptionIds[wits[i]].push(key);
           } else {
             transcriptionIds[wits[i]] = [key];
@@ -2549,7 +2549,7 @@ CL = (function() {
     html = [];
     //add a select all option
     html.push('<input class="boolean" type="checkbox" id="select_all" name="select_all"/><label>Select all</label><br/>');
-    for (let key in transcriptionIds) {
+    for (const key in transcriptionIds) {
       if (transcriptionIds[key].length > 1) {
         sigla = transcriptionIds[key].join('/');
         html.push('<input class="witness_select" type="checkbox" id="' + key + '" value="' + transcriptionIds[key].join('|') +
@@ -2599,8 +2599,8 @@ CL = (function() {
     var data, handsToRemove, hands;
     handsToRemove = [];
     data = cforms.serialiseForm('remove_witnesses_form');
-    for (let key in data) {
-      if (data.hasOwnProperty(key) && data[key] !== null && data[key] !== true) {
+    for (const key in data) {
+      if (Object.prototype.hasOwnProperty.call(data, key) && data[key] !== null && data[key] !== true) {
         hands = data[key].split('|');
         for (let i = 0; i < hands.length; i += 1) {
           handsToRemove.push(hands[i]);
@@ -2672,8 +2672,8 @@ CL = (function() {
       return false;
     }
     // apparatuses
-    for (let key in CL.data) {
-      if (CL.data.hasOwnProperty(key)) {
+    for (const key in CL.data) {
+      if (Object.prototype.hasOwnProperty.call(CL.data, key)) {
         if (key.indexOf('apparatus') !== -1) {
           for (let i = 0; i < CL.data[key].length; i += 1) {
             _removeWitnessFromUnit(CL.data[key][i], hand);
@@ -2681,7 +2681,7 @@ CL = (function() {
               genuineReadingFound = false;
               for (let j = 0; j < CL.data[key][i].readings.length; j += 1) {
                 if (CL.data[key][i].readings[j].text.length > 0 ||
-                  CL.data[key][i].readings[j].hasOwnProperty('SR_text')) {
+                  Object.prototype.hasOwnProperty.call(CL.data[key][i].readings[j], 'SR_text')) {
                   genuineReadingFound = true;
                 }
               }
@@ -2724,7 +2724,7 @@ CL = (function() {
     url = staticUrl;
     // the form not always used but the default will always have a form value and if implementations are skipping
     // it then that is fine because they will deal with the form themselves.
-    if (_contextInput && _contextInput.hasOwnProperty('form') && _contextInput.form !== null) {
+    if (_contextInput && Object.prototype.hasOwnProperty.call(_contextInput, 'form') && _contextInput.form !== null) {
       url += _contextInput.form;
     }
     if (url === staticUrl) {
@@ -2735,20 +2735,17 @@ CL = (function() {
     $.get(url, function(html) {
       CL.container.innerHTML = html;
       document.getElementById('project_name').innerHTML = CL.project.name;
-      if (_contextInput && _contextInput.hasOwnProperty('onload_function') && _contextInput.onload_function !== null) {
+      if (_contextInput && Object.prototype.hasOwnProperty.call(_contextInput, 'onload_function') && _contextInput.onload_function !== null) {
         runFunction(_contextInput.onload_function, [CL.project]);
       } else {
         //run the default function to populate hideen form elements
         _contextInputOnload(project);
       }
-      var footer;
-
-      footer = [];
-
-      if (CL.services.hasOwnProperty('switchProject')) {
+      const footer = [];
+      if (Object.prototype.hasOwnProperty.call(CL.services, 'switchProject')) {
         footer.push('<input class="pure-button left_foot" type="button" id="switch_project_button" value="Switch project" />');
       }
-      if (CL.services.hasOwnProperty('viewProjectSummary')) {
+      if (Object.prototype.hasOwnProperty.call(CL.services, 'viewProjectSummary')) {
         footer.push('<input class="pure-button right_foot" type="button" id="project_summary" value="View Project Page"/>');
       }
 
@@ -2760,7 +2757,7 @@ CL = (function() {
   };
 
   addIndexHandlers = function() {
-    if (document.getElementById('switch_project_button') && CL.services.hasOwnProperty('switchProject')) {
+    if (document.getElementById('switch_project_button') && Object.prototype.hasOwnProperty.call(CL.services, 'switchProject')) {
       CL.services.switchProject();
     }
     if (document.getElementById('collation_settings')) {
@@ -2800,8 +2797,8 @@ CL = (function() {
   getHandsAndSigla = function() {
     var details;
     details = [];
-    for (let key in CL.data.hand_id_map) {
-      if (CL.data.hand_id_map.hasOwnProperty(key)) {
+    for (const key in CL.data.hand_id_map) {
+      if (Object.prototype.hasOwnProperty.call(CL.data.hand_id_map, key)) {
         details.push({
           'hand': key,
           'document': CL.data.hand_id_map[key] + '|' + key
@@ -2906,9 +2903,9 @@ CL = (function() {
         suffixTypes = getRuleClasses('suffixed_sigla', true, 'value', 'identifier');
         //I don't think this if statement is ever used - but I'm not confident enough to delete it
         //TODO: comment this out and see if anything breaks!
-        if (data.hasOwnProperty('reading_classes')) {
-          for (let key in suffixTypes) {
-            if (suffixTypes.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(data, 'reading_classes')) {
+          for (const key in suffixTypes) {
+            if (Object.prototype.hasOwnProperty.call(suffixTypes, key)) {
               if (data.reading_classes.indexOf(key) !== -1 && suffix.indexOf(suffixTypes[key]) === -1) {
                 suffix += suffixTypes[key];
               }
@@ -2916,9 +2913,9 @@ CL = (function() {
           }
         }
         for (let j = 0; j < data.text.length; j += 1) {
-          for (let key in suffixTypes) {
-            if (suffixTypes.hasOwnProperty(key)) {
-              if (data.text[j][witness] && data.text[j][witness].hasOwnProperty('decision_class') &&
+          for (const key in suffixTypes) {
+            if (Object.prototype.hasOwnProperty.call(suffixTypes, key)) {
+              if (data.text[j][witness] && Object.prototype.hasOwnProperty.call(data.text[j][witness], 'decision_class') &&
                         data.text[j][witness].decision_class.indexOf(key) !== -1) {
                 if (suffix.indexOf(suffixTypes[key]) === -1) {
                   suffix += suffixTypes[key];
@@ -2930,13 +2927,13 @@ CL = (function() {
         // now check offset marked readings (i.e created in SV or OR) this needs to check the id
         // of the unit (which we don't have at this point) is the same as the marked reading unit_id property
         if (typeof start !== 'undefined' && typeof end !== 'undefined' && typeof appId !== 'undefined') {
-          for (let key in CL.data.marked_readings) {
+          for (const key in CL.data.marked_readings) {
             for (let j = 0; j < CL.data.marked_readings[key].length; j += 1) {
               if (CL.data.marked_readings[key][j].start === start &&
                         CL.data.marked_readings[key][j].end === end &&
                           CL.data.marked_readings[key][j].apparatus === appId &&
                             CL.data.marked_readings[key][j].witness === witness) {
-                if (CL.data.marked_readings[key][j].hasOwnProperty('first_word_index')) {
+                if (Object.prototype.hasOwnProperty.call(CL.data.marked_readings[key][j], 'first_word_index')) {
                   if (CL.data.marked_readings[key][j].first_word_index === firstWordIndex) {
                     for (let k = 0; k < CL.data.marked_readings[key][j].suffixed_sigla.length; k += 1) {
                       if (CL.data.marked_readings[key][j].suffixed_sigla[k] === true) {
@@ -2960,19 +2957,19 @@ CL = (function() {
           }
         }
         //now if we have an auto V rule for supplied text on the project add those
-        if (CL.project.hasOwnProperty('useVForSupplied') && CL.project.useVForSupplied === true) {
+        if (Object.prototype.hasOwnProperty.call(CL.project, 'useVForSupplied') && CL.project.useVForSupplied === true) {
           for (let j = 0; j < data.text.length; j += 1) {
             //check the main reading
-            if (data.text[j][witness] && data.text[j][witness].hasOwnProperty('supplied')) {
+            if (data.text[j][witness] && Object.prototype.hasOwnProperty.call(data.text[j][witness], 'supplied')) {
               if (suffix.indexOf('V') === -1) {
                 suffix += 'V';
               }
             }
           }
-          if (data.hasOwnProperty('SR_text') && data.SR_text.hasOwnProperty(witness)) {
+          if (Object.prototype.hasOwnProperty.call(data, 'SR_text') && Object.prototype.hasOwnProperty.call(data.SR_text, witness)) {
             for (let j = 0; j < data.SR_text[witness].text.length; j += 1) {
               if (data.SR_text[witness].text[j][witness] &&
-                      data.SR_text[witness].text[j][witness].hasOwnProperty('supplied')) {
+                      Object.prototype.hasOwnProperty.call(data.SR_text[witness].text[j][witness], 'supplied')) {
                 if (suffix.indexOf('V') === -1) {
                   suffix += 'V';
                 }
@@ -3007,7 +3004,7 @@ CL = (function() {
     $(window).on('resize', function() {
       expandFillPageClients();
     });
-    if (!CL.services.hasOwnProperty('localJavascript')) {
+    if (!Object.prototype.hasOwnProperty.call(CL.services, 'localJavascript')) {
       CL.services.localJavascript = [];
     }
     _includeJavascript(CL.services.localJavascript, function() {
@@ -3024,7 +3021,7 @@ CL = (function() {
     localJs = [];
     //TODO: this is untested as we don't currently specify js in any projects
     //TOTEST: this
-    if (project.hasOwnProperty('local_js_file')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'local_js_file')) {
       for (let i = 0; i < project.local_js_file.length; i += 1) {
         localJs.push(staticUrl + project.local_js_file[i]);
       }
@@ -3041,62 +3038,62 @@ CL = (function() {
     CL.project = {};
 
     // TODO DEPRECATE _id (for id) and project (for name) in future release
-    if (project.hasOwnProperty('_id')) {
+    if (Object.prototype.hasOwnProperty.call(project, '_id')) {
       CL.project.id = project._id;
       console.warn('The use of \'_id\' in project is deprecated. \'id\' should be used instead.');
-    } else if (project.hasOwnProperty('id')) {
+    } else if (Object.prototype.hasOwnProperty.call(project, 'id')) {
       CL.project.id = project.id;
     }
-    if (project.hasOwnProperty('project')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'project')) {
       CL.project.name = project.project;
       console.warn('The use of \'project\' in project is deprecated. \'name\' should be used instead.');
-    } else if (project.hasOwnProperty('name')) {
+    } else if (Object.prototype.hasOwnProperty.call(project, 'name')) {
       CL.project.name = project.name;
     }
     // end deprecation
 
     CL.project.witnesses = project.witnesses;
-    if (project.hasOwnProperty('book_name')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'book_name')) {
       CL.project.book_name = project.book_name;
     }
-    if (project.hasOwnProperty('witnessSort')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'witnessSort')) {
       CL.project.witnessSort = project.witnessSort;
     }
-    if (project.hasOwnProperty('preStageChecks')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'preStageChecks')) {
       CL.project.preStageChecks = project.preStageChecks;
     }
-    if (project.hasOwnProperty('approvalSettings')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'approvalSettings')) {
       CL.project.approvalSettings = project.approvalSettings;
     }
-    if (project.hasOwnProperty('exporterSettings')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'exporterSettings')) {
       CL.project.exporterSettings = project.exporterSettings;
     }
-    if (project.hasOwnProperty('extraFooterButtons')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'extraFooterButtons')) {
       CL.project.extraFooterButtons = project.extraFooterButtons;
     }
-    if (project.hasOwnProperty('useVForSupplied')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'useVForSupplied')) {
       CL.project.useVForSupplied = project.useVForSupplied;
     }
-    if (project.hasOwnProperty('extractWordsForHeader') && typeof project.extractWordsForHeader === 'string') {
+    if (Object.prototype.hasOwnProperty.call(project, 'extractWordsForHeader') && typeof project.extractWordsForHeader === 'string') {
       CL.project.extractWordsForHeader = _getFunctionFromString(project.extractWordsForHeader);
     }
-    if (project.hasOwnProperty('witnessDecorators')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'witnessDecorators')) {
       CL.project.witnessDecorators = project.witnessDecorators;
     } else {
       CL.project.witnessDecorators = null;
     }
 
-    if (project.hasOwnProperty('omCategories')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'omCategories')) {
       CL.project.omCategories = project.omCategories;
-    } else if (CL.services.hasOwnProperty('omCategories')) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'omCategories')) {
       CL.project.omCategories = CL.services.omCategories;
     } else {
       CL.project.omCategories = [];
     }
 
-    if (project.hasOwnProperty('prepareDisplayString') && typeof project.prepareDisplayString === 'string') {
+    if (Object.prototype.hasOwnProperty.call(project, 'prepareDisplayString') && typeof project.prepareDisplayString === 'string') {
       CL.project.prepareDisplayString = _getFunctionFromString(project.prepareDisplayString);
-    } else if (CL.services.hasOwnProperty('prepareDisplayString')) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'prepareDisplayString')) {
       CL.project.prepareDisplayString = CL.services.prepareDisplayString;
     } else {
       CL.project.prepareDisplayString = function(string) {
@@ -3104,9 +3101,9 @@ CL = (function() {
       };
     }
 
-    if (project.hasOwnProperty('prepareNormalisedString') && typeof project.prepareNormalisedString === 'string') {
+    if (Object.prototype.hasOwnProperty.call(project, 'prepareNormalisedString') && typeof project.prepareNormalisedString === 'string') {
       CL.project.prepareNormalisedString = _getFunctionFromString(project.prepareNormalisedString);
-    } else if (CL.services.hasOwnProperty('prepareNormalisedString')) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'prepareNormalisedString')) {
       CL.project.prepareNormalisedString = CL.services.prepareNormalisedString;
     } else {
       CL.project.prepareNormalisedString = function(string) {
@@ -3114,9 +3111,9 @@ CL = (function() {
       };
     }
 
-    if (project.hasOwnProperty('allowCommentsOnRegRules')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'allowCommentsOnRegRules')) {
       CL.project.allowCommentsOnRegRules = project.allowCommentsOnRegRules;
-    } else if (CL.services.hasOwnProperty('allowCommentsOnRegRules')) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'allowCommentsOnRegRules')) {
       CL.project.allowCommentsOnRegRules = CL.services.allowCommentsOnRegRules;
     } else {
       // default is false
@@ -3124,9 +3121,9 @@ CL = (function() {
     }
 
     // settings for collapse all button (rarely used so allowing as option to keep footer clean)
-    if (project.hasOwnProperty('showCollapseAllUnitsButton')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'showCollapseAllUnitsButton')) {
       CL.project.showCollapseAllUnitsButton = project.showCollapseAllUnitsButton;
-    } else if (CL.services.hasOwnProperty('showCollapseAllUnitsButton')) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'showCollapseAllUnitsButton')) {
       CL.project.showCollapseAllUnitsButton = CL.services.showCollapseAllUnitsButton;
     } else {
       // default is false
@@ -3134,9 +3131,9 @@ CL = (function() {
     }
 
     // settings for get apparatus button in approved view
-    if (project.hasOwnProperty('showGetApparatusButton')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'showGetApparatusButton')) {
       CL.project.showGetApparatusButton = project.showGetApparatusButton;
-    } else if (CL.services.hasOwnProperty('showGetApparatusButton')) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'showGetApparatusButton')) {
       CL.project.showGetApparatusButton = CL.services.showGetApparatusButton;
     } else {
       // default is true
@@ -3144,8 +3141,8 @@ CL = (function() {
     }
 
     if (CL.project.showGetApparatusButton === true &&
-            !CL.services.hasOwnProperty('getApparatusForContext') &&
-              !CL.services.hasOwnProperty('apparatusServiceUrl')) {
+            !Object.prototype.hasOwnProperty.call(CL.services, 'getApparatusForContext') &&
+              !Object.prototype.hasOwnProperty.call(CL.services, 'apparatusServiceUrl')) {
       //then we don't have enough info to use get apparatus so override settings and do not show the button
       console.log('The get apparatus button will not be shown as the required data for running the service was not ' +
         'available. Either getApparatusForContext or apparatusServiceUrl must be provided in the services ' +
@@ -3154,9 +3151,9 @@ CL = (function() {
     }
 
     // set the algorithm settings
-    if (project.hasOwnProperty('collationAlgorithmSettings')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'collationAlgorithmSettings')) {
       CL.collationAlgorithmSettings = project.collationAlgorithmSettings;
-    } else if (CL.services.hasOwnProperty('collationAlgorithmSettings')) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'collationAlgorithmSettings')) {
       CL.collationAlgorithmSettings = CL.services.collationAlgorithmSettings;
     } else {
       //default is changed from previous releases
@@ -3166,18 +3163,18 @@ CL = (function() {
     }
     // OR lac and OM
     // combine all lacs
-    if (project.hasOwnProperty('combineAllLacsInOR')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'combineAllLacsInOR')) {
       CL.project.combineAllLacsInOR = project.combineAllLacsInOR;
-    } else if (CL.services.hasOwnProperty('combineAllLacsInOR')) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'combineAllLacsInOR')) {
       CL.project.combineAllLacsInOR = CL.services.combineAllLacsInOR;
     } else {
       // default is false
       CL.project.combineAllLacsInOR = false;
     }
     // combine all oms
-    if (project.hasOwnProperty('combineAllOmsInOR')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'combineAllOmsInOR')) {
       CL.project.combineAllOmsInOR = project.combineAllOmsInOR;
-    } else if (CL.services.hasOwnProperty('combineAllOmsInOR')) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'combineAllOmsInOR')) {
       CL.project.combineAllOmsInOR = CL.services.combineAllOmsInOR;
     } else {
       //default is false
@@ -3186,18 +3183,18 @@ CL = (function() {
 
     // approved lac and OM
     // combine all lacs
-    if (project.hasOwnProperty('combineAllLacsInApproved')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'combineAllLacsInApproved')) {
       CL.project.combineAllLacsInApproved = project.combineAllLacsInApproved;
-    } else if (CL.services.hasOwnProperty('combineAllLacsInApproved')) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'combineAllLacsInApproved')) {
       CL.project.combineAllLacsInApproved = CL.services.combineAllLacsInApproved;
     } else {
       // default is false
       CL.project.combineAllLacsInApproved = false;
     }
     // combine all oms
-    if (project.hasOwnProperty('combineAllOmsInApproved')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'combineAllOmsInApproved')) {
       CL.project.combineAllOmsInApproved = project.combineAllOmsInApproved;
-    } else if (CL.services.hasOwnProperty('combineAllOmsInApproved')) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'combineAllOmsInApproved')) {
       CL.project.combineAllOmsInApproved = CL.services.combineAllOmsInApproved;
     } else {
       //default is false
@@ -3205,30 +3202,30 @@ CL = (function() {
     }
 
 
-    if (project.hasOwnProperty('lacUnitLabel')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'lacUnitLabel')) {
       CL.project.lacUnitLabel = project.lacUnitLabel;
-    } else if (CL.services.hasOwnProperty('lacUnitLabel')) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'lacUnitLabel')) {
       CL.project.lacUnitLabel = CL.services.lacUnitLabel;
     } else {
       CL.project.lacUnitLabel = 'lac unit';
     }
 
-    if (project.hasOwnProperty('omUnitLabel')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'omUnitLabel')) {
       CL.project.omUnitLabel = project.omUnitLabel;
-    } else if (CL.services.hasOwnProperty('omUnitLabel')) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'omUnitLabel')) {
       CL.project.omUnitLabel = CL.services.omUnitLabel;
     } else {
       CL.project.omUnitLabel = 'om unit';
     }
 
-    if (CL.services.hasOwnProperty('undoStackLength')) {
+    if (Object.prototype.hasOwnProperty.call(CL.services, 'undoStackLength')) {
       SV.undoStackLength = CL.services.undoStackLength;
     } //default in SV cannot be overriden in projects due to potential memory issues
 
     //settings for witness changes
-    if (project.hasOwnProperty('allowWitnessChangesInSavedCollations')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'allowWitnessChangesInSavedCollations')) {
       CL.project.allowWitnessChangesInSavedCollations = project.allowWitnessChangesInSavedCollations;
-    } else if (CL.services.hasOwnProperty('allowWitnessChangesInSavedCollations')) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'allowWitnessChangesInSavedCollations')) {
       CL.project.allowWitnessChangesInSavedCollations = CL.services.allowWitnessChangesInSavedCollations;
     } else {
       //default is false
@@ -3236,9 +3233,9 @@ CL = (function() {
     }
 
     // settings for label storage in later stages
-    if (project.hasOwnProperty('storeMultipleSupportLabelsAsParents')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'storeMultipleSupportLabelsAsParents')) {
       CL.project.storeMultipleSupportLabelsAsParents = project.storeMultipleSupportLabelsAsParents;
-    } else if (CL.services.hasOwnProperty('storeMultipleSupportLabelsAsParents')) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'storeMultipleSupportLabelsAsParents')) {
       CL.project.storeMultipleSupportLabelsAsParents = CL.services.storeMultipleSupportLabelsAsParents;
     } else {
       //default is false
@@ -3247,9 +3244,9 @@ CL = (function() {
 
     // settings for zv labels which must also have set storeMultipleSupportAsParents to true
     if (CL.project.storeMultipleSupportLabelsAsParents === true) {
-      if (project.hasOwnProperty('useZvForAllReadingsSupport')) {
+      if (Object.prototype.hasOwnProperty.call(project, 'useZvForAllReadingsSupport')) {
         CL.project.useZvForAllReadingsSupport = project.useZvForAllReadingsSupport;
-      } else if (CL.services.hasOwnProperty('useZvForAllReadingsSupport')) {
+      } else if (Object.prototype.hasOwnProperty.call(CL.services, 'useZvForAllReadingsSupport')) {
         CL.project.useZvForAllReadingsSupport = CL.services.useZvForAllReadingsSupport;
       } else {
         // default is false
@@ -3261,9 +3258,9 @@ CL = (function() {
     }
 
     // settings for joining collation units across unit boundaries
-    if (project.hasOwnProperty('allowJoiningAcrossCollationUnits')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'allowJoiningAcrossCollationUnits')) {
       CL.project.allowJoiningAcrossCollationUnits = project.allowJoiningAcrossCollationUnits;
-    } else if (CL.services.hasOwnProperty('allowJoiningAcrossCollationUnits')) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'allowJoiningAcrossCollationUnits')) {
       CL.project.allowJoiningAcrossCollationUnits = CL.services.allowJoiningAcrossCollationUnits;
     } else {
       //default is false
@@ -3271,9 +3268,9 @@ CL = (function() {
     }
 
     //this bit does the index page settings.
-    if (project.hasOwnProperty('contextInput')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'contextInput')) {
       _contextInput = project.contextInput;
-    } else if (CL.services.hasOwnProperty('contextInput')) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'contextInput')) {
       _contextInput = CL.services.contextInput;
     } else {
       //use defaults
@@ -3289,9 +3286,9 @@ CL = (function() {
   };
 
   setRuleClasses = function(project) {
-    if (project.hasOwnProperty('ruleClasses') && project.ruleClasses !== undefined) {
+    if (Object.prototype.hasOwnProperty.call(project, 'ruleClasses') && project.ruleClasses !== undefined) {
       CL.ruleClasses = project.ruleClasses;
-    } else if (CL.services && CL.services.hasOwnProperty('ruleClasses')) {
+    } else if (CL.services && Object.prototype.hasOwnProperty.call(CL.services, 'ruleClasses')) {
       CL.ruleClasses = CL.services.ruleClasses;
     } else {
       CL.ruleClasses = DEF.ruleClasses;
@@ -3304,13 +3301,13 @@ CL = (function() {
     _defaultDisplaySettings = {};
     CL.displaySettings = {};
     //use project settings if there are some
-    if (project && project.hasOwnProperty('displaySettings')) {
+    if (project && Object.prototype.hasOwnProperty.call(project, 'displaySettings')) {
       CL.displaySettingsDetails = JSON.parse(JSON.stringify(project.displaySettings));
       for (let i = 0; i < project.displaySettings.configs.length; i += 1) {
         _defaultDisplaySettings[project.displaySettings.configs[i].id] = project.displaySettings.configs[i].check_by_default;
         CL.displaySettings[project.displaySettings.configs[i].id] = project.displaySettings.configs[i].check_by_default;
       }
-    } else if (CL.services.hasOwnProperty('displaySettings')) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'displaySettings')) {
       //else use the services settings
       CL.displaySettingsDetails = JSON.parse(JSON.stringify(CL.services.displaySettings));
       for (let i = 0; i < CL.services.displaySettings.configs.length; i += 1) {
@@ -3328,26 +3325,26 @@ CL = (function() {
   };
 
   _setLocalPythonFunctions = function(project) {
-    if (project.hasOwnProperty('localPythonImplementations')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'localPythonImplementations')) {
       CL.localPythonFunctions = project.localPythonImplementations;
-    } else if (CL.services.hasOwnProperty('localPythonImplementations')) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'localPythonImplementations')) {
       CL.localPythonFunctions = CL.services.localPythonImplementations;
     }
     // local collation function is set separately but needs adding to local_python_functions here.
     // It is set separately because we do not want to have to add it to all projects
     // that need to override some of the local functions
-    if (project.hasOwnProperty('localCollationFunction')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'localCollationFunction')) {
       CL.localPythonFunctions.local_collation_function = project.localCollationFunction;
-    } else if (CL.services.hasOwnProperty('localCollationFunction')) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'localCollationFunction')) {
       CL.localPythonFunctions.local_collation_function = CL.services.localCollationFunction;
     }
     // defaults are already in the code
   };
 
   _setRuleConditions = function(project) {
-    if (project.hasOwnProperty('ruleConditions')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'ruleConditions')) {
       CL.ruleConditions = project.ruleConditions;
-    } else if (CL.services.hasOwnProperty('ruleConditions')) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'ruleConditions')) {
       CL.ruleConditions = CL.services.ruleConditions;
     } else {
       CL.ruleConditions = DEF.ruleConditions;
@@ -3355,9 +3352,9 @@ CL = (function() {
   };
 
   setOverlappedOptions = function(project) {
-    if (project.hasOwnProperty('overlappedOptions')) {
+    if (Object.prototype.hasOwnProperty.call(project, 'overlappedOptions')) {
       CL.overlappedOptions = project.overlappedOptions;
-    } else if (CL.services.hasOwnProperty('overlappedOptions')) {
+    } else if (Object.prototype.hasOwnProperty.call(CL.services, 'overlappedOptions')) {
       CL.overlappedOptions = CL.services.overlappedOptions;
     }
     // there doesn't need to be any so no defaults required
@@ -3419,7 +3416,7 @@ CL = (function() {
 
   _getContextFromInputForm = function() {
     var context;
-    if (_contextInput && _contextInput.hasOwnProperty('result_provider') && _contextInput.result_provider !== null) {
+    if (_contextInput && Object.prototype.hasOwnProperty.call(_contextInput, 'result_provider') && _contextInput.result_provider !== null) {
       context = runFunction(_contextInput.result_provider);
     } else {
       context = document.getElementById('context').value;
@@ -3429,7 +3426,7 @@ CL = (function() {
 
   _getWitnessesFromInputForm = function() {
     var witnessList, data;
-    if (CL.services.hasOwnProperty('getWitnessesFromInputForm')) {
+    if (Object.prototype.hasOwnProperty.call(CL.services, 'getWitnessesFromInputForm')) {
       return CL.services.getWitnessesFromInputForm();
     } else {
       if (document.getElementById('preselected_witnesses')) {
@@ -3439,8 +3436,8 @@ CL = (function() {
         witnessList = [];
         data = cforms.serialiseForm('collation_form');
         if (!$.isEmptyObject(data)) {
-          for (let key in data) {
-            if (data.hasOwnProperty(key)) {
+          for (const key in data) {
+            if (Object.prototype.hasOwnProperty.call(data, key)) {
               witnessList.push(key);
             }
           }
@@ -3454,7 +3451,7 @@ CL = (function() {
   };
 
   _getDebugSetting = function() {
-    if (CL.services.hasOwnProperty('getDebugSetting')) {
+    if (Object.prototype.hasOwnProperty.call(CL.services, 'getDebugSetting')) {
       return CL.services.getDebugSetting();
     }
     return false;
@@ -3471,14 +3468,14 @@ CL = (function() {
 
     if (data.length > 0) {
       for (let i = 0; i < data.length; i += 1) {
-        if (data[i].hasOwnProperty('_id')) {
+        if (Object.prototype.hasOwnProperty.call(data[i], '_id')) {
           console.warn('\'_id\' is deprecated. Use \'id\' instead.');
           data[i].id = data[i]._id;
         }
-        if (data[i].hasOwnProperty('_meta')) {
+        if (Object.prototype.hasOwnProperty.call(data[i], '_meta')) {
           console.warn('\'_meta\' is deprecated. Use \'created_time\' and \'last_modified_time\' as keys on collation objects.');
           date = new Date(data[i]._meta._last_modified_time.$date);
-        } else if (data[i].hasOwnProperty('last_modified_time') && data[i].last_modified_time !== null) {
+        } else if (Object.prototype.hasOwnProperty.call(data[i], 'last_modified_time') && data[i].last_modified_time !== null) {
           date = new Date(data[i].last_modified_time);
         } else {
           date = new Date(data[i].created_time);
@@ -3489,13 +3486,13 @@ CL = (function() {
           minutes = String(date.getMinutes());
         }
         dateString = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + minutes;
-        if (data[i].hasOwnProperty('user')) {
+        if (Object.prototype.hasOwnProperty.call(data[i], 'user')) {
           user = data[i].user;
         } else {
           console.warn('In future versions collation objects will be required to have a \'user\' key');
           user = 'unknown';
         }
-        if (!byUser.hasOwnProperty(user)) {
+        if (!Object.prototype.hasOwnProperty.call(byUser, user)) {
           byUser[user] = {};
           users.push(user);
         }
@@ -3525,8 +3522,8 @@ CL = (function() {
       var userNames;
       if (userInfo) {
         userNames = {};
-        for (let k in userInfo) {
-          if (userInfo[k].hasOwnProperty('name')) {
+        for (const k in userInfo) {
+          if (Object.prototype.hasOwnProperty.call(userInfo[k], 'name')) {
             userNames[userInfo[k].id] = userInfo[k].name;
           } else {
             userNames[userInfo[k].id] = userInfo[k].id;
@@ -3585,12 +3582,12 @@ CL = (function() {
     html.push('<th>User</th><th>Regularised</th><th>Variants Set</th><th>Ordered</th><th>Approved</th>');
     userCount = Object.keys(byUser).length;
     firstRow = true;
-    for (let user in byUser) {
-      if (byUser.hasOwnProperty(user)) {
+    for (const user in byUser) {
+      if (Object.prototype.hasOwnProperty.call(byUser, user)) {
         if (users !== undefined) {
-          if (users.hasOwnProperty(user)) {
+          if (Object.prototype.hasOwnProperty.call(users, user)) {
             html.push('<tr><td>' + users[user] + '</td>');
-          } else if (users.hasOwnProperty(String(user))) {
+          } else if (Object.prototype.hasOwnProperty.call(users, String(user))) {
             html.push('<tr><td>' + users[String(user)] + '</td>');
           } else {
             html.push('<tr><td>' + user + '</td>');
@@ -3598,7 +3595,7 @@ CL = (function() {
         } else {
           html.push('<tr><td>' + user + '</td>');
         }
-        if (byUser[user].hasOwnProperty('regularised')) {
+        if (Object.prototype.hasOwnProperty.call(byUser[user], 'regularised')) {
           if (CL.project.allowWitnessChangesInSavedCollations === true) {
             if (byUser[user].regularised.witness_comparison[0] === false) {
               witnessComparisonClass = byUser[user].regularised.witness_comparison[1];
@@ -3628,7 +3625,7 @@ CL = (function() {
         } else {
           html.push('<td></td>');
         }
-        if (byUser[user].hasOwnProperty('set')) {
+        if (Object.prototype.hasOwnProperty.call(byUser[user], 'set')) {
           if (CL.project.allowWitnessChangesInSavedCollations === true) {
             if (byUser[user].set.witness_comparison[0] === false) {
               witnessComparisonClass = byUser[user].set.witness_comparison[1];
@@ -3658,7 +3655,7 @@ CL = (function() {
         } else {
           html.push('<td></td>');
         }
-        if (byUser[user].hasOwnProperty('ordered')) {
+        if (Object.prototype.hasOwnProperty.call(byUser[user], 'ordered')) {
           if (CL.project.allowWitnessChangesInSavedCollations === true) {
             if (byUser[user].ordered.witness_comparison[0] === false) {
               witnessComparisonClass = byUser[user].ordered.witness_comparison[1];
@@ -3737,7 +3734,7 @@ CL = (function() {
     document.getElementById('header').innerHTML = getHeaderHtml('Collation', context);
     document.getElementById('header').className = '';
 
-    if (CL.services.hasOwnProperty('showLoginStatus')) {
+    if (Object.prototype.hasOwnProperty.call(CL.services, 'showLoginStatus')) {
       CL.services.showLoginStatus();
     }
     $(':radio').on('click', function() {
@@ -3771,19 +3768,19 @@ CL = (function() {
                       'type="button" value="Load collation and remove witnesses"/>');
     }
     document.getElementById('footer').innerHTML = footerHtml.join('');
-    $('#load_saved_button').on('click', function(event) {
+    $('#load_saved_button').on('click', function() {
       CL.witnessEditingMode = false;
       CL.witnessAddingMode = false;
       CL.witnessRemovingMode = false;
       _loadSavedCollation();
     });
-    $('#load_saved_add_button').on('click', function(event) {
+    $('#load_saved_add_button').on('click', function() {
       CL.witnessEditingMode = true;
       CL.witnessAddingMode = true;
       CL.witnessRemovingMode = false;
       _addToSavedCollation();
     });
-    $('#load_saved_remove_button').on('click', function(event) {
+    $('#load_saved_remove_button').on('click', function() {
       CL.witnessEditingMode = true;
       CL.witnessAddingMode = false;
       CL.witnessRemovingMode = true;
@@ -3837,7 +3834,7 @@ CL = (function() {
         return;
       }
     }
-    if (existingCollation.data_settings.hasOwnProperty('base_text_siglum')) {
+    if (Object.prototype.hasOwnProperty.call(existingCollation.data_settings, 'base_text_siglum')) {
       CL.dataSettings.base_text_siglum = existingCollation.data_settings.base_text_siglum;
     }
     if (existingCollation.status !== 'regularised') {
@@ -3865,7 +3862,7 @@ CL = (function() {
             if (data.overtext_name === existingCollation.structure.overtext_name) {
 
               CL.witnessesAdded = [];
-              for (let key in data.hand_id_map) {
+              for (const key in data.hand_id_map) {
                 if (data.hand_id_map[key] !== CL.dataSettings.base_text) {
                   CL.witnessesAdded.push(key);
                 }
@@ -3901,7 +3898,7 @@ CL = (function() {
 
   _separateOverlapsInAddedUnits = function() {
     for (let i = 0; i < CL.data.apparatus.length; i += 1) {
-      if (CL.data.apparatus[i].hasOwnProperty('added')) {
+      if (Object.prototype.hasOwnProperty.call(CL.data.apparatus[i], 'added')) {
         SV.separateOverlapWitnesses(i, undefined);
         delete CL.data.apparatus[i].added;
       }
@@ -3909,9 +3906,9 @@ CL = (function() {
   };
 
   _mergeCollationObjects = function(mainCollation, newData, addedWits) {
-    var unit, index, newUnit, existingUnit, newUnits, existingUnits, newReadingText,
+    var index, newUnit, existingUnit, newUnits, existingUnits, newReadingText,
       matchingReadingFound, unitQueue, nextUnits, unit1, unit2, tempUnit, omReading,
-      existingWitnesses, unitId, position, before, after, beforeIds, afterIds,
+      existingWitnesses, before, after, beforeIds, afterIds,
       sharedIds, overlappedWitnesses;
 
     for (let i = 0; i < addedWits.length; i += 1) {
@@ -3932,9 +3929,9 @@ CL = (function() {
       }
     }
     // update hand_id_map
-    for (let key in newData.hand_id_map) {
-      if (newData.hand_id_map.hasOwnProperty(key)) {
-        if (!mainCollation.structure.hand_id_map.hasOwnProperty(key)) {
+    for (const key in newData.hand_id_map) {
+      if (Object.prototype.hasOwnProperty.call(newData.hand_id_map, key)) {
+        if (!Object.prototype.hasOwnProperty.call(mainCollation.structure.hand_id_map, key)) {
           mainCollation.structure.hand_id_map[key] = newData.hand_id_map[key];
         }
       }
@@ -3966,9 +3963,9 @@ CL = (function() {
             for (let i = 0; i < existingUnit.readings.length; i += 1) {
               // NB: this last condition should not be needed but before 26/09/21 the code was incorrectly
               // adding type="om" to readings even if they had text when they were combined/moved above an overlap
-              if (existingUnit.readings[i].hasOwnProperty('type') &&
+              if (Object.prototype.hasOwnProperty.call(existingUnit.readings[i], 'type') &&
                     existingUnit.readings[i].type == 'om' &&
-                    !existingUnit.readings[i].hasOwnProperty('overlap_status') &&
+                    !Object.prototype.hasOwnProperty.call(existingUnit.readings[i], 'overlap_status') &&
                     existingUnit.readings[i].text.length === 0) {
                 omReading = existingUnit.readings[i];
               }
@@ -4028,16 +4025,16 @@ CL = (function() {
                 }
               }
             }
-            for (let key in newData.hand_id_map) {
-              if (newData.hand_id_map.hasOwnProperty(key) && existingWitnesses.indexOf(key) !== -1) {
+            for (const key in newData.hand_id_map) {
+              if (Object.prototype.hasOwnProperty.call(newData.hand_id_map, key) && existingWitnesses.indexOf(key) !== -1) {
                 existingWitnesses.splice(existingWitnesses.indexOf(key), 1);
               }
             }
             if (existingWitnesses.length > 0) {
               omReading = null;
               for (let i = 0; i < newUnit.readings.length; i += 1) {
-                if (newUnit.readings[i].hasOwnProperty('type') && newUnit.readings[i].type == 'om' &&
-                  !newUnit.readings[i].hasOwnProperty('overlap_status')) {
+                if (Object.prototype.hasOwnProperty.call(newUnit.readings[i], 'type') && newUnit.readings[i].type == 'om' &&
+                  !Object.prototype.hasOwnProperty.call(newUnit.readings[i], 'overlap_status')) {
                   omReading = newUnit.readings[i];
                 }
               }
@@ -4072,7 +4069,8 @@ CL = (function() {
                 after = mainCollation.structure.apparatus[i];
               }
             }
-            if (before && after && before.hasOwnProperty('overlap_units') && after.hasOwnProperty('overlap_units')) {
+            if (before && after && Object.prototype.hasOwnProperty.call(before, 'overlap_units') &&
+                    Object.prototype.hasOwnProperty.call(after, 'overlap_units')) {
               // find out which ones are shared and add them to the new unit (we are not concerned about the ones
               // at the edges as the user can make and merge if needed)
               beforeIds = Object.keys(before.overlap_units);
@@ -4096,7 +4094,7 @@ CL = (function() {
                 newReadingText = extractWitnessText(newUnit.readings[j]);
 
                 for (let k = 0; k < existingUnit.readings.length; k += 1) {
-                  if (!existingUnit.readings[k].hasOwnProperty('overlap_status') &&
+                  if (!Object.prototype.hasOwnProperty.call(existingUnit.readings[k], 'overlap_status') &&
                     extractWitnessText(existingUnit.readings[k]) === newReadingText) {
                     matchingReadingFound = true;
                     _mergeNewReading(existingUnit.readings[k], newUnit.readings[j]);
@@ -4136,7 +4134,7 @@ CL = (function() {
                 matchingReadingFound = false;
                 newReadingText = extractWitnessText(unit1.readings[j]);
                 for (let k = 0; k < existingUnit.readings.length; k += 1) {
-                  if (!existingUnit.readings[k].hasOwnProperty('overlap_status') &&
+                  if (!Object.prototype.hasOwnProperty.call(existingUnit.readings[k], 'overlap_status') &&
                     extractWitnessText(existingUnit.readings[k]) === newReadingText) {
                     matchingReadingFound = true;
                     _mergeNewReading(existingUnit.readings[k], unit1.readings[j]);
@@ -4174,7 +4172,7 @@ CL = (function() {
 
   _mergeNewLacOmVerseReadings = function(unit, newData) {
     for (let i = 0; i < unit.readings.length; i += 1) {
-      if (unit.readings[i].hasOwnProperty('type')) {
+      if (Object.prototype.hasOwnProperty.call(unit.readings[i], 'type')) {
         if (unit.readings[i].type === 'lac_verse' && newData.lac_readings.length > 0) {
           for (let j = 0; j < newData.lac_readings.length; j += 1) {
             if (unit.readings[i].witnesses.indexOf(newData.lac_readings[j]) === -1) {
@@ -4227,7 +4225,7 @@ CL = (function() {
       CL.data = collation.structure;
       _separateOverlapsInAddedUnits();
 
-      if (!CL.data.apparatus[0].hasOwnProperty('_id')) {
+      if (!Object.prototype.hasOwnProperty.call(CL.data.apparatus[0], '_id')) {
         addUnitAndReadingIds();
       }
       //If we are adding witnesses at the regularisation stage then we need to save the settings
@@ -4277,8 +4275,8 @@ CL = (function() {
   };
 
   _getSubreadingWitnessData = function(reading, witness) {
-    for (let key in reading.subreadings) {
-      if (reading.subreadings.hasOwnProperty(key)) {
+    for (const key in reading.subreadings) {
+      if (Object.prototype.hasOwnProperty.call(reading.subreadings, key)) {
         for (let i = 0; i < reading.subreadings[key].length; i += 1) {
           if (reading.subreadings[key][i].witnesses.indexOf(witness) !== -1) {
             return reading.subreadings[key][i].text;
@@ -4345,7 +4343,7 @@ CL = (function() {
       _expandUnit(triangles[i].id, format);
     }
     $('#expand_collapse_button').off('click.expand_all');
-    $('#expand_collapse_button').on('click.expand_collapse_button', function(event) {
+    $('#expand_collapse_button').on('click.expand_collapse_button', function() {
       $(this).text('expand all');
       _collapseAll(format);
     });
@@ -4359,7 +4357,7 @@ CL = (function() {
       _collapseUnit(triangles[i].id, format);
     }
     $('#expand_collapse_button').off('click.collapse_all');
-    $('#expand_collapse_button').on('click.expand_all', function(event) {
+    $('#expand_collapse_button').on('click.expand_all', function() {
       $(this).text('collapse all');
       _expandAll(format);
     });
@@ -4379,13 +4377,13 @@ CL = (function() {
     }
     switch (format) {
       case 'set_variants':
-        if (options.hasOwnProperty('id')) {
+        if (Object.prototype.hasOwnProperty.call(options, 'id')) {
           idString = ' id="' + options.id + '"';
         } else {
           idString = '';
         }
-        if (!options.hasOwnProperty('start') || !options.hasOwnProperty('end')) {
-          if (options.hasOwnProperty('dropable') && options.dropable === true) {
+        if (!Object.prototype.hasOwnProperty.call(options, 'start') || !Object.prototype.hasOwnProperty.call(options, 'end')) {
+          if (Object.prototype.hasOwnProperty.call(options, 'dropable') && options.dropable === true) {
             cell = '<td' + idString + '></td>';
           } else {
             cell = '<td' + idString + ' class="mark"></td>';
@@ -4399,14 +4397,14 @@ CL = (function() {
         }
         break;
       case 'reorder':
-        if (!options.hasOwnProperty('start') || !options.hasOwnProperty('end')) {
+        if (!Object.prototype.hasOwnProperty.call(options, 'start') || !Object.prototype.hasOwnProperty.call(options, 'end')) {
           cell = '<td class="mark"></td>';
         } else {
           cell = '<td class="mark start_' + options.start + '" colspan="' + (options.end - options.start + 1) + '"></td>';
         }
         break;
       default:
-        if (!options.hasOwnProperty('start') || !options.hasOwnProperty('end')) {
+        if (!Object.prototype.hasOwnProperty.call(options, 'start') || !Object.prototype.hasOwnProperty.call(options, 'end')) {
           cell = '<td></td>';
         } else {
           cell = '<td class="start_' + options.start + '" colspan="' + (options.end - options.start + 1) + '"></td>';
@@ -4417,9 +4415,9 @@ CL = (function() {
 
   // merge dictionaries values from dict1 take priority
   _mergeDicts = function(dict1, dict2) {
-    for (let key in dict2) {
-      if (dict2.hasOwnProperty(key)) {
-        if (!dict1.hasOwnProperty(key)) {
+    for (const key in dict2) {
+      if (Object.prototype.hasOwnProperty.call(dict2, key)) {
+        if (!Object.prototype.hasOwnProperty.call(dict1, key)) {
           dict1[key] = dict2[key];
         }
       }
@@ -4431,15 +4429,15 @@ CL = (function() {
     var html, rowList, hand, rules, rowId, text, readingLabel, readingSuffix;
     html = [];
     rowList = [];
-    if (options.hasOwnProperty('highlighted_wit')) {
+    if (Object.prototype.hasOwnProperty.call(options, 'highlighted_wit')) {
       hand = options.highlighted_wit.split('|')[1];
     } else {
       hand = null;
     }
     rules = getRuleClasses(undefined, undefined, 'value', ['identifier', 'keep_as_main_reading',
                                                            'suffixed_label', 'suffixed_reading']);
-    for (let key in rules) {
-      if (rules.hasOwnProperty(key) && rules[key][1] === false) {
+    for (const key in rules) {
+      if (Object.prototype.hasOwnProperty.call(rules, key) && rules[key][1] === false) {
         delete rules[key];
       }
     }
@@ -4504,16 +4502,16 @@ CL = (function() {
 
           if (reading.text.length !== 0) {
             //this should never happen and means the data needs some serious work but keeping to keep collaborators happy
-            if (!reading.text[0].hasOwnProperty(witness)) {
+            if (!Object.prototype.hasOwnProperty.call(reading.text[0], witness)) {
               console.log('**** Problem witness: ' + witness);
               return [false];
             }
             if (reading.text[0][witness].index === '2') {
-              if (reading.hasOwnProperty('combined_gap_before_subreadings') &&
-                        reading.combined_gap_before_subreadings.hasOwnProperty(witness)) {
+              if (Object.prototype.hasOwnProperty.call(reading, 'combined_gap_before_subreadings') &&
+                      Object.prototype.hasOwnProperty.call(reading.combined_gap_before_subreadings, witness)) {
                 return [false];
               }
-              if (reading.text[0][witness].hasOwnProperty('gap_before')) {
+              if (Object.prototype.hasOwnProperty.call(reading.text[0][witness], 'gap_before')) {
                 return [true, reading.text[0][witness].gap_before_details];
               }
               return [false];
@@ -4531,9 +4529,10 @@ CL = (function() {
       for (let j = 0; j < apparatus[i].readings.length; j += 1) {
         if (getAllReadingWitnesses(apparatus[i].readings[j]).indexOf(witness) !== -1) {
           reading = getReading(apparatus[i].readings[j], witness);
-          if (reading.hasOwnProperty('overlap_status') && apparatus[i].hasOwnProperty('overlap_units')) {
-            for (let key in apparatus[i].overlap_units) {
-              if (apparatus[i].overlap_units.hasOwnProperty(key)) {
+          if (Object.prototype.hasOwnProperty.call(reading, 'overlap_status') &&
+                  Object.prototype.hasOwnProperty.call(apparatus[i], 'overlap_units')) {
+            for (const key in apparatus[i].overlap_units) {
+              if (Object.prototype.hasOwnProperty.call(apparatus[i].overlap_units, key)) {
                 if (apparatus[i].overlap_units[key].indexOf(witness) !== -1) {
                   temp = findOverlapUnitById(key);
                   if (temp !== null) {
@@ -4555,11 +4554,11 @@ CL = (function() {
             return [false];
           }
           // this should never happen and means the data needs some serious work but keeping to keep collaborators happy
-          if (!reading.text[reading.text.length - 1].hasOwnProperty(witness)) {
+          if (!Object.prototype.hasOwnProperty.call(reading.text[reading.text.length - 1], witness)) {
             console.log('**** Problem witness: ' + witness);
             return [false];
           }
-          if (reading.text[reading.text.length - 1][witness].hasOwnProperty('gap_after')) {
+          if (Object.prototype.hasOwnProperty.call(reading.text[reading.text.length - 1][witness], 'gap_after')) {
             return [true, reading.text[reading.text.length - 1][witness].gap_details];
           }
           return [false];
@@ -4574,17 +4573,18 @@ CL = (function() {
     witnesses = [];
     if (reading.text.length === 0) {
       for (let i = 0; i < reading.witnesses.length; i += 1) {
-        if ((reading.hasOwnProperty('SR_text') && !reading.SR_text.hasOwnProperty(reading.witnesses[i])) ||
-                  !reading.hasOwnProperty('SR_text')) {
+        if ((Object.prototype.hasOwnProperty.call(reading, 'SR_text') &&
+                  !Object.prototype.hasOwnProperty.call(reading.SR_text, reading.witnesses[i])) ||
+                    !Object.prototype.hasOwnProperty.call(reading, 'SR_text')) {
           if (witnesses.indexOf(reading.witnesses[i]) === -1) {
             witnesses.push(reading.witnesses[i]);
           }
         }
       }
     }
-    if (reading.hasOwnProperty('SR_text')) {
-      for (let key in reading.SR_text) {
-        if (reading.SR_text.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(reading, 'SR_text')) {
+      for (const key in reading.SR_text) {
+        if (Object.prototype.hasOwnProperty.call(reading.SR_text, key)) {
           if (reading.SR_text[key].text.length === 0) {
             if (witnesses.indexOf(key) === -1) {
               witnesses.push(key);
@@ -4594,9 +4594,9 @@ CL = (function() {
       }
     }
     // don't think this is needed
-    if (reading.hasOwnProperty('subreadings')) {
-      for (let key in reading.subreadings) {
-        if (reading.subreadings.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(reading, 'subreadings')) {
+      for (const key in reading.subreadings) {
+        if (Object.prototype.hasOwnProperty.call(reading.subreadings, key)) {
           for (let i = 0; i < reading.subreadings[key].length; i += 1) {
             if (reading.subreadings[key][i].text.length === 0) {
               for (let j = 0; j < reading.subreadings[key][i].witnesses.length; j += 1) {
@@ -4616,9 +4616,9 @@ CL = (function() {
     if (reading.text.length === 0) {
       return true;
     }
-    if (reading.hasOwnProperty('subreadings')) {
-      for (let key in reading.subreadings) {
-        if (reading.subreadings.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(reading, 'subreadings')) {
+      for (const key in reading.subreadings) {
+        if (Object.prototype.hasOwnProperty.call(reading.subreadings, key)) {
           for (let i = 0; i < reading.subreadings[key].length; i += 1) {
             if (reading.subreadings[key][i].text.length === 0) {
               return true;
@@ -4627,9 +4627,9 @@ CL = (function() {
         }
       }
     }
-    if (reading.hasOwnProperty('SR_text')) {
-      for (let key in reading.SR_text) {
-        if (reading.SR_text.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(reading, 'SR_text')) {
+      for (const key in reading.SR_text) {
+        if (Object.prototype.hasOwnProperty.call(reading.SR_text, key)) {
           if (reading.SR_text[key].text.length === 0) {
             return true;
           }
@@ -4640,11 +4640,11 @@ CL = (function() {
   };
 
   _isOverlapped = function(unit, witness) {
-    if (!unit.hasOwnProperty('overlap_units')) {
+    if (!Object.prototype.hasOwnProperty.call(unit, 'overlap_units')) {
       return false;
     }
-    for (let key in unit.overlap_units) {
-      if (unit.overlap_units.hasOwnProperty(key)) {
+    for (const key in unit.overlap_units) {
+      if (Object.prototype.hasOwnProperty.call(unit.overlap_units, key)) {
         if (unit.overlap_units[key].indexOf(witness) !== -1) {
           return true;
         }
@@ -4677,7 +4677,7 @@ CL = (function() {
    * */
   _cleanExtraGaps = function() {
     for (let i = 0; i < CL.data.apparatus.length; i += 1) {
-      if (CL.data.apparatus[i].hasOwnProperty('created') && !unitHasText(CL.data.apparatus[i])) {
+      if (Object.prototype.hasOwnProperty.call(CL.data.apparatus[i], 'created') && !unitHasText(CL.data.apparatus[i])) {
         CL.data.apparatus[i] = null;
       }
     }
@@ -4690,9 +4690,9 @@ CL = (function() {
   _getOverlapUnitReadings = function(unit) {
     var overlapReadings, overlappingUnit;
     overlapReadings = [];
-    if (unit.hasOwnProperty('overlap_units')) {
-      for (let key in unit.overlap_units) {
-        if (unit.overlap_units.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(unit, 'overlap_units')) {
+      for (const key in unit.overlap_units) {
+        if (Object.prototype.hasOwnProperty.call(unit.overlap_units, key)) {
           overlappingUnit = findOverlapUnitById(key);
           if (overlappingUnit !== null) {
             // start at 1 because we don't care about a reading (its just the base text)
@@ -4708,20 +4708,20 @@ CL = (function() {
 
   _checkExtraGapRequiredBefore = function(reading, witness) {
     var subreading;
-    if (reading.text.length > 0 && !reading.text[0].hasOwnProperty('combined_gap_before')) {
-      if (!reading.hasOwnProperty('combined_gap_before_subreadings') ||
-              (reading.hasOwnProperty('combined_gap_before_subreadings') &&
+    if (reading.text.length > 0 && !Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before')) {
+      if (!Object.prototype.hasOwnProperty.call(reading, 'combined_gap_before_subreadings') ||
+              (Object.prototype.hasOwnProperty.call(reading, 'combined_gap_before_subreadings') &&
                 reading.combined_gap_before_subreadings.indexOf(witness === -1))) {
         if (reading.text.length > 0 &&
-                reading.text[0].hasOwnProperty(witness) &&
-                  reading.text[0][witness].hasOwnProperty('gap_before')) {
+                Object.prototype.hasOwnProperty.call(reading.text[0], witness) &&
+                  Object.prototype.hasOwnProperty.call(reading.text[0][witness], 'gap_before')) {
           return true;
         }
-        if (reading.hasOwnProperty('subreadings') || reading.hasOwnProperty('SR_text')) {
+        if (Object.prototype.hasOwnProperty.call(reading, 'subreadings') || Object.prototype.hasOwnProperty.call(reading, 'SR_text')) {
           subreading = getSubreadingOfWitness(reading, witness, true);
           if (subreading && subreading.text.length > 0 &&
-                  !subreading.text[0].hasOwnProperty('combined_gap_before') &&
-                    subreading.text[0][witness].hasOwnProperty('gap_before')) {
+                  !Object.prototype.hasOwnProperty.call(subreading.text[0], 'combined_gap_before') &&
+                    Object.prototype.hasOwnProperty.call(subreading.text[0][witness], 'gap_before')) {
             return true;
           }
         }
@@ -4769,22 +4769,22 @@ CL = (function() {
                   // or it is overlapped & the next unit/wit is not overlapped (it is the last unit of an overlap)
                   (overlapped && !_isOverlapped(unitList[unitPos + 1], witnesses[j]))) {
           if (readings[i].text.length > 0 &&
-                    !readings[i].text[readings[i].text.length - 1].hasOwnProperty('combined_gap_after')) {
-            if (!readings[i].hasOwnProperty('combined_gap_after_subreadings') ||
-              (readings[i].hasOwnProperty('combined_gap_after_subreadings') &&
+                    !Object.prototype.hasOwnProperty.call(readings[i].text[readings[i].text.length - 1], 'combined_gap_after')) {
+            if (!Object.prototype.hasOwnProperty.call(readings[i], 'combined_gap_after_subreadings') ||
+              (Object.prototype.hasOwnProperty.call(readings[i], 'combined_gap_after_subreadings') &&
                 readings[i].combined_gap_after_subreadings.indexOf(witnesses[j] === -1))) {
               if (readings[i].text.length > 0 &&
-                readings[i].text[readings[i].text.length - 1].hasOwnProperty(witnesses[j]) &&
-                readings[i].text[readings[i].text.length - 1][witnesses[j]].hasOwnProperty('gap_after')) {
+                      Object.prototype.hasOwnProperty.call(readings[i].text[readings[i].text.length - 1], witnesses[j]) &&
+                      Object.prototype.hasOwnProperty.call(readings[i].text[readings[i].text.length - 1][witnesses[j]], 'gap_after')) {
                 if (_combinedGapInNextUnit(unitList, unitPos, witnesses[j]) === false) {
                   return true;
                 }
               }
-              if (readings[i].hasOwnProperty('subreadings') || readings[i].hasOwnProperty('SR_text')) {
+              if (Object.prototype.hasOwnProperty.call(readings[i], 'subreadings') || Object.prototype.hasOwnProperty.call(readings[i], 'SR_text')) {
                 subreading = getSubreadingOfWitness(readings[i], witnesses[j], true);
                 if (subreading && subreading.text.length > 0 &&
-                        !subreading.text[subreading.text.length - 1].hasOwnProperty('combined_gap_after') &&
-                          subreading.text[subreading.text.length - 1][witnesses[j]].hasOwnProperty('gap_after')) {
+                        !Object.prototype.hasOwnProperty.call(subreading.text[subreading.text.length - 1], 'combined_gap_after') &&
+                          Object.prototype.hasOwnProperty.call(subreading.text[subreading.text.length - 1][witnesses[j]], 'gap_after')) {
                   if (_combinedGapInNextUnit(unitList, unitPos, witnesses[j]) === false) {
                     return true;
                   }
@@ -4812,11 +4812,11 @@ CL = (function() {
       }
       for (let i = 0; i < readings.length; i += 1) {
         if (readings[i].witnesses.indexOf(witness) !== -1) {
-          if (readings[i].hasOwnProperty('combined_gap_before_subreadings') &&
+          if (Object.prototype.hasOwnProperty.call(readings[i], 'combined_gap_before_subreadings') &&
             readings[i].combined_gap_before_subreadings.indexOf(witness) !== -1) {
             return true;
           }
-          if (readings[i].text.length > 0 && readings[i].text[0].hasOwnProperty('combined_gap_before')) {
+          if (readings[i].text.length > 0 && Object.prototype.hasOwnProperty.call(readings[i].text[0], 'combined_gap_before')) {
             return true;
           }
           subreading = getSubreadingOfWitness(readings[i], witness, true);
@@ -4835,25 +4835,25 @@ CL = (function() {
   _getNewGapRdgDetails = function(unit, overlappingReading) {
     var details;
     details = {};
-    if (overlappingReading.hasOwnProperty('combined_gap_before_subreadings')) {
+    if (Object.prototype.hasOwnProperty.call(overlappingReading, 'combined_gap_before_subreadings')) {
       details.witnesses = overlappingReading.combined_gap_before_subreadings;
       details.details = overlappingReading.combined_gap_before_subreadings_details[overlappingReading.combined_gap_before_subreadings[0]];
     } else {
       if (overlappingReading.text.length > 0 &&
-        overlappingReading.text[0].hasOwnProperty('combined_gap_before')) {
-        details.details = overlappingReading.text[0].combined_gap_before_details;
+            Object.prototype.hasOwnProperty.call(overlappingReading.text[0], 'combined_gap_before')) {
+              details.details = overlappingReading.text[0].combined_gap_before_details;
       }
     }
-    if (overlappingReading.hasOwnProperty('combined_gap_after_subreadings')) {
+    if (Object.prototype.hasOwnProperty.call(overlappingReading, 'combined_gap_after_subreadings')) {
       details.details = overlappingReading.text[overlappingReading.text.length - 1][overlappingReading.combined_gap_after_subreadings].gap_details;
       details.witnesses = overlappingReading.combined_gap_after_subreadings;
     } else {
       if (overlappingReading.text.length > 0 &&
-        overlappingReading.text[overlappingReading.text.length - 1].hasOwnProperty('combined_gap_after')) {
-        details.details = overlappingReading.text[overlappingReading.text.length - 1][overlappingReading.witnesses[0]].gap_details;
+              Object.prototype.hasOwnProperty.call(overlappingReading.text[overlappingReading.text.length - 1], 'combined_gap_after')) {
+                details.details = overlappingReading.text[overlappingReading.text.length - 1][overlappingReading.witnesses[0]].gap_details;
       }
     }
-    if (!details.hasOwnProperty('witnesses')) {
+    if (!Object.prototype.hasOwnProperty.call(details, 'witnesses')) {
       details.witnesses = overlappingReading.witnesses;
     }
     for (let i = 0; i < unit.readings.length; i += 1) {
@@ -4865,12 +4865,12 @@ CL = (function() {
         }
       }
     }
-    if (overlappingReading.hasOwnProperty('type')) {
+    if (Object.prototype.hasOwnProperty.call(overlappingReading, 'type')) {
       details.type = overlappingReading.type;
     } else {
       details.type = 'om';
     }
-    if (overlappingReading.hasOwnProperty('details')) {
+    if (Object.prototype.hasOwnProperty.call(overlappingReading, 'details')) {
       details.details = overlappingReading.details;
     }
     return details;
@@ -4884,10 +4884,10 @@ CL = (function() {
     otherWits = JSON.parse(JSON.stringify(allWitnesses));
     // if anything marked as overlapped and is empty in the first 'real' unit
     // ALL overlap indexes need adding to this one
-    if (adjacentUnit.hasOwnProperty('overlap_units') &&
+    if (Object.prototype.hasOwnProperty.call(adjacentUnit, 'overlap_units') &&
       overlapHasEmptyReading(adjacentUnit.overlap_units)) {
-      for (let key in adjacentUnit.overlap_units) {
-        if (adjacentUnit.overlap_units.hasOwnProperty(key) &&
+      for (const key in adjacentUnit.overlap_units) {
+        if (Object.prototype.hasOwnProperty.call(adjacentUnit.overlap_units, key) &&
           (typeof inclusiveOverlaps === 'undefined' ||
             typeof inclusiveOverlaps !== 'undefined' &&
             inclusiveOverlaps.indexOf(key) !== -1)
@@ -4931,7 +4931,7 @@ CL = (function() {
       newUnit.readings.push({'witnesses': otherWits, 'text': []});
     }
     specialWitnesses = [];
-    if (CL.data.hasOwnProperty('special_categories')) {
+    if (Object.prototype.hasOwnProperty.call(CL.data, 'special_categories')) {
       for (let j = 0; j < CL.data.special_categories.length; j += 1) {
         for (let i = 0; i < CL.data.apparatus.length; i += 1) {
           newUnit.readings.push({'text': [],
@@ -4972,10 +4972,10 @@ CL = (function() {
   };
 
   _extraGapIsWithinAnOverlap = function(current) {
-    if (current + 1 < CL.data.apparatus.length && CL.data.apparatus[current + 1].hasOwnProperty('overlap_units')) {
-      for (let key in CL.data.apparatus[current].overlap_units) {
-        if (CL.data.apparatus[current].overlap_units.hasOwnProperty(key) &&
-          CL.data.apparatus[current + 1].overlap_units.hasOwnProperty(key)) {
+    if (current + 1 < CL.data.apparatus.length && Object.prototype.hasOwnProperty.call(CL.data.apparatus[current + 1], 'overlap_units')) {
+      for (const key in CL.data.apparatus[current].overlap_units) {
+        if (Object.prototype.hasOwnProperty.call(CL.data.apparatus[current].overlap_units, key) &&
+                Object.prototype.hasOwnProperty.call(CL.data.apparatus[current + 1].overlap_units, key)) {
           return true;
         }
       }
@@ -4986,10 +4986,10 @@ CL = (function() {
   _getInclusiveOverlapReadings = function(current) {
     var inclusiveOverlaps;
     inclusiveOverlaps = [];
-    if (current + 1 < CL.data.apparatus.length && CL.data.apparatus[current + 1].hasOwnProperty('overlap_units')) {
-      for (let key in CL.data.apparatus[current].overlap_units) {
-        if (CL.data.apparatus[current].overlap_units.hasOwnProperty(key) &&
-          CL.data.apparatus[current + 1].overlap_units.hasOwnProperty(key)) {
+    if (current + 1 < CL.data.apparatus.length && Object.prototype.hasOwnProperty.call(CL.data.apparatus[current + 1], 'overlap_units')) {
+      for (const key in CL.data.apparatus[current].overlap_units) {
+        if (Object.prototype.hasOwnProperty.call(CL.data.apparatus[current].overlap_units, key) &&
+                  Object.prototype.hasOwnProperty.call(CL.data.apparatus[current + 1].overlap_units, key)) {
           inclusiveOverlaps.push(key);
         }
       }
@@ -5069,7 +5069,7 @@ CL = (function() {
     var extraReading;
     for (let i = 0; i < extraReadings.length; i += 1) {
       if (extraReadings[i].details === gapDetails &&
-            ((typeof overlapStatus === 'undefined' && !extraReadings[i].hasOwnProperty('overlap_status')) ||
+            ((typeof overlapStatus === 'undefined' && !Object.prototype.hasOwnProperty.call(extraReadings[i], 'overlap_status')) ||
             (typeof overlapStatus !== 'undefined' && extraReadings[i].overlap_status === overlapStatus))) {
         extraReadings[i].witnesses.push(witness);
         return extraReadings;
@@ -5146,8 +5146,8 @@ CL = (function() {
     SV.undoStack = [];
     OR.undoStack = [];
     if (latest === null) {
-      for (let key in _defaultDisplaySettings) {
-        if (_defaultDisplaySettings.hasOwnProperty(key)) {
+      for (const key in _defaultDisplaySettings) {
+        if (Object.prototype.hasOwnProperty.call(_defaultDisplaySettings, key)) {
           CL.displaySettings[key] = _defaultDisplaySettings[key];
         }
       }
@@ -5203,7 +5203,7 @@ CL = (function() {
     apparatus = CL.data.apparatus;
     for (let i = 0; i < apparatus.length; i += 1) {
       for (let j = 0; j < apparatus[i].readings.length; j += 1) {
-        if (apparatus[i].readings[j].hasOwnProperty('overlap')) {
+        if (Object.prototype.hasOwnProperty.call(apparatus[i].readings[j], 'overlap')) {
           apparatus[i].readings[j] = 'None';
         }
       }
@@ -5217,24 +5217,24 @@ CL = (function() {
   _getApprovalSettings = function() {
     var defaults;
     defaults = [true, ''];
-    if (CL.project.hasOwnProperty('approvalSettings')) {
-      if (CL.project.approvalSettings.hasOwnProperty('allow_approval_overwrite')) {
+    if (Object.prototype.hasOwnProperty.call(CL.project, 'approvalSettings')) {
+      if (Object.prototype.hasOwnProperty.call(CL.project.approvalSettings, 'allow_approval_overwrite')) {
         if (CL.project.approvalSettings.allow_approval_overwrite === true) {
           return [true, ''];
         }
-        if (CL.project.approvalSettings.hasOwnProperty('no_overwrite_message')) {
+        if (Object.prototype.hasOwnProperty.call(CL.project.approvalSettings, 'no_overwrite_message')) {
           return [false, CL.project.approvalSettings.no_overwrite_message];
         }
         return [false, 'You are not allowed to overwrite a previously approved version in this project.'];
       }
       return defaults;
     }
-    if (CL.services.hasOwnProperty('approvalSettings')) {
-      if (CL.services.approvalSettings.hasOwnProperty('allow_approval_overwrite')) {
+    if (Object.prototype.hasOwnProperty.call(CL.services, 'approvalSettings')) {
+      if (Object.prototype.hasOwnProperty.call(CL.services.approvalSettings, 'allow_approval_overwrite')) {
         if (CL.services.approvalSettings.allow_approval_overwrite === true) {
           return [true];
         }
-        if (CL.services.approvalSettings.hasOwnProperty('no_overwrite_message')) {
+        if (Object.prototype.hasOwnProperty.call(CL.services.approvalSettings, 'no_overwrite_message')) {
           return [false, CL.services.approvalSettings.no_overwrite_message];
         }
         return [false, 'You are not allowed to overwrite a previously approved version.'];
@@ -5253,13 +5253,13 @@ CL = (function() {
       return 1;
     }
     //if one is overlapped put it at the bottom
-    if (a.hasOwnProperty('overlap_status') && b.hasOwnProperty('overlap_status')) {
+    if (Object.prototype.hasOwnProperty.call(a, 'overlap_status') && Object.prototype.hasOwnProperty.call(b, 'overlap_status')) {
       return 0;
     }
-    if (a.hasOwnProperty('overlap_status')) {
+    if (Object.prototype.hasOwnProperty.call(a, 'overlap_status')) {
       return 1;
     }
-    if (b.hasOwnProperty('overlap_status')) {
+    if (Object.prototype.hasOwnProperty.call(b, 'overlap_status')) {
       return -1;
     }
     // otherwise check if they are both om lac readings
@@ -5337,18 +5337,18 @@ CL = (function() {
     if (document.getElementById('distance')) {
       document.getElementById('distance').value = CL.collationAlgorithmSettings.distance;
     }
-    $('#fuzzy_match').on('click', function(event) {
+    $('#fuzzy_match').on('click', function() {
       if (document.getElementById('fuzzy_match').checked === true) {
         document.getElementById('distance').removeAttribute('disabled');
       } else {
         document.getElementById('distance').disabled = 'disabled';
       }
     });
-    $('#save_settings').on('click', function(event) {
+    $('#save_settings').on('click', function() {
       data = cforms.serialiseForm('settings_form');
-      for (let setting in CL.collationAlgorithmSettings) {
-        if (CL.collationAlgorithmSettings.hasOwnProperty(setting)) {
-          if (data.hasOwnProperty(setting)) {
+      for (const setting in CL.collationAlgorithmSettings) {
+        if (Object.prototype.hasOwnProperty.call(CL.collationAlgorithmSettings, setting)) {
+          if (Object.prototype.hasOwnProperty.call(data, setting)) {
             CL.collationAlgorithmSettings[setting] = data[setting];
           } else {
             CL.collationAlgorithmSettings[setting] = false;
@@ -5357,7 +5357,7 @@ CL = (function() {
       }
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('settings'));
     });
-    $('#close_settings').on('click', function(event) {
+    $('#close_settings').on('click', function() {
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('settings'));
     });
   };
@@ -5488,13 +5488,13 @@ CL = (function() {
    * if it does not return null */
   _findStandoffWitness = function(witness, start, end, firstWordIndex) {
     var entry;
-    for (let key in CL.data.marked_readings) {
-      if (CL.data.marked_readings.hasOwnProperty(key)) {
+    for (const key in CL.data.marked_readings) {
+      if (Object.prototype.hasOwnProperty.call(CL.data.marked_readings, key)) {
         for (let i = CL.data.marked_readings[key].length - 1; i >= 0; i -= 1) {
           if (CL.data.marked_readings[key][i].witness === witness &&
             CL.data.marked_readings[key][i].start === start &&
             CL.data.marked_readings[key][i].end === end) {
-            if (CL.data.marked_readings[key][i].hasOwnProperty('first_word_index')) {
+            if (Object.prototype.hasOwnProperty.call(CL.data.marked_readings[key][i], 'first_word_index')) {
               if (CL.data.marked_readings[key][i].first_word_index === firstWordIndex) {
                 entry = JSON.parse(JSON.stringify(CL.data.marked_readings[key][i]));
                 CL.data.marked_readings[key].splice(i, 1);
@@ -5514,7 +5514,7 @@ CL = (function() {
 
   findReadingPosById = function(unit, id) {
     for (let i = 0; i < unit.readings.length; i += 1) {
-      if (unit.readings[i].hasOwnProperty('_id') && unit.readings[i]._id === id) {
+      if (Object.prototype.hasOwnProperty.call(unit.readings[i], '_id') && unit.readings[i]._id === id) {
         return i;
       }
     }
@@ -5524,10 +5524,10 @@ CL = (function() {
   // I considered making these cumulative but decided against so that projects can always override services
   // if they have different editorial practices (can be overridden on a stage by stage basis)
   _getPreStageChecks = function(stage) {
-    if (CL.project.hasOwnProperty('preStageChecks') && CL.project.preStageChecks.hasOwnProperty(stage)) {
+    if (Object.prototype.hasOwnProperty.call(CL.project, 'preStageChecks') && Object.prototype.hasOwnProperty.call(CL.project.preStageChecks, stage)) {
       return CL.project.preStageChecks[stage];
     }
-    if (CL.services.hasOwnProperty('preStageChecks') && CL.services.preStageChecks.hasOwnProperty(stage)) {
+    if (Object.prototype.hasOwnProperty.call(CL.services, 'preStageChecks') && Object.prototype.hasOwnProperty.call(CL.services.preStageChecks, stage)) {
       return CL.services.preStageChecks[stage];
     }
     return [];
@@ -5541,8 +5541,8 @@ CL = (function() {
     ruleDetails = getRuleClasses(undefined, undefined, 'value', ['suffixed_sigla', 'identifier', 'name',
                                                                   'subreading', 'suffixed_label']);
     subreadingTypes = [];
-    for (let key in ruleDetails) {
-      if (ruleDetails.hasOwnProperty(key) && ruleDetails[key][3] === true) {
+    for (const key in ruleDetails) {
+      if (Object.prototype.hasOwnProperty.call(ruleDetails, key) && ruleDetails[key][3] === true) {
         subreadingTypes.push(key);
       }
     }
@@ -5570,12 +5570,12 @@ CL = (function() {
 
     //loop through the words and get the decisions for each word
     for (let i = 0; i < subreading.text.length; i += 1) {
-      if (subreading.text[i][witness].hasOwnProperty('decision_class')) {
+      if (Object.prototype.hasOwnProperty.call(subreading.text[i][witness], 'decision_class')) {
         classes.push(JSON.parse(JSON.stringify(subreading.text[i][witness].decision_class)));
       } else {
         classes.push([]);
       }
-      if (subreading.text[i][witness].hasOwnProperty('decision_details')) {
+      if (Object.prototype.hasOwnProperty.call(subreading.text[i][witness], 'decision_details')) {
         decisionDetails = JSON.parse(JSON.stringify(subreading.text[i][witness].decision_details));
 
         decisionDetails[0].base_reading = baseReadingsWithSettingsApplied[decisionDetails[0].t]['interface'];
@@ -5594,15 +5594,15 @@ CL = (function() {
                                          subreadingTypes, reading, witness, subreading);
     standoffReading.value = standoffReading.values.join('|');
     delete standoffReading.values;
-    if (!CL.data.marked_readings.hasOwnProperty(standoffReading.value)) {
+    if (!Object.prototype.hasOwnProperty.call(CL.data.marked_readings, standoffReading.value)) {
       CL.data.marked_readings[standoffReading.value] = [];
     }
-    if (reading.text.length > 0 && reading.text[reading.text.length - 1].hasOwnProperty('combined_gap_after')) {
+    if (reading.text.length > 0 && Object.prototype.hasOwnProperty.call(reading.text[reading.text.length - 1], 'combined_gap_after')) {
       standoffReading.combined_gap_after = true;
     }
-    if (reading.text.length > 0 && reading.text[0].hasOwnProperty('combined_gap_before')) {
+    if (reading.text.length > 0 && Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before')) {
       standoffReading.combined_gap_before = true;
-      if (reading.text[0].hasOwnProperty('combined_gap_before_details')) {
+      if (Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before_details')) {
         standoffReading.combined_gap_before_details = reading.text[0].combined_gap_before_details;
       }
     }
@@ -5700,19 +5700,20 @@ CL = (function() {
   _getHistoricalReading = function(ruleType, positions, classes, details, reading, witness, subreading) {
     var newReading;
     newReading = [];
-    if (reading.hasOwnProperty('combined_gap_before_subreadings') &&
-      reading.combined_gap_before_subreadings.indexOf(witness) !== -1 &&
-      reading.hasOwnProperty('combined_gap_before_subreadings_details') &&
-      reading.combined_gap_before_subreadings_details.hasOwnProperty(witness)) {
+    if (Object.prototype.hasOwnProperty.call(reading, 'combined_gap_before_subreadings') &&
+            reading.combined_gap_before_subreadings.indexOf(witness) !== -1 &&
+            Object.prototype.hasOwnProperty.call(reading, 'combined_gap_before_subreadings_details') &&
+            Object.prototype.hasOwnProperty.call(reading.combined_gap_before_subreadings_details, witness)) {
       newReading.push('&lt;' + reading.combined_gap_before_subreadings_details[witness] + '&gt;');
-    } else if (reading.text.length > 0 && reading.text[0].hasOwnProperty('combined_gap_before') &&
-      (!reading.hasOwnProperty('SR_text') || !reading.SR_text.hasOwnProperty(witness))) {
-      if (reading.text[0].hasOwnProperty(witness) && reading.text[0][witness].hasOwnProperty('gap_before')) {
+    } else if (reading.text.length > 0 && Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before') &&
+                  (!Object.prototype.hasOwnProperty.call(reading, 'SR_text') || !Object.prototype.hasOwnProperty.call(reading.SR_text, witness))) {
+      if (Object.prototype.hasOwnProperty.call(reading.text[0], witness) &&
+            Object.prototype.hasOwnProperty.call(reading.text[0][witness], 'gap_before')) {
         // first unit in verse this might actually work like the others now
         newReading.push('&lt;' + reading.text[0][witness].gap_before_details + '&gt;');
-      } else if (reading.text[0].hasOwnProperty('combined_gap_before') &&
-        reading.text[0].combined_gap_before.length > 0 &&
-        reading.text[0].hasOwnProperty('combined_gap_before_details')) {
+      } else if (Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before') &&
+                      reading.text[0].combined_gap_before.length > 0 &&
+                        Object.prototype.hasOwnProperty.call(reading.text[0], 'combined_gap_before_details')) {
         //subsequent units in verse
         //this may be the only condition ever hit here
         newReading.push('&lt;' + reading.text[0].combined_gap_before_details + '&gt;');
@@ -5734,13 +5735,13 @@ CL = (function() {
       } else {
         newReading.push(details[i][0].n);
       }
-      if (i === positions.length - 1 && reading.text[i].hasOwnProperty('combined_gap_after') &&
+      if (i === positions.length - 1 && Object.prototype.hasOwnProperty.call(reading.text[i], 'combined_gap_after') &&
         reading.text[i].combined_gap_after.indexOf(witness) !== -1) {
-        if (subreading.text[i][witness].hasOwnProperty('gap_after')) {
+        if (Object.prototype.hasOwnProperty.call(subreading.text[i][witness], 'gap_after')) {
           newReading.push('&lt;' + subreading.text[i][witness].gap_details + '&gt;');
         }
       } else if (i !== positions.length - 1) {
-        if (subreading.text[i][witness].hasOwnProperty('gap_after')) {
+        if (Object.prototype.hasOwnProperty.call(subreading.text[i][witness], 'gap_after')) {
           newReading.push('&lt;' + subreading.text[i][witness].gap_details + '&gt;');
         }
       }
@@ -5779,316 +5780,116 @@ CL = (function() {
     return number;
   };
 
+  return {
 
-  if (testing) {
-    return {
+    services: services,
+    container: container,
+    displaySettings: displaySettings,
+    displaySettingsDetails: displaySettingsDetails,
+    ruleClasses: ruleClasses,
+    ruleConditions: ruleConditions,
+    localPythonFunctions: localPythonFunctions,
+    overlappedOptions: overlappedOptions,
+    dataSettings: dataSettings,
+    collationAlgorithmSettings: collationAlgorithmSettings,
+    highlighted: highlighted,
+    highlightedAdded: highlightedAdded,
+    showSubreadings: showSubreadings,
+    managingEditor: managingEditor,
+    project: project,
+    collateData: collateData,
+    context: context,
+    data: data,
+    stage: stage,
+    isDirty: isDirty,
+    calculatePosition: calculatePosition,
+    witnessEditingMode: witnessEditingMode,
+    witnessRemovingMode: witnessRemovingMode,
+    witnessAddingMode: witnessAddingMode,
+    witnessesAdded: witnessesAdded,
+    savedDisplaySettings: savedDisplaySettings,
+    savedAlgorithmSettings: savedAlgorithmSettings,
+    savedDataSettings: savedDataSettings,
+    existingCollation: existingCollation,
+    findReadingPosById: findReadingPosById,
+    setServiceProvider: setServiceProvider,
+    expandFillPageClients: expandFillPageClients,
+    getHeaderHtml: getHeaderHtml,
+    addUnitAndReadingIds: addUnitAndReadingIds,
+    addReadingIds: addReadingIds,
+    addReadingId: addReadingId,
+    addUnitId: addUnitId,
+    extractWitnessText: extractWitnessText,
+    getAllReadingWitnesses: getAllReadingWitnesses,
+    findUnitById: findUnitById,
+    findStandoffRegularisation: findStandoffRegularisation,
+    getRuleClasses: getRuleClasses,
+    getCollationHeader: getCollationHeader,
+    addTriangleFunctions: addTriangleFunctions,
+    getOverlapLayout: getOverlapLayout,
+    sortReadings: sortReadings,
+    extractDisplayText: extractDisplayText,
+    getReadingLabel: getReadingLabel,
+    getAlphaId: getAlphaId,
+    getReadingSuffix: getReadingSuffix,
+    addSubreadingEvents: addSubreadingEvents,
+    getUnitLayout: getUnitLayout,
+    unitHasText: unitHasText,
+    isBlank: isBlank,
+    getHighlightedText: getHighlightedText,
+    findOverlapUnitById: findOverlapUnitById,
+    getReading: getReading,
+    lacOmFix: lacOmFix,
+    getSubreadingOfWitness: getSubreadingOfWitness,
+    overlapHasEmptyReading: overlapHasEmptyReading,
+    removeNullItems: removeNullItems,
+    addStageLinks: addStageLinks,
+    addExtraFooterButtons: addExtraFooterButtons,
+    makeVerseLinks: makeVerseLinks,
+    getUnitAppReading: getUnitAppReading,
+    setList: setList,
+    getActiveUnitWitnesses: getActiveUnitWitnesses,
+    getExporterSettings: getExporterSettings,
+    saveCollation: saveCollation,
+    sortWitnesses: sortWitnesses,
+    getSpecifiedAncestor: getSpecifiedAncestor,
+    hideTooltip: hideTooltip,
+    addHoverEvents: addHoverEvents,
+    markReading: markReading,
+    showSplitWitnessMenu: showSplitWitnessMenu,
+    markStandoffReading: markStandoffReading,
+    findUnitPosById: findUnitPosById,
+    findReadingById: findReadingById,
+    findReadingByText: findReadingByText,
+    applyPreStageChecks: applyPreStageChecks,
+    makeStandoffReading: makeStandoffReading,
+    doMakeStandoffReading: doMakeStandoffReading,
+    makeMainReading: makeMainReading,
+    getOrderedAppLines: getOrderedAppLines,
+    loadIndexPage: loadIndexPage,
+    addIndexHandlers: addIndexHandlers,
+    getHandsAndSigla: getHandsAndSigla,
+    createNewReading: createNewReading,
+    getReadingWitnesses: getReadingWitnesses,
+    removeWitness: removeWitness,
+    setUpRemoveWitnessesForm: setUpRemoveWitnessesForm,
+    removeWitnesses: removeWitnesses,
+    getRemoveWitnessDataFromForm: getRemoveWitnessDataFromForm,
+    checkWitnessesAgainstProject: checkWitnessesAgainstProject,
+    setOverlappedOptions: setOverlappedOptions,
+    setRuleClasses: setRuleClasses,
+    returnToSummaryTable: returnToSummaryTable,
+    prepareAdditionalCollation: prepareAdditionalCollation,
+    removeSpecialWitnesses: removeSpecialWitnesses,
+    runFunction: runFunction,
+    expandWitnessDecorators: expandWitnessDecorators,
+    pad2: pad2,
 
-      services: services,
-      container: container,
-      displaySettings: displaySettings,
-      displaySettingsDetails: displaySettingsDetails,
-      ruleClasses: ruleClasses,
-      ruleConditions: ruleConditions,
-      localPythonFunctions: localPythonFunctions,
-      overlappedOptions: overlappedOptions,
-      dataSettings: dataSettings,
-      collationAlgorithmSettings: collationAlgorithmSettings,
-      highlighted: highlighted,
-      highlightedAdded: highlightedAdded,
-      showSubreadings: showSubreadings,
-      managingEditor: managingEditor,
-      project: project,
-      collateData: collateData,
-      context: context,
-      data: data,
-      stage: stage,
-      isDirty: isDirty,
-      calculatePosition: calculatePosition,
-      witnessEditingMode: witnessEditingMode,
-      witnessRemovingMode: witnessRemovingMode,
-      witnessAddingMode: witnessAddingMode,
-      witnessesAdded: witnessesAdded,
-      savedDisplaySettings: savedDisplaySettings,
-      savedAlgorithmSettings: savedAlgorithmSettings,
-      savedDataSettings: savedDataSettings,
-      existingCollation: existingCollation,
-      pad2: pad2,
-
-      setServiceProvider: setServiceProvider,
-      expandFillPageClients: expandFillPageClients,
-      getHeaderHtml: getHeaderHtml,
-      addUnitAndReadingIds: addUnitAndReadingIds,
-      addReadingIds: addReadingIds,
-      addReadingId: addReadingId,
-      addUnitId: addUnitId,
-      extractWitnessText: extractWitnessText,
-      getAllReadingWitnesses: getAllReadingWitnesses,
-      findUnitById: findUnitById,
-      findStandoffRegularisation: findStandoffRegularisation,
-      getRuleClasses: getRuleClasses,
-      getCollationHeader: getCollationHeader,
-      addTriangleFunctions: addTriangleFunctions,
-      getOverlapLayout: getOverlapLayout,
-      sortReadings: sortReadings,
-      extractDisplayText: extractDisplayText,
-      getReadingLabel: getReadingLabel,
-      getAlphaId: getAlphaId,
-      getReadingSuffix: getReadingSuffix,
-      addSubreadingEvents: addSubreadingEvents,
-      getUnitLayout: getUnitLayout,
-      unitHasText: unitHasText,
-      isBlank: isBlank,
-      getHighlightedText: getHighlightedText,
-      findOverlapUnitById: findOverlapUnitById,
-      getReading: getReading,
-      lacOmFix: lacOmFix,
-      getSubreadingOfWitness: getSubreadingOfWitness,
-      overlapHasEmptyReading: overlapHasEmptyReading,
-      removeNullItems: removeNullItems,
-      addStageLinks: addStageLinks,
-      addExtraFooterButtons: addExtraFooterButtons,
-      makeVerseLinks: makeVerseLinks,
-      getUnitAppReading: getUnitAppReading,
-      setList: setList,
-      getActiveUnitWitnesses: getActiveUnitWitnesses,
-      getExporterSettings: getExporterSettings,
-      saveCollation: saveCollation,
-      sortWitnesses: sortWitnesses,
-      getSpecifiedAncestor: getSpecifiedAncestor,
-      hideTooltip: hideTooltip,
-      addHoverEvents: addHoverEvents,
-      markReading: markReading,
-      showSplitWitnessMenu: showSplitWitnessMenu,
-      markStandoffReading: markStandoffReading,
-      findUnitPosById: findUnitPosById,
-      findReadingById: findReadingById,
-      findReadingByText: findReadingByText,
-      applyPreStageChecks: applyPreStageChecks,
-      makeStandoffReading: makeStandoffReading,
-      doMakeStandoffReading: doMakeStandoffReading,
-      makeMainReading: makeMainReading,
-      getOrderedAppLines: getOrderedAppLines,
-      loadIndexPage: loadIndexPage,
-      addIndexHandlers: addIndexHandlers,
-      getHandsAndSigla: getHandsAndSigla,
-      createNewReading: createNewReading,
-      getReadingWitnesses: getReadingWitnesses,
-      removeWitness: removeWitness,
-      setUpRemoveWitnessesForm: setUpRemoveWitnessesForm,
-      removeWitnesses: removeWitnesses,
-      getRemoveWitnessDataFromForm: getRemoveWitnessDataFromForm,
-      checkWitnessesAgainstProject: checkWitnessesAgainstProject,
-      setOverlappedOptions: setOverlappedOptions,
-      setRuleClasses: setRuleClasses,
-      returnToSummaryTable: returnToSummaryTable,
-      prepareAdditionalCollation: prepareAdditionalCollation,
-      removeSpecialWitnesses: removeSpecialWitnesses,
-      findReadingPosById: findReadingPosById,
-      runFunction: runFunction,
-      expandWitnessDecorators: expandWitnessDecorators,
-
-      //deprecated function mapping for calls from older services
-      set_service_provider: setServiceProvider,
-      load_index_page: loadIndexPage,
-      add_index_handlers: addIndexHandlers,
-      _managing_editor: managingEditor,
-
-
-      //private for testing only
-      _initialiseEditor: _initialiseEditor,
-      _initialiseProject: _initialiseProject,
-      _setProjectConfig: _setProjectConfig,
-      _setDisplaySettings: _setDisplaySettings,
-      _setLocalPythonFunctions: _setLocalPythonFunctions,
-      _setRuleConditions: _setRuleConditions,
-      _includeJavascript: _includeJavascript,
-      _loadSavedCollation: _loadSavedCollation,
-      _prepareCollation: _prepareCollation,
-      _getContextFromInputForm: _getContextFromInputForm,
-      _getWitnessesFromInputForm: _getWitnessesFromInputForm,
-      _showSavedVersions: _showSavedVersions,
-      _getSavedRadio: _getSavedRadio,
-      _makeSavedCollationTable: _makeSavedCollationTable,
-      _getSubreadingWitnessData: _getSubreadingWitnessData,
-      _findStandoffRegularisationText: _findStandoffRegularisationText,
-      _collapseUnit: _collapseUnit,
-      _expandUnit: _expandUnit,
-      _expandAll: _expandAll,
-      _collapseAll: _collapseAll,
-      _getEmptyCell: _getEmptyCell,
-      _mergeDicts: _mergeDicts,
-      _getUnitData: _getUnitData,
-      _hasGapBefore: _hasGapBefore,
-      _hasGapAfter: _hasGapAfter,
-      _getAllEmptyReadingWitnesses: _getAllEmptyReadingWitnesses,
-      _containsEmptyReading: _containsEmptyReading,
-      _isOverlapped: _isOverlapped,
-      _removeLacOmVerseWitnesses: _removeLacOmVerseWitnesses,
-      _cleanExtraGaps: _cleanExtraGaps,
-      _getOverlapUnitReadings: _getOverlapUnitReadings,
-      _checkExtraGapRequiredBefore: _checkExtraGapRequiredBefore,
-      _extraGapRequiredBefore: _extraGapRequiredBefore,
-      _extraGapRequiredAfter: _extraGapRequiredAfter,
-      _combinedGapInNextUnit: _combinedGapInNextUnit,
-      _getNewGapRdgDetails: _getNewGapRdgDetails,
-      _addExtraGapReadings: _addExtraGapReadings,
-      _extraGapIsWithinAnOverlap: _extraGapIsWithinAnOverlap,
-      _getInclusiveOverlapReadings: _getInclusiveOverlapReadings,
-      _getExtraGapLocation: _getExtraGapLocation,
-      _createExtraGaps: _createExtraGaps,
-      _addLacReading: _addLacReading,
-      _addNavEvent: _addNavEvent,
-      _findLatestStageVerse: _findLatestStageVerse,
-      _loadLatestStageVerse: _loadLatestStageVerse,
-      _removeOverlappedReadings: _removeOverlappedReadings,
-      _getApprovalSettings: _getApprovalSettings,
-      _compareReadings: _compareReadings,
-      _disableEventPropagation: _disableEventPropagation,
-      _showCollationSettings: _showCollationSettings,
-      _checkWitnesses: _checkWitnesses,
-      _getScrollPosition: _getScrollPosition,
-      _getMousePosition: _getMousePosition,
-      _displayWitnessesHover: _displayWitnessesHover,
-      _getWitnessesForReading: _getWitnessesForReading,
-      _findStandoffWitness: _findStandoffWitness,
-      _getPreStageChecks: _getPreStageChecks,
-      _makeRegDecisionsStandoff: _makeRegDecisionsStandoff,
-      _contextInputOnload: _contextInputOnload,
-      _removeWitnessFromUnit: _removeWitnessFromUnit,
-      _findSaved: _findSaved,
-      _addToSavedCollation: _addToSavedCollation,
-      _displaySavedCollation: _displaySavedCollation,
-      _mergeCollationObjects: _mergeCollationObjects,
-      _getUnitsByStartIndex: _getUnitsByStartIndex,
-      _mergeNewLacOmVerseReadings: _mergeNewLacOmVerseReadings,
-      _mergeNewReading: _mergeNewReading,
-      _getReadingHistory: _getReadingHistory,
-      _getNextTargetRuleInfo: _getNextTargetRuleInfo,
-      _removeAppliedRules: _removeAppliedRules,
-      _getHistoricalReading: _getHistoricalReading,
-      _extractAllTValuesForRGAppliedRules: _extractAllTValuesForRGAppliedRules,
-      _makeStandoffReading2: _makeStandoffReading2,
-      _getFunctionFromString: _getFunctionFromString,
-      _separateOverlapsInAddedUnits: _separateOverlapsInAddedUnits,
-      //private variables for testing only
-      _contextInput: _contextInput,
-      _defaultDisplaySettings: _defaultDisplaySettings,
-      _collapsed: _collapsed,
-      _alpha: _alpha,
-      _displayMode: _displayMode,
-    };
-  } else {
-
-    return {
-
-      services: services,
-      container: container,
-      displaySettings: displaySettings,
-      displaySettingsDetails: displaySettingsDetails,
-      ruleClasses: ruleClasses,
-      ruleConditions: ruleConditions,
-      localPythonFunctions: localPythonFunctions,
-      overlappedOptions: overlappedOptions,
-      dataSettings: dataSettings,
-      collationAlgorithmSettings: collationAlgorithmSettings,
-      highlighted: highlighted,
-      highlightedAdded: highlightedAdded,
-      showSubreadings: showSubreadings,
-      managingEditor: managingEditor,
-      project: project,
-      collateData: collateData,
-      context: context,
-      data: data,
-      stage: stage,
-      isDirty: isDirty,
-      calculatePosition: calculatePosition,
-      witnessEditingMode: witnessEditingMode,
-      witnessRemovingMode: witnessRemovingMode,
-      witnessAddingMode: witnessAddingMode,
-      witnessesAdded: witnessesAdded,
-      savedDisplaySettings: savedDisplaySettings,
-      savedAlgorithmSettings: savedAlgorithmSettings,
-      savedDataSettings: savedDataSettings,
-      existingCollation: existingCollation,
-      findReadingPosById: findReadingPosById,
-      setServiceProvider: setServiceProvider,
-      expandFillPageClients: expandFillPageClients,
-      getHeaderHtml: getHeaderHtml,
-      addUnitAndReadingIds: addUnitAndReadingIds,
-      addReadingIds: addReadingIds,
-      addReadingId: addReadingId,
-      addUnitId: addUnitId,
-      extractWitnessText: extractWitnessText,
-      getAllReadingWitnesses: getAllReadingWitnesses,
-      findUnitById: findUnitById,
-      findStandoffRegularisation: findStandoffRegularisation,
-      getRuleClasses: getRuleClasses,
-      getCollationHeader: getCollationHeader,
-      addTriangleFunctions: addTriangleFunctions,
-      getOverlapLayout: getOverlapLayout,
-      sortReadings: sortReadings,
-      extractDisplayText: extractDisplayText,
-      getReadingLabel: getReadingLabel,
-      getAlphaId: getAlphaId,
-      getReadingSuffix: getReadingSuffix,
-      addSubreadingEvents: addSubreadingEvents,
-      getUnitLayout: getUnitLayout,
-      unitHasText: unitHasText,
-      isBlank: isBlank,
-      getHighlightedText: getHighlightedText,
-      findOverlapUnitById: findOverlapUnitById,
-      getReading: getReading,
-      lacOmFix: lacOmFix,
-      getSubreadingOfWitness: getSubreadingOfWitness,
-      overlapHasEmptyReading: overlapHasEmptyReading,
-      removeNullItems: removeNullItems,
-      addStageLinks: addStageLinks,
-      addExtraFooterButtons: addExtraFooterButtons,
-      makeVerseLinks: makeVerseLinks,
-      getUnitAppReading: getUnitAppReading,
-      setList: setList,
-      getActiveUnitWitnesses: getActiveUnitWitnesses,
-      getExporterSettings: getExporterSettings,
-      saveCollation: saveCollation,
-      sortWitnesses: sortWitnesses,
-      getSpecifiedAncestor: getSpecifiedAncestor,
-      hideTooltip: hideTooltip,
-      addHoverEvents: addHoverEvents,
-      markReading: markReading,
-      showSplitWitnessMenu: showSplitWitnessMenu,
-      markStandoffReading: markStandoffReading,
-      findUnitPosById: findUnitPosById,
-      findReadingById: findReadingById,
-      findReadingByText: findReadingByText,
-      applyPreStageChecks: applyPreStageChecks,
-      makeStandoffReading: makeStandoffReading,
-      doMakeStandoffReading: doMakeStandoffReading,
-      makeMainReading: makeMainReading,
-      getOrderedAppLines: getOrderedAppLines,
-      loadIndexPage: loadIndexPage,
-      addIndexHandlers: addIndexHandlers,
-      getHandsAndSigla: getHandsAndSigla,
-      createNewReading: createNewReading,
-      getReadingWitnesses: getReadingWitnesses,
-      removeWitness: removeWitness,
-      setUpRemoveWitnessesForm: setUpRemoveWitnessesForm,
-      removeWitnesses: removeWitnesses,
-      getRemoveWitnessDataFromForm: getRemoveWitnessDataFromForm,
-      checkWitnessesAgainstProject: checkWitnessesAgainstProject,
-      setOverlappedOptions: setOverlappedOptions,
-      setRuleClasses: setRuleClasses,
-      returnToSummaryTable: returnToSummaryTable,
-      prepareAdditionalCollation: prepareAdditionalCollation,
-      removeSpecialWitnesses: removeSpecialWitnesses,
-      runFunction: runFunction,
-      expandWitnessDecorators: expandWitnessDecorators,
-      pad2: pad2,
-
-      //deprecated function mapping for calls from older services
-      set_service_provider: setServiceProvider,
-      load_index_page: loadIndexPage,
-      add_index_handlers: addIndexHandlers,
-      _managing_editor: managingEditor,
-    };
-  }
+    //deprecated function mapping for calls from older services
+    set_service_provider: setServiceProvider,
+    load_index_page: loadIndexPage,
+    add_index_handlers: addIndexHandlers,
+    _managing_editor: managingEditor,
+  };
+  
 }());
