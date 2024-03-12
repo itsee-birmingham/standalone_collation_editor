@@ -25,6 +25,7 @@
  * link to the original resource download page – not the actual file.)
  **/
 
+/* exported MD5 */
 var MD5 = function(string) {
 
   function RotateLeft(lValue, iShiftBits) {

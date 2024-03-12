@@ -1,30 +1,26 @@
-/*jshint esversion: 6 */
+/* exported drag */
 var drag = (function () {
-    "use strict";
 
     // private variables
-    let _behaviours = {};
+    const _behaviours = {};
     let _startX, _startY, _startZIndex;
+    let _dragElement;
 
-    // private functions
-    let _dragMouseDown, _mouseDrag, _closeDragElement, _dragElement;
-    //public functions
-    let initDraggable;
-
-    initDraggable = function (elemId, x, y, onDrop) {
-      let element, dragZone;
+  return {
+    
+    initDraggable: function (elemId, x, y, onDrop) {
       if (!document.getElementById(elemId)) {
         return false;
       }
-      element = document.getElementById(elemId);
-      dragZone = element.querySelectorAll('.drag-zone');
+      const element = document.getElementById(elemId);
+      const dragZone = element.querySelectorAll('.drag-zone');
       if (dragZone.length === 1) {
         // if there is a drag-zone specified only drag by that
-        dragZone[0].onmousedown = _dragMouseDown;
+        dragZone[0].onmousedown = drag._dragMouseDown;
         dragZone[0].setAttribute('data-drags', elemId);
       } else {
         // else drag from anywhere
-        element.onmousedown = _dragMouseDown;
+        element.onmousedown = drag._dragMouseDown;
         element.setAttribute('data-drags', elemId);
       }
       // set permitted behaviour booleans
@@ -42,9 +38,9 @@ var drag = (function () {
       if (typeof onDrop !== 'undefined') {
         _behaviours[elemId].drop_function = onDrop;
       }
-    };
+    },
 
-    _dragMouseDown = function (e) {
+    _dragMouseDown: function (e) {
       e = e || window.event;
       e.preventDefault();
       _dragElement = document.getElementById(e.target.getAttribute('data-drags'));
@@ -56,12 +52,12 @@ var drag = (function () {
       _startY = _dragElement.clientY;
       _startZIndex = _dragElement.style.zIndex;
       _dragElement.style.zIndex = 40000;
-      document.onmouseup = _closeDragElement;
+      document.onmouseup = drag._closeDragElement;
       // call a function whenever the cursor moves:
-      document.onmousemove = _mouseDrag;
-    };
+      document.onmousemove = drag._mouseDrag;
+    },
 
-    _mouseDrag = function (e) {
+    _mouseDrag: function (e) {
       let newLeft, newRight, newTop, newBase;
       e = e || window.event;
       e.preventDefault();
@@ -82,21 +78,18 @@ var drag = (function () {
           _dragElement.style.top = newTop + "px";
         }
       }
-    };
+    },
 
-    _closeDragElement = function () {
+    _closeDragElement: function () {
       // stop moving when mouse button is released:
       _dragElement.style.zIndex = _startZIndex;
-      if (_behaviours[_dragElement.id].hasOwnProperty('drop_function')) {
+      if (Object.prototype.hasOwnProperty.call(_behaviours[_dragElement.id], 'drop_function')) {
         _behaviours[_dragElement.id].drop_function(_dragElement);
       }
       _dragElement = null;
       document.onmouseup = null;
       document.onmousemove = null;
-    };
-
-    return {
-            initDraggable: initDraggable
-            };
+    }
+  };
 
 }());

@@ -1,5 +1,6 @@
+/* exported DEF */
 var DEF = (function() {
-  "use strict";
+
   return {
 
     ruleClasses: [{

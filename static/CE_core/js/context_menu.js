@@ -74,7 +74,7 @@ var SimpleContextMenu = {
       SimpleContextMenu._menus[classNames] = menuId;
     }
     if (typeof(classNames) == "object") {
-      for (x = 0; x < classNames.length; x += 1) {
+      for (let x = 0; x < classNames.length; x += 1) {
         SimpleContextMenu._menus[classNames[x]] = menuId;
       }
     }
@@ -93,7 +93,7 @@ var SimpleContextMenu = {
       if (typeof(className) != "undefined") {
         className = className.replace(/^\s+/g, "").replace(/\s+$/g, "");
         var classArray = className.split(/[ ]+/g);
-        for (i = 0; i < classArray.length; i += 1) {
+        for (let i = 0; i < classArray.length; i += 1) {
           if (SimpleContextMenu._menus[classArray[i]]) {
             return SimpleContextMenu._menus[classArray[i]];
           }
