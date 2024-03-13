@@ -241,7 +241,7 @@ var SV = (function() {
               document.getElementsByTagName('body')[0].appendChild(removeWitsForm);
               removeFunction = function() {
                 var handsToRemove;
-                handsToRemove = CL.getRemoveWitnessDataFromForm('remove_witnesses_form');
+                handsToRemove = CL.getRemoveWitnessDataFromForm();
                 SV.prepareForOperation();
                 CL.removeWitnesses(handsToRemove, 'set');
                 // clear undo stack so you can't go back to a point with the witnesses still present.
@@ -1467,7 +1467,7 @@ var SV = (function() {
      * also some functions and tests for behaviours are included in here
      **/
     _redipsInitSV: function() {
-      let sourceCol, targetCol, sourceRow, targetRow, errorMess, scrollOffset, width, isSpace;
+      let sourceCol, targetCol, targetRow, errorMess, scrollOffset, width, isSpace;
       const rd = REDIPS.drag;
       rd.init();
       rd.event.clicked = function() {
@@ -1516,10 +1516,8 @@ var SV = (function() {
               sourceCol = parseInt(rd.td.source.id.substring(rd.td.source.id.indexOf('_') + 1));
               targetCol = parseInt(rd.td.target.id.substring(rd.td.target.id.indexOf('_') + 1));
               if (sourceCol === targetCol) {
-                sourceRow = rd.td.source.id.substring(0, rd.td.source.id.indexOf('_'));
                 targetRow = rd.td.target.id.substring(0, rd.td.target.id.indexOf('_'));
-                isSpace = OR.canUnitMoveTo(CL.data[_selectedVariantUnits[0][1]][_selectedVariantUnits[0][0]]._id,
-                                          sourceRow, targetRow);
+                isSpace = OR.canUnitMoveTo(CL.data[_selectedVariantUnits[0][1]][_selectedVariantUnits[0][0]]._id, targetRow);
                 if (isSpace) {
                   // move it to the target row or combine if there are two
                   SV._moveOverlapping(_selectedVariantUnits[0], targetRow);
