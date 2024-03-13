@@ -765,7 +765,7 @@ var RG = (function() {
       // set the data values
       options.data.rules = rules;
       options.data.unit_data = collationData;
-      //data settings
+      // data settings
       const dataSettings = {};
       dataSettings.base_text = CL.dataSettings.base_text;
       dataSettings.base_text_siglum = CL.dataSettings.base_text_siglum;
@@ -775,7 +775,7 @@ var RG = (function() {
   
       const displaySettings = {};
       for (const setting in CL.displaySettings) {
-        if (Object.prototype.hasOwnProperty.call(CL.displaySetting, setting)) {
+        if (Object.prototype.hasOwnProperty.call(CL.displaySettings, setting)) {
           if (CL.displaySettings[setting] === true) {
             displaySettings[setting] = CL.displaySettings[setting];
           }
