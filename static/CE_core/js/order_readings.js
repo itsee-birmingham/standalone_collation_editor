@@ -1548,7 +1548,11 @@ var OR = (function() {
           } else {
             reading.join_backwards = true;
           }
+          const scrollOffset = [document.getElementById('scroller').scrollLeft,
+                                document.getElementById('scroller').scrollTop];
           OR.showOrderReadings({'container': CL.container});
+          document.getElementById('scroller').scrollLeft = scrollOffset[0];
+          document.getElementById('scroller').scrollTop = scrollOffset[1];
         });
         $('#backwards_join').on('mouseover.bj_mo', function() {
           CL.hideTooltip();
@@ -1567,7 +1571,11 @@ var OR = (function() {
           } else {
             reading.join_forwards = true;
           }
+          const scrollOffset = [document.getElementById('scroller').scrollLeft,
+                                document.getElementById('scroller').scrollTop];
           OR.showOrderReadings({'container': CL.container});
+          document.getElementById('scroller').scrollLeft = scrollOffset[0];
+          document.getElementById('scroller').scrollTop = scrollOffset[1];
         });
         $('#forwards_join').on('mouseover.fj_mo', function() {
           CL.hideTooltip();
