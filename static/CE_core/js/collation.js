@@ -4013,7 +4013,7 @@ var CL = (function() {
               }
               newUnit.added = true;
               mainCollation.structure.apparatus.push(newUnit);
-              mainCollation.structure.apparatus.sort(SV._compareFirstWordIndexes);
+              mainCollation.structure.apparatus.sort(SV.compareFirstWordIndexes);
               before = null;
               after = null;
               for (let i = 0; i < mainCollation.structure.apparatus.length; i += 1) {
@@ -4083,7 +4083,7 @@ var CL = (function() {
                     "first_word_index": existingUnit.first_word_index,
                     "end": unit2.end
                   };
-                  unit1 = SV._combineReadings(unit1.readings, unit2.readings, tempUnit, false);
+                  unit1 = SV.combineReadings(unit1.readings, unit2.readings, tempUnit, false);
                 }
                 for (let j = 0; j < unit1.readings.length; j += 1) {
                   matchingReadingFound = false;

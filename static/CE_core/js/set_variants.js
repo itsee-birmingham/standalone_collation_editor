@@ -1086,8 +1086,7 @@ var SV = (function() {
       }
     },
 
-    // TODO: make properly public if necessary
-    _compareFirstWordIndexes: function(a, b) {
+    compareFirstWordIndexes: function(a, b) {
       let aMain, bMain, aSub, bSub;
       if (typeof a.first_word_index === 'undefined' || typeof b.first_word_index === 'undefined') {
         return 0;
@@ -1121,10 +1120,9 @@ var SV = (function() {
       return 0;
     },
 
-    // TODO: make public if necessary
     // keep combined_gap_before_subreadings
     /** used when moving readings and combining units to figure out all the reading combinations */
-    _combineReadings: function(readings1, readings2, newunit, moveReading) {
+    combineReadings: function(readings1, readings2, newunit, moveReading) {
       let read1, read2, witness, text, newRdg;
       const newReadings = {};
       // this section builds a dictionary with reading index numbers (for empty readings) or the text with indication
@@ -1143,7 +1141,6 @@ var SV = (function() {
               read2 = null;
             }
           }
-
           // need to make a fake new reading in order to extract the text
           newRdg = {
             'text': SV._orderUnitText(readings1, readings2, [read1, read2], witness)
@@ -1152,7 +1149,6 @@ var SV = (function() {
             'witness': witness,
             'reading_type': 'mainreading'
           });
-
           if (Object.prototype.hasOwnProperty.call(readings1[read1], 'overlap_status')) {
             text = text + '_' + readings1[read1].overlap_status;
           }
@@ -1217,13 +1213,6 @@ var SV = (function() {
       return newunit;
     },
 
-
-
-
-
-
-
-
     _setUpSVRemoveWitnessesForm: function(wits, data) {
       document.getElementById('remove_witnesses_div').style.left = document.getElementById('scroller').offsetWidth -
                                                 document.getElementById('remove_witnesses_div').offsetWidth - 15 + 'px';
@@ -1264,7 +1253,6 @@ var SV = (function() {
       const allComplete = SV.areAllUnitsComplete();
       const allInOrder = SV._checkAllWitnessesIntegrity();
       const standoffProblems = SV.checkStandoffReadingProblems();
-  
       if (allComplete && allInOrder && !standoffProblems[0]) {
         extraResults = CL.applyPreStageChecks('order_readings');
         if (extraResults[0] === true) {
@@ -1911,11 +1899,11 @@ var SV = (function() {
           SV.separateOverlapWitnesses(unitNum, targetLocation);
         }
         // sort the result
-        CL.data.apparatus.sort(SV._compareFirstWordIndexes);
+        CL.data.apparatus.sort(SV.compareFirstWordIndexes);
         // reindex the moved unit
         SV.reindexUnit(targetLocation);
         // sort it again (this needs to be two stages to preserve word order)
-        CL.data.apparatus.sort(SV._compareFirstWordIndexes);
+        CL.data.apparatus.sort(SV.compareFirstWordIndexes);
         SV.unprepareForOperation();
         SV.checkBugStatus('move', 'unit ' + unitNum + ' to index ' + targetLocation + ' in apparatus.');
         problems = SV._checkWordOrderIntegrity(originalLocation, targetLocation);
@@ -2142,7 +2130,7 @@ var SV = (function() {
           // stick it on the end then sort
           CL.data.apparatus.push(newunit);
           //sort the apparatus
-          CL.data.apparatus.sort(SV._compareFirstWordIndexes);
+          CL.data.apparatus.sort(SV.compareFirstWordIndexes);
           // reindex the moved unit - this works because target location actually becomes start index in the function
           SV.reindexUnit(targetLocation);
           newUnitPos = CL.findUnitPosById('apparatus', newUnitId);
@@ -2160,7 +2148,7 @@ var SV = (function() {
           CL.data.apparatus = CL.removeNullItems(CL.data.apparatus);
           // sort the apparatus again - it is important to do this twice (before and after reindexing)
           // but the reason eludes me just now
-          CL.data.apparatus.sort(SV._compareFirstWordIndexes);
+          CL.data.apparatus.sort(SV.compareFirstWordIndexes);
           SV.unprepareForOperation();
           SV.checkBugStatus('move', 'reading ' + readingPos + ' with witnesses ' + witnesses.join(', ') + ' from unit ' +
                             unitNum + ' to index ' + targetLocation + ' in apparatus.');
@@ -2441,7 +2429,7 @@ var SV = (function() {
             }
           }
         }
-        newunit = SV._combineReadings(unit1.readings, unit2.readings, newunit, false);
+        newunit = SV.combineReadings(unit1.readings, unit2.readings, newunit, false);
         if (keepId === true) {
           newunit._id = unit1._id;
         } else {
@@ -2991,7 +2979,7 @@ var SV = (function() {
 
           SV.unsplitUnitWitnesses(units[1][0], appId);
           // merge reading into target unit
-          unit1 = SV._combineReadings(unit1.readings, reading, unit1, true);
+          unit1 = SV.combineReadings(unit1.readings, reading, unit1, true);
 
           if (unit1.start === unit1.end) {
             SV.reindexUnit(unit1.start);
@@ -3653,7 +3641,7 @@ var SV = (function() {
         }
       }
       // now sort them by start index and then by index of first item in text
-      CL.data[appId].sort(SV._compareFirstWordIndexes);
+      CL.data[appId].sort(SV.compareFirstWordIndexes);
       SV._tidyUnits(appId);
       SV.unprepareForOperation();
       SV.showSetVariantsData();
@@ -3974,7 +3962,7 @@ var SV = (function() {
       CL.data.apparatus[unitNum].overlap_units[olId] = CL.getAllReadingWitnesses(reading);
       if (Object.prototype.hasOwnProperty.call(CL.data, 'apparatus' + newunit.row)) {
         CL.data['apparatus' + newunit.row].push(newunit);
-        CL.data['apparatus' + newunit.row].sort(SV._compareFirstWordIndexes);
+        CL.data['apparatus' + newunit.row].sort(SV.compareFirstWordIndexes);
       } else {
         CL.data['apparatus' + newunit.row] = [newunit];
       }
@@ -3994,7 +3982,7 @@ var SV = (function() {
       const unit = CL.data[unitDetails[1]][unitDetails[0]];
       unit.row = parseInt(targetRow);
       CL.data['apparatus' + targetRow].push(unit);
-      CL.data['apparatus' + targetRow].sort(SV._compareFirstWordIndexes);
+      CL.data['apparatus' + targetRow].sort(SV.compareFirstWordIndexes);
       CL.data[unitDetails[1]].splice(unitDetails[0], 1);
       SV.checkBugStatus('move overlapping unit', unitDetails[0] + ' from ' + unitDetails[1] + ' to ' + targetRow + '.');
       SV.showSetVariantsData();
