@@ -2425,7 +2425,6 @@ var CL = (function() {
         $('#remove_selected_button').on('click', removeFunction);
       } else {
         $('#remove_selected_button').on('click', function() {
-          handsToRemove;
           const handsToRemove = CL.getRemoveWitnessDataFromForm();
           CL.removeWitnesses(handsToRemove, stage);
           CL.isDirty = true;
