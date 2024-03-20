@@ -108,7 +108,8 @@ class Exporter(object):
         """Function to get the text of the lemma within the specified range in the overtext.
 
         Args:
-            overtext (JSON): The JSON segment representing the overtext.
+            overtext (JSON): The JSON segment representing the overtext for this unit. The data should be wrapped in a 
+                             dictionary as the value to the key 'current' eg. {'current': [{'id': 'basetext', 'tokens': []}]}
             start (int): The start index for the current lemma required.
             end (int): The end index for the current lemma required.
 
@@ -122,7 +123,7 @@ class Exporter(object):
         real_end = int(end/2)-1
         if real_start < 0:
             real_start = 0
-        required_text = overtext['tokens'][real_start:real_end+1]
+        required_text = overtext['current']['tokens'][real_start:real_end+1]
         words = []
         for token in required_text:
             word = []
@@ -278,7 +279,8 @@ class Exporter(object):
 
         Args:
             apparatus (JSON): The JSON segment representing the apparatus for this unit.
-            overtext (JSON): The JSON segment representing the overtext for this unit.
+            overtext (JSON): The JSON segment representing the overtext for this unit. The data should be wrapped in a 
+                             dictionary as the value to the key 'current' eg. {'current': [{'id': 'basetext', 'tokens': []}]}
             context (str): The reference for this apparatus unit context.
             missing (list): The list of witnesses to exclude from this apparatus.
 
@@ -292,7 +294,7 @@ class Exporter(object):
             display_end = self.get_required_end(unit, context)
             app = etree.fromstring('<app type="main" n="%s" from="%s" to="%s"></app>' % (context, start, display_end))
             lem = etree.Element('lem')
-            lem.set('wit', overtext['id'])
+            lem.set('wit', overtext['current']['id'])
             text = self.get_lemma_text(overtext, int(start), int(end))
             lem.text = text[0]
             if len(text) > 1:
@@ -350,6 +352,9 @@ class Exporter(object):
             if readings:
                 app_list.append(app)
         return app_list
+    
+    def get_overtext_data(self, structure):
+        return {'current': structure['overtext'][0]}
 
     def get_unit_xml(self, entry):
         """Function to turn the JSON apparatus of the collation unit into TEI XML.
@@ -422,7 +427,9 @@ class Exporter(object):
         # this sort will change the order of the overlap units so shortest starting at each index point comes first
         apparatus = sorted(apparatus, key=lambda d: (d['start'], d['end']))
 
-        app_units = self.get_app_units(apparatus, entry['structure']['overtext'][0], context, missing)
+        overtext = self.get_overtext_data(entry['structure'])
+
+        app_units = self.get_app_units(apparatus, overtext, context, missing)
         for app in app_units:
             vtree.append(app)
 

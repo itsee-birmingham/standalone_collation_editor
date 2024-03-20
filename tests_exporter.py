@@ -725,7 +725,7 @@ class ExporterUnitTests(TestCase):
 
     def test_get_lemma_text_defaults(self):
         exp = Exporter()
-        overtext = self.OVERTEXT[0]
+        overtext = {'current': self.OVERTEXT[0]}
 
         # test a few ranges where there is data
         expected_text = ['ἀποκαλύψαι τὸν υἱὸν']
@@ -755,7 +755,7 @@ class ExporterUnitTests(TestCase):
 
     def test_get_lemma_text_with_punctuation(self):
         exp = Exporter(include_punctuation=True)
-        overtext = self.OVERTEXT[0]
+        overtext = {'current': self.OVERTEXT[0]}
 
         expected_text = ['ἔθνεσιν,']
         generated_text = exp.get_lemma_text(overtext, 24, 24)
@@ -1038,7 +1038,7 @@ class ExporterUnitTests(TestCase):
                                            etree.fromstring('<rdg n="b" varSeq="2" wit="6 7">addition<wit>'
                                                             '<idno>6</idno><idno>7</idno></wit></rdg>')]
         context = 'Gal.1.1'
-        overtext = {'id': 'basetext'}
+        overtext = {'current': {'id': 'basetext'}}
         # give it just enough to control the loops and stop calls breaking (data seems to be needed even though they
         # are mocked)
         apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'}, {'label': 'b'}]},
@@ -1103,7 +1103,7 @@ class ExporterUnitTests(TestCase):
                                            etree.fromstring('<rdg type="subreading" cause="orthographic" n="bo" '
                                                             'varSeq="3" wit="8">mie lema<wit><idno>8</idno></wit></rdg>')]  # NoQA
         context = 'Gal.1.1'
-        overtext = {'id': 'basetext'}
+        overtext = {'current': {'id': 'basetext'}}
         apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'},
                      {'label': 'b', 'subreadings': {'orthographic': [{'label': 'b', 'suffix': ''}]}}]}]
         missing = []
@@ -1156,7 +1156,7 @@ class ExporterUnitTests(TestCase):
                                            etree.fromstring('<rdg n="b" varSeq="2" wit="6 7">addition<wit>'
                                                             '<idno>6</idno><idno>7</idno></wit></rdg>')]
         context = 'Gal.1.1'
-        overtext = {'id': 'basetext'}
+        overtext = {'current': {'id': 'basetext'}}
         # give it just enough to control the loops and stop calls breaking (data seems to be needed even though they
         # are mocked)
         apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'}, {'label': 'b'}]},
@@ -1218,7 +1218,7 @@ class ExporterUnitTests(TestCase):
                                                             'varSeq="3" wit="8">mie lema<wit><idno>8</idno>'
                                                             '</wit></rdg>')]
         context = 'Gal.1.1'
-        overtext = {'id': 'basetext'}
+        overtext = {'current': {'id': 'basetext'}}
         apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'},
                                                          {'label': 'b',
                                                           'subreadings': {'orthographic': [{'label': 'b',
@@ -1276,7 +1276,7 @@ class ExporterUnitTests(TestCase):
                         '<app type="main" n="Gal.1.1" from="2" to="8" /><app type="main" n="Gal.1.1" from="2" to="4" />'
                         '<app type="main" n="Gal.1.1" from="6" to="8" /></ab>')
         xml = exp.get_unit_xml(app)
-        mocked_get_app_units.assert_called_with([], {'id': 'basetext'}, 'Gal.1.1', expected_missing)
+        mocked_get_app_units.assert_called_with([], {'current': {'id': 'basetext'}}, 'Gal.1.1', expected_missing)
         self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
 
     @patch('collation.core.exporter.Exporter.get_app_units')
@@ -1299,7 +1299,7 @@ class ExporterUnitTests(TestCase):
                         '<app type="main" n="Gal.1.1" from="2" to="8" /><app type="main" n="Gal.1.1" from="2" to="4" />'
                         '<app type="main" n="Gal.1.1" from="6" to="8" /></ab>')
         xml = exp.get_unit_xml(app)
-        mocked_get_app_units.assert_called_with([], {'id': 'basetext'}, 'Gal.1.1', expected_missing)
+        mocked_get_app_units.assert_called_with([], {'current': {'id': 'basetext'}}, 'Gal.1.1', expected_missing)
         self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
 
     @patch('collation.core.exporter.Exporter.get_app_units')
@@ -1322,7 +1322,7 @@ class ExporterUnitTests(TestCase):
                         '<app type="main" n="Gal.1.1" from="2" to="8" /><app type="main" n="Gal.1.1" from="2" to="4" />'
                         '<app type="main" n="Gal.1.1" from="6" to="8" /></ab>')
         xml = exp.get_unit_xml(app)
-        mocked_get_app_units.assert_called_with([], {'id': 'basetext'}, 'Gal.1.1', expected_missing)
+        mocked_get_app_units.assert_called_with([], {'current': {'id': 'basetext'}}, 'Gal.1.1', expected_missing)
         self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
 
     @patch('collation.core.exporter.Exporter.get_app_units')
@@ -1344,7 +1344,7 @@ class ExporterUnitTests(TestCase):
                         '<app type="main" n="Gal.1.1" from="2" to="4" />'
                         '<app type="main" n="Gal.1.1" from="6" to="8" /></ab>')
         xml = exp.get_unit_xml(app)
-        mocked_get_app_units.assert_called_with([], {'id': 'basetext'}, 'Gal.1.1', expected_missing)
+        mocked_get_app_units.assert_called_with([], {'current': {'id': 'basetext'}}, 'Gal.1.1', expected_missing)
         self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
 
     @patch('collation.core.exporter.Exporter.get_app_units')
@@ -1362,7 +1362,7 @@ class ExporterUnitTests(TestCase):
         # no point testing export just test the call is correct
         expected_missing = ['basetext']
         exp.get_unit_xml(app)
-        mocked_get_app_units.assert_called_with([], {'id': 'basetext'}, 'Gal.1.1', expected_missing)
+        mocked_get_app_units.assert_called_with([], {'current': {'id': 'basetext'}}, 'Gal.1.1', expected_missing)
 
     @patch('collation.core.exporter.Exporter.get_app_units')
     def test_get_unit_xml_unit_sorting(self, mocked_get_app_units):
@@ -1386,7 +1386,7 @@ class ExporterUnitTests(TestCase):
                         }
         exp = Exporter()
         exp.get_unit_xml(original_app)
-        mocked_get_app_units.assert_called_with(expected_ordered_units, {'id': 'basetext'}, 'Gal.1.1', [])
+        mocked_get_app_units.assert_called_with(expected_ordered_units, {'current': {'id': 'basetext'}}, 'Gal.1.1', [])
 
     # test units from all app lines are included
     @patch('collation.core.exporter.Exporter.get_app_units')
@@ -1405,7 +1405,7 @@ class ExporterUnitTests(TestCase):
         exp = Exporter()
         expected_app_order = [{'start': 2, 'end': 4}, {'start': 2, 'end': 8}, {'start': 9, 'end': 9}]
         exp.get_unit_xml(app)
-        mocked_get_app_units.assert_called_with(expected_app_order, {'id': 'basetext'}, 'Gal.1.1', [])
+        mocked_get_app_units.assert_called_with(expected_app_order, {'current': {'id': 'basetext'}}, 'Gal.1.1', [])
 
     @patch('collation.core.exporter.Exporter.get_unit_xml')
     def test_export_data(self, mocked_get_unit_xml):

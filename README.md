@@ -17,7 +17,7 @@ Acknowledgements
 
 The software was created by Catherine Smith at the Institute for Textual Scholarship and Electronic Editing (ITSEE) in
 the University of Birmingham. The restructuring required for the 1.0 release was completed by Catherine Smith and Troy
-A. Griffitts.  The software was developed for and supported by the following research projects:
+A. Griffitts. The software was developed for and supported by the following research projects:
 
 - The Workspace for Collaborative Editing (AHRC/DFG collaborative project 2010-2013)
 - COMPAUL (funded by the European Union 7th Framework Programme under grant agreement 283302, 2011-2016)
@@ -1452,9 +1452,13 @@ Catena Dev branch changes
 
 * Exported XML apparatus uses the n attribute for the identifier of ```<ab>``` elements rather than xml:id. The value of the attribute remains unchanged.
 
+* In exprter.py the order of overlapped units in relation to top line units has changed. The shortest unit starting at each index point now comes first (previously the the longest unit came first).
+
 * In exporter.py ```get_text()``` when om and lac are returned their string value is always returned with the full stop eg. ```om.``` 
 
 * In exporter.py there is a new function ```get_required_end()```. This is irrelevant in this particular exporter but is important in exporters which build on this one and which are required to make joins across collation unit boundaries. This function can be overwritten in inheriting exporters to allow the correct data for the end of the unit to be set in the XML.
+
+* In exporter.py there is a small change to the way the ```overtext``` argument passed into ```get_app_units()``` is structured. it is now calculated in the ```get_overtext_data()``` function. The new structure puts the older overtext data in a dictionary as the value for the key 'current'. The change has been made to allow for readings to be joined over collation unit boundaries. The core code does not support joining over collation unit boundaries but exporters which inherit from exporter.py may want to use this new function. If this function is being overridden in inheriting exporters then the ```get_lemma_text()``` function must also be updated for the structure produced by ```get_overtext_data()```.
 
 * A very small change to the way pre-stage checks are implemented. If no message is provided in the configuration then no alert will be displayed, the result of the check will still be followed so if a test fails the unit will not progress to the next stage. This was done so that confirm boxes can be used in the code of the check itself to use warnings that can be overridden by the user, in these cases it should be the result of the confirmation which is passed back as the results of the checks.
 
