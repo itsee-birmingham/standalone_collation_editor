@@ -111,13 +111,15 @@ class Exporter(object):
             overtext (JSON): The JSON segment representing the overtext for this unit. The data should be wrapped in a
                              dictionary as the value to the key 'current'
                              eg. {'current': [{'id': 'basetext', 'tokens': []}]}
-            start (int): The start index for the current lemma required.
-            end (int): The end index for the current lemma required.
+            start (str): The start index for the current lemma required.
+            end (str): The end index for the current lemma required.
 
         Returns:
             list: A list of up to two items, the first is the string representing the overtext for this range,
                 the optional second item is the string 'om' if the first item is an empty string.
         """
+        start = int(start)
+        end = int(end)
         if start == end and start % 2 == 1:
             return ['', 'om']
         real_start = int(start/2)-1
@@ -268,6 +270,7 @@ class Exporter(object):
 
         Args:
             unit (JSON): The current apparatus unit being processed.
+            context (str): The context of this collation unit (used in inheriting classes to recognise joined readings)
 
         Returns:
             string: The string to use for the end value in the apparatus <app> tag.
@@ -292,12 +295,11 @@ class Exporter(object):
         app_list = []
         for unit in apparatus:
             start = unit['start']
-            end = unit['end']
-            display_end = self.get_required_end(unit, context)
-            app = etree.fromstring('<app type="main" n="%s" from="%s" to="%s"></app>' % (context, start, display_end))
+            end = self.get_required_end(unit, context)
+            app = etree.fromstring('<app type="main" n="%s" from="%s" to="%s"></app>' % (context, start, end))
             lem = etree.Element('lem')
             lem.set('wit', overtext['current']['id'])
-            text = self.get_lemma_text(overtext, int(start), int(end))
+            text = self.get_lemma_text(overtext, start, end)
             lem.text = text[0]
             if len(text) > 1:
                 lem.set('type', text[1])
