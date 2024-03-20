@@ -1374,8 +1374,8 @@ class ExporterUnitTests(TestCase):
                                   {'start': 2, 'end': 4},
                                   {'start': 9, 'end': 9},
                                   {'start': 2, 'end': 8}]
-        expected_ordered_units = [{'start': 2, 'end': 8},
-                                  {'start': 2, 'end': 4},
+        expected_ordered_units = [{'start': 2, 'end': 4},
+                                  {'start': 2, 'end': 8},
                                   {'start': 6, 'end': 8},
                                   {'start': 9, 'end': 9}]
         original_app = {'context': 'Gal.1.1',
@@ -1403,7 +1403,7 @@ class ExporterUnitTests(TestCase):
                              'om_readings': []}
                }
         exp = Exporter()
-        expected_app_order = [{'start': 2, 'end': 8}, {'start': 2, 'end': 4}, {'start': 9, 'end': 9}]
+        expected_app_order = [{'start': 2, 'end': 4}, {'start': 2, 'end': 8}, {'start': 9, 'end': 9}]
         exp.get_unit_xml(app)
         mocked_get_app_units.assert_called_with(expected_app_order, {'id': 'basetext'}, 'Gal.1.1', [])
 

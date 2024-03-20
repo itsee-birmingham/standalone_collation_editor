@@ -419,8 +419,8 @@ class Exporter(object):
         # if we are ignoring the basetext add it to our missing list so it isn't listed (except in lemma)
         if self.ignore_basetext:
             missing.append(basetext_siglum)
-        # this sort will change the order of the overlap units so longest starting at each index point comes first
-        apparatus = sorted(apparatus, key=lambda d: (d['start'], -d['end']))
+        # this sort will change the order of the overlap units so shortest starting at each index point comes first
+        apparatus = sorted(apparatus, key=lambda d: (d['start'], d['end']))
 
         app_units = self.get_app_units(apparatus, entry['structure']['overtext'][0], context, missing)
         for app in app_units:
