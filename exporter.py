@@ -108,8 +108,9 @@ class Exporter(object):
         """Function to get the text of the lemma within the specified range in the overtext.
 
         Args:
-            overtext (JSON): The JSON segment representing the overtext for this unit. The data should be wrapped in a 
-                             dictionary as the value to the key 'current' eg. {'current': [{'id': 'basetext', 'tokens': []}]}
+            overtext (JSON): The JSON segment representing the overtext for this unit. The data should be wrapped in a
+                             dictionary as the value to the key 'current'
+                             eg. {'current': [{'id': 'basetext', 'tokens': []}]}
             start (int): The start index for the current lemma required.
             end (int): The end index for the current lemma required.
 
@@ -279,8 +280,9 @@ class Exporter(object):
 
         Args:
             apparatus (JSON): The JSON segment representing the apparatus for this unit.
-            overtext (JSON): The JSON segment representing the overtext for this unit. The data should be wrapped in a 
-                             dictionary as the value to the key 'current' eg. {'current': [{'id': 'basetext', 'tokens': []}]}
+            overtext (JSON): The JSON segment representing the overtext for this unit. The data should be wrapped in a
+                             dictionary as the value to the key 'current'
+                             eg. {'current': [{'id': 'basetext', 'tokens': []}]}
             context (str): The reference for this apparatus unit context.
             missing (list): The list of witnesses to exclude from this apparatus.
 
@@ -352,7 +354,7 @@ class Exporter(object):
             if readings:
                 app_list.append(app)
         return app_list
-    
+
     def get_overtext_data(self, structure):
         return {'current': structure['overtext'][0]}
 
