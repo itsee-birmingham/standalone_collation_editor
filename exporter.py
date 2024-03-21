@@ -357,8 +357,11 @@ class Exporter(object):
                 app_list.append(app)
         return app_list
 
-    def get_overtext_data(self, structure):
-        return {'current': structure['overtext'][0]}
+    def get_overtext_data(self, entry):
+        return {'current': entry['structure']['overtext'][0]}
+
+    def sort_units(self, unit):
+        return (unit['start'], -unit['end'])
 
     def get_unit_xml(self, entry):
         """Function to turn the JSON apparatus of the collation unit into TEI XML.
@@ -428,10 +431,8 @@ class Exporter(object):
         # if we are ignoring the basetext add it to our missing list so it isn't listed (except in lemma)
         if self.ignore_basetext:
             missing.append(basetext_siglum)
-        # this sort will change the order of the overlap units so shortest starting at each index point comes first
-        apparatus = sorted(apparatus, key=lambda d: (d['start'], d['end']))
-
-        overtext = self.get_overtext_data(entry['structure'])
+        apparatus = sorted(apparatus, key=self.sort_units)
+        overtext = self.get_overtext_data(entry)
 
         app_units = self.get_app_units(apparatus, overtext, context, missing)
         for app in app_units:

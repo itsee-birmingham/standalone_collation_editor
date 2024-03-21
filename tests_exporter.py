@@ -729,28 +729,28 @@ class ExporterUnitTests(TestCase):
 
         # test a few ranges where there is data
         expected_text = ['ἀποκαλύψαι τὸν υἱὸν']
-        generated_text = exp.get_lemma_text(overtext, 2, 6)
+        generated_text = exp.get_lemma_text(overtext, '2', '6')
         self.assertEqual(expected_text, generated_text)
 
         expected_text = ['ἐν']
-        generated_text = exp.get_lemma_text(overtext, 10, 10)
+        generated_text = exp.get_lemma_text(overtext, '10', '10')
         self.assertEqual(expected_text, generated_text)
 
         expected_text = ['ἀποκαλύψαι']
-        generated_text = exp.get_lemma_text(overtext, 1, 3)
+        generated_text = exp.get_lemma_text(overtext, '1', '3')
         self.assertEqual(expected_text, generated_text)
 
         expected_text = ['ἔθνεσιν']
-        generated_text = exp.get_lemma_text(overtext, 24, 24)
+        generated_text = exp.get_lemma_text(overtext, '24', '24')
         self.assertEqual(expected_text, generated_text)
 
         # test where there is no data
         expected_text = ['', 'om']
-        generated_text = exp.get_lemma_text(overtext, 27, 27)
+        generated_text = exp.get_lemma_text(overtext, '27', '27')
         self.assertEqual(expected_text, generated_text)
 
         expected_text = ['', 'om']
-        generated_text = exp.get_lemma_text(overtext, 1, 1)
+        generated_text = exp.get_lemma_text(overtext, '1', '1')
         self.assertEqual(expected_text, generated_text)
 
     def test_get_lemma_text_with_punctuation(self):
@@ -758,11 +758,11 @@ class ExporterUnitTests(TestCase):
         overtext = {'current': self.OVERTEXT[0]}
 
         expected_text = ['ἔθνεσιν,']
-        generated_text = exp.get_lemma_text(overtext, 24, 24)
+        generated_text = exp.get_lemma_text(overtext, '24', '24')
         self.assertEqual(expected_text, generated_text)
 
         expected_text = ['(ἐν)']
-        generated_text = exp.get_lemma_text(overtext, 10, 10)
+        generated_text = exp.get_lemma_text(overtext, '10', '10')
         self.assertEqual(expected_text, generated_text)
 
     def test_get_witnesses(self):
@@ -1374,8 +1374,8 @@ class ExporterUnitTests(TestCase):
                                   {'start': 2, 'end': 4},
                                   {'start': 9, 'end': 9},
                                   {'start': 2, 'end': 8}]
-        expected_ordered_units = [{'start': 2, 'end': 4},
-                                  {'start': 2, 'end': 8},
+        expected_ordered_units = [{'start': 2, 'end': 8},
+                                  {'start': 2, 'end': 4},       
                                   {'start': 6, 'end': 8},
                                   {'start': 9, 'end': 9}]
         original_app = {'context': 'Gal.1.1',
@@ -1403,7 +1403,7 @@ class ExporterUnitTests(TestCase):
                              'om_readings': []}
                }
         exp = Exporter()
-        expected_app_order = [{'start': 2, 'end': 4}, {'start': 2, 'end': 8}, {'start': 9, 'end': 9}]
+        expected_app_order = [{'start': 2, 'end': 8}, {'start': 2, 'end': 4}, {'start': 9, 'end': 9}]
         exp.get_unit_xml(app)
         mocked_get_app_units.assert_called_with(expected_app_order, {'current': {'id': 'basetext'}}, 'Gal.1.1', [])
 
