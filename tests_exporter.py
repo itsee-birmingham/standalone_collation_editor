@@ -1375,7 +1375,7 @@ class ExporterUnitTests(TestCase):
                                   {'start': 9, 'end': 9},
                                   {'start': 2, 'end': 8}]
         expected_ordered_units = [{'start': 2, 'end': 8},
-                                  {'start': 2, 'end': 4},       
+                                  {'start': 2, 'end': 4},
                                   {'start': 6, 'end': 8},
                                   {'start': 9, 'end': 9}]
         original_app = {'context': 'Gal.1.1',
