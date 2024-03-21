@@ -122,6 +122,8 @@ class Exporter(object):
         end = int(end)
         if start == end and start % 2 == 1:
             return ['', 'om']
+        if start % 2 == 1:
+            start += 1
         real_start = int(start/2)-1
         real_end = int(end/2)-1
         if real_start < 0:

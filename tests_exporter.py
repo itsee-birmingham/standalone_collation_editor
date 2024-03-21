@@ -744,6 +744,14 @@ class ExporterUnitTests(TestCase):
         generated_text = exp.get_lemma_text(overtext, '24', '24')
         self.assertEqual(expected_text, generated_text)
 
+        expected_text = ['αὐτοῦ ἐν ἐμοί ἵνα εὐαγγελίζωμαι αὐτὸν ἐν']
+        generated_text = exp.get_lemma_text(overtext, '7', '20')
+        self.assertEqual(expected_text, generated_text)
+
+        expected_text = ['αὐτοῦ ἐν ἐμοί ἵνα εὐαγγελίζωμαι αὐτὸν ἐν']
+        generated_text = exp.get_lemma_text(overtext, '8', '21')
+        self.assertEqual(expected_text, generated_text)
+
         # test where there is no data
         expected_text = ['', 'om']
         generated_text = exp.get_lemma_text(overtext, '27', '27')
