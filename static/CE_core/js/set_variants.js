@@ -340,7 +340,6 @@ var SV = (function() {
       options.overlap_details = {};  // get rid of the one from the last apparatus
       // copy the originalColumnLengths data so we can use to calculate gapAfter accurately
       const originalColumnLengths = JSON.parse(JSON.stringify(options.column_lengths));
-  
       for (let i = 0; i < app.length; i += 1) {
         id = app[i]._id;
         // first find real start value
@@ -2372,6 +2371,7 @@ var SV = (function() {
       const witnessEquality = SV._checkWitnessEquality(unit1, unit2, appId);
       const overlapBoundaries = SV._checkOverlapBoundaries(unit1, unit2, appId);
       const overlapStatusAgreement = SV._checkOverlapStatusAgreement(unit1, unit2, appId);
+      SV._addToUndoStack(CL.data);
       if (witnessEquality && overlapBoundaries && overlapStatusAgreement) {
         if (keepId === true) {
           // combine the reference ids in the top apparatus
@@ -2401,7 +2401,6 @@ var SV = (function() {
                                                    unit2.readings[i].combined_gap_after_subreadings);
           }
         }
-        SV._addToUndoStack(CL.data);
         // make a new unit
         newunit = {};
         newunit.start = Math.min(unit1.start, unit2.start);
