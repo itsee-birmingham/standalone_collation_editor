@@ -584,14 +584,28 @@ class ExporterUnitTests(TestCase):
 
     def test_get_text_default_settings(self):
         exp = Exporter()
-        reading = self.BASE_UNIT['readings'][0]
+        reading = {'_id': 'abc',
+                   'text': [{'interface': 'υιον'},
+                            {'interface': 'αυτου'}],
+                   'label': 'a',
+                   'text_string': 'υιον αυτου',
+                   'subreadings': {
+                       'abbreviation': [{'text_string': 'υν αυτου',
+                                         'text': []}]}}
         expected_text = ['υιον αυτου']
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
 
     def test_get_text_default_settings_older_format(self):
         exp = Exporter()
-        reading = self.BASE_UNIT['readings'][0]
+        reading = {'_id': 'abc',
+                   'text': [{'interface': 'υιον'},
+                            {'interface': 'αυτου'}],
+                   'label': 'a',
+                   'text_string': 'υιον αυτου',
+                   'subreadings': {
+                       'abbreviation': [{'text_string': 'υν αυτου',
+                                         'text': []}]}}
         # change the data to the older format
         del reading['text_string']
         expected_text = ['υιον αυτου']
@@ -600,9 +614,16 @@ class ExporterUnitTests(TestCase):
 
     def test_get_text_default_settings_subreading(self):
         exp = Exporter()
-        reading = self.BASE_UNIT['readings'][0]['subreadings']['abbreviation'][0]
+        reading = {'_id': 'abc',
+                   'text': [{'interface': 'υιον'},
+                            {'interface': 'αυτου'}],
+                   'label': 'a',
+                   'text_string': 'υιον αυτου',
+                   'subreadings': {
+                       'abbreviation': [{'text_string': 'υν αυτου',
+                                         'text': []}]}}
         expected_text = ['υν αυτου']
-        generated_text = exp.get_text(reading, is_subreading=True)
+        generated_text = exp.get_text(reading['subreadings']['abbreviation'][0], is_subreading=True)
         self.assertEqual(expected_text, generated_text)
 
     def test_get_text_default_settings_om(self):
