@@ -542,6 +542,8 @@ var SR = (function () {
       }
       //target is the reading at the object level where two of the keys are witnesses and text
       target = CL.getSubreadingOfWitness(reading, witness, true);
+      console.log('TARGET')
+      console.log(target)
       if (target === null) {
         target = reading;
       }
@@ -617,6 +619,8 @@ var SR = (function () {
               '&lt;' + subreadings[type][i].text_string + '&gt;' === textString) {
               if (subreadings[type][i].witnesses.indexOf(witness) === -1) {
                 subreadings[type][i].witnesses.push(witness);
+                console.log('subreadings[type][i]')
+                console.log(subreadings[type][i])
                 for (let j = 0; j < subreadings[type][i].text.length; j += 1) {
                   console.log(j)
                   subreadings[type][i].text[j].reading.push(witness);
