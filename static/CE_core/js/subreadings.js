@@ -618,7 +618,9 @@ var SR = (function () {
               if (subreadings[type][i].witnesses.indexOf(witness) === -1) {
                 subreadings[type][i].witnesses.push(witness);
                 for (let j = 0; j < subreadings[type][i].text.length; j += 1) {
+                  console.log(j)
                   subreadings[type][i].text[j].reading.push(witness);
+                  console.log(JSON.parse(JSON.stringify(target.text)))
                   subreadings[type][i].text[j][witness] = target.text[j][witness];
                   if (Object.prototype.hasOwnProperty.call(options, 'standoff') && options.standoff === true) {
                     subreadings[type][i].text[j][witness]['interface'] = target.text[j]['interface'];
