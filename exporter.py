@@ -275,7 +275,7 @@ class Exporter(object):
             context (str): The context of this collation unit (used in inheriting classes to recognise joined readings)
 
         Returns:
-            string: The string to use for the end value in the apparatus <app> tag.
+            str: The string to use for the end value in the apparatus <app> tag.
         """
         return unit['end']
 
