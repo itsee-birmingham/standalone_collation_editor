@@ -156,7 +156,7 @@ var cforms = (function () {
               if (cforms._hasData(subjson)) {
                 try {
                   json[key.substring(0, key.lastIndexOf('_'))].push(subjson);
-                } catch (err) {
+                } catch {
                   json[key.substring(0, key.lastIndexOf('_'))] = [ subjson ];
                 }
               } else {
