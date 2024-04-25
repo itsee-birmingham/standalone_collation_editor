@@ -100,7 +100,7 @@ var SR = (function () {
                             }
                             // then make the subreading for that witness (you might have to split a reading)
                             subreadings = SR._addToSubreadings(subreadings, child, markedReading.witness,
-                              markedReading.value.split('|'), options);
+                                                               markedReading.value.split('|'), options);
                             if (SR._witnessIn(subreadings, markedReading.witness)) {
                               parent.subreadings = subreadings;
                               forDeletion.push([markedReading.witness, child]);
@@ -542,8 +542,6 @@ var SR = (function () {
       }
       //target is the reading at the object level where two of the keys are witnesses and text
       target = CL.getSubreadingOfWitness(reading, witness, true);
-      // console.log('TARGET')
-      // console.log(target)
       if (target === null) {
         target = reading;
       }
@@ -619,15 +617,19 @@ var SR = (function () {
               '&lt;' + subreadings[type][i].text_string + '&gt;' === textString) {
               if (subreadings[type][i].witnesses.indexOf(witness) === -1) {
                 subreadings[type][i].witnesses.push(witness);
-                // console.log('subreadings[type][i]')
-                // console.log(subreadings[type][i])
                 for (let j = 0; j < subreadings[type][i].text.length; j += 1) {
-                  // console.log(j)
                   subreadings[type][i].text[j].reading.push(witness);
-                  // console.log(JSON.parse(JSON.stringify(target.text)))
-                  subreadings[type][i].text[j][witness] = target.text[j][witness];
-                  if (Object.prototype.hasOwnProperty.call(options, 'standoff') && options.standoff === true) {
-                    subreadings[type][i].text[j][witness]['interface'] = target.text[j]['interface'];
+                  // the next if statement stops errors if the target has a different length text list.
+                  // that should only happen if there are stacked regularisations made in SV and the reading 
+                  // is not unique in the subreadings. It was added to fix a but where om was regularised to an extant
+                  // word (with a category not shown in OR) and then that word was regularised to another reading 
+                  // (which is shown in OR). In this case the target had an empty text list but when only displaying
+                  // edition subreadings the text of the first regularisation matched it to an existing subreading.
+                  if (target.text.length > j) {
+                    subreadings[type][i].text[j][witness] = target.text[j][witness];
+                    if (Object.prototype.hasOwnProperty.call(options, 'standoff') && options.standoff === true) {
+                      subreadings[type][i].text[j][witness]['interface'] = target.text[j]['interface'];
+                    }
                   }
                 }
               }
