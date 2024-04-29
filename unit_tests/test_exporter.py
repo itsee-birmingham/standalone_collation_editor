@@ -651,7 +651,7 @@ class ExporterUnitTests(TestCase):
                    "type": "om_verse",
                    "witnesses": ["467", "1959"]
                    }
-        expected_text = ['om.', 'om_verse']
+        expected_text = ['om.', 'om']
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
 
@@ -666,7 +666,7 @@ class ExporterUnitTests(TestCase):
                    "type": "om_verse",
                    "witnesses": ["467", "1959"]
                    }
-        expected_text = ['om unit', 'om_verse']
+        expected_text = ['om unit', 'om']
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
 
@@ -694,7 +694,7 @@ class ExporterUnitTests(TestCase):
                    "type": "lac_verse",
                    "witnesses": ["467", "1959"]
                    }
-        expected_text = ['lac.', 'lac_verse']
+        expected_text = ['lac.', 'lac']
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
 
@@ -709,7 +709,7 @@ class ExporterUnitTests(TestCase):
                    "type": "lac_verse",
                    "witnesses": ["467", "1959"]
                    }
-        expected_text = ['lac unit', 'lac_verse']
+        expected_text = ['lac unit', 'lac']
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
 
@@ -724,7 +724,7 @@ class ExporterUnitTests(TestCase):
                    "type": "lac_verse",
                    "witnesses": ["467", "1959"]
                    }
-        expected_text = ['abbreviated text', 'lac_verse']
+        expected_text = ['abbreviated text', 'lac']
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
 
@@ -733,7 +733,6 @@ class ExporterUnitTests(TestCase):
         reading = {
                 "_id": "e8cfee9e910e487b54542fd6d8953f0c",
                 "text": [],
-                "type": "om",
                 "label": "zu",
                 "suffixes": [""],
                 "witnesses": ["1929*"],
@@ -1039,6 +1038,56 @@ class ExporterUnitTests(TestCase):
         mocked_get_label.assert_called_with(reading_label, False, None, reading)
         mocked_get_text.assert_called_with(reading, False)
         mocked_check_for_suffixed_reading_marker.assert_called_with(['om.', 'om'], None, reading)
+        # check the result
+        self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
+
+    @patch('collation.core.exporter.Exporter.check_for_suffixed_reading_marker')
+    @patch('collation.core.exporter.Exporter.get_text')
+    @patch('collation.core.exporter.Exporter.get_label')
+    def test_make_reading_lac_verse_reading(self,
+                                            mocked_get_label,
+                                            mocked_get_text,
+                                            mocked_check_for_suffixed_reading_marker):
+        mocked_get_label.return_value = 'b'
+        mocked_get_text.return_value = ['lac.', 'lac']
+        mocked_check_for_suffixed_reading_marker.return_value = ['lac.', 'lac']
+        # set required args so they are easier to see in the test
+        reading = None  # we don't actually need one because the functions that use it are mocked
+        index_position = 1
+        reading_label = 'zz'
+        witnesses = ['1838']
+        exp = Exporter()
+        expected_xml = '<rdg n="b" type="lac" varSeq="2" wit="1838">lac.<wit><idno>1838</idno></wit></rdg>'
+        xml = exp.make_reading(reading, index_position, reading_label, witnesses)
+        # check the right things are passed to the mocked functions
+        mocked_get_label.assert_called_with(reading_label, False, None, reading)
+        mocked_get_text.assert_called_with(reading, False)
+        mocked_check_for_suffixed_reading_marker.assert_called_with(['lac.', 'lac'], None, reading)
+        # check the result
+        self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
+
+    @patch('collation.core.exporter.Exporter.check_for_suffixed_reading_marker')
+    @patch('collation.core.exporter.Exporter.get_text')
+    @patch('collation.core.exporter.Exporter.get_label')
+    def test_make_reading_overlapped_verse_reading(self,
+                                                   mocked_get_label,
+                                                   mocked_get_text,
+                                                   mocked_check_for_suffixed_reading_marker):
+        mocked_get_label.return_value = 'b'
+        mocked_get_text.return_value = ['', 'overlapped']
+        mocked_check_for_suffixed_reading_marker.return_value = ['', 'overlapped']
+        # set required args so they are easier to see in the test
+        reading = None  # we don't actually need one because the functions that use it are mocked
+        index_position = 1
+        reading_label = 'zu'
+        witnesses = ['1838']
+        exp = Exporter()
+        expected_xml = '<rdg n="b" type="overlapped" varSeq="2" wit="1838"><wit><idno>1838</idno></wit></rdg>'
+        xml = exp.make_reading(reading, index_position, reading_label, witnesses)
+        # check the right things are passed to the mocked functions
+        mocked_get_label.assert_called_with(reading_label, False, None, reading)
+        mocked_get_text.assert_called_with(reading, False)
+        mocked_check_for_suffixed_reading_marker.assert_called_with(['', 'overlapped'], None, reading)
         # check the result
         self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
 
