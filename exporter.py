@@ -80,7 +80,7 @@ class Exporter(object):
 
         Returns:
             list: A list with at most two items, the first is a string of the text of the reading, the second an
-                optional string representing the text to present in the case of a reading with no text (such as a
+                optional string representing the type of the reading in the case of a reading with no text (such as a
                 lac or om reading).
         """
         if is_subreading is True:
@@ -89,20 +89,19 @@ class Exporter(object):
             if 'text_string' in reading:
                 return [reading['text_string'].replace('&lt;', '<').replace('&gt;', '>')]
             return [' '.join(i['interface'] for i in reading['text'])]
-        else:
-            if 'overlap_status' in reading.keys() and (reading['overlap_status'] in self.overlap_status_to_ignore):
-                text = ['', reading['overlap_status']]
-            elif 'type' in reading.keys() and reading['type'] in ['om_verse', 'om']:
-                if 'details' in reading.keys():
-                    text = [reading['details'], reading['type']]
-                else:
-                    text = ['om.', reading['type']]
-            elif 'type' in reading.keys() and reading['type'] in ['lac_verse', 'lac']:
-                if 'details' in reading.keys():
-                    text = [reading['details'], reading['type']]
-                else:
-                    text = ['lac.', reading['type']]
-        return text
+        if 'overlap_status' in reading.keys():
+            if reading['overlap_status'] in self.overlap_status_to_ignore:
+                return ['', reading['overlap_status']]
+            return [reading['overlap_status'], 'overlapped']
+        if 'type' in reading.keys() and reading['type'] in ['om_verse', 'om']:
+            if 'details' in reading.keys():
+                return [reading['details'], 'om']
+            return ['om.', 'om']
+        if 'type' in reading.keys() and reading['type'] in ['lac_verse', 'lac']:
+            if 'details' in reading.keys():
+                return [reading['details'], 'lac']
+            else:
+                return ['lac.', 'lac']
 
     def get_lemma_text(self, overtext, start, end):
         """Function to get the text of the lemma within the specified range in the overtext.
