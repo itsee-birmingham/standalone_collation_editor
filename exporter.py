@@ -23,8 +23,10 @@ class Exporter(object):
         consolidate_lac_verse (bool, optional): Indicates whether or not witnesses which are lac for the entire
             collation unit are listed once at the start of the apparatus or indicated in each variant unit.
             Defaults to True.
-        include_lemma_when_no_variants (bool, optional): Indicates whether ot not to include the lemma in the export
+        include_lemma_when_no_variants (bool, optional): Indicates whether or not to include the lemma in the export
             if it has no variant readings. Defaults to False.
+        exclude_lemma_entry (bool, optional): Indicates if the lemma entry in the apparatus should be excluded. If the
+            setting is True the apparatus will not have a <lem> tag for each entry. Defaults to False.
         rule_classes (dict, optional): This if the dictionary representing the rule classes used in the current
             editing project. Defaults to {}.
     """
@@ -37,6 +39,7 @@ class Exporter(object):
                  consolidate_om_verse=True,
                  consolidate_lac_verse=True,
                  include_lemma_when_no_variants=False,
+                 exclude_lemma_entry=False,
                  rule_classes={}):
 
         self.format = format
@@ -50,6 +53,7 @@ class Exporter(object):
         self.consolidate_om_verse = consolidate_om_verse
         self.consolidate_lac_verse = consolidate_lac_verse
         self.include_lemma_when_no_variants = include_lemma_when_no_variants
+        self.exclude_lemma_entry = exclude_lemma_entry
         self.rule_classes = rule_classes
 
     def export_data(self, data):
@@ -298,13 +302,14 @@ class Exporter(object):
             start = unit['start']
             end = self.get_required_end(unit, context)
             app = etree.fromstring('<app type="main" n="%s" from="%s" to="%s"></app>' % (context, start, end))
-            lem = etree.Element('lem')
-            lem.set('wit', overtext['current']['id'])
-            text = self.get_lemma_text(overtext, start, end)
-            lem.text = text[0]
-            if len(text) > 1:
-                lem.set('type', text[1])
-            app.append(lem)
+            if self.exclude_lemma_entry is not True:
+                lem = etree.Element('lem')
+                lem.set('wit', overtext['current']['id'])
+                text = self.get_lemma_text(overtext, start, end)
+                lem.text = text[0]
+                if len(text) > 1:
+                    lem.set('type', text[1])
+                app.append(lem)
             readings = False
             if self.include_lemma_when_no_variants:
                 readings = True
