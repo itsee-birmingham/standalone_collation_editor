@@ -4,7 +4,7 @@ import globals from "globals";
 export default [
     js.configs.recommended,
     {
-        ignores: ['static/CE_core/js/*min.js'],
+        ignores: ["**/js/*"],
         languageOptions: {
             ecmaVersion: 2022,
             sourceType: "script",

@@ -28,7 +28,7 @@ jobs:
 
       # install eslint
       - name: Install eslint
-        run: npm i eslint@"<9.0.0"
+        run: npm i eslint
       
       - name: Install plugin
         run: npm i @stylistic/eslint-plugin
