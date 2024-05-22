@@ -326,7 +326,12 @@ class Exporter(object):
                         subtype = None
                         if 'reading_classes' in reading:
                             subtype = ' '.join(reading['reading_classes'])
-                        app.append(self.make_reading(reading, i, reading['label'], wits, subtype=subtype))
+                        try:
+                            app.append(self.make_reading(reading, i, reading['label'], wits, subtype=subtype))
+                        except KeyError:
+                            raise KeyError(f'There is a problem with {context}, {start}-{end}, '
+                                           f'reading {reading["label"]} {", ".join(wits)} '
+                                           f'which is missing a text_string')
                     if 'subreadings' in reading:
                         for key in reading['subreadings']:
                             for subreading in reading['subreadings'][key]:
@@ -347,7 +352,12 @@ class Exporter(object):
                         subtype = None
                         if 'reading_classes' in reading:
                             subtype = ' '.join(reading['reading_classes'])
-                        app.append(self.make_reading(reading, i, reading['label'], wits, subtype=subtype))
+                        try:
+                            app.append(self.make_reading(reading, i, reading['label'], wits, subtype=subtype))
+                        except KeyError:
+                            raise KeyError(f'There is a problem with {context}, {start}-{end}, '
+                                           f'reading {reading["label"]} {", ".join(wits)} '
+                                           f'which is missing a text_string')
                     if 'subreadings' in reading:
                         for key in reading['subreadings']:
                             for subreading in reading['subreadings'][key]:
