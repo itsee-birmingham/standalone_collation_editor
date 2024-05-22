@@ -28,12 +28,12 @@ jobs:
 
       # install eslint
       - name: Install eslint
-        run: npm i eslint
+        run: npm i eslint 
       
       - name: Install plugin
         run: npm i @stylistic/eslint-plugin
 
       # lint the files
       - name: Do the linting
-        run: node_modules/eslint/bin/eslint.js static/CE_core/js/*.js
+        run: node_modules/eslint/bin/eslint.js static/CE_core/js/*.js --ignore-pattern "**/*.min.js"
 
