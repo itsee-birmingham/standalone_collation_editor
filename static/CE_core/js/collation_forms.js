@@ -7,7 +7,8 @@ var cforms = (function () {
       const elems = typeof elemList !== 'undefined' ? elemList : document.getElementById(formId).elements;
       const filteredElems = [];
       for (let i = 0; i < elems.length; i += 1) {
-        if (elems[i].disabled === false && (elems[i].name || $(elems[i]).hasClass('data_group'))) {
+        if (elems[i].disabled === false &&
+              (elems[i].name || $(elems[i]).hasClass('data_group') || $(elems[i]).hasClass('data-group'))) {
           filteredElems.push(elems[i]);
         }
       }
@@ -139,7 +140,7 @@ var cforms = (function () {
       const json = {};
       for (let i = 0; i < elems.length; i += 1) {
         elem = elems[i];
-        if ($(elem).hasClass('data_group')) {
+        if ($(elem).hasClass('data_group') || $(elem).hasClass('data-group')) {
           //construct a list of all elements descending from elem
           subelems = [];
           // j records where we are in the list of elements so we can set i
