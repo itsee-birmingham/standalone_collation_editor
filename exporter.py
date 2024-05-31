@@ -1,5 +1,6 @@
 import re
 import xml.etree.ElementTree as etree
+from .exceptions import MissingSuffixesException
 
 
 class Exporter(object):
@@ -55,30 +56,117 @@ class Exporter(object):
         self.include_lemma_when_no_variants = include_lemma_when_no_variants
         self.exclude_lemma_entry = exclude_lemma_entry
         self.rule_classes = rule_classes
+        # set once in export_data
+        self.overtext_siglum = None
 
     def export_data(self, data):
-        """The main function called by ExporterFactory.
+        """Takes the JSON data from the collation editor process it into TEI XML and returns that as a string.
 
-        This function takes the JSON data from the collation editor process it into TEI XML and returns that as a
-        string.
+        The main function called by ExporterFactory.
 
         Args:
-            data (JSON): The JSON data structure from the collation editor.
+            data (dict): The JSON data structure from the collation editor.
 
         Returns:
             str: A string representing the serialised XML apparatus.
         """
         output = []
-        for unit in data:
-            output.append(etree.tostring(self.get_unit_xml(unit), 'utf-8').decode())
+        self.overtext_siglum = data['structure']['overtext_name']
+        for collation_unit in data:
+
+            output.append(etree.tostring(self.get_unit_xml(collation_unit), 'utf-8').decode())
         return '<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0">{}' \
                '</TEI>'.format('\n'.join(output).replace('<?xml version=\'1.0\' encoding=\'utf-8\'?>', ''))
+
+    def clean_collation_unit(self, collation_unit):
+        """Clean the data and back fill anything missing from older data structures.
+
+        Args:
+            collation_unit (dict): The collation unit structure which has two keys (context, structure) where structure
+            is the JSON that comes out of the collation editor.
+        """
+        structure = collation_unit['structure']
+        # remove the data we don't need (without raising an error if it isn't there)
+        structure.pop('special_categories', None)
+        structure.pop('marked_readings', None)
+        # simplify overtext structure
+        structure['overtext'] = [self.strip_overtext(x) for x in structure['overtext']['tokens']]
+
+        # now do the variant units
+        for key in structure:
+            if 'apparatus' in key:
+                for variant_unit in structure[key]:
+                    try:
+                        self.clean_variant_unit(variant_unit)
+                    except MissingSuffixesException:
+                        raise MissingSuffixesException(f'At least one of the readings in {collation_unit["context"]} '
+                                                       f'is missing the suffixes data. Reapproving this unit will '
+                                                       f'probably fix the problem.')
+
+    def clean_variant_unit(self, variant_unit):
+        # remove what we don't need (without raising an error if it isn't there)
+        variant_unit.pop('first_word_index', None)
+        variant_unit.pop('_id', None)
+        variant_unit.pop('overlap_units', None)
+        for reading in variant_unit['readings']:
+            try:
+                self.clean_reading(reading)
+            except Exception:
+                raise
+
+    def clean_reading(self, reading):
+        # first check that we don't have any unfixable missing data because if we do we may as well stop now
+        if len(reading['witnesses']) > 0 and 'suffixes' not in reading:
+            raise MissingSuffixesException()
+        # now backfill any missing data in the older structures
+        # make the text_string if it doesn't exist
+        if 'text_string' not in reading:
+            reading['text_string'] = [' '.join(i['interface'] for i in reading['text'])]
+        # make the label_suffix and the reading_suffix values if we need them and they don't exist
+        if 'reading_classes' in reading and len(reading['reading_classes']) > 0:
+            if 'label_suffix' not in reading:
+                label_suffixes = []
+                for clss in reading['reading_classes']:
+                    for rule in self.rule_classes:
+                        if rule['value'] == clss:
+                            if rule['suffixed_label'] is True:
+                                label_suffixes.append(rule['identifier'])
+                if len(label_suffixes) > 0:
+                    label_suffixes.sort()
+                reading['label_suffix'] = ''.join(label_suffixes)
+            if 'reading_suffix' not in reading:
+                reading_suffixes = []
+                for clss in reading['reading_classes']:
+                    for rule in self.rule_classes:
+                        if rule['value'] == clss:
+                            if rule['suffixed_reading'] is True:
+                                reading_suffixes.append(rule['identifier'])
+                if len(reading_suffixes) > 0:
+                    reading['reading_suffix'] = ''.join(reading_suffixes)
+        # restructure the text array to make it as minimal as it possibly can be
+        # move the witness details from the text array to the reading level regardless of where the witnesses are,
+        #   don't forget about things in SR_text
+        # promote all subreadings?
+
+    def strip_overtext(self, token):
+        """Strip the unecessary keys from the overtext token dictionary.
+
+        Args:
+            token (dict): The dictionary representing a single word in the overtext.
+
+        Returns:
+            dict: The input dictionary with the keys in the to_remove list removed.
+        """
+        to_remove = ['reading', 'siglum', 'rule_match', 'verse', 't']
+        for item in to_remove:
+            token.pop(item)
+        return token
 
     def get_text(self, reading, is_subreading=False):
         """Extracts the text of the reading supplied and returns it as a string.
 
         Args:
-            reading (JSON): The JSON segment representing a reading in the collation editor apparatus.
+            reading (dict): The JSON segment representing a reading in the collation editor apparatus.
             is_subreading (bool, optional): Set to true if this reading is a subreading and not a main reading.
                 Defaults to False.
 
@@ -90,9 +178,7 @@ class Exporter(object):
         if is_subreading is True:
             return [reading['text_string'].replace('&lt;', '<').replace('&gt;', '>')]
         if len(reading['text']) > 0:
-            if 'text_string' in reading:
-                return [reading['text_string'].replace('&lt;', '<').replace('&gt;', '>')]
-            return [' '.join(i['interface'] for i in reading['text'])]
+            return [reading['text_string'].replace('&lt;', '<').replace('&gt;', '>')]
         if 'overlap_status' in reading.keys():
             if reading['overlap_status'] in self.overlap_status_to_ignore:
                 return ['', reading['overlap_status']]
@@ -111,7 +197,7 @@ class Exporter(object):
         """Function to get the text of the lemma within the specified range in the overtext.
 
         Args:
-            overtext (JSON): The JSON segment representing the overtext for this unit. The data should be wrapped in a
+            overtext (dict): The JSON segment representing the overtext for this unit. The data should be wrapped in a
                              dictionary as the value to the key 'current'
                              eg. {'current': [{'id': 'basetext', 'tokens': []}]}
             start (str): The start index for the current lemma required.
@@ -147,7 +233,7 @@ class Exporter(object):
         """Function to return the witnesses that should be reported for the given reading.
 
         Args:
-            reading (JSON): The JSON segment representing the reading.
+            reading (dict): The JSON segment representing the reading.
             to_remove (list): A list of witnesses which should be excluded from the output.
 
         Returns:
@@ -161,60 +247,43 @@ class Exporter(object):
                 witnesses.remove(wit)
         return witnesses
 
-    def get_label(self, label, is_subreading, subtype, reading):
+    def get_label(self, label, is_subreading, reading):
         """Function to get the correct label to display for the reading.
 
         Args:
             label (str): The current label of the reading (the basic form).
             is_subreading (bool): A boolean to say whether or not this is a subreading.
-            subtype (str): The category of subreading if applicable.
-            reading (JSON): The JSON segment representing the reading.
+            reading (dict): The JSON segment representing the reading.
 
         Returns:
             str: The label to display for the reading.
         """
         if is_subreading is True:
             return label
-        if subtype is None:
-            return label
         if 'label_suffix' in reading:
             return '{}{}'.format(label, reading['label_suffix'])
-        for entry in self.rule_classes:
-            if entry['value'] == subtype:
-                if entry['suffixed_label'] is True:
-                    return '{}{}'.format(label, entry['identifier'])
-                break
         return label
 
-    def check_for_suffixed_reading_marker(self, text, subtype, reading):
+    def check_for_suffixed_reading_marker(self, text, reading):
         """Function to add any required reading suffixes to the text of the reading.
 
         Args:
             text (str): The extracted text of the current reading.
-            subtype (str): The subtype category of this reading if applicable.
-            reading (JSON): The JSON segent representing the reading.
+            reading (dict): The JSON segent representing the reading.
 
         Returns:
             str: The text of the reading as it should now be displayed including any suffixes.
         """
-        if subtype is None:
-            return text
         if 'reading_suffix' in reading:
             text[0] = '{} ({})'.format(text[0], reading['reading_suffix'])
             return text
-        for entry in self.rule_classes:
-            if entry['value'] == subtype:
-                if entry['suffixed_reading'] is True:
-                    text[0] = '{} ({})'.format(text[0], entry['identifier'])
-                    return text
-                break
         return text
 
     def make_reading(self, reading, index_position, label, witnesses, is_subreading=False, subtype=None):
         """Function to make the TEI XML version of a reading.
 
         Args:
-            reading (JSON): The JSON segment representing the reading.
+            reading (dict): The JSON segment representing the reading.
             index_position (int): The position of this reading in the apparatus unit.
             label (str): The current label of the reading (the basic form).
             witnesses (list): A list of witnesses for this reading.
@@ -225,9 +294,9 @@ class Exporter(object):
             ElementTree.Element: The XML structure as an element tree rdg element.
         """
         rdg = etree.Element('rdg')
-        rdg.set('n', self.get_label(label, is_subreading, subtype, reading))
+        rdg.set('n', self.get_label(label, is_subreading, reading))
         text = self.get_text(reading, is_subreading)
-        text = self.check_for_suffixed_reading_marker(text, subtype, reading)
+        text = self.check_for_suffixed_reading_marker(text, reading)
         if is_subreading is True:
             rdg.set('type', 'subreading')
         elif len(text) > 1:
@@ -274,7 +343,7 @@ class Exporter(object):
         over multiple units, can overwrite it to provide the end value required.
 
         Args:
-            unit (JSON): The current apparatus unit being processed.
+            unit (dict): The current apparatus unit being processed.
             context (str): The context of this collation unit (used in inheriting classes to recognise joined readings)
 
         Returns:
@@ -287,8 +356,8 @@ class Exporter(object):
         representing one variant unit in TEI XML.
 
         Args:
-            apparatus (JSON): The JSON segment representing the apparatus for this unit.
-            overtext (JSON): The JSON segment representing the overtext for this unit. The data should be wrapped in a
+            apparatus (dict): The JSON segment representing the apparatus for this unit.
+            overtext (dict): The JSON segment representing the overtext for this unit. The data should be wrapped in a
                              dictionary as the value to the key 'current'
                              eg. {'current': [{'id': 'basetext', 'tokens': []}]}
             context (str): The reference for this apparatus unit context.
@@ -325,13 +394,9 @@ class Exporter(object):
                             readings = True
                         subtype = None
                         if 'reading_classes' in reading:
-                            subtype = ' '.join(reading['reading_classes'])
-                        try:
-                            app.append(self.make_reading(reading, i, reading['label'], wits, subtype=subtype))
-                        except KeyError:
-                            raise KeyError(f'There is a problem with {context}, {start}-{end}, '
-                                           f'reading {reading["label"]} {", ".join(wits)} '
-                                           f'which is missing a text_string')
+                            subtype = '|'.join(reading['reading_classes'])
+                        app.append(self.make_reading(reading, i, reading['label'], wits, subtype=subtype))
+                        
                     if 'subreadings' in reading:
                         for key in reading['subreadings']:
                             for subreading in reading['subreadings'][key]:
@@ -352,12 +417,8 @@ class Exporter(object):
                         subtype = None
                         if 'reading_classes' in reading:
                             subtype = ' '.join(reading['reading_classes'])
-                        try:
-                            app.append(self.make_reading(reading, i, reading['label'], wits, subtype=subtype))
-                        except KeyError:
-                            raise KeyError(f'There is a problem with {context}, {start}-{end}, '
-                                           f'reading {reading["label"]} {", ".join(wits)} '
-                                           f'which is missing a text_string')
+                        app.append(self.make_reading(reading, i, reading['label'], wits, subtype=subtype))
+
                     if 'subreadings' in reading:
                         for key in reading['subreadings']:
                             for subreading in reading['subreadings'][key]:
@@ -383,7 +444,7 @@ class Exporter(object):
         """Function to turn the JSON apparatus of the collation unit into TEI XML.
 
         Args:
-            entry (JSON): The JSON fragment representing the apparatus of a collation unit.
+            entry (dict): The JSON fragment representing the apparatus of a collation unit.
 
         Returns:
             ElementTree.Element: The root element of a tree representing this collation unit in TEI XML.
