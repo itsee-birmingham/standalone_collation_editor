@@ -60,15 +60,34 @@ class RestructureExportDataMixin(object):
             reading (dict): The JSON dictionary representing the reading.
 
         Raises:
-            MissingSuffixesException: raised if the readingis missing the list of witness suffixes.
+            MissingSuffixesException: raised if the reading is missing the list of witness suffixes.
         """
         # first check that we don't have any unfixable missing data because if we do we may as well stop now
         if len(reading['witnesses']) > 0 and 'suffixes' not in reading:
             raise MissingSuffixesException()
+
+        self._supply_missing_reading_data(reading)
+        # remove the stuff we don't need
+        reading.pop('SR_text', None)
+        reading.pop('standoff_subreadings', None)
+        # restructure the text array to make it as minimal as it possibly can be
+        reading['text'] = self._simplify_text_list(reading)
+        if 'subreadings' in reading:
+            for type in reading['subreadings']:
+                for subreading in reading['subreadings'][type]:
+                    self._clean_reading(subreading)
+        # promote all subreadings?
+
+    def _supply_missing_reading_data(self, reading):
+        """Supply keys which may be missing in older versions of the data.
+
+        Args:
+            reading (dict): The JSON dictionary representing the reading which is modified in place.
+        """
         # now backfill any missing data in the older structures
         # make the text_string if it doesn't exist
         if 'text_string' not in reading:
-            reading['text_string'] = [' '.join(i['interface'] for i in reading['text'])]
+            reading['text_string'] = ' '.join([i['interface'] for i in reading['text']])
         # make the label_suffix and the reading_suffix values if we need them and they don't exist
         if 'reading_classes' in reading and len(reading['reading_classes']) > 0:
             if 'label_suffix' not in reading:
@@ -90,16 +109,6 @@ class RestructureExportDataMixin(object):
                                 reading_suffixes.append(rule['identifier'])
                 if len(reading_suffixes) > 0:
                     reading['reading_suffix'] = ''.join(reading_suffixes)
-        # remove the stuff we don't need
-        reading.pop('SR_text', None)
-        reading.pop('standoff_subreadings', None)
-        # restructure the text array to make it as minimal as it possibly can be
-        reading['text'] = self._simplify_text_list(reading)
-        if 'subreadings' in reading:
-            for type in reading['subreadings']:
-                for subreading in reading['subreadings'][type]:
-                    self._clean_reading(subreading)
-        # promote all subreadings?
 
     def _simplify_text_list(self, reading):
         """
