@@ -1,15 +1,17 @@
 import re
 import xml.etree.ElementTree as etree
-from .exceptions import MissingSuffixesException
+from .restructure_export_data_mixin import RestructureExportDataMixin
 
 
-class Exporter(object):
+class Exporter(RestructureExportDataMixin, object):
     """The basic exporter to export a collation unit apparatus to TEI XML.
 
     This exporter offers a basic conversion of the collation editor aparatus format to an almost TEI compliant format
     of XML. It works only one unit a time and does not include a header since the output will not be sufficient for
     real world use. This exporter should be used as the base for a more complex exporter suitable for the text
-    being edited or the output from this exporter can be manually edited to produce the format required.
+    being edited or the output from this exporter can be manually edited to produce the format required. The mixin
+    restructures the data from collation data into a simpler stripped down format to use for exporting and also
+    backfills some data which may be missing in collations produced in the early versions of the collation editor.
 
     Args:
         format (str, optional): The output format requires. options are [negative_xml|positive_xml].
@@ -28,8 +30,8 @@ class Exporter(object):
             if it has no variant readings. Defaults to False.
         exclude_lemma_entry (bool, optional): Indicates if the lemma entry in the apparatus should be excluded. If the
             setting is True the apparatus will not have a <lem> tag for each entry. Defaults to False.
-        rule_classes (dict, optional): This if the dictionary representing the rule classes used in the current
-            editing project. Defaults to {}.
+        rule_classes (dict, optional): This is the dictionary representing the rule classes used in the current
+            editing project. Defaults to {}. Only needed for older data.
     """
 
     def __init__(self,
@@ -77,90 +79,6 @@ class Exporter(object):
             output.append(etree.tostring(self.get_unit_xml(collation_unit), 'utf-8').decode())
         return '<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0">{}' \
                '</TEI>'.format('\n'.join(output).replace('<?xml version=\'1.0\' encoding=\'utf-8\'?>', ''))
-
-    def clean_collation_unit(self, collation_unit):
-        """Clean the data and back fill anything missing from older data structures.
-
-        Args:
-            collation_unit (dict): The collation unit structure which has two keys (context, structure) where structure
-            is the JSON that comes out of the collation editor.
-        """
-        structure = collation_unit['structure']
-        # remove the data we don't need (without raising an error if it isn't there)
-        structure.pop('special_categories', None)
-        structure.pop('marked_readings', None)
-        # simplify overtext structure
-        structure['overtext'] = [self.strip_overtext(x) for x in structure['overtext']['tokens']]
-
-        # now do the variant units
-        for key in structure:
-            if 'apparatus' in key:
-                for variant_unit in structure[key]:
-                    try:
-                        self.clean_variant_unit(variant_unit)
-                    except MissingSuffixesException:
-                        raise MissingSuffixesException(f'At least one of the readings in {collation_unit["context"]} '
-                                                       f'is missing the suffixes data. Reapproving this unit will '
-                                                       f'probably fix the problem.')
-
-    def clean_variant_unit(self, variant_unit):
-        # remove what we don't need (without raising an error if it isn't there)
-        variant_unit.pop('first_word_index', None)
-        variant_unit.pop('_id', None)
-        variant_unit.pop('overlap_units', None)
-        for reading in variant_unit['readings']:
-            try:
-                self.clean_reading(reading)
-            except Exception:
-                raise
-
-    def clean_reading(self, reading):
-        # first check that we don't have any unfixable missing data because if we do we may as well stop now
-        if len(reading['witnesses']) > 0 and 'suffixes' not in reading:
-            raise MissingSuffixesException()
-        # now backfill any missing data in the older structures
-        # make the text_string if it doesn't exist
-        if 'text_string' not in reading:
-            reading['text_string'] = [' '.join(i['interface'] for i in reading['text'])]
-        # make the label_suffix and the reading_suffix values if we need them and they don't exist
-        if 'reading_classes' in reading and len(reading['reading_classes']) > 0:
-            if 'label_suffix' not in reading:
-                label_suffixes = []
-                for clss in reading['reading_classes']:
-                    for rule in self.rule_classes:
-                        if rule['value'] == clss:
-                            if rule['suffixed_label'] is True:
-                                label_suffixes.append(rule['identifier'])
-                if len(label_suffixes) > 0:
-                    label_suffixes.sort()
-                reading['label_suffix'] = ''.join(label_suffixes)
-            if 'reading_suffix' not in reading:
-                reading_suffixes = []
-                for clss in reading['reading_classes']:
-                    for rule in self.rule_classes:
-                        if rule['value'] == clss:
-                            if rule['suffixed_reading'] is True:
-                                reading_suffixes.append(rule['identifier'])
-                if len(reading_suffixes) > 0:
-                    reading['reading_suffix'] = ''.join(reading_suffixes)
-        # restructure the text array to make it as minimal as it possibly can be
-        # move the witness details from the text array to the reading level regardless of where the witnesses are,
-        #   don't forget about things in SR_text
-        # promote all subreadings?
-
-    def strip_overtext(self, token):
-        """Strip the unecessary keys from the overtext token dictionary.
-
-        Args:
-            token (dict): The dictionary representing a single word in the overtext.
-
-        Returns:
-            dict: The input dictionary with the keys in the to_remove list removed.
-        """
-        to_remove = ['reading', 'siglum', 'rule_match', 'verse', 't']
-        for item in to_remove:
-            token.pop(item)
-        return token
 
     def get_text(self, reading, is_subreading=False):
         """Extracts the text of the reading supplied and returns it as a string.
@@ -396,7 +314,7 @@ class Exporter(object):
                         if 'reading_classes' in reading:
                             subtype = '|'.join(reading['reading_classes'])
                         app.append(self.make_reading(reading, i, reading['label'], wits, subtype=subtype))
-                        
+
                     if 'subreadings' in reading:
                         for key in reading['subreadings']:
                             for subreading in reading['subreadings'][key]:
