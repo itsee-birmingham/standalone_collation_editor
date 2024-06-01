@@ -75,8 +75,8 @@ class Exporter(RestructureExportDataMixin, object):
         output = []
         self.overtext_siglum = data['structure']['overtext_name']
         for collation_unit in data:
-
-            output.append(etree.tostring(self.get_unit_xml(collation_unit), 'utf-8').decode())
+            restructured_collation_unit = self.clean_collation_unit(collation_unit)
+            output.append(etree.tostring(self.get_unit_xml(restructured_collation_unit), 'utf-8').decode())
         return '<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0">{}' \
                '</TEI>'.format('\n'.join(output).replace('<?xml version=\'1.0\' encoding=\'utf-8\'?>', ''))
 
