@@ -428,161 +428,9 @@ class ExporterUnitTests(TestCase):
             'first_word_index': '6'
           }
 
-    OVERTEXT = [
-          {
-            'id': 'basetext',
-            'hand': 'firsthand',
-            'tokens': [
-              {
-                't': 'αποκαλυψαι',
-                'index': '2',
-                'lemma': 'αποκαλυψαι',
-                'verse': 'Gal.1.16',
-                'siglum': 'basetext',
-                'reading': 'basetext',
-                'original': 'ἀποκαλύψαι',
-                'rule_match': ['αποκαλυψαι']
-              },
-              {
-                't': 'τον',
-                'index': '4',
-                'lemma': 'τον',
-                'verse': 'Gal.1.16',
-                'siglum': 'basetext',
-                'reading': 'basetext',
-                'original': 'τὸν',
-                'rule_match': ['τον']
-              },
-              {
-                't': 'υιον',
-                'index': '6',
-                'lemma': 'υιον',
-                'verse': 'Gal.1.16',
-                'siglum': 'basetext',
-                'reading': 'basetext',
-                'original': 'υἱὸν',
-                'rule_match': ['υιον']
-              },
-              {
-                't': 'αυτου',
-                'index': '8',
-                'lemma': 'αυτου',
-                'verse': 'Gal.1.16',
-                'siglum': 'basetext',
-                'reading': 'basetext',
-                'original': 'αὐτοῦ',
-                'rule_match': ['αυτου']
-              },
-              {
-                't': 'εν',
-                'index': '10',
-                'lemma': 'εν',
-                'verse': 'Gal.1.16',
-                'siglum': 'basetext',
-                'reading': 'basetext',
-                'original': 'ἐν',
-                'pc_before': '(',
-                'pc_after': ')',
-                'rule_match': ['εν']
-              },
-              {
-                't': 'εμοι',
-                'index': '12',
-                'lemma': 'εμοι',
-                'verse': 'Gal.1.16',
-                'siglum': 'basetext',
-                'reading': 'basetext',
-                'original': 'ἐμοί',
-                'pc_after': ',',
-                'rule_match': ['εμοι']
-              },
-              {
-                't': 'ινα',
-                'index': '14',
-                'lemma': 'ινα',
-                'verse': 'Gal.1.16',
-                'siglum': 'basetext',
-                'reading': 'basetext',
-                'original': 'ἵνα',
-                'rule_match': ['ινα']
-              },
-              {
-                't': 'ευαγγελιζωμαι',
-                'index': '16',
-                'lemma': 'ευαγγελιζωμαι',
-                'verse': 'Gal.1.16',
-                'siglum': 'basetext',
-                'reading': 'basetext',
-                'original': 'εὐαγγελίζωμαι',
-                'rule_match': ['ευαγγελιζωμαι']
-              },
-              {
-                't': 'αυτον',
-                'index': '18',
-                'lemma': 'αυτον',
-                'verse': 'Gal.1.16',
-                'siglum': 'basetext',
-                'reading': 'basetext',
-                'original': 'αὐτὸν',
-                'rule_match': ['αυτον']
-              },
-              {
-                't': 'εν',
-                'index': '20',
-                'lemma': 'εν',
-                'verse': 'Gal.1.16',
-                'siglum': 'basetext',
-                'reading': 'basetext',
-                'original': 'ἐν',
-                'rule_match': ['εν']
-              },
-              {
-                't': 'τοις',
-                'index': '22',
-                'lemma': 'τοις',
-                'verse': 'Gal.1.16',
-                'siglum': 'basetext',
-                'reading': 'basetext',
-                'original': 'τοῖς',
-                'rule_match': ['τοις']
-              },
-              {
-                't': 'εθνεσιν',
-                'index': '24',
-                'lemma': 'εθνεσιν',
-                'verse': 'Gal.1.16',
-                'siglum': 'basetext',
-                'reading': 'basetext',
-                'original': 'ἔθνεσιν',
-                'pc_after': ',',
-                'rule_match': ['εθνεσιν']
-              },
-              {
-                't': 'ευθεως',
-                'index': '26',
-                'lemma': 'ευθεως',
-                'verse': 'Gal.1.16',
-                'siglum': 'basetext',
-                'reading': 'basetext',
-                'original': 'εὐθέως',
-                'rule_match': ['ευθεως']
-              },
-              {
-                't': 'ου',
-                'index': '28',
-                'lemma': 'ου',
-                'verse': 'Gal.1.16',
-                'siglum': 'basetext',
-                'reading': 'basetext',
-                'original': 'οὐ',
-                'rule_match': ['ου']
-              }
-            ],
-            'hand_abbreviation': '*'
-          }
-        ]
-
-    def test_get_text_default_settings(self):
+    def test_get_text_main_reading(self):
+        """Test getting the main reading text.
+        """
         exp = Exporter()
         reading = {'_id': 'abc',
                    'text': [{}, {}],
@@ -593,7 +441,9 @@ class ExporterUnitTests(TestCase):
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
 
-    def test_get_text_default_settings_subreading(self):
+    def test_get_text_subreading(self):
+        """Test getting the subreading text.
+        """
         exp = Exporter()
         reading = {'_id': 'abc',
                    'text': [{}, {}],
@@ -604,7 +454,9 @@ class ExporterUnitTests(TestCase):
         generated_text = exp.get_text(reading['subreadings']['abbreviation'][0], is_subreading=True)
         self.assertEqual(expected_text, generated_text)
 
-    def test_get_text_default_settings_om(self):
+    def test_get_text_om(self):
+        """Test getting the text if the text is omitted.
+        """
         exp = Exporter()
         reading = {'_id': 'abc',
                    'text': [],
@@ -617,7 +469,9 @@ class ExporterUnitTests(TestCase):
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
 
-    def test_get_text_default_settings_om_verse(self):
+    def test_get_text_om_verse(self):
+        """Test getting the text if the entire collation unit is omitted but no details are given.
+        """
         exp = Exporter()
         reading = {'_id': 'abc',
                    'text': [],
@@ -630,7 +484,9 @@ class ExporterUnitTests(TestCase):
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
 
-    def test_get_text_default_settings_om_verse_details(self):
+    def test_get_text_om_verse_details(self):
+        """Test getting the text if the entire collation unit is omitted and details are given.
+        """
         exp = Exporter()
         reading = {'_id': 'abc',
                    'text': [],
@@ -644,7 +500,9 @@ class ExporterUnitTests(TestCase):
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
 
-    def test_get_text_default_settings_lac(self):
+    def test_get_text_lac(self):
+        """Test getting the text if the reading is lac.
+        """
         exp = Exporter()
         reading = {'_id': 'abc',
                    'text': [],
@@ -657,7 +515,9 @@ class ExporterUnitTests(TestCase):
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
 
-    def test_get_text_default_settings_lac_verse(self):
+    def test_get_text_lac_verse(self):
+        """Test getting the text if the entire unit is lac but no details are given.
+        """
         exp = Exporter()
         reading = {'_id': 'abc',
                    'text': [],
@@ -670,7 +530,9 @@ class ExporterUnitTests(TestCase):
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
 
-    def test_get_text_default_settings_lac_verse_details(self):
+    def test_get_text_lac_verse_details(self):
+        """Test getting the text if the reading is lac and details are given.
+        """
         exp = Exporter()
         reading = {'_id': 'abc',
                    'text': [],
@@ -684,7 +546,9 @@ class ExporterUnitTests(TestCase):
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
 
-    def test_get_text_default_settings_lac_special_category_details(self):
+    def test_get_text_lac_special_category_details(self):
+        """Test getting the text if the reading is lac and there are special categories to apply.
+        """
         exp = Exporter()
         reading = {'_id': 'abc',
                    'text': [],
@@ -698,7 +562,9 @@ class ExporterUnitTests(TestCase):
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
 
-    def test_get_text_default_settings_overlapped(self):
+    def test_get_text_overlapped(self):
+        """Test getting the text if the reading has been overlapped.
+        """
         exp = Exporter()
         reading = {'_id': 'abc',
                    'text': [],
@@ -711,619 +577,591 @@ class ExporterUnitTests(TestCase):
         generated_text = exp.get_text(reading)
         self.assertEqual(expected_text, generated_text)
 
-#     def test_get_lemma_text_defaults(self):
-#         exp = Exporter()
-#         overtext = {'current': self.OVERTEXT[0]}
+    def test_get_lemma_text(self):
+        """Tests to check lemma text extraction without punctuation.
+        """
+        exp = Exporter()
+        # simplified version of overtext data for testing
+        overtext = {'current': [{'original': 'this'},
+                                {'original': 'is'},
+                                {'original': 'the'},
+                                {'original': 'lemma'},
+                                {'original': 'text'},
+                                {'original': 'for'},
+                                {'original': 'a'},
+                                {'original': 'unit'},
+                                {'original': 'verse',
+                                 'pc_after': ')',
+                                 'pc_before': '('}]}
 
-#         # test a few ranges where there is data
-#         expected_text = ['ἀποκαλύψαι τὸν υἱὸν']
-#         generated_text = exp.get_lemma_text(overtext, '2', '6')
-#         self.assertEqual(expected_text, generated_text)
+        # test a few ranges where there is data
+        expected_text = ['this is the']
+        generated_text = exp.get_lemma_text(overtext, '2', '6')
+        self.assertEqual(expected_text, generated_text)
 
-#         expected_text = ['ἐν']
-#         generated_text = exp.get_lemma_text(overtext, '10', '10')
-#         self.assertEqual(expected_text, generated_text)
+        expected_text = ['text']
+        generated_text = exp.get_lemma_text(overtext, '10', '10')
+        self.assertEqual(expected_text, generated_text)
 
-#         expected_text = ['ἀποκαλύψαι']
-#         generated_text = exp.get_lemma_text(overtext, '1', '3')
-#         self.assertEqual(expected_text, generated_text)
+        expected_text = ['this']
+        generated_text = exp.get_lemma_text(overtext, '1', '3')
+        self.assertEqual(expected_text, generated_text)
 
-#         expected_text = ['ἔθνεσιν']
-#         generated_text = exp.get_lemma_text(overtext, '24', '24')
-#         self.assertEqual(expected_text, generated_text)
+        expected_text = ['this']
+        generated_text = exp.get_lemma_text(overtext, '0', '3')
+        self.assertEqual(expected_text, generated_text)
 
-#         expected_text = ['αὐτοῦ ἐν ἐμοί ἵνα εὐαγγελίζωμαι αὐτὸν ἐν']
-#         generated_text = exp.get_lemma_text(overtext, '7', '20')
-#         self.assertEqual(expected_text, generated_text)
+        expected_text = ['is the lemma text for']
+        generated_text = exp.get_lemma_text(overtext, '3', '12')
+        self.assertEqual(expected_text, generated_text)
 
-#         expected_text = ['αὐτοῦ ἐν ἐμοί ἵνα εὐαγγελίζωμαι αὐτὸν ἐν']
-#         generated_text = exp.get_lemma_text(overtext, '8', '21')
-#         self.assertEqual(expected_text, generated_text)
+        # test where there is no data
+        expected_text = ['', 'om']
+        generated_text = exp.get_lemma_text(overtext, '9', '9')
+        self.assertEqual(expected_text, generated_text)
 
-#         # test where there is no data
-#         expected_text = ['', 'om']
-#         generated_text = exp.get_lemma_text(overtext, '27', '27')
-#         self.assertEqual(expected_text, generated_text)
+        expected_text = ['', 'om']
+        generated_text = exp.get_lemma_text(overtext, '1', '1')
+        self.assertEqual(expected_text, generated_text)
 
-#         expected_text = ['', 'om']
-#         generated_text = exp.get_lemma_text(overtext, '1', '1')
-#         self.assertEqual(expected_text, generated_text)
+    def test_get_lemma_text_with_punctuation(self):
+        """Tests to check lemma text extraction with punctuation.
+        """
+        exp = Exporter(include_punctuation=True)
+        # simplified version of overtext data for testing
+        overtext = {'current': [{'original': 'this'},
+                                {'original': 'is'},
+                                {'original': 'the'},
+                                {'original': 'lemma'},
+                                {'original': 'text'},
+                                {'original': 'for'},
+                                {'original': 'a'},
+                                {'original': 'unit'},
+                                {'original': 'verse',
+                                 'pc_after': ')',
+                                 'pc_before': '('}]}
 
-#     def test_get_lemma_text_with_punctuation(self):
-#         exp = Exporter(include_punctuation=True)
-#         overtext = {'current': self.OVERTEXT[0]}
+        expected_text = ['(verse)']
+        generated_text = exp.get_lemma_text(overtext, '18', '18')
+        self.assertEqual(expected_text, generated_text)
 
-#         expected_text = ['ἔθνεσιν,']
-#         generated_text = exp.get_lemma_text(overtext, '24', '24')
-#         self.assertEqual(expected_text, generated_text)
+        expected_text = ['unit (verse)']
+        generated_text = exp.get_lemma_text(overtext, '16', '18')
+        self.assertEqual(expected_text, generated_text)
 
-#         expected_text = ['(ἐν)']
-#         generated_text = exp.get_lemma_text(overtext, '10', '10')
-#         self.assertEqual(expected_text, generated_text)
+    def test_get_witnesses(self):
+        """Test get witnesses with and without a to_remove list.
+        """
+        exp = Exporter()
+        reading = {'witnesses': ['02', '5', '35', '38*', 'L23-S3W4D1', 'basetext'],
+                   'suffixes': ['V', '', 'r', '', '', '']}
 
-    # def test_get_witnesses(self):
-    #     exp = Exporter()
-    #     reading = self.BASE_UNIT['readings'][0]
+        expected_witnesses = ['02V', '5', '35r', '38*', 'L23-S3W4D1', 'basetext']
+        generated_witnesses = exp.get_witnesses(reading, [])
+        self.assertEqual(expected_witnesses, generated_witnesses)
 
-    #     expected_witnesses = ['02V', '5', '35', '38', 'L23-S3W4D1', 'basetext']
-    #     generated_witnesses = exp.get_witnesses(reading, [])
-    #     self.assertEqual(expected_witnesses, generated_witnesses)
+        expected_witnesses = ['02V', '35r', '38*', 'L23-S3W4D1']
+        generated_witnesses = exp.get_witnesses(reading, ['5', 'basetext'])
+        self.assertEqual(expected_witnesses, generated_witnesses)
 
-    #     expected_witnesses = ['02V', '35', '38', 'L23-S3W4D1']
-    #     generated_witnesses = exp.get_witnesses(reading, ['5', 'basetext'])
-    #     self.assertEqual(expected_witnesses, generated_witnesses)
+    def test_get_label_main_reading_1(self):
+        """Test get main reading label with no suffix.
+        """
+        exp = Exporter()
+        reading = {'_id': 'abc', 'label': 'b'}
+        expected_label = 'b'
+        generated_label = exp.get_label('b', False, reading)
+        self.assertEqual(expected_label, generated_label)
 
-#     def test_get_label_main_reading_1(self):
-#         exp = Exporter()
-#         reading = self.BASE_UNIT['readings'][1]
-#         expected_label = 'b'
-#         generated_label = exp.get_label('b', False, None, reading)
-#         self.assertEqual(expected_label, generated_label)
+    def test_get_label_main_reading_2(self):
+        """Test get main reading label with a label_suffix.
+        """
+        exp = Exporter()
+        reading = {'_id': 'abc', 'label': 'b', 'label_suffix': 'f'}
+        expected_label = 'bf'
+        generated_label = exp.get_label('b', False, reading)
+        self.assertEqual(expected_label, generated_label)
 
-#     def test_get_label_main_reading_2(self):
-#         exp = Exporter()
-#         reading = {
-#                 '_id': '6411b86361757a8d56e7006eddb8ebae',
-#                 'text': [],
-#                 'type': 'om',
-#                 'label': 'b',
-#                 'suffixes': [''],
-#                 'witnesses': ['1929*'],
-#                 'text_string': 'om.',
-#                 'label_suffix': 'f',
-#                 'reading_classes': ['fehlerMR']
-#               }
-#         expected_label = 'bf'
-#         generated_label = exp.get_label('b', False, 'fehler', reading)
-#         self.assertEqual(expected_label, generated_label)
+    def test_get_label_subreading(self):
+        """Test get subreading label. Note that subreading labels are calculated before we get here and are simply
+        returned.
+        """
+        exp = Exporter()
+        reading = {'_id': 'def', 'suffix': 'f'}
+        expected_label = 'bf'
+        generated_label = exp.get_label('bf', True, reading)
+        self.assertEqual(expected_label, generated_label)
 
-#     def test_get_label_subreading(self):
-#         exp = Exporter()
-#         reading = {
-#                       'text': [
-#                         {
-#                           '1398': {
-#                             'n': 'ευαγγελισωμαι',
-#                             't': 'ευαγγελισομαι',
-#                             'index': '16',
-#                             'siglum': '1398',
-#                             'original': 'ευαγγελισομαι',
-#                             'interface': 'ευαγγελισομαι',
-#                             'rule_match': ['ευαγγελισομαι']
-#                           },
-#                           'index': '16.1',
-#                           'verse': 'Gal.1.16',
-#                           'reading': ['1398'],
-#                           'interface': 'ευαγγελισομαι'
-#                         }
-#                       ],
-#                       'suffix': 'f',
-#                       'suffixes': [''],
-#                       'witnesses': ['1398'],
-#                       'text_string': 'ευαγγελισομαι'
-#                     }
-#         expected_label = 'b'
-#         generated_label = exp.get_label('b', True, 'fehler', reading)
-#         self.assertEqual(expected_label, generated_label)
+    def test_check_for_suffixed_reading_marker_with_marker(self):
+        """Test the reading suffix is added to the text if there is one.
+        """
+        exp = Exporter()
+        reading = {'text_string': 'my text', 'reading_suffix': 'K'}
+        expected_text = ['my text (K)']
+        generated_text = exp.check_for_suffixed_reading_marker(['my text'], reading)
+        self.assertEqual(expected_text, generated_text)
 
-#     def test_get_label_subreading_legacy_1(self):
-#         # this tests an older form of the data where label_suffix for main readings were not added in approved data
-#         exp = Exporter(rule_classes=[{'value': 'fehler', 'identifier': 'f', 'suffixed_label': True}])
-#         reading = {
-#                 '_id': '6411b86361757a8d56e7006eddb8ebae',
-#                 'text': [],
-#                 'type': 'om',
-#                 'label': 'b',
-#                 'suffixes': [''],
-#                 'witnesses': ['1929*'],
-#                 'text_string': 'om.',
-#                 'label_suffix': 'f',
-#                 'reading_classes': ['fehlerMR']
-#               }
-#         del reading['label_suffix']
-#         expected_label = 'bf'
-#         generated_label = exp.get_label('b', False, 'fehler', reading)
-#         self.assertEqual(expected_label, generated_label)
+    def test_check_for_suffixed_reading_marker_without_marker(self):
+        """Test the the text is returned unchanged if there is no reading suffix.
+        """
+        exp = Exporter()
+        reading = {'text_string': 'my text'}
+        expected_text = ['my text']
+        generated_text = exp.check_for_suffixed_reading_marker(['my text'], reading)
+        self.assertEqual(expected_text, generated_text)
 
-#     def test_get_label_subreading_legacy_2(self):
-#         # this tests an older form of the data where label_suffix for main readings were not added in approved data
-#         exp = Exporter(rule_classes=[{'value': 'fehler', 'identifier': 'f', 'suffixed_label': False}])
-#         reading = {
-#                 '_id': '6411b86361757a8d56e7006eddb8ebae',
-#                 'text': [],
-#                 'type': 'om',
-#                 'label': 'b',
-#                 'suffixes': [''],
-#                 'witnesses': ['1929*'],
-#                 'text_string': 'om.',
-#                 'label_suffix': 'f',
-#                 'reading_classes': ['fehlerMR']
-#               }
-#         del reading['label_suffix']
-#         expected_label = 'b'
-#         generated_label = exp.get_label('b', False, 'fehler', reading)
-#         self.assertEqual(expected_label, generated_label)
+    def test_fix_subreading_suffix(self):
+        exp = Exporter()
 
-    # def test_check_for_suffixed_reading_marker(self):
-    #     exp = Exporter()
-    #     reading = self.BASE_UNIT['readings'][0]
-    #     # adapt the data so we have the right input
-    #     reading['reading_suffix'] = 'K'
-    #     expected_text = ['υιον αυτου']
-    #     generated_text = exp.check_for_suffixed_reading_marker(['υιον αυτου'], reading)
-    #     self.assertEqual(expected_text, generated_text)
+        expected_suffix = 'of'
+        generated_suffix = exp.fix_subreading_suffix('ooff')
+        self.assertEqual(expected_suffix, generated_suffix)
 
-    #     expected_text = ['υιον αυτου (K)']
-    #     generated_text = exp.check_for_suffixed_reading_marker(['υιον αυτου'], 'commentary', reading)
-    #     self.assertEqual(expected_text, generated_text)
+        expected_suffix = 'o'
+        generated_suffix = exp.fix_subreading_suffix('o')
+        self.assertEqual(expected_suffix, generated_suffix)
 
-#     def test_check_for_suffixed_reading_marker_legacy_1(self):
-#         exp = Exporter(rule_classes=[{'value': 'commentary', 'identifier': 'K', 'suffixed_reading': True}])
-#         reading = self.BASE_UNIT['readings'][0]
-#         if 'reading_suffix' in reading:
-#             del reading['reading_suffix']
-#         expected_text = ['υιον αυτου (K)']
-#         generated_text = exp.check_for_suffixed_reading_marker(['υιον αυτου'], 'commentary', reading)
-#         self.assertEqual(expected_text, generated_text)
+    @patch('collation.core.exporter.Exporter.check_for_suffixed_reading_marker')
+    @patch('collation.core.exporter.Exporter.get_text')
+    @patch('collation.core.exporter.Exporter.get_label')
+    def test_make_reading_main_reading_1(self,
+                                         mocked_get_label,
+                                         mocked_get_text,
+                                         mocked_check_for_suffixed_reading_marker):
+        """Test make_reading for a main reading with a single witness and a simple label.
+        """
+        mocked_get_label.return_value = 'b'
+        mocked_get_text.return_value = ['και']
+        mocked_check_for_suffixed_reading_marker.return_value = ['και']
+        # set required args so they are easier to see in the test
+        reading = None  # we don't actually need one because the functions that use it are mocked
+        index_position = 1
+        reading_label = 'b'
+        witnesses = ['6']
+        exp = Exporter()
+        expected_xml = '<rdg n="b" varSeq="2" wit="6">και<wit><idno>6</idno></wit></rdg>'
+        xml = exp.make_reading(reading, index_position, reading_label, witnesses)
+        # check the right things are passed to the mocked functions
+        mocked_get_label.assert_called_with(reading_label, False, reading)
+        mocked_get_text.assert_called_with(reading, False)
+        mocked_check_for_suffixed_reading_marker.assert_called_with(['και'], reading)
+        # check the result
+        self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
 
-#     def test_check_for_suffixed_reading_marker_legacy_2(self):
-#         exp = Exporter(rule_classes=[{'value': 'commentary', 'identifier': 'K', 'suffixed_reading': False}])
-#         reading = self.BASE_UNIT['readings'][0]
-#         if 'reading_suffix' in reading:
-#             del reading['reading_suffix']
-#         expected_text = ['υιον αυτου']
-#         generated_text = exp.check_for_suffixed_reading_marker(['υιον αυτου'], 'commentary', reading)
-#         self.assertEqual(expected_text, generated_text)
+    @patch('collation.core.exporter.Exporter.check_for_suffixed_reading_marker')
+    @patch('collation.core.exporter.Exporter.get_text')
+    @patch('collation.core.exporter.Exporter.get_label')
+    def test_make_reading_main_reading_2(self,
+                                         mocked_get_label,
+                                         mocked_get_text,
+                                         mocked_check_for_suffixed_reading_marker):
+        """Test make_reading for a main reading with multiple witnesses and a complex label.
+        """
+        mocked_get_label.return_value = 'cf'
+        mocked_get_text.return_value = ['κι']
+        mocked_check_for_suffixed_reading_marker.return_value = ['κι']
+        # set required args so they are easier to see in the test
+        reading = None  # we don't actually need one because the functions that use it are mocked
+        index_position = 2
+        reading_label = 'c'
+        witnesses = ['6', '7']
+        exp = Exporter()
+        expected_xml = '<rdg n="cf" varSeq="3" wit="6 7">κι<wit><idno>6</idno><idno>7</idno></wit></rdg>'
+        xml = exp.make_reading(reading, index_position, reading_label, witnesses)
+        # check the right things are passed to the mocked functions
+        mocked_get_label.assert_called_with(reading_label, False, reading)
+        mocked_get_text.assert_called_with(reading, False)
+        mocked_check_for_suffixed_reading_marker.assert_called_with(['κι'], reading)
+        # check the result
+        self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
 
-#     def test_fix_subreading_suffix(self):
-#         exp = Exporter()
+    @patch('collation.core.exporter.Exporter.check_for_suffixed_reading_marker')
+    @patch('collation.core.exporter.Exporter.get_text')
+    @patch('collation.core.exporter.Exporter.get_label')
+    def test_make_reading_subreading(self,
+                                     mocked_get_label,
+                                     mocked_get_text,
+                                     mocked_check_for_suffixed_reading_marker):
+        """Test make_reading for a subreading.
+        """
+        mocked_get_label.return_value = 'af'
+        mocked_get_text.return_value = ['om.', 'om']
+        mocked_check_for_suffixed_reading_marker.return_value = ['om.', 'om']
+        # set required args so they are easier to see in the test
+        reading = None  # we don't actually need one because the functions that use it are mocked
+        index_position = 1
+        reading_label = 'af'  # subreadings have pre-compiled labels in the data
+        witnesses = ['206*']
+        subreading = True
+        subreading_subtype = 'fehler'
+        exp = Exporter()
+        expected_xml = ('<rdg n="af" type="subreading" cause="fehler" varSeq="2" wit="206*">om.<wit>'
+                        '<idno>206*</idno></wit></rdg>')
+        xml = exp.make_reading(reading, index_position, reading_label, witnesses, subreading, subreading_subtype)
+        # check the right things are passed to the mocked functions
+        mocked_get_label.assert_called_with(reading_label, subreading, reading)
+        mocked_get_text.assert_called_with(reading, subreading)
+        mocked_check_for_suffixed_reading_marker.assert_called_with(['om.', 'om'], reading)
+        # check the result
+        self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
 
-#         expected_suffix = 'of'
-#         generated_suffix = exp.fix_subreading_suffix('ooff')
-#         self.assertEqual(expected_suffix, generated_suffix)
+    @patch('collation.core.exporter.Exporter.check_for_suffixed_reading_marker')
+    @patch('collation.core.exporter.Exporter.get_text')
+    @patch('collation.core.exporter.Exporter.get_label')
+    def test_make_reading_om_reading(self,
+                                     mocked_get_label,
+                                     mocked_get_text,
+                                     mocked_check_for_suffixed_reading_marker):
+        """Test make_reading for an om reading.
+        """
+        mocked_get_label.return_value = 'b'
+        mocked_get_text.return_value = ['om.', 'om']
+        mocked_check_for_suffixed_reading_marker.return_value = ['om.', 'om']
+        # set required args so they are easier to see in the test
+        reading = None  # we don't actually need one because the functions that use it are mocked
+        index_position = 1
+        reading_label = 'b'
+        witnesses = ['1838']
+        exp = Exporter()
+        expected_xml = '<rdg n="b" type="om" varSeq="2" wit="1838">om.<wit><idno>1838</idno></wit></rdg>'
+        xml = exp.make_reading(reading, index_position, reading_label, witnesses)
+        # check the right things are passed to the mocked functions
+        mocked_get_label.assert_called_with(reading_label, False, reading)
+        mocked_get_text.assert_called_with(reading, False)
+        mocked_check_for_suffixed_reading_marker.assert_called_with(['om.', 'om'], reading)
+        # check the result
+        self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
 
-#         expected_suffix = 'o'
-#         generated_suffix = exp.fix_subreading_suffix('o')
-#         self.assertEqual(expected_suffix, generated_suffix)
+    @patch('collation.core.exporter.Exporter.check_for_suffixed_reading_marker')
+    @patch('collation.core.exporter.Exporter.get_text')
+    @patch('collation.core.exporter.Exporter.get_label')
+    def test_make_reading_lac_verse_reading(self,
+                                            mocked_get_label,
+                                            mocked_get_text,
+                                            mocked_check_for_suffixed_reading_marker):
+        """Test make_reading for a lac reading.
+        """
+        mocked_get_label.return_value = 'b'
+        mocked_get_text.return_value = ['lac.', 'lac']
+        mocked_check_for_suffixed_reading_marker.return_value = ['lac.', 'lac']
+        # set required args so they are easier to see in the test
+        reading = None  # we don't actually need one because the functions that use it are mocked
+        index_position = 1
+        reading_label = 'zz'
+        witnesses = ['1838']
+        exp = Exporter()
+        expected_xml = '<rdg n="b" type="lac" varSeq="2" wit="1838">lac.<wit><idno>1838</idno></wit></rdg>'
+        xml = exp.make_reading(reading, index_position, reading_label, witnesses)
+        # check the right things are passed to the mocked functions
+        mocked_get_label.assert_called_with(reading_label, False, reading)
+        mocked_get_text.assert_called_with(reading, False)
+        mocked_check_for_suffixed_reading_marker.assert_called_with(['lac.', 'lac'], reading)
+        # check the result
+        self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
 
-#     @patch('collation.core.exporter.Exporter.check_for_suffixed_reading_marker')
-#     @patch('collation.core.exporter.Exporter.get_text')
-#     @patch('collation.core.exporter.Exporter.get_label')
-#     def test_make_reading_main_reading_1(self,
-#                                          mocked_get_label,
-#                                          mocked_get_text,
-#                                          mocked_check_for_suffixed_reading_marker):
-#         mocked_get_label.return_value = 'b'
-#         mocked_get_text.return_value = ['και']
-#         mocked_check_for_suffixed_reading_marker.return_value = ['και']
-#         # set required args so they are easier to see in the test
-#         reading = None  # we don't actually need one because the functions that use it are mocked
-#         index_position = 1
-#         reading_label = 'b'
-#         witnesses = ['6']
-#         exp = Exporter()
-#         expected_xml = '<rdg n='b' varSeq='2' wit='6'>και<wit><idno>6</idno></wit></rdg>'
-#         xml = exp.make_reading(reading, index_position, reading_label, witnesses)
-#         # check the right things are passed to the mocked functions
-#         mocked_get_label.assert_called_with(reading_label, False, None, reading)
-#         mocked_get_text.assert_called_with(reading, False)
-#         mocked_check_for_suffixed_reading_marker.assert_called_with(['και'], None, reading)
-#         # check the result
-#         self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
+    @patch('collation.core.exporter.Exporter.check_for_suffixed_reading_marker')
+    @patch('collation.core.exporter.Exporter.get_text')
+    @patch('collation.core.exporter.Exporter.get_label')
+    def test_make_reading_overlapped_verse_reading(self,
+                                                   mocked_get_label,
+                                                   mocked_get_text,
+                                                   mocked_check_for_suffixed_reading_marker):
+        """Test make_reading for an overlapped reading.
+        """
+        mocked_get_label.return_value = 'b'
+        mocked_get_text.return_value = ['', 'overlapped']
+        mocked_check_for_suffixed_reading_marker.return_value = ['', 'overlapped']
+        # set required args so they are easier to see in the test
+        reading = None  # we don't actually need one because the functions that use it are mocked
+        index_position = 1
+        reading_label = 'zu'
+        witnesses = ['1838']
+        exp = Exporter()
+        expected_xml = '<rdg n="b" type="overlapped" varSeq="2" wit="1838"><wit><idno>1838</idno></wit></rdg>'
+        xml = exp.make_reading(reading, index_position, reading_label, witnesses)
+        # check the right things are passed to the mocked functions
+        mocked_get_label.assert_called_with(reading_label, False, reading)
+        mocked_get_text.assert_called_with(reading, False)
+        mocked_check_for_suffixed_reading_marker.assert_called_with(['', 'overlapped'], reading)
+        # check the result
+        self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
 
-#     @patch('collation.core.exporter.Exporter.check_for_suffixed_reading_marker')
-#     @patch('collation.core.exporter.Exporter.get_text')
-#     @patch('collation.core.exporter.Exporter.get_label')
-#     def test_make_reading_main_reading_2(self,
-#                                          mocked_get_label,
-#                                          mocked_get_text,
-#                                          mocked_check_for_suffixed_reading_marker):
-#         mocked_get_label.return_value = 'cf'
-#         mocked_get_text.return_value = ['κι']
-#         mocked_check_for_suffixed_reading_marker.return_value = ['κι']
-#         # set required args so they are easier to see in the test
-#         reading = None  # we don't actually need one because the functions that use it are mocked
-#         index_position = 2
-#         reading_label = 'c'
-#         witnesses = ['6', '7']
-#         exp = Exporter()
-#         expected_xml = '<rdg n='cf' varSeq='3' wit='6 7'>κι<wit><idno>6</idno><idno>7</idno></wit></rdg>'
-#         xml = exp.make_reading(reading, index_position, reading_label, witnesses)
-#         # check the right things are passed to the mocked functions
-#         mocked_get_label.assert_called_with(reading_label, False, None, reading)
-#         mocked_get_text.assert_called_with(reading, False)
-#         mocked_check_for_suffixed_reading_marker.assert_called_with(['κι'], None, reading)
-#         # check the result
-#         self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
+    @patch('collation.core.exporter.Exporter.make_reading')
+    @patch('collation.core.exporter.Exporter.get_witnesses')
+    @patch('collation.core.exporter.Exporter.get_lemma_text')
+    def test_get_app_units_positive_apparatus(self,
+                                              mocked_get_lemma_text,
+                                              mocked_get_witnesses,
+                                              mocked_make_reading):
+        """Test get_app_units on a positive apparatus with no subreadings.
+        """
+        mocked_get_lemma_text.side_effect = [['my lemma'], ['here'], ['', 'om']]
+        mocked_get_witnesses.side_effect = [['basetext', '6'], ['7', '8'], ['basetext'], ['7', '8'],
+                                            ['6'], ['basetext', '8'], ['6', '7']]
+        mocked_make_reading.side_effect = [etree.fromstring('<rdg n="a" varSeq="1" wit="basetext 6">my lemma<wit>'
+                                                            '<idno>basetext</idno><idno>6</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7 8">my lema<wit>'
+                                                            '<idno>7</idno><idno>8</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="a" varSeq="1" wit="basetext">here<wit>'
+                                                            '<idno>basetext</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7 8">my lema<wit>'
+                                                            '<idno>7</idno><idno>8</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="c" type="om" cause="fehlerMR" varSeq="3" '
+                                                            'wit="6">om.<wit><idno>6</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="a" varSeq="1" wit="basetext 8">om.<wit>'
+                                                            '<idno>basetext</idno><idno>8</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="6 7">addition<wit>'
+                                                            '<idno>6</idno><idno>7</idno></wit></rdg>')]
+        context = 'Gal.1.1'
+        overtext = {'current': {'id': 'basetext'}}
+        # give it just enough to control the loops and stop calls breaking (data seems to be needed even though they
+        # are mocked)
+        apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'}, {'label': 'b'}]},
+                     {'start': 6, 'end': 6, 'readings': [{'label': 'a'}, {'label': 'b'}, {'label': 'c',
+                                                                                          'reading_classes': ['fehlerMR']  # NoQA
+                                                                                          }]},
+                     {'start': 7, 'end': 7, 'readings': [{'label': 'a'}, {'label': 'b'}]}]
+        missing = []
+        exp = Exporter()
+        expected_xml = [('<app type="main" n="Gal.1.1" from="2" to="4"><lem wit="basetext">my lemma</lem>'
+                         '<rdg n="a" varSeq="1" wit="basetext 6">my lemma<wit><idno>basetext</idno><idno>6</idno></wit>'
+                         '</rdg><rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno><idno>8</idno></wit>'
+                         '</rdg></app>'),
+                        ('<app type="main" n="Gal.1.1" from="6" to="6"><lem wit="basetext">here</lem>'
+                         '<rdg n="a" varSeq="1" wit="basetext">here<wit><idno>basetext</idno></wit></rdg>'
+                         '<rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno><idno>8</idno></wit></rdg>'
+                         '<rdg n="c" type="om" cause="fehlerMR" varSeq="3" wit="6">om.<wit><idno>6</idno></wit>'
+                         '</rdg></app>'),
+                        ('<app type="main" n="Gal.1.1" from="7" to="7"><lem wit="basetext" type="om" />'
+                         '<rdg n="a" varSeq="1" wit="basetext 8">om.<wit><idno>basetext</idno><idno>8</idno></wit>'
+                         '</rdg><rdg n="b" varSeq="2" wit="6 7">addition<wit><idno>6</idno><idno>7</idno></wit>'
+                         '</rdg></app>')]
+        app_units = exp.get_app_units(apparatus, overtext, context, missing)
+        result = []
+        for unit in app_units:
+            result.append(etree.tostring(unit, encoding='UTF-8').decode('UTF-8'))
+        # check the right things are passed to the mocked functions
+        mocked_get_lemma_text.assert_has_calls([call(overtext, 2, 4), call(overtext, 6, 6), call(overtext, 7, 7)])
+        mocked_get_witnesses.assert_has_calls([call({'label': 'a'}, missing),
+                                               call({'label': 'b'}, missing),
+                                               call({'label': 'a'}, missing),
+                                               call({'label': 'b'}, missing),
+                                               call({'label': 'c', 'reading_classes': ['fehlerMR']}, missing),
+                                               call({'label': 'a'}, missing),
+                                               call({'label': 'b'}, missing)
+                                               ])
+        mocked_make_reading.assert_has_calls([call({'label': 'a'}, 0, 'a', ['basetext', '6'], subtype=None),
+                                              call({'label': 'b'}, 1, 'b', ['7', '8'], subtype=None),
+                                              call({'label': 'a'}, 0, 'a', ['basetext'], subtype=None),
+                                              call({'label': 'b'}, 1, 'b', ['7', '8'], subtype=None),
+                                              call({'label': 'c', 'reading_classes': ['fehlerMR']}, 2, 'c', ['6'],
+                                              subtype='fehlerMR'),
+                                              call({'label': 'a'}, 0, 'a', ['basetext', '8'], subtype=None),
+                                              call({'label': 'b'}, 1, 'b', ['6', '7'], subtype=None)
+                                              ])
+        # check the result
+        self.assertEqual(result, expected_xml)
 
-#     @patch('collation.core.exporter.Exporter.check_for_suffixed_reading_marker')
-#     @patch('collation.core.exporter.Exporter.get_text')
-#     @patch('collation.core.exporter.Exporter.get_label')
-#     def test_make_reading_subreading(self,
-#                                      mocked_get_label,
-#                                      mocked_get_text,
-#                                      mocked_check_for_suffixed_reading_marker):
-#         mocked_get_label.return_value = 'af'
-#         mocked_get_text.return_value = ['om.', 'om']
-#         mocked_check_for_suffixed_reading_marker.return_value = ['om.', 'om']
-#         # set required args so they are easier to see in the test
-#         reading = None  # we don't actually need one because the functions that use it are mocked
-#         index_position = 1
-#         reading_label = 'af'  # subreadings have pre-compiled labels in the data
-#         witnesses = ['206*']
-#         subreading = True
-#         subreading_subtype = 'fehler'
-#         exp = Exporter()
-#         expected_xml = ('<rdg n='af' type='subreading' cause='fehler' varSeq='2' wit='206*'>om.<wit>'
-#                         '<idno>206*</idno></wit></rdg>')
-#         xml = exp.make_reading(reading, index_position, reading_label, witnesses, subreading, subreading_subtype)
-#         # check the right things are passed to the mocked functions
-#         mocked_get_label.assert_called_with(reading_label, subreading, subreading_subtype, reading)
-#         mocked_get_text.assert_called_with(reading, subreading)
-#         mocked_check_for_suffixed_reading_marker.assert_called_with(['om.', 'om'], subreading_subtype, reading)
-#         # check the result
-#         self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
+    @patch('collation.core.exporter.Exporter.make_reading')
+    @patch('collation.core.exporter.Exporter.get_witnesses')
+    @patch('collation.core.exporter.Exporter.get_lemma_text')
+    def test_get_app_units_positive_apparatus_subreading(self,
+                                                         mocked_get_lemma_text,
+                                                         mocked_get_witnesses,
+                                                         mocked_make_reading):
+        """Test get_app_units on a positive apparatus with a subreading. 
+        """
+        mocked_get_lemma_text.side_effect = [['my lemma']]
+        mocked_get_witnesses.side_effect = [['basetext', '6'], ['7'], ['8']]
+        mocked_make_reading.side_effect = [etree.fromstring('<rdg n="a" varSeq="1" wit="basetext 6">my lemma<wit>'
+                                                            '<idno>basetext</idno><idno>6</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7">my lema<wit><idno>7</idno>'
+                                                            '</wit></rdg>'),
+                                           etree.fromstring('<rdg type="subreading" cause="orthographic" n="bo" '
+                                                            'varSeq="3" wit="8">mie lema<wit><idno>8</idno></wit></rdg>')]  # NoQA
+        context = 'Gal.1.1'
+        overtext = {'current': {'id': 'basetext'}}
+        apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'},
+                     {'label': 'b', 'subreadings': {'orthographic': [{'label': 'b', 'suffix': ''}]}}]}]
+        missing = []
+        exp = Exporter()
+        expected_xml = [('<app type="main" n="Gal.1.1" from="2" to="4"><lem wit="basetext">my lemma</lem>'
+                         '<rdg n="a" varSeq="1" wit="basetext 6">my lemma<wit><idno>basetext</idno><idno>6</idno>'
+                         '</wit></rdg><rdg n="b" varSeq="2" wit="7">my lema<wit><idno>7</idno></wit></rdg>'
+                         '<rdg type="subreading" cause="orthographic" n="bo" varSeq="3" wit="8">mie lema<wit>'
+                         '<idno>8</idno></wit></rdg></app>')]
+        app_units = exp.get_app_units(apparatus, overtext, context, missing)
+        result = []
+        for unit in app_units:
+            result.append(etree.tostring(unit, encoding='UTF-8').decode('UTF-8'))
+        # check the right things are passed to the mocked functions
+        mocked_get_lemma_text.assert_has_calls([call(overtext, 2, 4)])
+        mocked_get_witnesses.assert_has_calls([call({'label': 'a'}, missing),
+                                               call({'label': 'b',
+                                                     'subreadings': {'orthographic': [{'label': 'b',
+                                                                                       'suffix': ''}]}}, missing),
+                                               call({'label': 'b', 'suffix': ''}, missing)
+                                               ])
+        mocked_make_reading.assert_has_calls([call({'label': 'a'}, 0, 'a', ['basetext', '6'], subtype=None),
+                                              call({'label': 'b',
+                                                    'subreadings': {'orthographic': [{'label': 'b',
+                                                                                      'suffix': ''}]}}, 1, 'b', ['7'], subtype=None),  # NoQA
+                                              call({'label': 'b', 'suffix': ''}, 1, 'b', ['8'], True, 'orthographic')
+                                              ])
+        # check the result
+        self.assertEqual(result, expected_xml)
 
-#     @patch('collation.core.exporter.Exporter.check_for_suffixed_reading_marker')
-#     @patch('collation.core.exporter.Exporter.get_text')
-#     @patch('collation.core.exporter.Exporter.get_label')
-#     def test_make_reading_om_reading(self,
-#                                      mocked_get_label,
-#                                      mocked_get_text,
-#                                      mocked_check_for_suffixed_reading_marker):
-#         mocked_get_label.return_value = 'b'
-#         mocked_get_text.return_value = ['om.', 'om']
-#         mocked_check_for_suffixed_reading_marker.return_value = ['om.', 'om']
-#         # set required args so they are easier to see in the test
-#         reading = None  # we don't actually need one because the functions that use it are mocked
-#         index_position = 1
-#         reading_label = 'b'
-#         witnesses = ['1838']
-#         exp = Exporter()
-#         expected_xml = '<rdg n='b' type='om' varSeq='2' wit='1838'>om.<wit><idno>1838</idno></wit></rdg>'
-#         xml = exp.make_reading(reading, index_position, reading_label, witnesses)
-#         # check the right things are passed to the mocked functions
-#         mocked_get_label.assert_called_with(reading_label, False, None, reading)
-#         mocked_get_text.assert_called_with(reading, False)
-#         mocked_check_for_suffixed_reading_marker.assert_called_with(['om.', 'om'], None, reading)
-#         # check the result
-#         self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
+    @patch('collation.core.exporter.Exporter.make_reading')
+    @patch('collation.core.exporter.Exporter.get_witnesses')
+    @patch('collation.core.exporter.Exporter.get_lemma_text')
+    def test_get_app_units_negative_apparatus(self,
+                                              mocked_get_lemma_text,
+                                              mocked_get_witnesses,
+                                              mocked_make_reading):
+        """Test get_app_units on a negative apparatus with no subreadings.
+        """
+        mocked_get_lemma_text.side_effect = [['my lemma'], ['here'], ['', 'om']]
+        mocked_get_witnesses.side_effect = [['basetext', '6'], ['7', '8'], ['basetext'], ['7', '8'],
+                                            ['6'], ['basetext', '8'], ['6', '7']]
+        mocked_make_reading.side_effect = [etree.fromstring('<rdg n="a" varSeq="1">my lemma</rdg>'),
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7 8">my lema<wit>'
+                                                            '<idno>7</idno><idno>8</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="a" varSeq="1">here</rdg>'),
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno>'
+                                                            '<idno>8</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="c" type="om" cause="fehlerMR" varSeq="3" '
+                                                            'wit="6">om.<wit><idno>6</idno></wit></rdg>'),
+                                           etree.fromstring('<rdg n="a" varSeq="1">om.</rdg>'),
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="6 7">addition<wit>'
+                                                            '<idno>6</idno><idno>7</idno></wit></rdg>')]
+        context = 'Gal.1.1'
+        overtext = {'current': {'id': 'basetext'}}
+        # give it just enough to control the loops and stop calls breaking (data seems to be needed even though they
+        # are mocked)
+        apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'}, {'label': 'b'}]},
+                     {'start': 6, 'end': 6, 'readings': [{'label': 'a'}, {'label': 'b'},
+                                                         {'label': 'c', 'reading_classes': ['fehlerMR']}]},
+                     {'start': 7, 'end': 7, 'readings': [{'label': 'a'}, {'label': 'b'}]}]
+        missing = []
+        exp = Exporter(format='negative_xml')
+        expected_xml = [('<app type="main" n="Gal.1.1" from="2" to="4"><lem wit="basetext">my lemma</lem>'
+                         '<rdg n="a" varSeq="1">my lemma</rdg><rdg n="b" varSeq="2" wit="7 8">my lema<wit>'
+                         '<idno>7</idno><idno>8</idno></wit></rdg></app>'),
+                        ('<app type="main" n="Gal.1.1" from="6" to="6"><lem wit="basetext">here</lem>'
+                         '<rdg n="a" varSeq="1">here</rdg><rdg n="b" varSeq="2" wit="7 8">my lema<wit><idno>7</idno>'
+                         '<idno>8</idno></wit></rdg><rdg n="c" type="om" cause="fehlerMR" varSeq="3" wit="6">om.<wit>'
+                         '<idno>6</idno></wit></rdg></app>'),
+                        ('<app type="main" n="Gal.1.1" from="7" to="7"><lem wit="basetext" type="om" />'
+                         '<rdg n="a" varSeq="1">om.</rdg><rdg n="b" varSeq="2" wit="6 7">addition<wit><idno>6</idno>'
+                         '<idno>7</idno></wit></rdg></app>')]
+        app_units = exp.get_app_units(apparatus, overtext, context, missing)
+        result = []
+        for unit in app_units:
+            result.append(etree.tostring(unit, encoding='UTF-8').decode('UTF-8'))
+        # check the right calls are made - only make_reading should differ from positive version as it should always
+        # get an empty list for the witnesses in the a reading calls.
+        mocked_get_lemma_text.assert_has_calls([call(overtext, 2, 4), call(overtext, 6, 6), call(overtext, 7, 7)])
+        mocked_get_witnesses.assert_has_calls([call({'label': 'a'}, missing),
+                                               call({'label': 'b'}, missing),
+                                               call({'label': 'a'}, missing),
+                                               call({'label': 'b'}, missing),
+                                               call({'label': 'c', 'reading_classes': ['fehlerMR']}, missing),
+                                               call({'label': 'a'}, missing),
+                                               call({'label': 'b'}, missing)
+                                               ])
+        mocked_make_reading.assert_has_calls([call({'label': 'a'}, 0, 'a', [], subtype=None),
+                                              call({'label': 'b'}, 1, 'b', ['7', '8'], subtype=None),
+                                              call({'label': 'a'}, 0, 'a', [], subtype=None),
+                                              call({'label': 'b'}, 1, 'b', ['7', '8'], subtype=None),
+                                              call({'label': 'c', 'reading_classes': ['fehlerMR']}, 2, 'c', ['6'],
+                                              subtype='fehlerMR'),
+                                              call({'label': 'a'}, 0, 'a', [], subtype=None),
+                                              call({'label': 'b'}, 1, 'b', ['6', '7'], subtype=None)
+                                              ])
+        # check the result
+        self.assertEqual(result, expected_xml)
 
-#     @patch('collation.core.exporter.Exporter.check_for_suffixed_reading_marker')
-#     @patch('collation.core.exporter.Exporter.get_text')
-#     @patch('collation.core.exporter.Exporter.get_label')
-#     def test_make_reading_lac_verse_reading(self,
-#                                             mocked_get_label,
-#                                             mocked_get_text,
-#                                             mocked_check_for_suffixed_reading_marker):
-#         mocked_get_label.return_value = 'b'
-#         mocked_get_text.return_value = ['lac.', 'lac']
-#         mocked_check_for_suffixed_reading_marker.return_value = ['lac.', 'lac']
-#         # set required args so they are easier to see in the test
-#         reading = None  # we don't actually need one because the functions that use it are mocked
-#         index_position = 1
-#         reading_label = 'zz'
-#         witnesses = ['1838']
-#         exp = Exporter()
-#         expected_xml = '<rdg n='b' type='lac' varSeq='2' wit='1838'>lac.<wit><idno>1838</idno></wit></rdg>'
-#         xml = exp.make_reading(reading, index_position, reading_label, witnesses)
-#         # check the right things are passed to the mocked functions
-#         mocked_get_label.assert_called_with(reading_label, False, None, reading)
-#         mocked_get_text.assert_called_with(reading, False)
-#         mocked_check_for_suffixed_reading_marker.assert_called_with(['lac.', 'lac'], None, reading)
-#         # check the result
-#         self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
-
-#     @patch('collation.core.exporter.Exporter.check_for_suffixed_reading_marker')
-#     @patch('collation.core.exporter.Exporter.get_text')
-#     @patch('collation.core.exporter.Exporter.get_label')
-#     def test_make_reading_overlapped_verse_reading(self,
-#                                                    mocked_get_label,
-#                                                    mocked_get_text,
-#                                                    mocked_check_for_suffixed_reading_marker):
-#         mocked_get_label.return_value = 'b'
-#         mocked_get_text.return_value = ['', 'overlapped']
-#         mocked_check_for_suffixed_reading_marker.return_value = ['', 'overlapped']
-#         # set required args so they are easier to see in the test
-#         reading = None  # we don't actually need one because the functions that use it are mocked
-#         index_position = 1
-#         reading_label = 'zu'
-#         witnesses = ['1838']
-#         exp = Exporter()
-#         expected_xml = '<rdg n='b' type='overlapped' varSeq='2' wit='1838'><wit><idno>1838</idno></wit></rdg>'
-#         xml = exp.make_reading(reading, index_position, reading_label, witnesses)
-#         # check the right things are passed to the mocked functions
-#         mocked_get_label.assert_called_with(reading_label, False, None, reading)
-#         mocked_get_text.assert_called_with(reading, False)
-#         mocked_check_for_suffixed_reading_marker.assert_called_with(['', 'overlapped'], None, reading)
-#         # check the result
-#         self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
-
-#     @patch('collation.core.exporter.Exporter.make_reading')
-#     @patch('collation.core.exporter.Exporter.get_witnesses')
-#     @patch('collation.core.exporter.Exporter.get_lemma_text')
-#     def test_get_app_units_positive_apparatus(self,
-#                                               mocked_get_lemma_text,
-#                                               mocked_get_witnesses,
-#                                               mocked_make_reading):
-#         mocked_get_lemma_text.side_effect = [['my lemma'], ['here'], ['', 'om']]
-#         mocked_get_witnesses.side_effect = [['basetext', '6'], ['7', '8'], ['basetext'], ['7', '8'],
-#                                             ['6'], ['basetext', '8'], ['6', '7']]
-#         mocked_make_reading.side_effect = [etree.fromstring('<rdg n='a' varSeq='1' wit='basetext 6'>my lemma<wit>'
-#                                                             '<idno>basetext</idno><idno>6</idno></wit></rdg>'),
-#                                            etree.fromstring('<rdg n='b' varSeq='2' wit='7 8'>my lema<wit>'
-#                                                             '<idno>7</idno><idno>8</idno></wit></rdg>'),
-#                                            etree.fromstring('<rdg n='a' varSeq='1' wit='basetext'>here<wit>'
-#                                                             '<idno>basetext</idno></wit></rdg>'),
-#                                            etree.fromstring('<rdg n='b' varSeq='2' wit='7 8'>my lema<wit>'
-#                                                             '<idno>7</idno><idno>8</idno></wit></rdg>'),
-#                                            etree.fromstring('<rdg n='c' type='om' cause='fehlerMR' varSeq='3' '
-#                                                             'wit='6'>om.<wit><idno>6</idno></wit></rdg>'),
-#                                            etree.fromstring('<rdg n='a' varSeq='1' wit='basetext 8'>om.<wit>'
-#                                                             '<idno>basetext</idno><idno>8</idno></wit></rdg>'),
-#                                            etree.fromstring('<rdg n='b' varSeq='2' wit='6 7'>addition<wit>'
-#                                                             '<idno>6</idno><idno>7</idno></wit></rdg>')]
-#         context = 'Gal.1.1'
-#         overtext = {'current': {'id': 'basetext'}}
-#         # give it just enough to control the loops and stop calls breaking (data seems to be needed even though they
-#         # are mocked)
-#         apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'}, {'label': 'b'}]},
-#                      {'start': 6, 'end': 6, 'readings': [{'label': 'a'}, {'label': 'b'}, {'label': 'c',
-#                                                                                           'reading_classes': ['fehlerMR']  # NoQA
-#                                                                                           }]},
-#                      {'start': 7, 'end': 7, 'readings': [{'label': 'a'}, {'label': 'b'}]}]
-#         missing = []
-#         exp = Exporter()
-#         expected_xml = [('<app type='main' n='Gal.1.1' from='2' to='4'><lem wit='basetext'>my lemma</lem>'
-#                          '<rdg n='a' varSeq='1' wit='basetext 6'>my lemma<wit><idno>basetext</idno><idno>6</idno></wit>'
-#                          '</rdg><rdg n='b' varSeq='2' wit='7 8'>my lema<wit><idno>7</idno><idno>8</idno></wit>'
-#                          '</rdg></app>'),
-#                         ('<app type='main' n='Gal.1.1' from='6' to='6'><lem wit='basetext'>here</lem>'
-#                          '<rdg n='a' varSeq='1' wit='basetext'>here<wit><idno>basetext</idno></wit></rdg>'
-#                          '<rdg n='b' varSeq='2' wit='7 8'>my lema<wit><idno>7</idno><idno>8</idno></wit></rdg>'
-#                          '<rdg n='c' type='om' cause='fehlerMR' varSeq='3' wit='6'>om.<wit><idno>6</idno></wit>'
-#                          '</rdg></app>'),
-#                         ('<app type='main' n='Gal.1.1' from='7' to='7'><lem wit='basetext' type='om' />'
-#                          '<rdg n='a' varSeq='1' wit='basetext 8'>om.<wit><idno>basetext</idno><idno>8</idno></wit>'
-#                          '</rdg><rdg n='b' varSeq='2' wit='6 7'>addition<wit><idno>6</idno><idno>7</idno></wit>'
-#                          '</rdg></app>')]
-#         app_units = exp.get_app_units(apparatus, overtext, context, missing)
-#         result = []
-#         for unit in app_units:
-#             result.append(etree.tostring(unit, encoding='UTF-8').decode('UTF-8'))
-#         # check the right things are passed to the mocked functions
-#         mocked_get_lemma_text.assert_has_calls([call(overtext, 2, 4), call(overtext, 6, 6), call(overtext, 7, 7)])
-#         mocked_get_witnesses.assert_has_calls([call({'label': 'a'}, missing),
-#                                                call({'label': 'b'}, missing),
-#                                                call({'label': 'a'}, missing),
-#                                                call({'label': 'b'}, missing),
-#                                                call({'label': 'c', 'reading_classes': ['fehlerMR']}, missing),
-#                                                call({'label': 'a'}, missing),
-#                                                call({'label': 'b'}, missing)
-#                                                ])
-#         mocked_make_reading.assert_has_calls([call({'label': 'a'}, 0, 'a', ['basetext', '6'], subtype=None),
-#                                               call({'label': 'b'}, 1, 'b', ['7', '8'], subtype=None),
-#                                               call({'label': 'a'}, 0, 'a', ['basetext'], subtype=None),
-#                                               call({'label': 'b'}, 1, 'b', ['7', '8'], subtype=None),
-#                                               call({'label': 'c', 'reading_classes': ['fehlerMR']}, 2, 'c', ['6'],
-#                                               subtype='fehlerMR'),
-#                                               call({'label': 'a'}, 0, 'a', ['basetext', '8'], subtype=None),
-#                                               call({'label': 'b'}, 1, 'b', ['6', '7'], subtype=None)
-#                                               ])
-#         # check the result
-#         self.assertEqual(result, expected_xml)
-
-#     @patch('collation.core.exporter.Exporter.make_reading')
-#     @patch('collation.core.exporter.Exporter.get_witnesses')
-#     @patch('collation.core.exporter.Exporter.get_lemma_text')
-#     def test_get_app_units_positive_apparatus_subreading(self,
-#                                                          mocked_get_lemma_text,
-#                                                          mocked_get_witnesses,
-#                                                          mocked_make_reading):
-#         mocked_get_lemma_text.side_effect = [['my lemma']]
-#         mocked_get_witnesses.side_effect = [['basetext', '6'], ['7'], ['8']]
-#         mocked_make_reading.side_effect = [etree.fromstring('<rdg n='a' varSeq='1' wit='basetext 6'>my lemma<wit>'
-#                                                             '<idno>basetext</idno><idno>6</idno></wit></rdg>'),
-#                                            etree.fromstring('<rdg n='b' varSeq='2' wit='7'>my lema<wit><idno>7</idno>'
-#                                                             '</wit></rdg>'),
-#                                            etree.fromstring('<rdg type='subreading' cause='orthographic' n='bo' '
-#                                                             'varSeq='3' wit='8'>mie lema<wit><idno>8</idno></wit></rdg>')]  # NoQA
-#         context = 'Gal.1.1'
-#         overtext = {'current': {'id': 'basetext'}}
-#         apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'},
-#                      {'label': 'b', 'subreadings': {'orthographic': [{'label': 'b', 'suffix': ''}]}}]}]
-#         missing = []
-#         exp = Exporter()
-#         expected_xml = [('<app type='main' n='Gal.1.1' from='2' to='4'><lem wit='basetext'>my lemma</lem>'
-#                          '<rdg n='a' varSeq='1' wit='basetext 6'>my lemma<wit><idno>basetext</idno><idno>6</idno>'
-#                          '</wit></rdg><rdg n='b' varSeq='2' wit='7'>my lema<wit><idno>7</idno></wit></rdg>'
-#                          '<rdg type='subreading' cause='orthographic' n='bo' varSeq='3' wit='8'>mie lema<wit>'
-#                          '<idno>8</idno></wit></rdg></app>')]
-#         app_units = exp.get_app_units(apparatus, overtext, context, missing)
-#         result = []
-#         for unit in app_units:
-#             result.append(etree.tostring(unit, encoding='UTF-8').decode('UTF-8'))
-#         # check the right things are passed to the mocked functions
-#         mocked_get_lemma_text.assert_has_calls([call(overtext, 2, 4)])
-#         mocked_get_witnesses.assert_has_calls([call({'label': 'a'}, missing),
-#                                                call({'label': 'b',
-#                                                      'subreadings': {'orthographic': [{'label': 'b',
-#                                                                                        'suffix': ''}]}}, missing),
-#                                                call({'label': 'b', 'suffix': ''}, missing)
-#                                                ])
-#         mocked_make_reading.assert_has_calls([call({'label': 'a'}, 0, 'a', ['basetext', '6'], subtype=None),
-#                                               call({'label': 'b',
-#                                                     'subreadings': {'orthographic': [{'label': 'b',
-#                                                                                       'suffix': ''}]}}, 1, 'b', ['7'], subtype=None),  # NoQA
-#                                               call({'label': 'b', 'suffix': ''}, 1, 'b', ['8'], True, 'orthographic')
-#                                               ])
-#         # check the result
-#         self.assertEqual(result, expected_xml)
-
-#     @patch('collation.core.exporter.Exporter.make_reading')
-#     @patch('collation.core.exporter.Exporter.get_witnesses')
-#     @patch('collation.core.exporter.Exporter.get_lemma_text')
-#     def test_get_app_units_negative_apparatus(self,
-#                                               mocked_get_lemma_text,
-#                                               mocked_get_witnesses,
-#                                               mocked_make_reading):
-#         mocked_get_lemma_text.side_effect = [['my lemma'], ['here'], ['', 'om']]
-#         mocked_get_witnesses.side_effect = [['basetext', '6'], ['7', '8'], ['basetext'], ['7', '8'],
-#                                             ['6'], ['basetext', '8'], ['6', '7']]
-#         mocked_make_reading.side_effect = [etree.fromstring('<rdg n='a' varSeq='1'>my lemma</rdg>'),
-#                                            etree.fromstring('<rdg n='b' varSeq='2' wit='7 8'>my lema<wit>'
-#                                                             '<idno>7</idno><idno>8</idno></wit></rdg>'),
-#                                            etree.fromstring('<rdg n='a' varSeq='1'>here</rdg>'),
-#                                            etree.fromstring('<rdg n='b' varSeq='2' wit='7 8'>my lema<wit><idno>7</idno>'
-#                                                             '<idno>8</idno></wit></rdg>'),
-#                                            etree.fromstring('<rdg n='c' type='om' cause='fehlerMR' varSeq='3' '
-#                                                             'wit='6'>om.<wit><idno>6</idno></wit></rdg>'),
-#                                            etree.fromstring('<rdg n='a' varSeq='1'>om.</rdg>'),
-#                                            etree.fromstring('<rdg n='b' varSeq='2' wit='6 7'>addition<wit>'
-#                                                             '<idno>6</idno><idno>7</idno></wit></rdg>')]
-#         context = 'Gal.1.1'
-#         overtext = {'current': {'id': 'basetext'}}
-#         # give it just enough to control the loops and stop calls breaking (data seems to be needed even though they
-#         # are mocked)
-#         apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'}, {'label': 'b'}]},
-#                      {'start': 6, 'end': 6, 'readings': [{'label': 'a'}, {'label': 'b'},
-#                                                          {'label': 'c', 'reading_classes': ['fehlerMR']}]},
-#                      {'start': 7, 'end': 7, 'readings': [{'label': 'a'}, {'label': 'b'}]}]
-#         missing = []
-#         exp = Exporter(format='negative_xml')
-#         expected_xml = [('<app type='main' n='Gal.1.1' from='2' to='4'><lem wit='basetext'>my lemma</lem>'
-#                          '<rdg n='a' varSeq='1'>my lemma</rdg><rdg n='b' varSeq='2' wit='7 8'>my lema<wit>'
-#                          '<idno>7</idno><idno>8</idno></wit></rdg></app>'),
-#                         ('<app type='main' n='Gal.1.1' from='6' to='6'><lem wit='basetext'>here</lem>'
-#                          '<rdg n='a' varSeq='1'>here</rdg><rdg n='b' varSeq='2' wit='7 8'>my lema<wit><idno>7</idno>'
-#                          '<idno>8</idno></wit></rdg><rdg n='c' type='om' cause='fehlerMR' varSeq='3' wit='6'>om.<wit>'
-#                          '<idno>6</idno></wit></rdg></app>'),
-#                         ('<app type='main' n='Gal.1.1' from='7' to='7'><lem wit='basetext' type='om' />'
-#                          '<rdg n='a' varSeq='1'>om.</rdg><rdg n='b' varSeq='2' wit='6 7'>addition<wit><idno>6</idno>'
-#                          '<idno>7</idno></wit></rdg></app>')]
-#         app_units = exp.get_app_units(apparatus, overtext, context, missing)
-#         result = []
-#         for unit in app_units:
-#             result.append(etree.tostring(unit, encoding='UTF-8').decode('UTF-8'))
-#         # check the right calls are made - only make_reading should differ from positive version as it should always
-#         # get an empty list for the witnesses in the a reading calls.
-#         mocked_get_lemma_text.assert_has_calls([call(overtext, 2, 4), call(overtext, 6, 6), call(overtext, 7, 7)])
-#         mocked_get_witnesses.assert_has_calls([call({'label': 'a'}, missing),
-#                                                call({'label': 'b'}, missing),
-#                                                call({'label': 'a'}, missing),
-#                                                call({'label': 'b'}, missing),
-#                                                call({'label': 'c', 'reading_classes': ['fehlerMR']}, missing),
-#                                                call({'label': 'a'}, missing),
-#                                                call({'label': 'b'}, missing)
-#                                                ])
-#         mocked_make_reading.assert_has_calls([call({'label': 'a'}, 0, 'a', [], subtype=None),
-#                                               call({'label': 'b'}, 1, 'b', ['7', '8'], subtype=None),
-#                                               call({'label': 'a'}, 0, 'a', [], subtype=None),
-#                                               call({'label': 'b'}, 1, 'b', ['7', '8'], subtype=None),
-#                                               call({'label': 'c', 'reading_classes': ['fehlerMR']}, 2, 'c', ['6'],
-#                                               subtype='fehlerMR'),
-#                                               call({'label': 'a'}, 0, 'a', [], subtype=None),
-#                                               call({'label': 'b'}, 1, 'b', ['6', '7'], subtype=None)
-#                                               ])
-#         # check the result
-#         self.assertEqual(result, expected_xml)
-
-#     @patch('collation.core.exporter.Exporter.make_reading')
-#     @patch('collation.core.exporter.Exporter.get_witnesses')
-#     @patch('collation.core.exporter.Exporter.get_lemma_text')
-#     def test_get_app_units_negative_apparatus_subreading(self,
-#                                                          mocked_get_lemma_text,
-#                                                          mocked_get_witnesses,
-#                                                          mocked_make_reading):
-#         mocked_get_lemma_text.side_effect = [['my lemma']]
-#         mocked_get_witnesses.side_effect = [['basetext', '6'], ['7'], ['8']]
-#         mocked_make_reading.side_effect = [etree.fromstring('<rdg n='a' varSeq='1'>my lemma</rdg>'),
-#                                            etree.fromstring('<rdg n='b' varSeq='2' wit='7'>my lema<wit><idno>7</idno>'
-#                                                             '</wit></rdg>'),
-#                                            etree.fromstring('<rdg type='subreading' cause='orthographic' n='bo' '
-#                                                             'varSeq='3' wit='8'>mie lema<wit><idno>8</idno>'
-#                                                             '</wit></rdg>')]
-#         context = 'Gal.1.1'
-#         overtext = {'current': {'id': 'basetext'}}
-#         apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'},
-#                                                          {'label': 'b',
-#                                                           'subreadings': {'orthographic': [{'label': 'b',
-#                                                                                             'suffix': ''}]}}]}]
-#         missing = []
-#         exp = Exporter(format='negative_xml')
-#         expected_xml = [('<app type='main' n='Gal.1.1' from='2' to='4'><lem wit='basetext'>my lemma</lem>'
-#                          '<rdg n='a' varSeq='1'>my lemma</rdg><rdg n='b' varSeq='2' wit='7'>my lema<wit>'
-#                          '<idno>7</idno></wit></rdg><rdg type='subreading' cause='orthographic' n='bo' varSeq='3' '
-#                          'wit='8'>mie lema<wit><idno>8</idno></wit></rdg></app>')]
-#         app_units = exp.get_app_units(apparatus, overtext, context, missing)
-#         result = []
-#         for unit in app_units:
-#             result.append(etree.tostring(unit, encoding='UTF-8').decode('UTF-8'))
-#         # check the right things are passed to the mocked functions - only make_reading should differ from positive
-#         # version as it should always get an empty list for the witnesses in the a reading calls.
-#         mocked_get_lemma_text.assert_has_calls([call(overtext, 2, 4)])
-#         mocked_get_witnesses.assert_has_calls([call({'label': 'a'}, missing),
-#                                                call({'label': 'b',
-#                                                      'subreadings': {'orthographic': [{'label': 'b',
-#                                                                                        'suffix': ''}]}},
-#                                                     missing),
-#                                                call({'label': 'b', 'suffix': ''}, missing)
-#                                                ])
-#         mocked_make_reading.assert_has_calls([call({'label': 'a'}, 0, 'a', [], subtype=None),
-#                                               call({'label': 'b',
-#                                                     'subreadings': {'orthographic': [{'label': 'b',
-#                                                                                       'suffix': ''}]}},
-#                                                    1, 'b', ['7'], subtype=None),
-#                                               call({'label': 'b', 'suffix': ''}, 1, 'b', ['8'], True, 'orthographic')
-#                                               ])
-#         # check the result
-#         self.assertEqual(result, expected_xml)
+    @patch('collation.core.exporter.Exporter.make_reading')
+    @patch('collation.core.exporter.Exporter.get_witnesses')
+    @patch('collation.core.exporter.Exporter.get_lemma_text')
+    def test_get_app_units_negative_apparatus_subreading(self,
+                                                         mocked_get_lemma_text,
+                                                         mocked_get_witnesses,
+                                                         mocked_make_reading):
+        """Test get_app_units on a negative apparatus with a subreading. 
+        """
+        mocked_get_lemma_text.side_effect = [['my lemma']]
+        mocked_get_witnesses.side_effect = [['basetext', '6'], ['7'], ['8']]
+        mocked_make_reading.side_effect = [etree.fromstring('<rdg n="a" varSeq="1">my lemma</rdg>'),
+                                           etree.fromstring('<rdg n="b" varSeq="2" wit="7">my lema<wit><idno>7</idno>'
+                                                            '</wit></rdg>'),
+                                           etree.fromstring('<rdg type="subreading" cause="orthographic" n="bo" '
+                                                            'varSeq="3" wit="8">mie lema<wit><idno>8</idno>'
+                                                            '</wit></rdg>')]
+        context = 'Gal.1.1'
+        overtext = {'current': {'id': 'basetext'}}
+        apparatus = [{'start': 2, 'end': 4, 'readings': [{'label': 'a'},
+                                                         {'label': 'b',
+                                                          'subreadings': {'orthographic': [{'label': 'b',
+                                                                                            'suffix': ''}]}}]}]
+        missing = []
+        exp = Exporter(format='negative_xml')
+        expected_xml = [('<app type="main" n="Gal.1.1" from="2" to="4"><lem wit="basetext">my lemma</lem>'
+                         '<rdg n="a" varSeq="1">my lemma</rdg><rdg n="b" varSeq="2" wit="7">my lema<wit>'
+                         '<idno>7</idno></wit></rdg><rdg type="subreading" cause="orthographic" n="bo" varSeq="3" '
+                         'wit="8">mie lema<wit><idno>8</idno></wit></rdg></app>')]
+        app_units = exp.get_app_units(apparatus, overtext, context, missing)
+        result = []
+        for unit in app_units:
+            result.append(etree.tostring(unit, encoding='UTF-8').decode('UTF-8'))
+        # check the right things are passed to the mocked functions - only make_reading should differ from positive
+        # version as it should always get an empty list for the witnesses in the a reading calls.
+        mocked_get_lemma_text.assert_has_calls([call(overtext, 2, 4)])
+        mocked_get_witnesses.assert_has_calls([call({'label': 'a'}, missing),
+                                               call({'label': 'b',
+                                                     'subreadings': {'orthographic': [{'label': 'b',
+                                                                                       'suffix': ''}]}},
+                                                    missing),
+                                               call({'label': 'b', 'suffix': ''}, missing)
+                                               ])
+        mocked_make_reading.assert_has_calls([call({'label': 'a'}, 0, 'a', [], subtype=None),
+                                              call({'label': 'b',
+                                                    'subreadings': {'orthographic': [{'label': 'b',
+                                                                                      'suffix': ''}]}},
+                                                   1, 'b', ['7'], subtype=None),
+                                              call({'label': 'b', 'suffix': ''}, 1, 'b', ['8'], True, 'orthographic')
+                                              ])
+        # check the result
+        self.assertEqual(result, expected_xml)
 
 # # TODO: work out what is going on with 'include_lemma_when_no_variants' because False doesn't seem to do anything
 
-#     @patch('collation.core.exporter.Exporter.get_app_units')
-#     def test_get_unit_xml_defaults(self, mocked_get_app_units):
-#         mocked_get_app_units.return_value = [etree.fromstring('<app type='main' n='Gal.1.1' from='2' to='8'></app>'),
-#                                              etree.fromstring('<app type='main' n='Gal.1.1' from='2' to='4'></app>'),
-#                                              etree.fromstring('<app type='main' n='Gal.1.1' from='6' to='8'></app>')]
-#         self.maxDiff = None
-#         # data included in lac and om readings to check the default settings works on consolidating
-#         app = {'context': 'Gal.1.1',
-#                'structure': {'overtext': [{'id': 'basetext'}],
-#                              'apparatus': [],
-#                              'lac_readings': ['6', '8'],
-#                              'om_readings': ['7']}
-#                }
-#         exp = Exporter()
-#         expected_missing = ['6', '8', '7']
-#         expected_xml = ('<ab n='Gal.1.1-APP'><app type='lac' n='Gal.1.1'><lem wit='editorial'>Whole verse</lem>'
-#                         '<rdg type='lac' wit='6 8'>Def.<wit><idno>6</idno><idno>8</idno></wit></rdg>'
-#                         '<rdg type='lac' wit='7'>Om.<wit><idno>7</idno></wit></rdg></app>'
-#                         '<app type='main' n='Gal.1.1' from='2' to='8' /><app type='main' n='Gal.1.1' from='2' to='4' />'
-#                         '<app type='main' n='Gal.1.1' from='6' to='8' /></ab>')
-#         xml = exp.get_unit_xml(app)
-#         mocked_get_app_units.assert_called_with([], {'current': {'id': 'basetext'}}, 'Gal.1.1', expected_missing)
-#         self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
+    @patch('collation.core.exporter.Exporter.get_app_units')
+    def test_get_unit_xml_defaults(self, mocked_get_app_units):
+        mocked_get_app_units.return_value = [etree.fromstring('<app type="main" n="Gal.1.1" from="2" to="8"></app>'),
+                                             etree.fromstring('<app type="main" n="Gal.1.1" from="2" to="4"></app>'),
+                                             etree.fromstring('<app type="main" n="Gal.1.1" from="6" to="8"></app>')]
+        self.maxDiff = None
+        # data included in lac and om readings to check the default settings works on consolidating
+        app = {'context': 'Gal.1.1',
+               'structure': {'overtext': [{'original': 'my'}, {'original': 'overtext'}],
+                             'apparatus': [],
+                             'lac_readings': ['6', '8'],
+                             'om_readings': ['7']}
+               }
+        exp = Exporter()
+        expected_missing = ['6', '8', '7']
+        expected_xml = ('<ab n="Gal.1.1-APP"><app type="lac" n="Gal.1.1"><lem wit="editorial">Whole verse</lem>'
+                        '<rdg type="lac" wit="6 8">Def.<wit><idno>6</idno><idno>8</idno></wit></rdg>'
+                        '<rdg type="lac" wit="7">Om.<wit><idno>7</idno></wit></rdg></app>'
+                        '<app type="main" n="Gal.1.1" from="2" to="8" /><app type="main" n="Gal.1.1" from="2" to="4" />'
+                        '<app type="main" n="Gal.1.1" from="6" to="8" /></ab>')
+        xml = exp.get_unit_xml(app)
+        mocked_get_app_units.assert_called_with([],
+                                                {'current': [{'original': 'my'}, {'original': 'overtext'}]},
+                                                'Gal.1.1',
+                                                expected_missing)
+        self.assertEqual(etree.tostring(xml, encoding='UTF-8').decode('UTF-8'), expected_xml)
 
 #     @patch('collation.core.exporter.Exporter.get_app_units')
 #     def test_get_unit_xml_no_consolidate_lac(self, mocked_get_app_units):
@@ -1453,14 +1291,16 @@ class ExporterUnitTests(TestCase):
 #         exp.get_unit_xml(app)
 #         mocked_get_app_units.assert_called_with(expected_app_order, {'current': {'id': 'basetext'}}, 'Gal.1.1', [])
 
-#     @patch('collation.core.exporter.Exporter.get_unit_xml')
-#     def test_export_data(self, mocked_get_unit_xml):
-#         mocked_get_unit_xml.side_effect = [etree.fromstring('<ab n='Gal.1.1-APP' />'),
-#                                            etree.fromstring('<ab n='Gal.1.2-APP' />')]
-#         # just enough to get the loops working
-#         data = [{}, {}]
-#         expected_xml = ('<?xml version='1.0' encoding='utf-8'?><TEI xmlns='http://www.tei-c.org/ns/1.0'>'
-#                         '<ab n='Gal.1.1-APP' />\n<ab n='Gal.1.2-APP' /></TEI>')
-#         exp = Exporter()
-#         xml = exp.export_data(data)
-#         self.assertEqual(xml, expected_xml)
+    # @patch('collation.core.exporter.Exporter.get_unit_xml')
+    # def test_export_data(self, mocked_get_unit_xml):
+    #     """Test the overall structure produced by export_data.
+    #     """
+    #     mocked_get_unit_xml.side_effect = [etree.fromstring('<ab n="Gal.1.1-APP" />'),
+    #                                        etree.fromstring('<ab n="Gal.1.2-APP" />')]
+    #     # just enough to get the loops working
+    #     data = [{}, {}]
+    #     expected_xml = ('<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0">'
+    #                     '<ab n="Gal.1.1-APP" />\n<ab n="Gal.1.2-APP" /></TEI>')
+    #     exp = Exporter()
+    #     xml = exp.export_data(data)
+    #     self.assertEqual(xml, expected_xml)
