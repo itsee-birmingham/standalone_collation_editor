@@ -115,9 +115,9 @@ class Exporter(RestructureExportDataMixin, object):
         """Function to get the text of the lemma within the specified range in the overtext.
 
         Args:
-            overtext (dict): The JSON segment representing the overtext for this unit. The data should be wrapped in a
-                             dictionary as the value to the key 'current'
-                             eg. {'current': [{'id': 'basetext', 'tokens': []}]}
+            overtext (dict): The JSON segment representing the overtext tokens for this unit. The data should be
+                wrapped in a dictionary as the value to the key 'current'
+                eg. {'current': [{'index': 2, 'original': 'word1'}, {'index': 4, 'original': 'word2}]}
             start (str): The start index for the current lemma required.
             end (str): The end index for the current lemma required.
 
@@ -135,7 +135,7 @@ class Exporter(RestructureExportDataMixin, object):
         real_end = int(end/2)-1
         if real_start < 0:
             real_start = 0
-        required_text = overtext['current']['tokens'][real_start:real_end+1]
+        required_text = overtext['current'][real_start:real_end+1]
         words = []
         for token in required_text:
             word = []
@@ -169,7 +169,8 @@ class Exporter(RestructureExportDataMixin, object):
         """Function to get the correct label to display for the reading.
 
         Args:
-            label (str): The current label of the reading (the basic form).
+            label (str): The current label of the reading (the basic form for a main reading or the full label
+                for a subreading).
             is_subreading (bool): A boolean to say whether or not this is a subreading.
             reading (dict): The JSON segment representing the reading.
 
@@ -353,7 +354,7 @@ class Exporter(RestructureExportDataMixin, object):
         return app_list
 
     def get_overtext_data(self, entry):
-        return {'current': entry['structure']['overtext'][0]}
+        return {'current': entry['structure']['overtext']}
 
     def sort_units(self, unit):
         return (unit['start'], -unit['end'])
@@ -368,7 +369,7 @@ class Exporter(RestructureExportDataMixin, object):
             ElementTree.Element: The root element of a tree representing this collation unit in TEI XML.
         """
         context = entry['context']
-        basetext_siglum = entry['structure']['overtext'][0]['id']
+        basetext_siglum = self.overtext_siglum
 
         apparatus = entry['structure']['apparatus'][:]
 
