@@ -251,7 +251,7 @@ class RestructureExportDataMixinUnitTests(TestCase):
         """
         data = {'context': 'Gal.1.1',
                 'structure': {'special_categories': [], 'marked_readings': {}, 'apparatus': [{}, {}],
-                               'overtext': [{'tokens': [{}, {}, {}]}]}}
+                              'overtext': [{'tokens': [{}, {}, {}]}]}}
         expected = deepcopy(data)
         del expected['structure']['special_categories']
         del expected['structure']['marked_readings']
