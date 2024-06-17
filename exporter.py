@@ -73,7 +73,7 @@ class Exporter(RestructureExportDataMixin, object):
             str: A string representing the serialised XML apparatus.
         """
         output = []
-        self.overtext_siglum = data['structure']['overtext_name']
+        self.overtext_siglum = data[0]['structure']['overtext_name']
         for collation_unit in data:
             restructured_collation_unit = self.clean_collation_unit(collation_unit)
             output.append(etree.tostring(self.get_unit_xml(restructured_collation_unit), 'utf-8').decode())
@@ -292,7 +292,7 @@ class Exporter(RestructureExportDataMixin, object):
             app = etree.fromstring('<app type="main" n="%s" from="%s" to="%s"></app>' % (context, start, end))
             if self.exclude_lemma_entry is not True:
                 lem = etree.Element('lem')
-                lem.set('wit', overtext['current']['id'])
+                lem.set('wit', self.overtext_siglum)
                 text = self.get_lemma_text(overtext, start, end)
                 lem.text = text[0]
                 if len(text) > 1:

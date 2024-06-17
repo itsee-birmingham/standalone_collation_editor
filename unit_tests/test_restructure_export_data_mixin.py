@@ -251,7 +251,7 @@ class RestructureExportDataMixinUnitTests(TestCase):
         """
         data = {'context': 'Gal.1.1',
                 'structure': {'special_categories': [], 'marked_readings': {}, 'apparatus': [{}, {}],
-                              'overtext': {'tokens': [{}, {}, {}]}}}
+                               'overtext': [{'tokens': [{}, {}, {}]}]}}
         expected = deepcopy(data)
         del expected['structure']['special_categories']
         del expected['structure']['marked_readings']
@@ -271,7 +271,7 @@ class RestructureExportDataMixinUnitTests(TestCase):
         """
         data = {'context': 'Gal.1.1',
                 'structure': {'marked_readings': {}, 'apparatus': [{}, {}],
-                              'overtext': {'tokens': [{}, {}, {}]}}}
+                              'overtext': [{'tokens': [{}, {}, {}]}]}}
         expected = deepcopy(data)
         del expected['structure']['marked_readings']
         expected['structure']['overtext'] = [{}, {}, {}]
@@ -286,11 +286,11 @@ class RestructureExportDataMixinUnitTests(TestCase):
     @patch('collation.core.restructure_export_data_mixin.RestructureExportDataMixin._clean_variant_unit')
     @patch('collation.core.restructure_export_data_mixin.RestructureExportDataMixin._strip_keys')
     def test_clean_collation_unit_3(self, mocked_strip_keys, mocked_clean_variant_unit):
-        """Test that the this function raises an exception if the called function does.
+        """Test that this function raises an exception if the called function does.
         """
         data = {'context': 'Gal.1.1',
                 'structure': {'special_categories': [], 'marked_readings': {}, 'apparatus': [{}, {}],
-                              'overtext': {'tokens': [{}, {}, {}]}}}
+                              'overtext': [{'tokens': [{}, {}, {}]}]}}
         expected = deepcopy(data)
         del expected['structure']['special_categories']
         del expected['structure']['marked_readings']
