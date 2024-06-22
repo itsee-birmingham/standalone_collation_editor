@@ -50,8 +50,8 @@ class RestructureExportDataMixin(object):
         """
         # remove what we don't need (without raising an error if it isn't there)
         variant_unit.pop('first_word_index', None)
-        variant_unit.pop('_id', None)
-        variant_unit.pop('overlap_units', None)
+        # variant_unit.pop('_id', None)
+        # variant_unit.pop('overlap_units', None)
         for reading in variant_unit['readings']:
             try:
                 self._clean_reading(reading)
