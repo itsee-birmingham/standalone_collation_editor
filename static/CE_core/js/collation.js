@@ -3362,6 +3362,27 @@ var CL = (function() {
           'form': 'CE_core/html_fragments/default_index_input.html'
         };
       }
+      // settings for word order requirements
+      if (Object.prototype.hasOwnProperty.call(project, 'allowOutOfOrderWitnesses')) {
+        CL.project.allowOutOfOrderWitnesses = project.allowOutOfOrderWitnesses;
+        if (CL.project.allowOutOfOrderWitnesses === true &&
+              Object.prototype.hasOwnProperty.call(project, 'witnessesAllowedToBeOutOfOrder')) {
+          CL.project.witnessesAllowedToBeOutOfOrder = project.witnessesAllowedToBeOutOfOrder;
+        } else {
+          CL.project.witnessesAllowedToBeOutOfOrder = [];
+        }
+      } else if (Object.prototype.hasOwnProperty.call(CL.services, 'allowOutOfOrderWitnesses')) {
+        CL.project.allowOutOfOrderWitnesses = CL.services.allowOutOfOrderWitnesses;
+        if (CL.project.allowOutOfOrderWitnesses === true &&
+              Object.prototype.hasOwnProperty.call(CL.services, 'witnessesAllowedToBeOutOfOrder')) {
+          CL.project.witnessesAllowedToBeOutOfOrder = CL.services.witnessesAllowedToBeOutOfOrder;
+        } else {
+          CL.project.witnessesAllowedToBeOutOfOrder = [];
+        }
+      } else {
+        CL.project.allowOutOfOrderWitnesses = false;
+        CL.project.witnessesAllowedToBeOutOfOrder = [];
+      }
       CL.setRuleClasses(project);
       CL._setDisplaySettings(project);
       CL._setLocalPythonFunctions(project);

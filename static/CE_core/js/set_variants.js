@@ -3991,12 +3991,19 @@ var SV = (function() {
 
     // Integrity checks
 
-    // check order integrity in all witnesses
+    // check order integrity in witnesses unless turned off in settings
     _checkAllWitnessesIntegrity: function() {
+      if (CL.project.allowOutOfOrderWitnesses === true && CL.project.witnessesAllowedToBeOutOfOrder.length === 0) {
+        // then all witnesses can be out of order so just return true
+        return true;
+      }
       for (const hand in CL.data.hand_id_map) {
         if (Object.prototype.hasOwnProperty.call(CL.data.hand_id_map, hand)) {
-          if (SV._checkWitnessIntegrity(hand) == false) {
-            return false;
+          if (CL.project.allowOutOfOrderWitnesses === false ||
+                  CL.project.witnessesAllowedToBeOutOfOrder.indexOf(CL.data.hand_id_map[hand]) === -1) {
+            if (SV._checkWitnessIntegrity(hand) == false) {
+              return false;
+            }
           }
         }
       }
@@ -4199,6 +4206,18 @@ var SV = (function() {
           }
         }
       }
+      // here filter out anything that is in the allowed to be out of order list
+      if (CL.project.allowOutOfOrderWitnesses === true) {
+        if (CL.project.witnessesAllowedToBeOutOfOrder.length === 0) {
+          return [];
+        }
+        for (let i = 0; i < problems.length; i += 1) {
+          if (CL.project.witnessesAllowedToBeOutOfOrder.indexOf(CL.data.hand_id_map[problems[i]])!= -1) {
+            problems[i] = null;
+          }
+        }
+        problems = CL.removeNullItems(problems);
+      }
       _watchList.push.apply(_watchList, problems);
       _watchList = CL.setList(_watchList);
       return problems;
@@ -4230,6 +4249,18 @@ var SV = (function() {
         }
       }
       problems = CL.setList(problems);
+      // here filter out anything that is in the allowed to be out of order list
+      if (CL.project.allowOutOfOrderWitnesses === true) {
+        if (CL.project.witnessesAllowedToBeOutOfOrder.length === 0) {
+          return [];
+        }
+        for (let i = 0; i < problems.length; i += 1) {
+          if (CL.project.witnessesAllowedToBeOutOfOrder.indexOf(CL.data.hand_id_map[problems[i]])!= -1) {
+            problems[i] = null;
+          }
+        }
+        problems = CL.removeNullItems(problems);
+      }
       _watchList.push.apply(_watchList, problems);
       _watchList = CL.setList(_watchList);
       return problems;

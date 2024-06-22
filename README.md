@@ -441,6 +441,25 @@ The example below shows two checks added between set variants and order readings
   };
 ```
 
+
+- ### ```allowOutOfOrderWitnesses```
+
+**This variable can be overwritten in individual project settings**
+
+A boolean to determine whether witnesses are allowed to be out of order (have rearranged words) in the collation. It works with *witnessesAllowedToBeOutOfOrder* which can limit the selection of witnesses allowed to be out of order. Any witness/es allowed to be out of order will not appear in the warnings in the Set Variants stage and moving to Order Readings will also be allowed if those witnesses are out of order.
+
+The setting has no effect on the witnesses above overlapping units which are always allowed to be reordered.
+
+The default is false.
+
+
+- ### ```witnessesAllowedToBeOutOfOrder```
+
+This setting is only relevant if *allowOutOfOrderWitnesses* is true. It should contain a list of the witnesses (by transcription ID) that should be allowed to be out of order. If an empty list is provided then all witnesses are allowed to be out of order.
+
+The default is an empty list.
+
+
 - #### ```combineAllLacsInOR```
 
 **This variable can be overwritten in individual project settings**
@@ -917,8 +936,8 @@ Many of the options available in the services file can also be added to individu
 The data should be structured as a list containing JSON objects. Each object should have at least two top level keys with one optional key:
 
 - **label** *[string]* - The string/character used to decorate the witness siglum.
-- **superscript** *[boolean]* optional - If set to true the deocrator will be superscripted when displayed.
-- **witnesses** *[array]* - A list of witness which should be decoarated (this should always be a subset of the witnesses specified for the project).
+- **superscript** *[boolean]* optional - If set to true the decorator will be superscripted when displayed.
+- **witnesses** *[array]* - A list of witness to be decorated (this should always be a subset of the witnesses specified for the project).
 
 
 Python/Server Services
@@ -1448,13 +1467,15 @@ Catena Dev branch changes
 
 * Optional services and project setting *allowCommentsOnRegRules* added. This is a boolean which determines whether or not to show the comments box in the regularisation rule menu. This also involves a change in the default behaviour which will not show the comments box by default. To maintain existing beaviour this boolean should be set to true.
 
+* Optional services and project setting *allowOutOfOrderWitnesses* added along with *witnessesAllowedToBeOutOfOrder*. These settings are explained in the documentation above. The defaults maintain existing behaviour.
+
 * In exporter.py there is a breaking change in the ```get_text()```, ```make_reading()``` and ```get_label()``` function arguments. The argument 'type' which used to be the string 'subreading' or None is now a boolean called 'is_subreading'. All calls to this function in exporters which inherit from this will need to be changed accordingly.
 
 * Exported XML apparatus uses the n attribute for the identifier of ```<ab>``` elements rather than xml:id. The value of the attribute remains unchanged.
 
 * In exporter.py ```get_lemma_text()``` now takes start and end arguments as strings. This is important for dealing with joined units in inheriting exporters.
 
-* In exporter.py ```get_text()``` when om and lac are returned their string value is always returned with the full stop eg. ```om.``` 
+* In exporter.py ```get_text()``` when om and lac are returned their string value is always returned with the full stop eg. ```om.```
 
 * In exporter.py there is a new function ```get_required_end()```. This is irrelevant in this particular exporter but is important in exporters which build on this one and which are required to make joins across collation unit boundaries. This function can be overwritten in inheriting exporters to allow the correct data for the end of the unit to be set in the XML.
 
@@ -1463,3 +1484,5 @@ Catena Dev branch changes
 * A very small change to the way pre-stage checks are implemented. If no message is provided in the configuration then no alert will be displayed, the result of the check will still be followed so if a test fails the unit will not progress to the next stage. This was done so that confirm boxes can be used in the code of the check itself to use warnings that can be overridden by the user, in these cases it should be the result of the confirmation which is passed back as the results of the checks.
 
 * The message on a successful save has been changed from 'Save successful' to 'Last saved:' with a time stamp.
+
+* The collation data is now simplified at the very start of the exporter process. Generally this involved removing keys that are not used but the overtext is also restructured as part of this process and therefore any functions which access the overtext such as ```get_lemma_text()``` will need to be updated to reflect the new, simpler structure. Instead of the tokens being accessesed via ```overtext[0]['tokens']``` they are now directly in ```overtext```.
