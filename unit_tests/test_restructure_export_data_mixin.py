@@ -206,11 +206,9 @@ class RestructureExportDataMixinUnitTests(TestCase):
         """
         mocked_clean_reading.side_effect = [{}, {}]
         data = {'_id': '123', 'start': 2, 'end': 2, 'first_word_index': '2.1',
-                'overlap_units': [], 'readings': [{}, {}]}
+                'overlap_units': {}, 'readings': [{}, {}]}
         expected = deepcopy(data)
-        del expected['_id']
         del expected['first_word_index']
-        del expected['overlap_units']
         mixin = RestructureExportDataMixin()
         mixin._clean_variant_unit(data)
         self.assertEqual(mocked_clean_reading.call_count, 2)
@@ -223,7 +221,6 @@ class RestructureExportDataMixinUnitTests(TestCase):
         mocked_clean_reading.side_effect = [{}, {}]
         data = {'_id': '123', 'start': 2, 'end': 2, 'first_word_index': '2.1', 'readings': [{}, {}]}
         expected = deepcopy(data)
-        del expected['_id']
         del expected['first_word_index']
         mixin = RestructureExportDataMixin()
         mixin._clean_variant_unit(data)
@@ -236,11 +233,9 @@ class RestructureExportDataMixinUnitTests(TestCase):
         """
         mocked_clean_reading.side_effect = [{}, MissingSuffixesException('suffixes missing')]
         data = {'_id': '123', 'start': 2, 'end': 2, 'first_word_index': '2.1',
-                'overlap_units': [], 'readings': [{}, {}]}
+                'overlap_units': {}, 'readings': [{}, {}]}
         expected = deepcopy(data)
-        del expected['_id']
         del expected['first_word_index']
-        del expected['overlap_units']
         mixin = RestructureExportDataMixin()
         self.assertRaises(MissingSuffixesException, mixin._clean_variant_unit, data)
 

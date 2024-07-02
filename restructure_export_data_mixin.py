@@ -50,8 +50,6 @@ class RestructureExportDataMixin(object):
         """
         # remove what we don't need (without raising an error if it isn't there)
         variant_unit.pop('first_word_index', None)
-        # variant_unit.pop('_id', None)
-        # variant_unit.pop('overlap_units', None)
         for reading in variant_unit['readings']:
             try:
                 self._clean_reading(reading)
@@ -116,7 +114,8 @@ class RestructureExportDataMixin(object):
                     reading['reading_suffix'] = ''.join(reading_suffixes)
 
     def _simplify_text_list(self, reading):
-        """
+        """Simplify the list of tokens provided in the text key so it only includes the interface string.
+
         Args:
             reading (dict): The JSON dictionary representing the reading.
 
