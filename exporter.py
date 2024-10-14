@@ -188,7 +188,7 @@ class Exporter(RestructureExportDataMixin, object):
 
         Args:
             text (str): The extracted text of the current reading.
-            reading (dict): The JSON segent representing the reading.
+            reading (dict): The JSON segment representing the reading.
 
         Returns:
             str: The text of the reading as it should now be displayed including any suffixes.
