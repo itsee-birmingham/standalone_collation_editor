@@ -73,12 +73,18 @@ class RestructureExportDataMixin(object):
         # remove the stuff we don't need
         reading.pop('SR_text', None)
         reading.pop('standoff_subreadings', None)
-        # restructure the text array to make it as minimal as it possibly can be
-        reading['text'] = self._simplify_text_list(reading)
+        # restructure the text array to make it as minimal as it possibly can be (check it exists first because for
+        # the apparatus exporter it will not exists for added version/patristics readings
+        if 'text' in reading:
+            reading['text'] = self._simplify_text_list(reading)
         if 'subreadings' in reading:
-            for type in reading['subreadings']:
-                for subreading in reading['subreadings'][type]:
+            if isinstance(reading['subreadings'], list):
+                for subreading in reading['subreadings']:
                     self._clean_reading(subreading)
+            else:
+                for type in reading['subreadings']:
+                    for subreading in reading['subreadings'][type]:
+                        self._clean_reading(subreading)
         # promote all subreadings?
 
     def _supply_missing_reading_data(self, reading):
