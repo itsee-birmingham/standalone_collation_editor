@@ -5015,6 +5015,7 @@ var CL = (function() {
 
     _addNavEvent: function(elemId, collId) {
       $('#' + elemId).on('click', function() {
+        CL.showSubreadings = false;
         CL._loadSavedCollation(collId);
       });
     },
@@ -5070,8 +5071,10 @@ var CL = (function() {
     },
 
     _loadLatestStageVerse: function(latest, approved) {
+      console.log('loading')
       SV.undoStack = [];
       OR.undoStack = [];
+      CL.showSubreadings = false;
       if (latest === null) {
         for (const key in _defaultDisplaySettings) {
           if (Object.prototype.hasOwnProperty.call(_defaultDisplaySettings, key)) {
