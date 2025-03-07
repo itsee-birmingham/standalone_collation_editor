@@ -194,7 +194,7 @@ var SR = (function () {
         }
       }
       for (let i = 0; i < witnesses.length; i += 1) {
-        standoffReading = SR._getMatchingStandoffReading(witnesses[i], unit);
+        standoffReading = SR.getMatchingStandoffReading(witnesses[i], unit);
         if (standoffReading !== null) {
           if (Object.prototype.hasOwnProperty.call(options, 'end')) {
             standoffReading.end = options.end;
@@ -204,6 +204,26 @@ var SR = (function () {
           }
         }
       }
+    },
+
+    getMatchingStandoffReading: function (witness, unit) {
+      if (Object.prototype.hasOwnProperty.call(CL.data, 'marked_readings')) {
+        for (const type in CL.data.marked_readings) {
+          if (Object.prototype.hasOwnProperty.call(CL.data.marked_readings, type)) {
+            for (let i = 0; i < CL.data.marked_readings[type].length; i += 1) {
+              if (CL.data.marked_readings[type][i].apparatus === 'apparatus' + unit.row) {
+                if (CL.data.marked_readings[type][i].start === unit.start &&
+                  CL.data.marked_readings[type][i].end === unit.end) {
+                  if (CL.data.marked_readings[type][i].witness === witness) {
+                    return CL.data.marked_readings[type][i];
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      return null;
     },
 
     _getCorrectStandoffReadingText: function (markedReading, ruleClasses) {
@@ -524,13 +544,13 @@ var SR = (function () {
    * @param {Object} reading - the reading which needs to be made into a subreading
    * @param {String} witness - the witness that is becoming the subreading
    * @param {Array} typeList - a list of abbreviation type labels to be applied to the new subreading
-   * @param {Object} options - other optional data provided which are: 	rules - a list of the regularisation rules
-   *                           that are relevant for creating the subreadings
-   * 									text - the text of the subreading being created
-   * 									combined_gap_before - boolean
-   * 									combined_gap_after - boolean
-   * 									combined_gap_before_details - string
-   * 									standoff - boolean
+   * @param {Object} options - other optional data provided which are: 	
+   *                                rules - a list of the regularisation rules that are relevant for creating the subreadings
+   * 									              text - the text of the subreading being created
+   * 									              combined_gap_before - boolean
+   * 									              combined_gap_after - boolean
+   * 									              combined_gap_before_details - string
+   * 									              standoff - boolean
    * */
     _addToSubreadings: function (subreadings, reading, witness, typeList, options) {
       var matchFound, textString, type, realSuffixList, fakeSuffixList, suffixString, target;
@@ -784,27 +804,6 @@ var SR = (function () {
       }
       reading.witnesses = CL.setList(reading.witnesses);
       delete reading.subreadings;
-    },
-
-    // should be public?
-    _getMatchingStandoffReading: function (witness, unit) {
-      if (Object.prototype.hasOwnProperty.call(CL.data, 'marked_readings')) {
-        for (const type in CL.data.marked_readings) {
-          if (Object.prototype.hasOwnProperty.call(CL.data.marked_readings, type)) {
-            for (let i = 0; i < CL.data.marked_readings[type].length; i += 1) {
-              if (CL.data.marked_readings[type][i].apparatus === 'apparatus' + unit.row) {
-                if (CL.data.marked_readings[type][i].start === unit.start &&
-                  CL.data.marked_readings[type][i].end === unit.end) {
-                  if (CL.data.marked_readings[type][i].witness === witness) {
-                    return CL.data.marked_readings[type][i];
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      return null;
     }
 
   };

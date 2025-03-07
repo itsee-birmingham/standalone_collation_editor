@@ -1432,7 +1432,7 @@ var OR = (function() {
               Object.prototype.hasOwnProperty.call(reading, 'standoff_subreadings')) {
           // find the standoff reading entries (there may be several, use the standoff_subreadings list to navigate)
           for (let i = 0; i < reading.standoff_subreadings.length; i += 1) {
-            standoffEntry = SR._getMatchingStandoffReading(reading.standoff_subreadings[i], unit);
+            standoffEntry = SR.getMatchingStandoffReading(reading.standoff_subreadings[i], unit);
             // change the parent_text value
             standoffEntry.parent_text = '&lt;' + document.getElementById('om_category').value +'&gt;';
           }
