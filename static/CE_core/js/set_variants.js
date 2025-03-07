@@ -2106,12 +2106,14 @@ var SV = (function() {
           }
           if (witnesses.length > 0) {
             readings.push({
+              'type': 'om',
               'text': [],
               'witnesses': witnesses
             });
           }
-
+          console.log(readings)
           newunit.readings = readings;
+
           // remove original making sure you get the current position of the reading that has
           // moved (after prepareForOperation)
           unit2.readings.splice(readingPos, 1);
