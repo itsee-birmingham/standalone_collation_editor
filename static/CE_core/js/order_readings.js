@@ -17,7 +17,6 @@ var OR = (function() {
      * 		 possibilities are:
      *              	highlighted_wit - the witness to highlight in display*/
     showOrderReadings: function(options) {
-      console.log('the setting at the start of order readings is ' + CL.showSubreadings)
       let row, overlaps, num, newOverlapOptions, container, undoButton, showHideSubreadingsButtonText;
       console.log(JSON.parse(JSON.stringify(CL.data)));
       CL.stage = 'ordered';
