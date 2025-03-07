@@ -916,7 +916,7 @@ var CL = (function() {
         if (reading.label === 'zz') {
           readingLabel = '—';
         } else if (reading.label === 'zv') {
-          readingLabel = '?';
+          readingLabel = '?' + labelSuffix;
         }
       }
       if (Object.prototype.hasOwnProperty.call(reading, 'overlap_status')) {
