@@ -5,7 +5,7 @@ authors:
   given-names: "Catherine"
   orcid: "https://orcid.org/0000-0002-2530-9229"
 title: "collation_editor_core"
-version: 2.0.0
-doi: 10.5281/zenodo.4088056
-date-released: 2021-11-25
+version: 2.0.1
+doi: 10.5281/zenodo.6371367
+date-released: 2022-03-20
 url: "https://github.com/itsee-birmingham/collation_editor_core"
