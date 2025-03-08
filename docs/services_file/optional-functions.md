@@ -1,9 +1,7 @@
 ---
 id: optional-functions
-title: Optional Functions
+title: Optional Service File Functions
 ---
-
-# Optional Service File Functions
 
 ## ```showLoginStatus()```
 
