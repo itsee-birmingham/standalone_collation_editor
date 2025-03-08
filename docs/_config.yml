@@ -1,4 +1,4 @@
 name: Collation Editor Core
-
+remote_theme: zendesk/jekyll-theme-zendesk-garden@main
 include:
   - README.md
