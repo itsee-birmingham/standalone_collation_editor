@@ -12,10 +12,9 @@ sidebar:
        - optional-functions
   - python-services
   - project-settings
-  # - label: Installation
-  #   children:
-  #     - initialisation
-  #     - services file
-  # - label: Configuration
-  #   children:
-  #     - Your own data
+  - label: Upgrading to a newer version
+    children:
+      - upgrade-3x
+      - upgrade-2-0-x
+      - upgrade-1-1-x
+      - upgrade-1-0-x
