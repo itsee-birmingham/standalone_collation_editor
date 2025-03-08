@@ -8,7 +8,10 @@ sidebar:
     children:
        - required-variables
        - required-functions
-       - services-optional
+       - optional-variables
+       - optional-functions
+  - python-services
+  - project-settings
   # - label: Installation
   #   children:
   #     - initialisation

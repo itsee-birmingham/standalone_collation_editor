@@ -66,7 +66,6 @@ This function must get the current project details as a JSON object and call ```
 
 ### ```getUnitData()```
 
-
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
 | context | <code>string</code> | the reference for the unit required |
@@ -76,11 +75,8 @@ This function must get the current project details as a JSON object and call ```
 This function must find all of the JSON data for this context in each of the documents requested. The function should return a dictionary which in its minimal form needs to have a single key **results** which should contain an array of JSON objects. The JSON structure provided for each unit in each document should match the unit structure as described in the data structures section. Pay particular attention to the treatment of lacunose and omitted units which need to be handled in different ways depending on the result required in the collation editor.
 
 - Any documents that are lacunose for this unit and do not need a special label should be omitted from the data set entirely.
-
 - Special category lac readings for which the special category can be determined from the input format of the transcription, such as TEI XML, can be sent in the results data using the following structure outlined in the data structures section.
-
 - If any special lac labels are required for data that cannot be determined from the input format then a second key can be added to the main data structure with the name **special_categories**. This should contain an array of JSON objects where each object is structured as follows:
-
   - **label** The string to use as the label in the interface for this special category of lac.
   - **witnesses** An array of sigla for the witnesses that need to be given this label.
 
