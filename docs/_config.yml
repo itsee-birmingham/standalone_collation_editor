@@ -14,7 +14,7 @@ sidebar:
   - project-settings
   - label: Upgrading to a newer version
     children:
-      - upgrade-3x
+      - upgrade-3-0-x
       - upgrade-2-0-x
       - upgrade-1-1-x
       - upgrade-1-0-x
