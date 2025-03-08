@@ -1,10 +1,8 @@
 ---
 id: upgrade-1-0-x
-title: Upgrade to 1.0.x family from the deprecated version
+title: Upgrading to 1.0.x from deprecated version
 sidebar_label: Upgrading to 1.0.x
 ---
-
-# Upgrading to 1.0.x from deprecated version
 
 This code is not backwards compatible with early versions of the code archived at
 [https://github.com/itsee-birmingham/collation_editor](https://github.com/itsee-birmingham/collation_editor)

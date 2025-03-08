@@ -1,10 +1,7 @@
 ---
 id: optional-variables
-title: Optional Variables
+title: Optional Service File Variables
 ---
-
-
-# Optional Service File Variables
 
 ## ```localJavaScript```
 

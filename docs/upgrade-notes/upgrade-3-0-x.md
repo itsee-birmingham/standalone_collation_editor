@@ -1,10 +1,8 @@
 ---
 id: upgrade-3-0-x
-title: Upgrade to 3.0.x family from 2.0.x
+title: Catena Dev branch changes (3.0.0 release candidate)
 sidebar_label: Upgrading to 3.0.x
 ---
-
-# Catena Dev branch changes (3.0.0 release candidate)
 
 - Optional services and project setting *storeMultipleSupportLabelsAsParents* added which changes the behaviour of the label editing in order readings and stores support for multiple readings using the reading data itself so that it can be preserved and updated when readings are reordered. If this setting is used and set to true it will not have any impact on existing data but will offer the new label storage option for existing data. 
 - Optional services and project setting *useZvForAllReadingsSupport* added. This setting only works if *storeMultipleSupportLabelsAsParents* is also set to true. If this settings is true then when editing the label in order readings if all possible parent witnesses are selected as readings which could be supported by the current reading then the label used internally will be 'zv' and it will show in the collation editor with ?.

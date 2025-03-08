@@ -1,9 +1,7 @@
 ---
 id: required-functions
-title: Required Functions
+title: Required Service File Functions
 ---
-
-# Required Service File Functions
 
 ## ```initialiseEditor()```
 

@@ -1,10 +1,8 @@
 ---
 id: upgrade-2-0-x
-title: Upgrade to 2.0.x family from 1.x
+title: Upgrading to 2.0.x from 1.1.x
 sidebar_label: Upgrading to 2.0.x
 ---
-
-# Upgrading to 2.0.x from 1.1.x
 
 ## New features in this version
 

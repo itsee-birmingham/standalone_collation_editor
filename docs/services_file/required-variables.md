@@ -1,9 +1,7 @@
 ---
 id: required-variables
-title: Required Variables
+title: Required Service File Variables
 ---
-
-# Required Service File Variables
 
 ## ```supportedRuleScopes```
 
