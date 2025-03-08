@@ -99,20 +99,20 @@
                     "unclear": true,
                     "t": "\u03b5\u03c6\u03b1\u03b3\u03bf\u03bd",
                     "rule_match": [
-                        "\u03b5\u03c6\u03b1\u03b3\u03bf_\u03bd_"
+                        "\u03b5\u03c6\u03b1\u03b3\u03bf\u0323\u03bd_"
                     ],
                     "reading": "892",
-                    "original": "\u03b5\u03c6\u03b1\u03b3\u03bf_\u03bd_"
+                    "original": "\u03b5\u03c6\u03b1\u03b3\u03bf\u0323\u03bd_"
                 },
                 {
                     "index": "24",
                     "unclear": true,
                     "t": "\u03c4\u03bf\u03bd",
                     "rule_match": [
-                        "\u03c4_\u03bf\u03bd"
+                        "\u03c4\u0323\u03bf\u03bd"
                     ],
                     "reading": "892",
-                    "original": "\u03c4_\u03bf\u03bd"
+                    "original": "\u03c4\u0323\u03bf\u03bd"
                 },
                 {
                     "index": "26",
