@@ -1,7 +1,6 @@
 local_services = (function() {
 
 
-
   //function called on document ready
   $(function () {
     CL.setServiceProvider(local_services);
@@ -9,15 +8,16 @@ local_services = (function() {
 
   //compulsory settings
 
-	supportedRuleScopes = {'once': 'This place, these wits',
-	    			'always': 'Everywhere, all wits'};
+	const supportedRuleScopes = {'once': 'This place, these wits',
+	    			                   'always': 'Everywhere, all wits'};
+
+  const allowWitnessChangesInSavedCollations = true;
 
   getUserInfo = function (success_callback) {
     success_callback(_local_user);
   };
 
   initialiseEditor = function () {
-    console.log('initialising the editor from services');
     getCurrentEditingProject(CL.loadIndexPage);
     //in local services everyone is a managing editor as they are not collaborative projects
     CL.managingEditor = true;
@@ -29,13 +29,9 @@ local_services = (function() {
 	   });
   };
 
-  //TODO: remove private stuff from here if we stick with a single model
-  getVerseData = function(context, witnesses, private_witnesses, success_callback) {
-    if (private_witnesses) {
-      return success_callback([], RG.calculate_lac_wits);
-    }
+  getUnitData = function(context, witnesses, success_callback) {
     _load_witnesses(context, witnesses, function(results) {
-      success_callback(results, RG.calculate_lac_wits);
+      success_callback({results:results}, RG.calculate_lac_wits);
     });
   };
 
@@ -62,8 +58,7 @@ local_services = (function() {
 
   // if verse is passed, then verse rule; otherwise global
 	updateRules = function(rules, verse, success_callback) {
-    console.log(rules)
-	    updateRuleset([], [], rules, verse, success_callback);
+	  updateRuleset([], [], rules, verse, success_callback);
   },
 
 
@@ -74,7 +69,6 @@ local_services = (function() {
     if (typeof j === 'undefined') j = 0;
     if (typeof k === 'undefined') k = 0;
     if (i < for_deletion.length) {
-      console.log(for_deletion[i]);
       _delete_resource(_get_rule_type(for_deletion[i], verse), function() {
 
         return updateRuleset(for_deletion, for_global_exceptions, for_addition, verse, success_callback, ++i, j, k);
@@ -214,7 +208,7 @@ local_services = (function() {
     if (typeof options === "undefined") {
       options = {};
     }
-    url = staticUrl + 'collationserver/' + verse + '/';
+    url = staticUrl + 'collationserver/';
     if (options.hasOwnProperty('accept')) {
       url += options.accept;
     }
@@ -227,13 +221,27 @@ local_services = (function() {
     });
   };
 
-  getAdjoiningVerse = function (verse, is_previous, result_callback) {
+  getAdjoiningUnit = function (verse, is_previous, result_callback) {
 	    return result_callback(null);
 	};
 
+  applySettings = function (data, resultCallback) {
+    var url;
+    url = staticUrl + 'applysettings/';
+    $.ajax({
+      type: 'POST',
+      url: url,
+      data: {'data' :JSON.stringify(data)},
+      success: function(data){
+        resultCallback(data);
+      }}).fail(function(o) {
+        resultCallback(null);
+    });
+  };
+
+
   // save a collation to local datastore
 	saveCollation = function(verse, collation, confirm_message, overwrite_allowed, no_overwrite_message, result_callback) {
-    console.log('save collation');
 	  CL.services.getUserInfo(function(user) {
 	    var resource_type;
 	    resource_type = 'project/' + CL.project.id + '/user/' + user.id + '/collation/' + collation.status + '/' + verse + '.json';
@@ -247,7 +255,11 @@ local_services = (function() {
 	      // if exists
 	      if (status === 200) {
 	        if (overwrite_allowed) {
-	          var confirmed = confirm(confirm_message);
+            if (confirm_message === undefined) {
+              confirmed = true;
+            } else {
+              confirmed = confirm(confirm_message);
+            }
 	          if (confirmed === true) {
 	            _put_resource(resource_type, collation, function(result) {
 	              return result_callback(true);
@@ -396,7 +408,6 @@ local_services = (function() {
   };
 
   _delete_resource = function(resource_type, result_callback) {
-    console.log('deleting ' + resource_type);
     var params = {
       action: 'delete',
       resource_type: resource_type
@@ -438,18 +449,15 @@ local_services = (function() {
         }
         for (var k = 0; k < j.length; k += 1) {
           var doc_wit = {
-            _id: witness_list[i] + '_' + verse,
-            context: verse,
-            tei: '',
+            id: witness_list[i] + '_' + verse,
             siglum: j[k].siglum,
-            transcription_siglum: j[k].transcription_siglum,
             witnesses: j[k].witnesses
           };
           //a fudge so exsiting and new data structures still work. Eventually all should just be transcription including the key in doc_wit
           if (j[k].hasOwnProperty('transcription')) {
-            doc_wit.transcription_id = j[k].transcription;
+            doc_wit.transcription = j[k].transcription;
           } else {
-            doc_wit.transcription_id = j[k].transcription_id
+            doc_wit.transcription = j[k].transcription_id
           }
           results.push(doc_wit);
         }
@@ -485,26 +493,55 @@ local_services = (function() {
     });
   };
 
-  getApparatusForContext = function() {
-      var url;
-      SPN.show_loading_overlay();
-      url = staticUrl + 'apparatus';
-      console.log(url)
-      $.fileDownload(url, {
-        httpMethod: "POST",
-        data: {
-          settings: CL.getExporterSettings(),
-          data: JSON.stringify([{
-            "context": CL.context,
-            "structure": CL.data
-          }])
-        },
-        successCallback: function() {
-          SPN.remove_loading_overlay();
-        }
-        //can also add a failCallback here if you want
-      });
 
+  getApparatusForContext = function() {
+      spinner.showLoadingOverlay();
+      CL.services.getUserInfo(function(user) {
+        let resource_type, format, url, approved, settings;
+        resource_type = 'project/' + CL.project.id + '/user/' + user.id + '/collation/approved/' + CL.context + '.json';
+        _get_resource(resource_type, function(result, status) {
+          if (status === 200) {
+            approved = JSON.parse(result);
+          }
+          url = staticUrl + 'apparatus';   
+          settings = JSON.parse(CL.getExporterSettings());
+          if (!settings.hasOwnProperty('options')) {
+            settings.options = {};
+          }
+          settings.options.rule_classes = CL.ruleClasses;
+          settings.options.witness_decorators = CL.project.witnessDecorators;
+          format = settings.options.format;
+          if (format === undefined) {
+            // use the default
+            format = 'xml';
+          }
+          data = {settings: JSON.stringify(settings),
+                  data: JSON.stringify([{'context': CL.context,
+                                         'structure': approved.structure}])};
+          $.post(url, data).then(function (response) {
+              var blob, filename, downloadUrl, hiddenLink;
+              if (format.indexOf('xml') !== -1) {
+                blob = new Blob([response], {'type': 'text/xml'});
+                filename = CL.context + '_' + format + '_apparatus.xml';
+              } else {
+                blob = new Blob([response], {'type': 'text/txt'});
+                filename = CL.context + '_' + format + '_apparatus.txt';
+              }
+              downloadUrl = window.URL.createObjectURL(blob);
+              hiddenLink = document.createElement('a');
+              hiddenLink.style.display = 'none';
+              hiddenLink.href = downloadUrl;
+              hiddenLink.download = filename;
+              document.body.appendChild(hiddenLink);
+              hiddenLink.click();
+              window.URL.revokeObjectURL(downloadUrl);
+              spinner.removeLoadingOverlay();
+          }).fail(function (response) {
+            alert('This unit cannot be exported. First try reapproving the unit. If the problem persists please ' +
+                  'recollate the unit from the collation home page.');
+          });
+      });
+    });
   };
 
 
@@ -512,14 +549,14 @@ local_services = (function() {
 
     getCurrentEditingProject: getCurrentEditingProject,
     initialiseEditor: initialiseEditor,
-    getVerseData: getVerseData,
+    getUnitData: getUnitData,
     getSiglumMap: getSiglumMap,
     getRulesByIds: getRulesByIds,
     updateRules: updateRules,
     updateRuleset: updateRuleset,
     getRules: getRules,
     doCollation: doCollation,
-    getAdjoiningVerse: getAdjoiningVerse,
+    getAdjoiningUnit: getAdjoiningUnit,
     supportedRuleScopes: supportedRuleScopes,
     getUserInfo: getUserInfo,
     getRuleExceptions: getRuleExceptions,
@@ -529,8 +566,8 @@ local_services = (function() {
     loadSavedCollation: loadSavedCollation,
     getSavedStageIds: getSavedStageIds,
     getApparatusForContext: getApparatusForContext,
-
-
+    applySettings: applySettings,
+    allowWitnessChangesInSavedCollations: allowWitnessChangesInSavedCollations
 
   };
 

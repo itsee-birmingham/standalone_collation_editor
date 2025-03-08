@@ -1,0 +1,7415 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>reading merge tests</title>
+  <link rel="stylesheet" href="../../../../../common-static/tests/qunit-2.1.1.css">
+</head>
+<body>
+  <script type="text/javascript">testing = true
+          var SITE_DOMAIN = "http://localhost:8000";
+          var staticUrl = SITE_DOMAIN + '/static/';
+  </script>
+  <script type="text/javascript" src="../../../../../common-static/js/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src="../../../../../common-static/tests/qunit-2.1.1.js"></script>
+ 	<script type="text/javascript" src="../../../../../common-static/tests/sinon-1.17.7.js"></script>
+  <script type="text/javascript" src="../js/collation.js"></script>
+  <script type="text/javascript" src="../js/order_readings.js"></script>
+  <script type="text/javascript" src="../js/subreadings.js"></script>
+  <script type="text/javascript" src="../../../../../collation/static/collation/js/django_services.js"></script>
+  <script type="text/javascript">
+
+	  	var server, sandbox, data;
+
+	  	QUnit.testStart(function () {
+			  server = sinon.fakeServer.create();
+		  	sandbox = sinon.sandbox.create();
+
+        CL.ruleClasses = [
+          {
+            "value": "none",
+            "name": "None",
+            "create_in_RG": true,
+            "create_in_SV": true,
+            "create_in_OR": true,
+            "suffixed_sigla": false,
+            "suffixed_label": false,
+            "suffixed_reading": false,
+            "subreading": false,
+            "keep_as_main_reading": false
+          },
+         {
+            "value": "reconstructed",
+            "name": "Reconstructed",
+            "create_in_RG": true,
+            "create_in_SV": true,
+            "create_in_OR": true,
+            "identifier": "r",
+            "suffixed_sigla": false,
+            "suffixed_label": true,
+            "suffixed_reading": false,
+            "subreading": true,
+            "keep_as_main_reading": false
+         },
+         {
+           "value": "orthographic",
+           "name": "Orthographic",
+           "create_in_RG": true,
+           "create_in_SV": true,
+           "create_in_OR": true,
+           "identifier": "o",
+           "suffixed_sigla": false,
+           "suffixed_label": true,
+           "suffixed_reading": false,
+           "subreading": true,
+           "keep_as_main_reading": false
+          },
+          {
+            "value": "phonetic",
+            "name": "Phonetic",
+            "create_in_RG": true,
+            "create_in_SV": true,
+            "create_in_OR": true,
+            "identifier": "p",
+            "suffixed_sigla": false,
+            "suffixed_label": true,
+            "suffixed_reading": false,
+            "subreading": true,
+            "keep_as_main_reading": false
+           },
+           {
+             "value": "orthographic_phonetic",
+             "name": "Orthographic/Phonetic",
+             "create_in_RG": true,
+             "create_in_SV": true,
+             "create_in_OR": true,
+             "identifier": "op",
+             "suffixed_sigla": false,
+             "suffixed_label": true,
+             "suffixed_reading": false,
+             "subreading": true,
+             "keep_as_main_reading": false
+            },
+          {
+            "value": "abbreviation",
+            "name": "Abbreviation",
+            "create_in_RG": true,
+            "create_in_SV": true,
+            "create_in_OR": true,
+            "suffixed_sigla": false,
+            "suffixed_label": false,
+            "suffixed_reading": false,
+            "subreading": true,
+            "keep_as_main_reading": false
+          }
+        ];
+        CL.data = {
+  "apparatus": [
+    {
+      "end": 2,
+      "start": 2,
+      "readings": [
+        {
+          "text": [
+            {
+              "110": {
+                "t": "xšnūmaine",
+                "index": "2",
+                "siglum": "110",
+                "original": "xšnūmaine",
+                "pc_after": ":",
+                "rule_match": [
+                  "xšnūmaine"
+                ]
+              },
+              "400": {
+                "t": "xšnūmaine",
+                "index": "2",
+                "siglum": "400",
+                "original": "xšnūmaine",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xšnūmaine"
+                ]
+              },
+              "410": {
+                "t": "xšnūmaine",
+                "index": "2",
+                "siglum": "410",
+                "original": "xšnūmaine",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xšnūmaine"
+                ]
+              },
+              "451": {
+                "t": "xšnūmaine",
+                "index": "2",
+                "siglum": "451",
+                "original": "xšnūmaine",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xšnūmaine"
+                ]
+              },
+              "682": {
+                "t": "xšnūmaine",
+                "index": "2",
+                "siglum": "682",
+                "original": "xšnūmaine",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xšnūmaine"
+                ]
+              },
+              "4010": {
+                "t": "xšnūmaine",
+                "index": "2",
+                "siglum": "4010",
+                "original": "xšnūmaine",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xšnūmaine"
+                ]
+              },
+              "4240*": {
+                "t": "xšnūmaine",
+                "index": "2",
+                "siglum": "4240",
+                "original": "xšnūmaine",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xšnūmaine"
+                ]
+              },
+              "4240C": {
+                "t": "xšnūmaine",
+                "index": "2",
+                "siglum": "4240",
+                "original": "xšnūmaine",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xšnūmaine"
+                ]
+              },
+              "index": "2.1",
+              "verse": "Y.3.1.10",
+              "reading": [
+                "110",
+                "400",
+                "4010",
+                "410",
+                "4240*",
+                "4240C",
+                "451",
+                "682",
+                "basetext"
+              ],
+              "basetext": {
+                "t": "xšnūmaine",
+                "index": "2",
+                "siglum": "basetext",
+                "original": "xšnūmaine",
+                "rule_match": [
+                  "xšnūmaine"
+                ]
+              },
+              "interface": "xšnūmaine"
+            }
+          ],
+          "witnesses": [
+            "110",
+            "400",
+            "410",
+            "451",
+            "682",
+            "4010",
+            "4240*",
+            "4240C",
+            "basetext"
+          ],
+          "_id": "abe50a43c57f6323b760a895a31558a9",
+          "label": "a",
+          "text_string": "xšnūmaine",
+          "subreadings": {
+            "orthographic": [
+              {
+                "text": [
+                  {
+                    "672": {
+                      "n": "xšnūmaine",
+                      "t": "xšnū.maine",
+                      "index": "2",
+                      "siglum": "672",
+                      "original": "xšnū.maine",
+                      "pc_after": "P+.",
+                      "rule_match": [
+                        "xšnū.maine"
+                      ],
+                      "decision_class": [
+                        "orthographic"
+                      ],
+                      "decision_details": [
+                        {
+                          "n": "xšnūmaine",
+                          "t": "xšnū.maine",
+                          "id": 145,
+                          "class": "orthographic",
+                          "scope": "once"
+                        }
+                      ]
+                    },
+                    "4210": {
+                      "n": "xšnūmaine",
+                      "t": "xšnū.maine",
+                      "index": "2",
+                      "siglum": "4210",
+                      "original": "xšnū.maine",
+                      "pc_after": ":",
+                      "rule_match": [
+                        "xšnū.maine"
+                      ],
+                      "decision_class": [
+                        "orthographic"
+                      ],
+                      "decision_details": [
+                        {
+                          "n": "xšnūmaine",
+                          "t": "xšnū.maine",
+                          "id": 143,
+                          "class": "orthographic",
+                          "scope": "once"
+                        }
+                      ]
+                    },
+                    "4250": {
+                      "n": "xšnūmaine",
+                      "t": "xšnū.maine",
+                      "index": "2",
+                      "siglum": "4250",
+                      "original": "xšnū.maine",
+                      "pc_after": "P+.",
+                      "rule_match": [
+                        "xšnū.maine"
+                      ],
+                      "decision_class": [
+                        "orthographic"
+                      ],
+                      "decision_details": [
+                        {
+                          "n": "xšnūmaine",
+                          "t": "xšnū.maine",
+                          "id": 144,
+                          "class": "orthographic",
+                          "scope": "once"
+                        }
+                      ]
+                    },
+                    "index": "2.1",
+                    "verse": "Y.3.1.10",
+                    "interface": "xšnūmaine",
+                    "reading": [
+                      "672",
+                      "4210",
+                      "4250"
+                    ]
+                  }
+                ],
+                "text_string": "xšnū.maine",
+                "witnesses": [
+                  "672",
+                  "4210",
+                  "4250"
+                ],
+                "suffix": "o",
+                "suffixes": [
+                  "",
+                  "",
+                  ""
+                ]
+              }
+            ]
+          },
+          "suffixes": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "10": {
+                "t": "xšnīmaine",
+                "index": "2",
+                "siglum": "10",
+                "original": "xšnīmaine",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xšnīmaine"
+                ]
+              },
+              "15": {
+                "t": "xšnīmaine",
+                "index": "2",
+                "siglum": "15",
+                "original": "xšnīmaine",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xšnīmaine"
+                ]
+              },
+              "20": {
+                "t": "xšnīmaine",
+                "index": "2",
+                "siglum": "20",
+                "original": "xšnīmaine",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xšnīmaine"
+                ]
+              },
+              "29": {
+                "t": "xšnīmaine",
+                "index": "2",
+                "siglum": "29",
+                "original": "xšnīmaine",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xšnīmaine"
+                ]
+              },
+              "4000": {
+                "t": "xšnīmaine",
+                "index": "2",
+                "siglum": "4000",
+                "original": "xšnīmaine",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xšnīmaine"
+                ]
+              },
+              "4060": {
+                "t": "xšnīmaine",
+                "index": "2",
+                "siglum": "4060",
+                "original": "xšnīmaine",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xšnīmaine"
+                ]
+              },
+              "4161": {
+                "t": "xšnīmaine",
+                "index": "2",
+                "siglum": "4161",
+                "original": "xšnīmaine",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xšnīmaine"
+                ]
+              },
+              "5020": {
+                "t": "xšnīmaine",
+                "index": "2",
+                "siglum": "5020",
+                "original": "xšnīmaine",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xšnīmaine"
+                ]
+              },
+              "5102": {
+                "t": "xšnīmaine",
+                "index": "2",
+                "siglum": "5102",
+                "original": "xšnīmaine",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xšnīmaine"
+                ]
+              },
+              "4040*": {
+                "t": "xšnīmaine",
+                "index": "2",
+                "siglum": "4040",
+                "original": "xšnīmaine",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xšnīmaine"
+                ]
+              },
+              "4040C": {
+                "t": "xšnīmaine",
+                "index": "2",
+                "siglum": "4040",
+                "original": "xšnīmaine",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xšnīmaine"
+                ]
+              },
+              "index": "2.1",
+              "verse": "Y.3.1.10",
+              "reading": [
+                "10",
+                "15",
+                "20",
+                "29",
+                "4000",
+                "4040*",
+                "4040C",
+                "4060",
+                "4161",
+                "5020",
+                "5102"
+              ],
+              "interface": "xšnīmaine"
+            }
+          ],
+          "witnesses": [
+            "10",
+            "15",
+            "20",
+            "29",
+            "4000",
+            "4040*",
+            "4040C",
+            "4060",
+            "4161",
+            "5020",
+            "5102"
+          ],
+          "_id": "485c03a53bdeb0928f2ab75ccc052368",
+          "label": "b",
+          "text_string": "xšnīmaine",
+          "suffixes": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "100": {
+                "t": "xšnū.maēne",
+                "index": "2",
+                "siglum": "100",
+                "original": "xšnū.maēne",
+                "pc_after": ":",
+                "rule_match": [
+                  "xšnū.maēne"
+                ]
+              },
+              "230": {
+                "t": "xšnū.maēne",
+                "index": "2",
+                "siglum": "230",
+                "original": "xšnū.maēne",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xšnū.maēne"
+                ]
+              },
+              "index": "2.1",
+              "verse": "Y.3.1.10",
+              "reading": [
+                "100",
+                "230"
+              ],
+              "interface": "xšnū.maēne"
+            }
+          ],
+          "witnesses": [
+            "100",
+            "230"
+          ],
+          "_id": "fc7ac5d73f6948361aa29ca2e317564f",
+          "label": "c",
+          "text_string": "xšnū.maēne",
+          "suffixes": [
+            "",
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "120": {
+                "t": "xšnū.maini",
+                "index": "2",
+                "siglum": "120",
+                "original": "xšnū.maini",
+                "pc_after": ":",
+                "rule_match": [
+                  "xšnū.maini"
+                ]
+              },
+              "index": "2.1",
+              "verse": "Y.3.1.10",
+              "reading": [
+                "120"
+              ],
+              "interface": "xšnū.maini"
+            }
+          ],
+          "witnesses": [
+            "120"
+          ],
+          "_id": "89359ade72d43e6b7dce3b2d6fe03688",
+          "label": "d",
+          "text_string": "xšnū.maini",
+          "subreadings": {
+            "orthographic": [
+              {
+                "text": [
+                  {
+                    "2007": {
+                      "n": "xšnū.maini",
+                      "t": "xšnūmaini",
+                      "index": "2",
+                      "siglum": "2007",
+                      "original": "xšnūmaini",
+                      "pc_after": "P+.",
+                      "rule_match": [
+                        "xšnūmaini"
+                      ],
+                      "decision_class": [
+                        "orthographic"
+                      ],
+                      "decision_details": [
+                        {
+                          "n": "xšnū.maini",
+                          "t": "xšnūmaini",
+                          "id": 142,
+                          "class": "orthographic",
+                          "scope": "once"
+                        }
+                      ]
+                    },
+                    "index": "2.1",
+                    "verse": "Y.3.1.10",
+                    "interface": "xšnū.maini",
+                    "reading": [
+                      "2007"
+                    ]
+                  }
+                ],
+                "text_string": "xšnūmaini",
+                "witnesses": [
+                  "2007"
+                ],
+                "suffix": "o",
+                "suffixes": [
+                  ""
+                ]
+              }
+            ]
+          },
+          "suffixes": [
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "5": {
+                "t": "xšnīmaini",
+                "index": "2",
+                "siglum": "5",
+                "original": "xšnīmaini",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xšnīmaini"
+                ]
+              },
+              "2010": {
+                "t": "xšnīmaini",
+                "index": "2",
+                "siglum": "2010",
+                "original": "xšnīmaini",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xšnīmaini"
+                ]
+              },
+              "index": "2.1",
+              "verse": "Y.3.1.10",
+              "reading": [
+                "2010",
+                "5"
+              ],
+              "interface": "xšnīmaini"
+            }
+          ],
+          "witnesses": [
+            "5",
+            "2010"
+          ],
+          "_id": "75e9dd249af12d6b6f8233103ea56e6e",
+          "label": "e",
+          "text_string": "xšnīmaini",
+          "suffixes": [
+            "",
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "4200C": {
+                "t": "xšnmini",
+                "index": "2",
+                "siglum": "4200",
+                "original": "xšnmini",
+                "pc_after": "P+.",
+                "pc_before": "P+.",
+                "rule_match": [
+                  "xšnmini"
+                ]
+              },
+              "index": "2.1",
+              "verse": "VS.3.1.10",
+              "reading": [
+                "4200C"
+              ],
+              "interface": "xšnmini"
+            }
+          ],
+          "witnesses": [
+            "4200C"
+          ],
+          "_id": "3b983355aa71cba71ec7240d5ff3187b",
+          "label": "f",
+          "text_string": "xšnmini",
+          "suffixes": [
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "500": {
+                "t": "xṣ̌nūmaine",
+                "index": "2",
+                "siglum": "500",
+                "original": "xṣ̌nūmaine",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xṣ̌nūmaine"
+                ]
+              },
+              "510": {
+                "t": "xṣ̌nūmaine",
+                "index": "2",
+                "siglum": "510",
+                "original": "xṣ̌nūmaine",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xṣ̌nūmaine"
+                ]
+              },
+              "index": "2.1",
+              "verse": "Y.3.1.10",
+              "reading": [
+                "500",
+                "510"
+              ],
+              "interface": "xṣ̌nūmaine"
+            }
+          ],
+          "witnesses": [
+            "500",
+            "510"
+          ],
+          "_id": "3d4c66b00446cd0f6eb0609377c88ea0",
+          "label": "g",
+          "text_string": "xṣ̌nūmaine",
+          "suffixes": [
+            "",
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "677": {
+                "t": "xšnū5",
+                "index": "2",
+                "siglum": "677",
+                "original": "xšnū[5]",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "xšnū[5]"
+                ]
+              },
+              "index": "2.1",
+              "verse": "Y.3.1.10",
+              "reading": [
+                "677"
+              ],
+              "interface": "xšnū[5]"
+            }
+          ],
+          "witnesses": [
+            "677"
+          ],
+          "_id": "7e5f496988af8a60a26b38eb46dae7dc",
+          "label": "h",
+          "text_string": "xšnū[5]",
+          "suffixes": [
+            ""
+          ]
+        },
+        {
+          "created": true,
+          "type": "om",
+          "text": [],
+          "witnesses": [
+            "4200*"
+          ],
+          "_id": "e5f9d94475851b5bdead07844141fe63",
+          "SR_text": {
+            "4200*": {
+              "text": [],
+              "type": "om_verse",
+              "details": "om unit"
+            }
+          },
+          "standoff_subreadings": [
+            "4200*"
+          ],
+          "suffixes": [
+            ""
+          ]
+        }
+      ],
+      "first_word_index": "2.1",
+      "_id": "f671134de630bc6400a3750f218fb032"
+    },
+    {
+      "end": 4,
+      "start": 4,
+      "readings": [
+        {
+          "text": [
+            {
+              "5": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "5",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "10": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "10",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "15": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "15",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "20": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "20",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "100": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "100",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "110": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "110",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "120": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "120",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "230": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "230",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "410": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "410",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "451": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "451",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "500": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "500",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "510": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "510",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "2007": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "2007",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "2010": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "2010",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "4000": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "4000",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "4010": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "4010",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "4210": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "4210",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "5020": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "5020",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "5102": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "5102",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "4240*": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "4240",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "4240C": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "4240",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "index": "4.1",
+              "verse": "Y.3.1.10",
+              "reading": [
+                "10",
+                "100",
+                "110",
+                "120",
+                "15",
+                "20",
+                "2007",
+                "2010",
+                "230",
+                "4000",
+                "4010",
+                "410",
+                "4210",
+                "4240*",
+                "4240C",
+                "451",
+                "5",
+                "500",
+                "5020",
+                "510",
+                "5102",
+                "basetext"
+              ],
+              "basetext": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "basetext",
+                "original": "ahurahe",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "interface": "ahurahe"
+            }
+          ],
+          "witnesses": [
+            "5",
+            "10",
+            "15",
+            "20",
+            "100",
+            "110",
+            "120",
+            "230",
+            "410",
+            "451",
+            "500",
+            "510",
+            "2007",
+            "2010",
+            "4000",
+            "4010",
+            "4210",
+            "4240*",
+            "4240C",
+            "5020",
+            "5102",
+            "basetext"
+          ],
+          "_id": "389b2703c09200c2764f8b81b68794fa",
+          "label": "a",
+          "text_string": "ahurahe",
+          "suffixes": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "4040C": {
+                "t": "spəṇt",
+                "index": "4",
+                "siglum": "4040",
+                "original": "spəṇt",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "spəṇt"
+                ]
+              },
+              "index": "4.1",
+              "verse": "VS.3.1.10",
+              "reading": [
+                "4040C"
+              ],
+              "interface": "spəṇt"
+            }
+          ],
+          "witnesses": [
+            "4040C"
+          ],
+          "_id": "8ca9546f5c8b96dd851e9eab29fdc7e1",
+          "label": "b",
+          "text_string": "spəṇt",
+          "suffixes": [
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "4200C": {
+                "t": "spǝṇtaną̇m",
+                "index": "4",
+                "siglum": "4200",
+                "original": "spǝṇtaną̇m",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "spǝṇtaną̇m"
+                ]
+              },
+              "index": "4.1",
+              "verse": "VS.3.1.10",
+              "reading": [
+                "4200C"
+              ],
+              "interface": "spǝṇtaną̇m"
+            }
+          ],
+          "witnesses": [
+            "4200C"
+          ],
+          "_id": "b847d0000eaaa3a22e6c1793e369befc",
+          "label": "c",
+          "text_string": "spǝṇtaną̇m",
+          "suffixes": [
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "682": {
+                "t": "ahurahē",
+                "index": "4",
+                "siglum": "682",
+                "original": "ahurahē",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahē"
+                ]
+              },
+              "index": "4.1",
+              "verse": "Y.3.1.10",
+              "reading": [
+                "682"
+              ],
+              "interface": "ahurahē"
+            }
+          ],
+          "witnesses": [
+            "682"
+          ],
+          "_id": "4a5d61ebe3216adc390030784684b4c1",
+          "label": "d",
+          "text_string": "ahurahē",
+          "suffixes": [
+            ""
+          ]
+        },
+        {
+          "text": [],
+          "type": "om",
+          "witnesses": [
+            "29",
+            "400",
+            "672",
+            "677",
+            "4040*",
+            "4060",
+            "4161",
+            "4200*",
+            "4250"
+          ],
+          "_id": "901f76559ce2cba1a65d43115b874925",
+          "label": "e",
+          "text_string": "om.",
+          "SR_text": {
+            "29": {
+              "text": [],
+              "type": "om"
+            },
+            "400": {
+              "text": [],
+              "type": "om"
+            },
+            "672": {
+              "text": [],
+              "type": "om"
+            },
+            "677": {
+              "text": [],
+              "type": "om"
+            },
+            "4060": {
+              "text": [],
+              "type": "om"
+            },
+            "4161": {
+              "text": [],
+              "type": "om"
+            },
+            "4250": {
+              "text": [],
+              "type": "om"
+            },
+            "4040*": {
+              "text": [],
+              "type": "om"
+            },
+            "4200*": {
+              "text": [],
+              "type": "om_verse",
+              "details": "om unit"
+            }
+          },
+          "standoff_subreadings": [
+            "29",
+            "400",
+            "4040*",
+            "4060",
+            "4161",
+            "4250",
+            "672",
+            "677",
+            "4200*"
+          ],
+          "suffixes": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "first_word_index": "4.1",
+      "_id": "57d0e4c6cc51ae7da56f1bcd57480fe3"
+    },
+    {
+      "end": 5,
+      "start": 5,
+      "readings": [
+        {
+          "text": [],
+          "type": "om",
+          "witnesses": [
+            "5",
+            "10",
+            "15",
+            "20",
+            "29",
+            "100",
+            "110",
+            "120",
+            "230",
+            "400",
+            "410",
+            "451",
+            "500",
+            "510",
+            "672",
+            "677",
+            "682",
+            "2007",
+            "2010",
+            "4000",
+            "4010",
+            "4040*",
+            "4060",
+            "4161",
+            "4200*",
+            "4210",
+            "4240*",
+            "4240C",
+            "4250",
+            "5020",
+            "5102",
+            "basetext"
+          ],
+          "_id": "bf0b1e3e7fb90c9f0454f84323d008d0",
+          "label": "a",
+          "text_string": "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",
+          "SR_text": {
+            "5": {
+              "text": [],
+              "type": "om"
+            },
+            "10": {
+              "text": [],
+              "type": "om"
+            },
+            "15": {
+              "text": [],
+              "type": "om"
+            },
+            "20": {
+              "text": [],
+              "type": "om"
+            },
+            "29": {
+              "text": [],
+              "type": "om"
+            },
+            "100": {
+              "text": [],
+              "type": "om"
+            },
+            "110": {
+              "text": [],
+              "type": "om"
+            },
+            "120": {
+              "text": [],
+              "type": "om"
+            },
+            "230": {
+              "text": [],
+              "type": "om"
+            },
+            "400": {
+              "text": [],
+              "type": "om"
+            },
+            "410": {
+              "text": [],
+              "type": "om"
+            },
+            "451": {
+              "text": [],
+              "type": "om"
+            },
+            "500": {
+              "text": [],
+              "type": "om"
+            },
+            "510": {
+              "text": [],
+              "type": "om"
+            },
+            "672": {
+              "text": [],
+              "type": "om"
+            },
+            "677": {
+              "text": [],
+              "type": "om"
+            },
+            "682": {
+              "text": [],
+              "type": "om"
+            },
+            "2007": {
+              "text": [],
+              "type": "om"
+            },
+            "2010": {
+              "text": [],
+              "type": "om"
+            },
+            "4000": {
+              "text": [],
+              "type": "om"
+            },
+            "4010": {
+              "text": [],
+              "type": "om"
+            },
+            "4060": {
+              "text": [],
+              "type": "om"
+            },
+            "4161": {
+              "text": [],
+              "type": "om"
+            },
+            "4210": {
+              "text": [],
+              "type": "om"
+            },
+            "4250": {
+              "text": [],
+              "type": "om"
+            },
+            "5020": {
+              "text": [],
+              "type": "om"
+            },
+            "5102": {
+              "text": [],
+              "type": "om"
+            },
+            "4240*": {
+              "text": [],
+              "type": "om"
+            },
+            "4240C": {
+              "text": [],
+              "type": "om"
+            },
+            "basetext": {
+              "text": [],
+              "type": "om"
+            },
+            "4040*": {
+              "text": [],
+              "type": "om"
+            },
+            "4200*": {
+              "text": [],
+              "type": "om_verse",
+              "details": "om unit"
+            }
+          },
+          "standoff_subreadings": [
+            "10",
+            "100",
+            "110",
+            "120",
+            "15",
+            "20",
+            "2007",
+            "2010",
+            "230",
+            "4000",
+            "4010",
+            "410",
+            "4210",
+            "4240*",
+            "4240C",
+            "451",
+            "5",
+            "500",
+            "5020",
+            "510",
+            "5102",
+            "basetext",
+            "4060",
+            "677",
+            "4040*",
+            "4161",
+            "400",
+            "672",
+            "4250",
+            "29",
+            "682",
+            "4200*"
+          ],
+          "suffixes": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "4040C": {
+                "t": "aməṣ̌anąm",
+                "index": "6",
+                "siglum": "4040",
+                "original": "aməṣ̌anąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməṣ̌anąm"
+                ]
+              },
+              "index": "5.1",
+              "verse": "VS.3.1.10",
+              "reading": [
+                "4040C"
+              ],
+              "interface": "aməṣ̌anąm"
+            }
+          ],
+          "witnesses": [
+            "4040C"
+          ],
+          "_id": "78a2243b354d40714ef19ae9d6759d81",
+          "label": "b",
+          "text_string": "aməṣ̌anąm",
+          "suffixes": [
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "4200C": {
+                "t": "amǝsną̇m",
+                "index": "6",
+                "siglum": "4200",
+                "original": "amǝsną̇m",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "amǝsną̇m"
+                ]
+              },
+              "index": "5.1",
+              "verse": "VS.3.1.10",
+              "reading": [
+                "4200C"
+              ],
+              "interface": "amǝsną̇m"
+            }
+          ],
+          "witnesses": [
+            "4200C"
+          ],
+          "_id": "64b297d467ba57c14028a93e88122497",
+          "label": "c",
+          "text_string": "amǝsną̇m",
+          "suffixes": [
+            ""
+          ]
+        }
+      ],
+      "first_word_index": "5.1",
+      "_id": "50a6c04dd221d1e0b9b84da3dffe8d35"
+    },
+    {
+      "end": 5,
+      "start": 5,
+      "readings": [
+        {
+          "text": [],
+          "type": "om",
+          "witnesses": [
+            "5",
+            "10",
+            "15",
+            "20",
+            "29",
+            "100",
+            "110",
+            "120",
+            "230",
+            "400",
+            "410",
+            "451",
+            "500",
+            "510",
+            "672",
+            "677",
+            "682",
+            "2007",
+            "2010",
+            "4000",
+            "4010",
+            "4040*",
+            "4060",
+            "4161",
+            "4200*",
+            "4210",
+            "4250",
+            "5020",
+            "5102",
+            "basetext"
+          ],
+          "_id": "0395f3e8f226138a410d7bebef8591ca",
+          "label": "a",
+          "text_string": "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",
+          "SR_text": {
+            "5": {
+              "text": [],
+              "type": "om"
+            },
+            "10": {
+              "text": [],
+              "type": "om"
+            },
+            "15": {
+              "text": [],
+              "type": "om"
+            },
+            "20": {
+              "text": [],
+              "type": "om"
+            },
+            "29": {
+              "text": [],
+              "type": "om"
+            },
+            "100": {
+              "text": [],
+              "type": "om"
+            },
+            "110": {
+              "text": [],
+              "type": "om"
+            },
+            "120": {
+              "text": [],
+              "type": "om"
+            },
+            "230": {
+              "text": [],
+              "type": "om"
+            },
+            "400": {
+              "text": [],
+              "type": "om"
+            },
+            "410": {
+              "text": [],
+              "type": "om"
+            },
+            "451": {
+              "text": [],
+              "type": "om"
+            },
+            "500": {
+              "text": [],
+              "type": "om"
+            },
+            "510": {
+              "text": [],
+              "type": "om"
+            },
+            "672": {
+              "text": [],
+              "type": "om"
+            },
+            "677": {
+              "text": [],
+              "type": "om"
+            },
+            "682": {
+              "text": [],
+              "type": "om"
+            },
+            "2007": {
+              "text": [],
+              "type": "om"
+            },
+            "2010": {
+              "text": [],
+              "type": "om"
+            },
+            "4000": {
+              "text": [],
+              "type": "om"
+            },
+            "4010": {
+              "text": [],
+              "type": "om"
+            },
+            "4060": {
+              "text": [],
+              "type": "om"
+            },
+            "4161": {
+              "text": [],
+              "type": "om"
+            },
+            "4210": {
+              "text": [],
+              "type": "om"
+            },
+            "4250": {
+              "text": [],
+              "type": "om"
+            },
+            "5020": {
+              "text": [],
+              "type": "om"
+            },
+            "5102": {
+              "text": [],
+              "type": "om"
+            },
+            "basetext": {
+              "text": [],
+              "type": "om"
+            },
+            "4040*": {
+              "text": [],
+              "type": "om"
+            },
+            "4200*": {
+              "text": [],
+              "type": "om_verse",
+              "details": "om unit"
+            }
+          },
+          "standoff_subreadings": [
+            "10",
+            "100",
+            "110",
+            "120",
+            "15",
+            "20",
+            "2007",
+            "2010",
+            "230",
+            "4000",
+            "4010",
+            "410",
+            "4210",
+            "451",
+            "5",
+            "500",
+            "5020",
+            "510",
+            "5102",
+            "basetext",
+            "4060",
+            "677",
+            "4040*",
+            "4161",
+            "400",
+            "672",
+            "4250",
+            "29",
+            "682",
+            "4200*"
+          ],
+          "suffixes": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "4040C": {
+                "t": "mazdā̊",
+                "index": "8",
+                "siglum": "4040",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "4200C": {
+                "t": "mazdā̊",
+                "index": "8",
+                "siglum": "4200",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "4240*": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "4240",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "4240C": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "4240",
+                "original": "mazdā̊",
+                "pc_after": "P+.P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "index": "5.2",
+              "verse": "VS.3.1.10",
+              "reading": [
+                "4040C",
+                "4200C",
+                "4240*",
+                "4240C"
+              ],
+              "interface": "mazdā̊"
+            }
+          ],
+          "witnesses": [
+            "4040C",
+            "4200C",
+            "4240*",
+            "4240C"
+          ],
+          "_id": "3a3567c63f955f04e0f10f47d0be2771",
+          "label": "b",
+          "text_string": "mazdā̊",
+          "suffixes": [
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "first_word_index": "5.2",
+      "_id": "d4d66735e97813b639b57e11aa190911"
+    },
+    {
+      "end": 5,
+      "start": 5,
+      "readings": [
+        {
+          "text": [],
+          "type": "om",
+          "witnesses": [
+            "5",
+            "10",
+            "15",
+            "20",
+            "100",
+            "110",
+            "120",
+            "230",
+            "410",
+            "451",
+            "500",
+            "510",
+            "682",
+            "2007",
+            "2010",
+            "4000",
+            "4010",
+            "4040*",
+            "4200*",
+            "4210",
+            "4240C",
+            "5020",
+            "5102",
+            "basetext"
+          ],
+          "_id": "9cda80daf22f7b5c53c58127e59e0836",
+          "label": "a",
+          "text_string": "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",
+          "SR_text": {
+            "5": {
+              "text": [],
+              "type": "om"
+            },
+            "10": {
+              "text": [],
+              "type": "om"
+            },
+            "15": {
+              "text": [],
+              "type": "om"
+            },
+            "20": {
+              "text": [],
+              "type": "om"
+            },
+            "100": {
+              "text": [],
+              "type": "om"
+            },
+            "110": {
+              "text": [],
+              "type": "om"
+            },
+            "120": {
+              "text": [],
+              "type": "om"
+            },
+            "230": {
+              "text": [],
+              "type": "om"
+            },
+            "410": {
+              "text": [],
+              "type": "om"
+            },
+            "451": {
+              "text": [],
+              "type": "om"
+            },
+            "500": {
+              "text": [],
+              "type": "om"
+            },
+            "510": {
+              "text": [],
+              "type": "om"
+            },
+            "682": {
+              "text": [],
+              "type": "om"
+            },
+            "2007": {
+              "text": [],
+              "type": "om"
+            },
+            "2010": {
+              "text": [],
+              "type": "om"
+            },
+            "4000": {
+              "text": [],
+              "type": "om"
+            },
+            "4010": {
+              "text": [],
+              "type": "om"
+            },
+            "4210": {
+              "text": [],
+              "type": "om"
+            },
+            "5020": {
+              "text": [],
+              "type": "om"
+            },
+            "5102": {
+              "text": [],
+              "type": "om"
+            },
+            "4240C": {
+              "text": [],
+              "type": "om"
+            },
+            "basetext": {
+              "text": [],
+              "type": "om"
+            },
+            "4040*": {
+              "text": [],
+              "type": "om"
+            },
+            "4200*": {
+              "text": [],
+              "type": "om_verse",
+              "details": "om unit"
+            }
+          },
+          "standoff_subreadings": [
+            "10",
+            "100",
+            "110",
+            "120",
+            "15",
+            "20",
+            "2007",
+            "2010",
+            "230",
+            "4000",
+            "4010",
+            "410",
+            "4210",
+            "4240C",
+            "451",
+            "5",
+            "500",
+            "5020",
+            "510",
+            "5102",
+            "basetext",
+            "4040*",
+            "682",
+            "4200*"
+          ],
+          "suffixes": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "29": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "29",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "400": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "400",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "672": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "672",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "677": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "677",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "4060": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "4060",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "4161": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "4161",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "4250": {
+                "t": "ahurahe",
+                "index": "4",
+                "siglum": "4250",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "4040C": {
+                "t": "ahurahe",
+                "index": "10",
+                "siglum": "4040",
+                "original": "ahurahe",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "4240*": {
+                "t": "ahurahe",
+                "index": "8",
+                "siglum": "4240",
+                "original": "ahurahe",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "ahurahe"
+                ]
+              },
+              "index": "5.3",
+              "verse": "Y.3.1.10",
+              "reading": [
+                "29",
+                "400",
+                "4040C",
+                "4060",
+                "4161",
+                "4240*",
+                "4250",
+                "672",
+                "677"
+              ],
+              "interface": "ahurahe"
+            }
+          ],
+          "witnesses": [
+            "29",
+            "400",
+            "672",
+            "677",
+            "4040C",
+            "4060",
+            "4161",
+            "4240*",
+            "4250"
+          ],
+          "_id": "abe2df5cd7bd8d5cfe223951c2da4dfe",
+          "label": "b",
+          "text_string": "ahurahe",
+          "suffixes": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "4200C": {
+                "t": "hahurahi",
+                "index": "10",
+                "siglum": "4200",
+                "original": "hahurahi",
+                "rule_match": [
+                  "hahurahi"
+                ]
+              },
+              "index": "5.3",
+              "verse": "VS.3.1.10",
+              "reading": [
+                "4200C"
+              ],
+              "interface": "hahurahi"
+            }
+          ],
+          "witnesses": [
+            "4200C"
+          ],
+          "_id": "fbab612bbeb9e18a4ec6647898e392e1",
+          "label": "c",
+          "text_string": "hahurahi",
+          "suffixes": [
+            ""
+          ]
+        }
+      ],
+      "first_word_index": "5.3",
+      "_id": "87ab43f24feeea2d127f67f89bf55dca"
+    },
+    {
+      "end": 6,
+      "start": 6,
+      "readings": [
+        {
+          "text": [
+            {
+              "5": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "5",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "10": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "10",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "15": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "15",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "20": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "20",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "29": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "29",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "100": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "100",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "110": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "110",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "120": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "120",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "230": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "230",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "400": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "400",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "410": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "410",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "451": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "451",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "510": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "510",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "672": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "672",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "677": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "677",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "682": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "682",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "2007": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "2007",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "2010": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "2010",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "4000": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "4000",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "4010": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "4010",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "4060": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "4060",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "4161": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "4161",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "4250": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "4250",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "5020": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "5020",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "5102": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "5102",
+                "original": "mazdā̊",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "index": "6.1",
+              "verse": "Y.3.1.10",
+              "reading": [
+                "10",
+                "100",
+                "110",
+                "120",
+                "15",
+                "20",
+                "2007",
+                "2010",
+                "230",
+                "29",
+                "400",
+                "4000",
+                "4010",
+                "4060",
+                "410",
+                "4161",
+                "4250",
+                "451",
+                "5",
+                "5020",
+                "510",
+                "5102",
+                "672",
+                "677",
+                "682",
+                "basetext"
+              ],
+              "basetext": {
+                "t": "mazdā̊",
+                "index": "6",
+                "siglum": "basetext",
+                "original": "mazdā̊",
+                "rule_match": [
+                  "mazdā̊"
+                ]
+              },
+              "interface": "mazdā̊"
+            }
+          ],
+          "witnesses": [
+            "5",
+            "10",
+            "15",
+            "20",
+            "29",
+            "100",
+            "110",
+            "120",
+            "230",
+            "400",
+            "410",
+            "451",
+            "510",
+            "672",
+            "677",
+            "682",
+            "2007",
+            "2010",
+            "4000",
+            "4010",
+            "4060",
+            "4161",
+            "4250",
+            "5020",
+            "5102",
+            "basetext"
+          ],
+          "_id": "53b1fae3594840aecc0df3cdc700eecc",
+          "label": "a",
+          "text_string": "mazdā̊",
+          "subreadings": {
+            "reconstructed": [
+              {
+                "text": [
+                  {
+                    "500": {
+                      "t": "mazdā̊",
+                      "index": "6",
+                      "siglum": "500",
+                      "unclear": true,
+                      "original": "ma{zdā̊}",
+                      "pc_after": "P+.",
+                      "rule_match": [
+                        "ma{zdā̊}"
+                      ],
+                      "decision_class": [
+                        "reconstructed"
+                      ],
+                      "decision_details": [
+                        {
+                          "n": "mazdā̊",
+                          "t": "ma{zdā̊}",
+                          "id": 5638,
+                          "class": "reconstructed",
+                          "scope": "once"
+                        }
+                      ]
+                    },
+                    "index": "6.1",
+                    "verse": "Y.3.1.10",
+                    "interface": "mazdā̊",
+                    "reading": [
+                      "500"
+                    ]
+                  }
+                ],
+                "text_string": "ma{zdā̊}",
+                "witnesses": [
+                  "500"
+                ],
+                "suffix": "r",
+                "suffixes": [
+                  ""
+                ]
+              }
+            ],
+            "orthographic": [
+              {
+                "text": [
+                  {
+                    "index": "6.1",
+                    "verse": "Y.3.1.10",
+                    "4240*": {
+                      "n": "mazdā̊",
+                      "t": "mazdāǝ",
+                      "index": "10",
+                      "siglum": "4240",
+                      "original": "mazdāǝ",
+                      "pc_after": "P+.",
+                      "rule_match": [
+                        "mazdāǝ"
+                      ],
+                      "decision_class": [
+                        "orthographic"
+                      ],
+                      "decision_details": [
+                        {
+                          "n": "mazdā̊",
+                          "t": "mazdāǝ",
+                          "id": 5636,
+                          "class": "orthographic",
+                          "scope": "once"
+                        }
+                      ]
+                    },
+                    "interface": "mazdā̊",
+                    "reading": [
+                      "4240*",
+                      "4240C"
+                    ],
+                    "4240C": {
+                      "n": "mazdā̊",
+                      "t": "mazdāǝ",
+                      "index": "8",
+                      "siglum": "4240",
+                      "original": "mazdāǝ",
+                      "pc_after": "P+.",
+                      "rule_match": [
+                        "mazdāǝ"
+                      ],
+                      "decision_class": [
+                        "orthographic"
+                      ],
+                      "decision_details": [
+                        {
+                          "n": "mazdā̊",
+                          "t": "mazdāǝ",
+                          "id": 5637,
+                          "class": "orthographic",
+                          "scope": "once"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "text_string": "mazdāǝ",
+                "witnesses": [
+                  "4240*",
+                  "4240C"
+                ],
+                "suffix": "o",
+                "suffixes": [
+                  "",
+                  ""
+                ]
+              }
+            ]
+          },
+          "suffixes": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "4210": {
+                "t": "mazd1",
+                "index": "6",
+                "siglum": "4210",
+                "original": "mazd[1]",
+                "rule_match": [
+                  "mazd[1]"
+                ]
+              },
+              "index": "6.1",
+              "verse": "VS.3.1.10",
+              "reading": [
+                "4210"
+              ],
+              "interface": "mazd[1]"
+            }
+          ],
+          "witnesses": [
+            "4210"
+          ],
+          "_id": "cff9a7fb5242da429505bcd0db1aefcd",
+          "label": "b",
+          "text_string": "mazd[1]",
+          "suffixes": [
+            ""
+          ]
+        },
+        {
+          "text": [],
+          "type": "om",
+          "witnesses": [
+            "4040*",
+            "4040C",
+            "4200*",
+            "4200C"
+          ],
+          "_id": "7b9b727476cb771e9d417d939e49906d",
+          "label": "c",
+          "text_string": "om.",
+          "SR_text": {
+            "4040*": {
+              "text": [],
+              "type": "om"
+            },
+            "4040C": {
+              "text": [],
+              "type": "om"
+            },
+            "4200C": {
+              "text": [],
+              "type": "om"
+            },
+            "4200*": {
+              "text": [],
+              "type": "om_verse",
+              "details": "om unit"
+            }
+          },
+          "standoff_subreadings": [
+            "4040*",
+            "4040C",
+            "4200C",
+            "4200*"
+          ],
+          "suffixes": [
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "first_word_index": "6.1",
+      "_id": "7e5616a5abcfd011cc2f4346e0c3b65c"
+    },
+    {
+      "end": 8,
+      "start": 8,
+      "readings": [
+        {
+          "text": [
+            {
+              "15": {
+                "t": "aməṣ̌anąm",
+                "index": "8",
+                "siglum": "15",
+                "original": "aməṣ̌anąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməṣ̌anąm"
+                ]
+              },
+              "20": {
+                "t": "aməṣ̌anąm",
+                "index": "8",
+                "siglum": "20",
+                "original": "aməṣ̌anąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməṣ̌anąm"
+                ]
+              },
+              "29": {
+                "t": "aməṣ̌anąm",
+                "index": "8",
+                "siglum": "29",
+                "original": "aməṣ̌anąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməṣ̌anąm"
+                ]
+              },
+              "510": {
+                "t": "aməṣ̌anąm",
+                "index": "8",
+                "siglum": "510",
+                "original": "aməṣ̌anąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməṣ̌anąm"
+                ]
+              },
+              "2007": {
+                "t": "aməṣ̌anąm",
+                "index": "8",
+                "siglum": "2007",
+                "original": "aməṣ̌anąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməṣ̌anąm"
+                ]
+              },
+              "2010": {
+                "t": "aməṣ̌anąm",
+                "index": "8",
+                "siglum": "2010",
+                "original": "aməṣ̌anąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməṣ̌anąm"
+                ]
+              },
+              "4000": {
+                "t": "aməṣ̌anąm",
+                "index": "8",
+                "siglum": "4000",
+                "original": "aməṣ̌anąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməṣ̌anąm"
+                ]
+              },
+              "4010": {
+                "t": "aməṣ̌anąm",
+                "index": "8",
+                "siglum": "4010",
+                "original": "aməṣ̌anąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməṣ̌anąm"
+                ]
+              },
+              "4161": {
+                "t": "aməṣ̌anąm",
+                "index": "8",
+                "siglum": "4161",
+                "original": "aməṣ̌anąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməṣ̌anąm"
+                ]
+              },
+              "5020": {
+                "t": "aməṣ̌anąm",
+                "index": "8",
+                "siglum": "5020",
+                "original": "aməṣ̌anąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməṣ̌anąm"
+                ]
+              },
+              "5102": {
+                "t": "aməṣ̌anąm",
+                "index": "8",
+                "siglum": "5102",
+                "original": "aməṣ̌anąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməṣ̌anąm"
+                ]
+              },
+              "index": "8.1",
+              "verse": "Y.3.1.10",
+              "reading": [
+                "15",
+                "20",
+                "2007",
+                "2010",
+                "29",
+                "4000",
+                "4010",
+                "4161",
+                "5020",
+                "510",
+                "5102",
+                "basetext"
+              ],
+              "basetext": {
+                "t": "aməṣ̌anąm",
+                "index": "8",
+                "siglum": "basetext",
+                "original": "aməṣ̌anąm",
+                "rule_match": [
+                  "aməṣ̌anąm"
+                ]
+              },
+              "interface": "aməṣ̌anąm"
+            }
+          ],
+          "witnesses": [
+            "15",
+            "20",
+            "29",
+            "510",
+            "2007",
+            "2010",
+            "4000",
+            "4010",
+            "4161",
+            "5020",
+            "5102",
+            "basetext"
+          ],
+          "_id": "3459581549dd8ade4ea84bc01811a909",
+          "label": "a",
+          "text_string": "aməṣ̌anąm",
+          "subreadings": {
+            "reconstructed": [
+              {
+                "text": [
+                  {
+                    "10": {
+                      "t": "aməṣ̌anąm",
+                      "index": "8",
+                      "siglum": "10",
+                      "unclear": true,
+                      "original": "{a}məṣ̌anąm",
+                      "pc_after": "P+.",
+                      "rule_match": [
+                        "{a}məṣ̌anąm"
+                      ],
+                      "decision_class": [
+                        "reconstructed"
+                      ],
+                      "decision_details": [
+                        {
+                          "n": "aməṣ̌anąm",
+                          "t": "{a}məṣ̌anąm",
+                          "id": 5639,
+                          "class": "reconstructed",
+                          "scope": "once"
+                        }
+                      ]
+                    },
+                    "index": "8.1",
+                    "verse": "Y.3.1.10",
+                    "interface": "aməṣ̌anąm",
+                    "reading": [
+                      "10"
+                    ]
+                  }
+                ],
+                "text_string": "{a}məṣ̌anąm",
+                "witnesses": [
+                  "10"
+                ],
+                "suffix": "r",
+                "suffixes": [
+                  ""
+                ]
+              }
+            ]
+          },
+          "suffixes": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "5": {
+                "t": "aməšanąm",
+                "index": "8",
+                "siglum": "5",
+                "original": "aməšanąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməšanąm"
+                ]
+              },
+              "100": {
+                "t": "aməšanąm",
+                "index": "8",
+                "siglum": "100",
+                "original": "aməšanąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməšanąm"
+                ]
+              },
+              "230": {
+                "t": "aməšanąm",
+                "index": "8",
+                "siglum": "230",
+                "original": "aməšanąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməšanąm"
+                ]
+              },
+              "4060": {
+                "t": "aməšanąm",
+                "index": "8",
+                "siglum": "4060",
+                "original": "aməšanąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməšanąm"
+                ]
+              },
+              "index": "8.1",
+              "verse": "Y.3.1.10",
+              "reading": [
+                "100",
+                "230",
+                "4060",
+                "5"
+              ],
+              "interface": "aməšanąm"
+            }
+          ],
+          "witnesses": [
+            "5",
+            "100",
+            "230",
+            "4060"
+          ],
+          "_id": "386a42d57457f5144288123b779421c2",
+          "label": "b",
+          "text_string": "aməšanąm",
+          "suffixes": [
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "110": {
+                "t": "aməšną̇m",
+                "index": "8",
+                "siglum": "110",
+                "original": "aməšną̇m",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməšną̇m"
+                ]
+              },
+              "120": {
+                "t": "aməšną̇m",
+                "index": "8",
+                "siglum": "120",
+                "original": "aməšną̇m",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməšną̇m"
+                ]
+              },
+              "410": {
+                "t": "aməšną̇m",
+                "index": "8",
+                "siglum": "410",
+                "original": "aməšną̇m",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməšną̇m"
+                ]
+              },
+              "682": {
+                "t": "aməšną̇m",
+                "index": "8",
+                "siglum": "682",
+                "original": "aməšną̇m",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməšną̇m"
+                ]
+              },
+              "4250": {
+                "t": "aməšną̇m",
+                "index": "8",
+                "siglum": "4250",
+                "original": "aməšną̇m",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməšną̇m"
+                ]
+              },
+              "index": "8.1",
+              "verse": "Y.3.1.10",
+              "reading": [
+                "110",
+                "120",
+                "410",
+                "4250",
+                "682"
+              ],
+              "interface": "aməšną̇m"
+            }
+          ],
+          "witnesses": [
+            "110",
+            "120",
+            "410",
+            "682",
+            "4250"
+          ],
+          "_id": "55df0a33e891c536878b69a38df0a7ea",
+          "label": "c",
+          "text_string": "aməšną̇m",
+          "suffixes": [
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "400": {
+                "t": "amǝšaną̇m",
+                "index": "8",
+                "siglum": "400",
+                "original": "amǝšaną̇m",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "amǝšaną̇m"
+                ]
+              },
+              "index": "8.1",
+              "verse": "Y.3.1.10",
+              "reading": [
+                "400"
+              ],
+              "interface": "amǝšaną̇m"
+            }
+          ],
+          "witnesses": [
+            "400"
+          ],
+          "_id": "8d152f4e08be6223d666500816bf3a46",
+          "label": "d",
+          "text_string": "amǝšaną̇m",
+          "suffixes": [
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "4210": {
+                "t": "1məšną̇m",
+                "index": "8",
+                "siglum": "4210",
+                "original": "[1]məšną̇m",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "[1]məšną̇m"
+                ]
+              },
+              "index": "8.1",
+              "verse": "VS.3.1.10",
+              "reading": [
+                "4210"
+              ],
+              "interface": "[1]məšną̇m"
+            }
+          ],
+          "witnesses": [
+            "4210"
+          ],
+          "_id": "e987d41a47380b743dbbc463bb3db3b9",
+          "label": "e",
+          "text_string": "[1]məšną̇m",
+          "suffixes": [
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "672": {
+                "t": "aməšnąm",
+                "index": "8",
+                "siglum": "672",
+                "original": "aməšnąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməšnąm"
+                ]
+              },
+              "677": {
+                "t": "aməšnąm",
+                "index": "8",
+                "siglum": "677",
+                "original": "aməšnąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməšnąm"
+                ]
+              },
+              "4240*": {
+                "t": "aməšnąm",
+                "index": "12",
+                "siglum": "4240",
+                "original": "aməšnąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməšnąm"
+                ]
+              },
+              "4240C": {
+                "t": "aməšnąm",
+                "index": "10",
+                "siglum": "4240",
+                "original": "aməšnąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməšnąm"
+                ]
+              },
+              "index": "8.1",
+              "verse": "VS.3.1.10",
+              "reading": [
+                "4240*",
+                "4240C",
+                "672",
+                "677"
+              ],
+              "interface": "aməšnąm"
+            }
+          ],
+          "witnesses": [
+            "672",
+            "677",
+            "4240*",
+            "4240C"
+          ],
+          "_id": "22e77eb0db9a40de4de2a4fd672de26f",
+          "label": "f",
+          "text_string": "aməšnąm",
+          "suffixes": [
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "451": {
+                "t": "aməšaną̇m",
+                "index": "8",
+                "siglum": "451",
+                "original": "aməšaną̇m",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "aməšaną̇m"
+                ]
+              },
+              "index": "8.1",
+              "verse": "Y.3.1.10",
+              "reading": [
+                "451"
+              ],
+              "interface": "aməšaną̇m"
+            }
+          ],
+          "witnesses": [
+            "451"
+          ],
+          "_id": "66a4a8e0853ca1520e96cbaf1fc3a151",
+          "label": "g",
+          "text_string": "aməšaną̇m",
+          "suffixes": [
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "500": {
+                "t": "2əṣ̌anąm",
+                "index": "8",
+                "siglum": "500",
+                "original": "[2]əṣ̌anąm",
+                "rule_match": [
+                  "[2]əṣ̌anąm"
+                ]
+              },
+              "index": "8.1",
+              "verse": "Y.3.1.10",
+              "reading": [
+                "500"
+              ],
+              "interface": "[2]əṣ̌anąm"
+            }
+          ],
+          "witnesses": [
+            "500"
+          ],
+          "_id": "41d448d7341f07cbd371ad965f556b4d",
+          "label": "h",
+          "text_string": "[2]əṣ̌anąm",
+          "suffixes": [
+            ""
+          ]
+        },
+        {
+          "text": [],
+          "type": "om",
+          "witnesses": [
+            "4040*",
+            "4040C",
+            "4200*",
+            "4200C"
+          ],
+          "_id": "868356495ec3471acb447c0ba749ec57",
+          "label": "i",
+          "text_string": "om.",
+          "SR_text": {
+            "4040*": {
+              "text": [],
+              "type": "om"
+            },
+            "4040C": {
+              "text": [],
+              "type": "om"
+            },
+            "4200C": {
+              "text": [],
+              "type": "om"
+            },
+            "4200*": {
+              "text": [],
+              "type": "om_verse",
+              "details": "om unit"
+            }
+          },
+          "standoff_subreadings": [
+            "4040*",
+            "4040C",
+            "4200C",
+            "4200*"
+          ],
+          "suffixes": [
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "first_word_index": "8.1",
+      "_id": "7ac5152d8f680b5dc549db93dd119935"
+    },
+    {
+      "end": 10,
+      "start": 10,
+      "readings": [
+        {
+          "text": [
+            {
+              "5": {
+                "t": "spəṇtanąm",
+                "index": "10",
+                "siglum": "5",
+                "original": "spəṇtanąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "spəṇtanąm"
+                ]
+              },
+              "10": {
+                "t": "spəṇtanąm",
+                "index": "10",
+                "siglum": "10",
+                "original": "spəṇtanąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "spəṇtanąm"
+                ]
+              },
+              "15": {
+                "t": "spəṇtanąm",
+                "index": "10",
+                "siglum": "15",
+                "original": "spəṇtanąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "spəṇtanąm"
+                ]
+              },
+              "20": {
+                "t": "spəṇtanąm",
+                "index": "10",
+                "siglum": "20",
+                "original": "spəṇtanąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "spəṇtanąm"
+                ]
+              },
+              "29": {
+                "t": "spəṇtanąm",
+                "index": "10",
+                "siglum": "29",
+                "original": "spəṇtanąm",
+                "pc_after": "P+006",
+                "rule_match": [
+                  "spəṇtanąm"
+                ]
+              },
+              "100": {
+                "t": "spəṇtanąm",
+                "index": "10",
+                "siglum": "100",
+                "original": "spəṇtanąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "spəṇtanąm"
+                ]
+              },
+              "230": {
+                "t": "spəṇtanąm",
+                "index": "10",
+                "siglum": "230",
+                "original": "spəṇtanąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "spəṇtanąm"
+                ]
+              },
+              "510": {
+                "t": "spəṇtanąm",
+                "index": "10",
+                "siglum": "510",
+                "original": "spəṇtanąm",
+                "pc_after": "P+.::",
+                "rule_match": [
+                  "spəṇtanąm"
+                ]
+              },
+              "677": {
+                "t": "spəṇtanąm",
+                "index": "10",
+                "siglum": "677",
+                "original": "spəṇtanąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "spəṇtanąm"
+                ]
+              },
+              "2007": {
+                "t": "spəṇtanąm",
+                "index": "10",
+                "siglum": "2007",
+                "original": "spəṇtanąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "spəṇtanąm"
+                ]
+              },
+              "2010": {
+                "t": "spəṇtanąm",
+                "index": "10",
+                "siglum": "2010",
+                "original": "spəṇtanąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "spəṇtanąm"
+                ]
+              },
+              "4000": {
+                "t": "spəṇtanąm",
+                "index": "10",
+                "siglum": "4000",
+                "original": "spəṇtanąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "spəṇtanąm"
+                ]
+              },
+              "4010": {
+                "t": "spəṇtanąm",
+                "index": "10",
+                "siglum": "4010",
+                "original": "spəṇtanąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "spəṇtanąm"
+                ]
+              },
+              "4060": {
+                "t": "spəṇtanąm",
+                "index": "10",
+                "siglum": "4060",
+                "original": "spəṇtanąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "spəṇtanąm"
+                ]
+              },
+              "4161": {
+                "t": "spəṇtanąm",
+                "index": "10",
+                "siglum": "4161",
+                "original": "spəṇtanąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "spəṇtanąm"
+                ]
+              },
+              "5020": {
+                "t": "spəṇtanąm",
+                "index": "10",
+                "siglum": "5020",
+                "original": "spəṇtanąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "spəṇtanąm"
+                ]
+              },
+              "5102": {
+                "t": "spəṇtanąm",
+                "index": "10",
+                "siglum": "5102",
+                "original": "spəṇtanąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "spəṇtanąm"
+                ]
+              },
+              "4240*": {
+                "t": "spəṇtanąm",
+                "index": "14",
+                "siglum": "4240",
+                "original": "spəṇtanąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "spəṇtanąm"
+                ]
+              },
+              "4240C": {
+                "t": "spəṇtanąm",
+                "index": "12",
+                "siglum": "4240",
+                "original": "spəṇtanąm",
+                "pc_after": "P+.",
+                "rule_match": [
+                  "spəṇtanąm"
+                ]
+              },
+              "index": "10.1",
+              "verse": "Y.3.1.10",
+              "reading": [
+                "10",
+                "100",
+                "15",
+                "20",
+                "2007",
+                "2010",
+                "230",
+                "29",
+                "4000",
+                "4010",
+                "4060",
+                "4161",
+                "4240*",
+                "4240C",
+                "5",
+                "5020",
+                "510",
+                "5102",
+                "677",
+                "basetext"
+              ],
+              "basetext": {
+                "t": "spəṇtanąm",
+                "index": "10",
+                "siglum": "basetext",
+                "original": "spəṇtanąm",
+                "rule_match": [
+                  "spəṇtanąm"
+                ]
+              },
+              "interface": "spəṇtanąm"
+            }
+          ],
+          "witnesses": [
+            "5",
+            "10",
+            "15",
+            "20",
+            "29",
+            "100",
+            "230",
+            "510",
+            "677",
+            "2007",
+            "2010",
+            "4000",
+            "4010",
+            "4060",
+            "4161",
+            "4240*",
+            "4240C",
+            "5020",
+            "5102",
+            "basetext"
+          ],
+          "_id": "68850321df050d23c0c4a4bac173a809",
+          "label": "a",
+          "text_string": "spəṇtanąm",
+          "subreadings": {
+            "orthographic": [
+              {
+                "text": [
+                  {
+                    "110": {
+                      "n": "spəṇtanąm",
+                      "t": "spəntaną̇m",
+                      "index": "10",
+                      "siglum": "110",
+                      "original": "spəntaną̇m",
+                      "pc_after": "P+.",
+                      "rule_match": [
+                        "spəntaną̇m"
+                      ],
+                      "decision_class": [
+                        "orthographic"
+                      ],
+                      "decision_details": [
+                        {
+                          "n": "spəṇtanąm",
+                          "t": "spəntaną̇m",
+                          "id": 5640,
+                          "class": "orthographic",
+                          "scope": "once"
+                        }
+                      ]
+                    },
+                    "index": "10.1",
+                    "verse": "Y.3.1.10",
+                    "interface": "spəṇtanąm",
+                    "reading": [
+                      "110"
+                    ]
+                  }
+                ],
+                "text_string": "spəntaną̇m",
+                "witnesses": [
+                  "110"
+                ],
+                "suffix": "o",
+                "suffixes": [
+                  ""
+                ]
+              },
+              {
+                "text": [
+                  {
+                    "120": {
+                      "n": "spəṇtanąm",
+                      "t": "spəṇtaną̇m",
+                      "index": "10",
+                      "siglum": "120",
+                      "original": "spəṇtaną̇m",
+                      "pc_after": "P+.",
+                      "rule_match": [
+                        "spəṇtaną̇m"
+                      ],
+                      "decision_class": [
+                        "orthographic"
+                      ],
+                      "decision_details": [
+                        {
+                          "n": "spəṇtanąm",
+                          "t": "spəṇtaną̇m",
+                          "id": 5641,
+                          "class": "orthographic",
+                          "scope": "once"
+                        }
+                      ]
+                    },
+                    "400": {
+                      "n": "spəṇtanąm",
+                      "t": "spǝṇtaną̇m",
+                      "index": "10",
+                      "siglum": "400",
+                      "original": "spǝṇtaną̇m",
+                      "pc_after": "P+.::",
+                      "rule_match": [
+                        "spǝṇtaną̇m",
+                        "spəṇtaną̇m"
+                      ],
+                      "decision_class": [
+                        "none",
+                        "orthographic"
+                      ],
+                      "decision_details": [
+                        {
+                          "n": "spəṇtaną̇m",
+                          "t": "spǝṇtaną̇m",
+                          "id": 5647,
+                          "class": "none",
+                          "scope": "once"
+                        },
+                        {
+                          "n": "spəṇtanąm",
+                          "t": "spəṇtaną̇m",
+                          "id": 5648,
+                          "class": "orthographic",
+                          "scope": "once"
+                        }
+                      ]
+                    },
+                    "410": {
+                      "n": "spəṇtanąm",
+                      "t": "spəṇtaną̇m",
+                      "index": "10",
+                      "siglum": "410",
+                      "original": "spəṇtaną̇m",
+                      "pc_after": "P+.::",
+                      "rule_match": [
+                        "spəṇtaną̇m"
+                      ],
+                      "decision_class": [
+                        "orthographic"
+                      ],
+                      "decision_details": [
+                        {
+                          "n": "spəṇtanąm",
+                          "t": "spəṇtaną̇m",
+                          "id": 5642,
+                          "class": "orthographic",
+                          "scope": "once"
+                        }
+                      ]
+                    },
+                    "451": {
+                      "n": "spəṇtanąm",
+                      "t": "spəṇtaną̇m",
+                      "index": "10",
+                      "siglum": "451",
+                      "original": "spəṇtaną̇m",
+                      "pc_after": "P+.",
+                      "rule_match": [
+                        "spəṇtaną̇m"
+                      ],
+                      "decision_class": [
+                        "orthographic"
+                      ],
+                      "decision_details": [
+                        {
+                          "n": "spəṇtanąm",
+                          "t": "spəṇtaną̇m",
+                          "id": 5645,
+                          "class": "orthographic",
+                          "scope": "once"
+                        }
+                      ]
+                    },
+                    "682": {
+                      "n": "spəṇtanąm",
+                      "t": "spəṇtaną̇m",
+                      "index": "10",
+                      "siglum": "682",
+                      "original": "spəṇtaną̇m",
+                      "pc_after": "P+.::",
+                      "rule_match": [
+                        "spəṇtaną̇m"
+                      ],
+                      "decision_class": [
+                        "orthographic"
+                      ],
+                      "decision_details": [
+                        {
+                          "n": "spəṇtanąm",
+                          "t": "spəṇtaną̇m",
+                          "id": 5646,
+                          "class": "orthographic",
+                          "scope": "once"
+                        }
+                      ]
+                    },
+                    "4210": {
+                      "n": "spəṇtanąm",
+                      "t": "spəṇtaną̇m",
+                      "index": "10",
+                      "siglum": "4210",
+                      "original": "spəṇtaną̇m",
+                      "pc_after": "P+.",
+                      "rule_match": [
+                        "spəṇtaną̇m"
+                      ],
+                      "decision_class": [
+                        "orthographic"
+                      ],
+                      "decision_details": [
+                        {
+                          "n": "spəṇtanąm",
+                          "t": "spəṇtaną̇m",
+                          "id": 5643,
+                          "class": "orthographic",
+                          "scope": "once"
+                        }
+                      ]
+                    },
+                    "4250": {
+                      "n": "spəṇtanąm",
+                      "t": "spəṇtaną̇m",
+                      "index": "10",
+                      "siglum": "4250",
+                      "original": "spəṇtaną̇m",
+                      "pc_after": "P+.",
+                      "rule_match": [
+                        "spəṇtaną̇m"
+                      ],
+                      "decision_class": [
+                        "orthographic"
+                      ],
+                      "decision_details": [
+                        {
+                          "n": "spəṇtanąm",
+                          "t": "spəṇtaną̇m",
+                          "id": 5649,
+                          "class": "orthographic",
+                          "scope": "once"
+                        }
+                      ]
+                    },
+                    "index": "10.1",
+                    "verse": "Y.3.1.10",
+                    "interface": "spəṇtanąm",
+                    "reading": [
+                      "120",
+                      "400",
+                      "410",
+                      "451",
+                      "682",
+                      "4210",
+                      "4250"
+                    ]
+                  }
+                ],
+                "text_string": "spəṇtaną̇m",
+                "witnesses": [
+                  "120",
+                  "400",
+                  "410",
+                  "451",
+                  "682",
+                  "4210",
+                  "4250"
+                ],
+                "suffix": "o",
+                "suffixes": [
+                  "",
+                  "",
+                  "",
+                  "",
+                  "",
+                  "",
+                  ""
+                ]
+              },
+              {
+                "text": [
+                  {
+                    "672": {
+                      "n": "spəṇtanąm",
+                      "t": "spəntanąm",
+                      "index": "10",
+                      "siglum": "672",
+                      "original": "spəntanąm",
+                      "pc_after": "P+.",
+                      "rule_match": [
+                        "spəntanąm"
+                      ],
+                      "decision_class": [
+                        "orthographic"
+                      ],
+                      "decision_details": [
+                        {
+                          "n": "spəṇtanąm",
+                          "t": "spəntanąm",
+                          "id": 5650,
+                          "class": "orthographic",
+                          "scope": "once"
+                        }
+                      ]
+                    },
+                    "index": "10.1",
+                    "verse": "Y.3.1.10",
+                    "interface": "spəṇtanąm",
+                    "reading": [
+                      "672"
+                    ]
+                  }
+                ],
+                "text_string": "spəntanąm",
+                "witnesses": [
+                  "672"
+                ],
+                "suffix": "o",
+                "suffixes": [
+                  ""
+                ]
+              }
+            ]
+          },
+          "suffixes": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "text": [
+            {
+              "500": {
+                "t": "3ṇtanąm",
+                "index": "10",
+                "siglum": "500",
+                "original": "[3]ṇtanąm",
+                "pc_after": "P+006",
+                "rule_match": [
+                  "[3]ṇtanąm"
+                ]
+              },
+              "index": "10.1",
+              "verse": "Y.3.1.10",
+              "reading": [
+                "500"
+              ],
+              "interface": "[3]ṇtanąm"
+            }
+          ],
+          "witnesses": [
+            "500"
+          ],
+          "_id": "123cdfc5c84eace4d437a1259c06a9ed",
+          "label": "b",
+          "text_string": "[3]ṇtanąm",
+          "suffixes": [
+            ""
+          ]
+        },
+        {
+          "text": [],
+          "type": "om",
+          "witnesses": [
+            "4040*",
+            "4040C",
+            "4200*",
+            "4200C"
+          ],
+          "_id": "1ad22f911ac19bd0c142b320ccd4e9ed",
+          "label": "c",
+          "text_string": "om.",
+          "SR_text": {
+            "4040*": {
+              "text": [],
+              "type": "om"
+            },
+            "4040C": {
+              "text": [],
+              "type": "om"
+            },
+            "4200C": {
+              "text": [],
+              "type": "om"
+            },
+            "4200*": {
+              "text": [],
+              "type": "om_verse",
+              "details": "om unit"
+            }
+          },
+          "standoff_subreadings": [
+            "4040*",
+            "4040C",
+            "4200C",
+            "4200*"
+          ],
+          "suffixes": [
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "first_word_index": "10.1",
+      "_id": "f46a3f96858180f167633594b6c730ed"
+    }
+  ],
+  "hand_id_map": {
+    "5": "AV_5_Y3-Y8_Redcel",
+    "10": "AV_10_Y3-Y8_Redcel",
+    "15": "AV_15_Y3-Y8_Redcel",
+    "20": "AV_20_Y3-Y8_Redcel",
+    "29": "AV_29_Y3-Y8_Redcel",
+    "100": "AV_100_Y3-Y8_Redcel",
+    "110": "AV_110_Y3-Y8_Redcel",
+    "120": "AV_120_Y3-Y8_Redcel",
+    "230": "AV_230_Y3-Y8_Redcel",
+    "400": "AV_400_Y3-Y8_Redcel",
+    "410": "AV_410_Y3-Y8_Redcel",
+    "451": "AV_451_Y3-Y8_Redcel",
+    "500": "AV_500_Y3-Y8_Redcel",
+    "510": "AV_510_Y3-Y8_Redcel",
+    "672": "AV_672_Y3-Y8_Redcel",
+    "677": "AV_677_Y3-Y8_Redcel",
+    "682": "AV_682_Y3-Y8_Redcel",
+    "2007": "AV_2007_Y3-Y8_Redcel",
+    "2010": "AV_2010_Y3-Y8_Redcel",
+    "4000": "AV_4000_Y3-Y8_Redcel",
+    "4010": "AV_4010_Y3-Y8_Redcel",
+    "4060": "AV_4060_Y3-Y8_Redcel",
+    "4161": "AV_4161_Y3-Y8_Redcel",
+    "4210": "AV_4210_Y3-Y8_Redcel",
+    "4250": "AV_4250_Y3-Y8_Redcel",
+    "5020": "AV_5020_Y3-Y8_Redcel",
+    "5102": "AV_5102_Y3-Y8_Redcel",
+    "4040*": "AV_4040_Y3-Y8_Redcel",
+    "4040C": "AV_4040_Y3-Y8_Redcel",
+    "4200*": "AV_4200_Y3-Y8_Redcel",
+    "4200C": "AV_4200_Y3-Y8_Redcel",
+    "4240*": "AV_4240_Y3-Y8_Redcel",
+    "4240C": "AV_4240_Y3-Y8_Redcel",
+    "basetext": "AV_basetext_Y3-Y8_Redcel"
+  },
+  "om_readings": [
+    "4200*"
+  ],
+  "lac_readings": [],
+  "overtext_name": "basetext",
+  "special_categories": [],
+  "marked_readings": {
+    "none": [
+      {
+        "start": 2,
+        "end": 2,
+        "unit_id": "f671134de630bc6400a3750f218fb032",
+        "first_word_index": "2.1",
+        "witness": "4200*",
+        "apparatus": "apparatus",
+        "reading_text": "&lt;om unit&gt;",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "&lt;om unit&gt;"
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "details": "om unit",
+        "type": "om_verse"
+      },
+      {
+        "start": 4,
+        "end": 4,
+        "unit_id": "57d0e4c6cc51ae7da56f1bcd57480fe3",
+        "first_word_index": "4.1",
+        "witness": "29",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 4,
+        "end": 4,
+        "unit_id": "57d0e4c6cc51ae7da56f1bcd57480fe3",
+        "first_word_index": "4.1",
+        "witness": "400",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 4,
+        "end": 4,
+        "unit_id": "57d0e4c6cc51ae7da56f1bcd57480fe3",
+        "first_word_index": "4.1",
+        "witness": "4040*",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 4,
+        "end": 4,
+        "unit_id": "57d0e4c6cc51ae7da56f1bcd57480fe3",
+        "first_word_index": "4.1",
+        "witness": "4060",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 4,
+        "end": 4,
+        "unit_id": "57d0e4c6cc51ae7da56f1bcd57480fe3",
+        "first_word_index": "4.1",
+        "witness": "4161",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 4,
+        "end": 4,
+        "unit_id": "57d0e4c6cc51ae7da56f1bcd57480fe3",
+        "first_word_index": "4.1",
+        "witness": "4250",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 4,
+        "end": 4,
+        "unit_id": "57d0e4c6cc51ae7da56f1bcd57480fe3",
+        "first_word_index": "4.1",
+        "witness": "672",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 4,
+        "end": 4,
+        "unit_id": "57d0e4c6cc51ae7da56f1bcd57480fe3",
+        "first_word_index": "4.1",
+        "witness": "677",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 4,
+        "end": 4,
+        "unit_id": "57d0e4c6cc51ae7da56f1bcd57480fe3",
+        "first_word_index": "4.1",
+        "witness": "4200*",
+        "apparatus": "apparatus",
+        "reading_text": "&lt;om unit&gt;",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "&lt;om unit&gt;"
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "details": "om unit",
+        "type": "om_verse"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "10",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "100",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "110",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "120",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "15",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "20",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "2007",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "2010",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "230",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "4000",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "4010",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "410",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "4210",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "4240*",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "4240C",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "451",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "5",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "500",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "5020",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "510",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "5102",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "basetext",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "4060",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "677",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "4040*",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "4161",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "400",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "672",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "4250",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "29",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "682",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "50a6c04dd221d1e0b9b84da3dffe8d35",
+        "first_word_index": "5.1",
+        "witness": "4200*",
+        "apparatus": "apparatus",
+        "reading_text": "&lt;om unit&gt;",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "&lt;om unit&gt;"
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "details": "om unit",
+        "type": "om_verse"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "10",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "100",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "110",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "120",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "15",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "20",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "2007",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "2010",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "230",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "29",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "400",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "4000",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "4010",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "4040*",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "4060",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "410",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "4161",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "4210",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "4250",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "451",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "5",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "500",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "5020",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "510",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "5102",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "672",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "677",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "682",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "basetext",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "d4d66735e97813b639b57e11aa190911",
+        "first_word_index": "5.2",
+        "witness": "4200*",
+        "apparatus": "apparatus",
+        "reading_text": "&lt;om unit&gt;",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "&lt;om unit&gt;"
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "details": "om unit",
+        "type": "om_verse"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "10",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "100",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "110",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "120",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "15",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "20",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "2007",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "2010",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "230",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "4000",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "4010",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "4040*",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "410",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "4210",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "4240C",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "451",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "5",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "500",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "5020",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "510",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "5102",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "682",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "basetext",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 5,
+        "end": 5,
+        "unit_id": "87ab43f24feeea2d127f67f89bf55dca",
+        "first_word_index": "5.3",
+        "witness": "4200*",
+        "apparatus": "apparatus",
+        "reading_text": "&lt;om unit&gt;",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "&lt;om unit&gt;"
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "details": "om unit",
+        "type": "om_verse"
+      },
+      {
+        "start": 6,
+        "end": 6,
+        "unit_id": "7e5616a5abcfd011cc2f4346e0c3b65c",
+        "first_word_index": "6.1",
+        "witness": "4040*",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 6,
+        "end": 6,
+        "unit_id": "7e5616a5abcfd011cc2f4346e0c3b65c",
+        "first_word_index": "6.1",
+        "witness": "4040C",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 6,
+        "end": 6,
+        "unit_id": "7e5616a5abcfd011cc2f4346e0c3b65c",
+        "first_word_index": "6.1",
+        "witness": "4200C",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 6,
+        "end": 6,
+        "unit_id": "7e5616a5abcfd011cc2f4346e0c3b65c",
+        "first_word_index": "6.1",
+        "witness": "4200*",
+        "apparatus": "apparatus",
+        "reading_text": "&lt;om unit&gt;",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "&lt;om unit&gt;"
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "details": "om unit",
+        "type": "om_verse"
+      },
+      {
+        "start": 8,
+        "end": 8,
+        "unit_id": "7ac5152d8f680b5dc549db93dd119935",
+        "first_word_index": "8.1",
+        "witness": "4040*",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 8,
+        "end": 8,
+        "unit_id": "7ac5152d8f680b5dc549db93dd119935",
+        "first_word_index": "8.1",
+        "witness": "4040C",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 8,
+        "end": 8,
+        "unit_id": "7ac5152d8f680b5dc549db93dd119935",
+        "first_word_index": "8.1",
+        "witness": "4200C",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 8,
+        "end": 8,
+        "unit_id": "7ac5152d8f680b5dc549db93dd119935",
+        "first_word_index": "8.1",
+        "witness": "4200*",
+        "apparatus": "apparatus",
+        "reading_text": "&lt;om unit&gt;",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "&lt;om unit&gt;"
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "details": "om unit",
+        "type": "om_verse"
+      },
+      {
+        "start": 10,
+        "end": 10,
+        "unit_id": "f46a3f96858180f167633594b6c730ed",
+        "first_word_index": "10.1",
+        "witness": "4040*",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 10,
+        "end": 10,
+        "unit_id": "f46a3f96858180f167633594b6c730ed",
+        "first_word_index": "10.1",
+        "witness": "4040C",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 10,
+        "end": 10,
+        "unit_id": "f46a3f96858180f167633594b6c730ed",
+        "first_word_index": "10.1",
+        "witness": "4200C",
+        "apparatus": "apparatus",
+        "reading_text": "om.",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "om."
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "type": "om"
+      },
+      {
+        "start": 10,
+        "end": 10,
+        "unit_id": "f46a3f96858180f167633594b6c730ed",
+        "first_word_index": "10.1",
+        "witness": "4200*",
+        "apparatus": "apparatus",
+        "reading_text": "&lt;om unit&gt;",
+        "parent_text": "om.",
+        "identifier": [
+          null
+        ],
+        "suffixed_sigla": [
+          false
+        ],
+        "suffixed_label": [
+          false
+        ],
+        "reading_history": [
+          "&lt;om unit&gt;"
+        ],
+        "value": "none",
+        "subreading": [
+          false
+        ],
+        "name": [
+          "None"
+        ],
+        "details": "om unit",
+        "type": "om_verse"
+      }
+    ]
+  }
+}
+	  	});
+
+	  	QUnit.testDone(function () {
+	  		server.restore();
+	  		sandbox.restore();
+	  		// remove the error box if present - as it is attached to the body element I'm not sure
+	  		//the qunit-fixture thing will apply
+	  		if (document.getElementById('error')) {
+	  			document.getElementsByTagName('body')[0].removeChild(document.getElementById('error'));
+	  		}
+	  	});
+
+
+      QUnit.test("test mergeOms", function (assert) {
+        var original = JSON.parse(JSON.stringify(CL.data))
+    	  OR._mergeAllSuppliedEmptyReadings(['om', 'om_verse'], {'created': true, 'type': 'om', 'text': [], 'witnesses': []}, true);
+        console.log(CL.data)
+        assert.notEqual(orginal, CL.data);
+
+      });
+
+    </script>
+
+      	<script>testing = false</script>
+      	<div id="qunit"></div>
+     	<div id="qunit-fixture">
+
+
+    	</div>
+  </body>
+</html>

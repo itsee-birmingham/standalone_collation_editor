@@ -7,67 +7,66 @@ body.waiting,  body.waiting div input {
     cursor: wait;
 }
 
-div#header {
+#header {
     font-family: arial;
 }
 
-div#header h1 {
+#header h1 {
     font-size: 12pt;
 }
 
-div#header h1#stage_id {
+#header h1#stage_id {
     float: left;
 }
 
-div#header h1#project_name {
+#header h1#project_name {
     float: left;
     padding-left: 20px;
 }
 
-div#header h1#verse_ref {
+#header h1#verse_ref {
     float:left;
     padding-left: 20px;
 }
 
-div#header.collation_header {
+#header.collation_header {
     background: #9999EE;
 }
 
-div#header.regularisation_header {
+#header.regularisation_header {
     background: orangered;
 }
 
-div#header.set_variants_header {
+#header.set_variants_header {
     background: #FFBB55;
 }
 
-div#header.reorder_header {
+#header.reorder_header {
     background: #99FF99;
 }
 
-div#header.approved_header {
+#header.approved_header {
     background: silver;
 }
 
 
 
-div.project_header {
+.project_header {
     background: #CC99FF;
 }
 
-div.versional_editor_header {
+.versional_editor_header {
     background: lightblue;
 }
 
 
-
-div.admin_header {
+.admin_header {
     background: #CCCCFF;
 }
 
 
 
-div#header {
+#header {
     /*position: fixed;*/
     padding: 7px;
     height: 40px;
@@ -85,7 +84,7 @@ div#header {
 }
 
 
-div#header h1#version_language, div#header h1#other_versions_displayed, div#header h1#read_status {
+#header h1#version_language, #header h1#other_versions_displayed, #header h1#read_status {
     float: left;
     padding-left: 20px;
 }
@@ -97,13 +96,13 @@ div#login_status {
     font-size: 11pt;
 }
 
-div#container {
+#container {
     padding-top: 10px;
     padding-bottom: 50px;
 }
 
 
-div#container, div#scroller {
+#container, #scroller {
     overflow: auto;
     position: relative;
 }
@@ -160,7 +159,7 @@ div#footer select {
     padding: 0;
 }
 
-div#footer .pure-button {
+div#footer .pure-button, div#footer .btn {
 	margin-top: 8px;
 }
 
