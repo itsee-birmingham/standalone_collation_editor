@@ -4,10 +4,9 @@ title: Upgrade to 2.0.x family from 1.x
 sidebar_label: Upgrading to 2.0.x
 ---
 
-## Upgrading to collation_editor_core v2.0.x from collation_editor_core 1.1.x
+## Upgrading to 2.0.x from 1.1.x
 
-
-### New features in this version:
+### New features in this version
 
 - The option to add and/or remove witnesses from saved collations in the first two stages of the collation editor.
 - Support for lac/om unit readings where the editor need to be more specific about the reason for the absence.
@@ -31,7 +30,7 @@ If you are not yet using 1.1.x you are advised to work through each upgrade list
 here. You should use the readme file for the version you are upgrading to with the exception of the upgrade to 1.1.x
 which is covered in this file.
 
-### Required changes to the services file.
+### Required changes to the services file
 
 Some of these changes are required to keep things working. Most are only required in order to maintain existing
 behaviour. Where a change is required only to preserve existing behaviour it is noted in the explanation.
