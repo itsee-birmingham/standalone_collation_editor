@@ -6,7 +6,8 @@ sidebar:
   - installation
   - label: Services File
     children:
-       - services-required
+       - required-variables
+       - required-functions
        - services-optional
   # - label: Installation
   #   children:

@@ -1,45 +1,11 @@
 ---
-id: services-required
-title: Required Items
+id: required-functions
+title: Required Functions
 ---
 
-## Required Variables and Functions
+## Required Service File Functions
 
-### Required Service File Variables
-
-#### ```supportedRuleScopes```
-
-The collation editor supports four different rules scopes.
-
-- once - this place in this specified witness
-- verse - everywhere in every witness for this verse/collation unit
-- manuscript - everywhere in this specified witness
-- always - everywhere in every witness
-
-You can decide which of these you want your system to support and must ensure that the selected scopes can be stored
-and retrieved through the service file. The file based system offered in the standalone collation editor only supports
-two scopes (once and always) due to the storage and retrieval limitations.
-
-This variables is a JSON object in which the supported rule scopes as a string are each a key, the string must match
-the one in the list above. The value of the key is what is used in the drop down box when users select the scope for
-the rule they are creating. This can be any string that will adequately describe the scope for your users.
-
-An example for a system that supports once and always rule scopes is as follows:
-
-```js
-  supportedRuleScopes = {
-    "once": "This place, these wits",
-    "always": "Everywhere, all wits"
-  };
-```
-
-In future releases it may be possible for projects to limit the supported rules scopes to a subset of those provided by
-the services and also to change the value of the string displayed to users. Some of the key names may also be changed
-in 2.0.0 to be more generic (verse and manuscript in particular).
-
-### Required Service File Functions
-
-#### ```initialiseEditor()```
+### ```initialiseEditor()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -53,7 +19,7 @@ If the index page is to be set up with JavaScript using the settings provided in
 
 If ```CL.loadIndexPage()``` is not used as part of the index page setup then this function also needs to add a button with the id *switch_project_button* and one with the id *project_summary* if those functions are required on the platform. In addition, if you want users to be able to change the collation algorithm settings then a button with the id *collation_settings* should also be added. Details of how to activate the buttons can be found in the relevant entries in the Optional Service File Functions section.
 
-#### ```getUserInfo()```
+### ```getUserInfo()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -61,7 +27,7 @@ If ```CL.loadIndexPage()``` is not used as part of the index page setup then thi
 
 This function must get the current user details as a JSON object and call ```callback``` with the result. The user object itself must contain an **id** key. Any other data can be included in the object returned for use in your other service functions for example ```showLoginStatus``` might want to show the username.
 
-#### ```getUserInfoByIds()```
+### ```getUserInfoByIds()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -79,7 +45,7 @@ Given the ids ```["JS", "RS"]``` the JSON object should be as follows (where nam
 }
 ```
 
-#### ```applySettings()```
+### ```applySettings()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -90,7 +56,7 @@ The function should pass the data object to a Python service and run the callbac
 
 The Python service required is described in the Python services section below.
 
-#### ```getCurrentEditingProject()```
+### ```getCurrentEditingProject()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -98,7 +64,7 @@ The Python service required is described in the Python services section below.
 
 This function must get the current project details as a JSON object and call ```callback``` with the result. The structure of the project JSON is discussed in the project configuration section.
 
-#### ```getUnitData()```
+### ```getUnitData()```
 
 
 | Param  | Type                | Description  |
@@ -124,7 +90,7 @@ When all of the data has been retrieved the callback should be run on the result
 
 **NB:** Until version 2.0.0 this function was called ```getVerseData()```, had a boolean ```private``` as the third argument before the callback and returned a list (which is now the list in the **results** key).
 
-#### ```doCollation()```
+### ```doCollation()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -138,9 +104,7 @@ The python service required for the collation process is explained in the Python
 
 When the collation process has completed the JSON response from the Python collation system should be passed to resultCallback.
 
-
-
-#### ```saveCollation()```
+### ```saveCollation()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -153,7 +117,7 @@ When the collation process has completed the JSON response from the Python colla
 
 This function needs to save the collation object in the database. It must be stored in such a way that the ```getSavedCollations()``` and ```loadSavedCollation()``` functions can retrieve it.
 
-#### ```getSavedCollations()```
+### ```getSavedCollations()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -165,7 +129,7 @@ This should return all of the saved collations of the requested unit restricted 
 
 In future versions this function may include an optional projectId parameter rather than using the current project.
 
-#### ```loadSavedCollation()```
+### ```loadSavedCollation()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |

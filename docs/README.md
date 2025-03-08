@@ -1053,8 +1053,8 @@ Upgrading to collation_editor_core v2.0.x from collation_editor_core 1.1.x
 
 New features in this version:
 
-  - The option to add and/or remove witnesses from saved collations in the first two stages of the collation editor.
-  - Support for lac/om unit readings where the editor need to be more specific about the reason for the absence.
+- The option to add and/or remove witnesses from saved collations in the first two stages of the collation editor.
+- Support for lac/om unit readings where the editor need to be more specific about the reason for the absence.
 
 As well as the new features several changes have been made to remove hard coded behaviour which might need to differ
 for different texts and to remove some of the vocabulary that references biblical verses to be more consistent across
@@ -1075,53 +1075,51 @@ If you are not yet using 1.1.x you are advised to work through each upgrade list
 here. You should use the readme file for the version you are upgrading to with the exception of the upgrade to 1.1.x
 which is covered in this file.
 
-
-
 #### Required changes to the services file.
 
 Some of these changes are required to keep things working. Most are only required in order to maintain existing
 behaviour. Where a change is required only to preserve existing behaviour it is noted in the explanation.
 
 ##### Changes to variables
-  - ```lacUnitLabel``` and ```omUnitLabel``` should be provided in the services file to maintain the existing behaviour which displays 'lac verse' and 'om verse' respectively. The defaults have changed to 'lac unit' and 'om unit' to remove biblical verse assumption. The services choices can also be overridden in individual project settings if required.
-  - The variable ```collationAlgorithmSettings``` has been introduced in this release which can be set in the services file and/or the project configurations. The previous defaults may not have been the best option for many projects but to maintain the previous behaviour the services file should set the ```collationAlgorithmSettings``` keys to 'auto', true, 2. The 'auto' setting for the algorithm means that the collation preprocessor will choose an algorithm based on the presence of gaps at the end of the data to be collated. The defaults are explained in the description of the setting above.
-  - In this version the seldom used 'collapse all' button in the footer of all stages of the collation editor has been removed by default. The code which performs the function is still present in the core code and the button can be returned by adding the variable ```showCollapseAllUnitsButton``` and setting the value to the boolean ```true```. This should be done to maintain existing behaviour. This setting can also be used at the project level.
-  - Four new boolean variables have been introduced to determine whether lac and om readings should be combined at either the Order readings or approved stages. They are:
-    - ```combineAllLacsInOR```
-    - ```combineAllOmsInOR```
-    - ```combineAllLacsInApproved```
-    - ```combineAllOmsInApproved```
 
-  These variables can all be specified in the services file or in each project separately and the default for all four is false. To maintain existing behaviour of the editor the value of ```combineAllLacsInOR``` should be set to ```true```.
-  - To enable the new feature that allows witnesses to be added and/or removed from saved collations set the ```allowWitnessChangesInSavedCollations``` variable to ```true```. This can be set in either the services file or in the project configurations for the projects which need to use this feature.
-  - The undo stack length can now be altered in the services file. The default is in the code and is set at six. The variable ```undoStackLength``` can be used to increase this. A full version of the data structure is held in browser memory for each position in the stack. If you have  a lot of witnesses and/or longer units then setting this too high may cause problems.  Because of the possible memory issues this can only be set in services and cannot be changed in project settings.
+- ```lacUnitLabel``` and ```omUnitLabel``` should be provided in the services file to maintain the existing behaviour which displays 'lac verse' and 'om verse' respectively. The defaults have changed to 'lac unit' and 'om unit' to remove biblical verse assumption. The services choices can also be overridden in individual project settings if required.
+- The variable ```collationAlgorithmSettings``` has been introduced in this release which can be set in the services file and/or the project configurations. The previous defaults may not have been the best option for many projects but to maintain the previous behaviour the services file should set the ```collationAlgorithmSettings``` keys to 'auto', true, 2. The 'auto' setting for the algorithm means that the collation preprocessor will choose an algorithm based on the presence of gaps at the end of the data to be collated. The defaults are explained in the description of the setting above.
+- In this version the seldom used 'collapse all' button in the footer of all stages of the collation editor has been removed by default. The code which performs the function is still present in the core code and the button can be returned by adding the variable ```showCollapseAllUnitsButton``` and setting the value to the boolean ```true```. This should be done to maintain existing behaviour. This setting can also be used at the project level.
+- Four new boolean variables have been introduced to determine whether lac and om readings should be combined at either the Order readings or approved stages. They are:
+  - ```combineAllLacsInOR```
+  - ```combineAllOmsInOR```
+  - ```combineAllLacsInApproved```
+  - ```combineAllOmsInApproved```
+
+These variables can all be specified in the services file or in each project separately and the default for all four is false. To maintain existing behaviour of the editor the value of ```combineAllLacsInOR``` should be set to ```true```.
+
+- To enable the new feature that allows witnesses to be added and/or removed from saved collations set the ```allowWitnessChangesInSavedCollations``` variable to ```true```. This can be set in either the services file or in the project configurations for the projects which need to use this feature.
+- The undo stack length can now be altered in the services file. The default is in the code and is set at six. The variable ```undoStackLength``` can be used to increase this. A full version of the data structure is held in browser memory for each position in the stack. If you have  a lot of witnesses and/or longer units then setting this too high may cause problems.  Because of the possible memory issues this can only be set in services and cannot be changed in project settings.
 
 ##### Changes to functions and new required functions
 
-  - changes to existing function ```getVerseData()```
-    - ```getVerseData()``` function should be renamed to ```getUnitData()```.
-    - The boolean argument 'private' in the third position should be removed. The third and final argument should now be the callback.
-    - The return data for the function has changed (see description of service file above and details on special category lac readings). To maintain previous behaviour wrap the array returned in earlier versions in a dictionary as the value for the key *results*.
-  - ```getAdjoiningVerse()``` should be renamed to ```getAdjoiningUnit```.
-  - new optional functions ```prepareNormalisedString()``` and ```prepareDisplayString()```. These functions have been added to remove a hard coded action required from the early New Testament Greek implementation of the code. They are described fully in the optional services functions above. To maintain existing behaviour ```prepareNormalisedString()``` should replace an underdot (\&#803;) with an underscore and ```prepareDisplayString()``` the reverse. It is very unlikely that any projects will actually need this to be done unless unclear data is displayed with an underdot but stored in the database as an underscore.
-  - ```applySettings()``` function is required along with a supporting Python service. Both are fully documented above.
-  - If the 'get apparatus' button is shown (the default) and ```getApparatusForContext()``` is not provided in the services file then the new variable ```apparatusServiceUrl``` must be set in the services to the full url at which the python service for the apparatus export is running.
-  - If ```getApparatusForContext()``` is provided in the services file then the data exported should not be taken from the ```CL.data``` variable in the JavaScript. Instead the approved version of the unit should be retrieved from the database and the value of the *structure* key should be used as the export data. This is because the new button to show non-edition subreadings in the approved display changes the value of ```CL.data``` when it is used and means that the version of the data loaded into the interface is not always suitable for export. The version in the database will always be suitable as it cannot be saved except in the approval process itself.
-
+- changes to existing function ```getVerseData()```
+  - ```getVerseData()``` function should be renamed to ```getUnitData()```.
+  - The boolean argument 'private' in the third position should be removed. The third and final argument should now be the callback.
+  - The return data for the function has changed (see description of service file above and details on special category lac readings). To maintain previous behaviour wrap the array returned in earlier versions in a dictionary as the value for the key *results*.
+- ```getAdjoiningVerse()``` should be renamed to ```getAdjoiningUnit```.
+- new optional functions ```prepareNormalisedString()``` and ```prepareDisplayString()```. These functions have been added to remove a hard coded action required from the early New Testament Greek implementation of the code. They are described fully in the optional services functions above. To maintain existing behaviour ```prepareNormalisedString()``` should replace an underdot (\&#803;) with an underscore and ```prepareDisplayString()``` the reverse. It is very unlikely that any projects will actually need this to be done unless unclear data is displayed with an underdot but stored in the database as an underscore.
+- ```applySettings()``` function is required along with a supporting Python service. Both are fully documented above.
+- If the 'get apparatus' button is shown (the default) and ```getApparatusForContext()``` is not provided in the services file then the new variable ```apparatusServiceUrl``` must be set in the services to the full url at which the python service for the apparatus export is running.
+- If ```getApparatusForContext()``` is provided in the services file then the data exported should not be taken from the ```CL.data``` variable in the JavaScript. Instead the approved version of the unit should be retrieved from the database and the value of the *structure* key should be used as the export data. This is because the new button to show non-edition subreadings in the approved display changes the value of ```CL.data``` when it is used and means that the version of the data loaded into the interface is not always suitable for export. The version in the database will always be suitable as it cannot be saved except in the approval process itself.
 
 ##### Optional changes
 
-  - A new ```extractWordsForHeader()``` function can be specified in either the services file or project settings. The default option maintains current behaviour so it is unlikely that this will be needed for any existing projects. It is used to change the way the text above the numbers appears in all stages of the collation editor. It can be useful to add css classes to these words if some of them need to be highlighted or to display other text which is present in the data but which is not collated. This was introduced for the MUYA project, the first case is used to identifier main text and commentary text the second is used to display the ritual direction text.
-  - The *set_rule_string* key of ```localPythonFunctions``` which was used in previous releases is no longer used in this release and can be deleted from the services file and the python files.
-  - The *prepare_t* key of ```localPythonFunctions``` is not required for version 2.x. However, it is still required if the legacy regularisation system is being used and any processing was done in the extraction of the token JSON in  
-    order to create the t value. It is now documented as part of the [legacy_regularisation repository](https://github.com/itsee-birmingham/legacy_regularisation).
-  - The new variable ```collatexHost``` can be used to specify the location of the collateX microservices if they do not use the default of ```http://localhost:7369/collate```.
-  - A new setting ```showGetApparatusButton``` will remove the 'get apparatus' button from the approved page if set to false. The default is to show the button which was always the case in previous versions so no change is required to maintain existing behaviour.
+- A new ```extractWordsForHeader()``` function can be specified in either the services file or project settings. The default option maintains current behaviour so it is unlikely that this will be needed for any existing projects. It is used to change the way the text above the numbers appears in all stages of the collation editor. It can be useful to add css classes to these words if some of them need to be highlighted or to display other text which is present in the data but which is not collated. This was introduced for the MUYA project, the first case is used to identifier main text and commentary text the second is used to display the ritual direction text.
+- The *set_rule_string* key of ```localPythonFunctions``` which was used in previous releases is no longer used in this release and can be deleted from the services file and the python files.
+- The *prepare_t* key of ```localPythonFunctions``` is not required for version 2.x. However, it is still required if the legacy regularisation system is being used and any processing was done in the extraction of the token JSON in order to create the t value. It is now documented as part 
+of the [legacy_regularisation repository](https://github.com/itsee-birmingham/legacy_regularisation).
+- The new variable ```collatexHost``` can be used to specify the location of the collateX microservices if they do not use the default of ```http://localhost:7369/collate```.
+- A new setting ```showGetApparatusButton``` will remove the 'get apparatus' button from the approved page if set to false. The default is to show the button which was always the case in previous versions so no change is required to maintain existing behaviour.
 
 ##### Changes to project settings
 
-  - rules classes specified in project settings should use the JSON key **ruleClasses** not **regularisation_classes**. This bring them in line with the services equivalent. Both were supported for projects in earlier versions.
-
+- rules classes specified in project settings should use the JSON key **ruleClasses** not **regularisation_classes**. This bring them in line with the services equivalent. Both were supported for projects in earlier versions.
 
 #### Other changes to be aware of but that do not necessarily require actions
 
