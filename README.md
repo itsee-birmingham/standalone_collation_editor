@@ -16,9 +16,13 @@ The collation editor has primarily been tested in Firefox but should also work i
 Installation and Start up
 ---
 
+Before trying to start the collation editor please ensure that there are no spaces in the directory name.
+
+By default the collation editor runs on port 8080. If you need to change the port number, you can edit the last line of the bottle_server.py file to refer to the port you wish to use.
+
 ### On Mac and Linux
 
-To start the collation editor download the code from github and navigate to the collation_editor directory. From here run the start up script `startup.sh`. This script should start both collateX and the server that runs the collation editor.
+To start the collation editor download the code from github and navigate to the standalone_collation_editor directory. From here run the start up script `startup.sh`. This script should start both collateX and the server that runs the collation editor.
 
 If collate has started sucessfully you should be able to see it at:
 localhost:7369
@@ -28,7 +32,7 @@ localhost:8080/collation
 
 ### On Windows
 
-To start the collation editor download the code from github  and navigate to the collation_editor directory. From here run the start up script `startup.bat`. This script should start both collateX and the server that runs the collation editor.
+To start the collation editor download the code from github  and navigate to the standalone_collation_editor directory. From here run the start up script `startup.bat`. This script should start both collateX and the server that runs the collation editor.
 
 If collate has started sucessfully you should be able to see it at:
 localhost:7369
