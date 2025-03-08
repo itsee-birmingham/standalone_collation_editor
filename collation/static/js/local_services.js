@@ -18,7 +18,6 @@ local_services = (function() {
   };
 
   initialiseEditor = function () {
-    console.log('initialising the editor from services');
     getCurrentEditingProject(CL.loadIndexPage);
     //in local services everyone is a managing editor as they are not collaborative projects
     CL.managingEditor = true;
@@ -33,9 +32,6 @@ local_services = (function() {
   getUnitData = function(context, witnesses, success_callback) {
     _load_witnesses(context, witnesses, function(results) {
       success_callback({results:results}, RG.calculate_lac_wits);
-
-    // _load_witnesses(context, witnesses, function(results) {
-    //   success_callback(results, RG.calculate_lac_wits);
     });
   };
 
@@ -62,8 +58,7 @@ local_services = (function() {
 
   // if verse is passed, then verse rule; otherwise global
 	updateRules = function(rules, verse, success_callback) {
-    console.log(rules)
-	    updateRuleset([], [], rules, verse, success_callback);
+	  updateRuleset([], [], rules, verse, success_callback);
   },
 
 
@@ -74,7 +69,6 @@ local_services = (function() {
     if (typeof j === 'undefined') j = 0;
     if (typeof k === 'undefined') k = 0;
     if (i < for_deletion.length) {
-      console.log(for_deletion[i]);
       _delete_resource(_get_rule_type(for_deletion[i], verse), function() {
 
         return updateRuleset(for_deletion, for_global_exceptions, for_addition, verse, success_callback, ++i, j, k);
@@ -149,7 +143,6 @@ local_services = (function() {
       });
       return;
     }
-    console.log(resource_types)
     if (i >= resource_types.length) {
       return result_callback(rules);
     }
@@ -249,7 +242,6 @@ local_services = (function() {
 
   // save a collation to local datastore
 	saveCollation = function(verse, collation, confirm_message, overwrite_allowed, no_overwrite_message, result_callback) {
-    console.log('save collation');
 	  CL.services.getUserInfo(function(user) {
 	    var resource_type;
 	    resource_type = 'project/' + CL.project.id + '/user/' + user.id + '/collation/' + collation.status + '/' + verse + '.json';
@@ -416,7 +408,6 @@ local_services = (function() {
   };
 
   _delete_resource = function(resource_type, result_callback) {
-    console.log('deleting ' + resource_type);
     var params = {
       action: 'delete',
       resource_type: resource_type
