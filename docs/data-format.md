@@ -1,5 +1,5 @@
 ---
-id: data
+id: data-format
 title: Data Structure Required for Collation Input
 sidebar_label: Data Format
 ---

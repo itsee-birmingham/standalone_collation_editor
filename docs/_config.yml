@@ -13,6 +13,7 @@ sidebar:
        - optional-functions
   - python-services
   - project-settings
+  - data-format
   - label: Upgrading Versions
     children:
       - upgrade-3-0-x
