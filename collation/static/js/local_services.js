@@ -449,18 +449,15 @@ local_services = (function() {
         }
         for (var k = 0; k < j.length; k += 1) {
           var doc_wit = {
-            _id: witness_list[i] + '_' + verse,
-            context: verse,
-            tei: '',
+            id: witness_list[i] + '_' + verse,
             siglum: j[k].siglum,
-            transcription_siglum: j[k].transcription_siglum,
             witnesses: j[k].witnesses
           };
           //a fudge so exsiting and new data structures still work. Eventually all should just be transcription including the key in doc_wit
           if (j[k].hasOwnProperty('transcription')) {
-            doc_wit.transcription_id = j[k].transcription;
+            doc_wit.transcription = j[k].transcription;
           } else {
-            doc_wit.transcription_id = j[k].transcription_id
+            doc_wit.transcription = j[k].transcription_id
           }
           results.push(doc_wit);
         }
