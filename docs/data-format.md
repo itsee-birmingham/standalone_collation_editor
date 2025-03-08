@@ -14,7 +14,7 @@ The data structure for each witness retrieved for collation by the ```getUnitDat
 
 Other keys can be included if they are needed for other functions in the platform.
 
-For transcriptions which have text for this unit the witness array should contain an entry for each hand present in the unit. When dealing with corrected text the collation editor treats each hand as a completely separate witness to the text. For this reason it is advisable to provide a full representation of the reading and not just the corrected words if you do not want the shared words to appear as omitted in the collation editor. Each hand should be represented by a JSON object with two keys.
+For transcriptions which have extant text in this unit, the witness array should contain an entry for each hand present in the unit. When dealing with corrected text the collation editor treats each hand as a completely separate witness to the text. For this reason it is advisable to provide a full representation of the corrector reading and not just the corrected words. If you do not do this, then the shared words will appear as *om.* in the corrector hand. Each hand should be represented by a JSON object with two keys.
 
 - **id** *[string]* The sigla used to refer to this hand in the collation editor.
 - **tokens** *[array]* The array of JSON objects each of which represents a single word in this reading.
@@ -39,6 +39,7 @@ If an entire unit is lac and requires a special category label in the collation 
 
 - It can be pre-calculated and supplied in the **special_categories** key of the object returned from ```getUnitData()``` (see the documentation of that function for details of the format required) in which case no other data for the unit should be returned in data.
 - It can be encoded in the witnesses data by providing an empty array for the **tokens** key value and adding the key **gap_reading** which should contain the string value to be assigned to this lacunose reading in the collation editor.
+
 It is up to the platform developers to decide which is most appropriate in each circumstance. The result in the collation editor will be the same regardless of how the data is provided.
 
 ## Encoding Gaps within a Collation Unit
