@@ -30,7 +30,7 @@ A. Griffitts. The software was developed for and supported by the following rese
 - CATENA (funded by the European Union Horizon 2020 Research and Innovation Programme under grant agreement 770816, 2018-2023)
 
 The collation editor makes use of several third party libraries written and made available by other developers. Details
-of sources and licenses are available in the headers of the relevant JavaScript files. The redips drag and drop library
+of sources and licenses are available in the headers of the relevant JavaScript files. The [redips drag and drop library]
 (https://github.com/dbunic/REDIPS_drag) warrants special mention as it is used for all of the drag and drop interaction.
 
 ### Referencing
@@ -38,6 +38,4 @@ of sources and licenses are available in the headers of the relevant JavaScript 
 To cite the collation editor core code please use the doi:
 [![DOI](https://zenodo.org/badge/142011800.svg)](https://zenodo.org/badge/latestdoi/142011800)
 
-[^1]: David C. Parker, *Textual Scholarship and the making of the New Testament* Oxford: OUP (2011), pp. 10-14,29,
-  Peter M. W. Robinson, 'The Concept of the Work in the Digital Age', *Ecdotica* 1/2013, pp. 13-42
-  Peter M. W. Robinson, An approach to complex texts in multiple documents, *Digital Scholarship in the Humanities*, Volume 37, Issue 4, December 2022, Pages 1179–1196
+[^1]: See David C. Parker, *Textual Scholarship and the making of the New Testament* Oxford: OUP (2011), pp. 10-14,29, Peter M. W. Robinson, 'The Concept of the Work in the Digital Age', *Ecdotica* 1/2013, pp. 13-42 and Peter M. W. Robinson, An approach to complex texts in multiple documents, *Digital Scholarship in the Humanities*, Volume 37, Issue 4, December 2022, Pages 1179–1196
