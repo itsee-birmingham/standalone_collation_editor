@@ -1,6 +1,7 @@
 ---
 id: optional-functions
 title: Optional Service File Functions
+sidebar_label: Optional Functions
 ---
 
 ## ```showLoginStatus()```

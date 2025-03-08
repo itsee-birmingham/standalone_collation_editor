@@ -1,6 +1,7 @@
 ---
 id: python-services
 title: Python/Server Services
+sidebar_label: Python Services
 ---
 
 To support the server side code packaged with the collation editor some urls are required to provide the connection between the python and the JavaScript. The code required for each service should be minimal as they largely serve to pass data from the client side to the server side.

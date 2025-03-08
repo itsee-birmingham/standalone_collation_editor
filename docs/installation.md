@@ -3,8 +3,6 @@ id: installation
 title: Installation
 ---
 
-# Installation
-
 ## Dependencies
 
 The following are required to run the collation editor code but are not provided in the repository.

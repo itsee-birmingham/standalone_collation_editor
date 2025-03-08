@@ -1,6 +1,7 @@
 ---
 id: data
 title: Data Structure Required for Collation Input
+sidebar_label: Data Format
 ---
 
 The data structure for each witness retrieved for collation by the ```getUnitData()``` function should a JSON object with the following keys:
