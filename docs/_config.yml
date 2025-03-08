@@ -2,7 +2,7 @@ name: Collation Editor Core
 remote_theme: zendesk/jekyll-theme-zendesk-garden@main
 search-enabled: true
 sidebar:
-  - Introduction
+  - introduction
   # - label: Installation
   #   children:
   #     - initialisation
