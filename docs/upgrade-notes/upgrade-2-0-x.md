@@ -4,9 +4,9 @@ title: Upgrade to 2.0.x family from 1.x
 sidebar_label: Upgrading to 2.0.x
 ---
 
-## Upgrading to 2.0.x from 1.1.x
+# Upgrading to 2.0.x from 1.1.x
 
-### New features in this version
+## New features in this version
 
 - The option to add and/or remove witnesses from saved collations in the first two stages of the collation editor.
 - Support for lac/om unit readings where the editor need to be more specific about the reason for the absence.
@@ -30,12 +30,12 @@ If you are not yet using 1.1.x you are advised to work through each upgrade list
 here. You should use the readme file for the version you are upgrading to with the exception of the upgrade to 1.1.x
 which is covered in this file.
 
-### Required changes to the services file
+## Required changes to the services file
 
 Some of these changes are required to keep things working. Most are only required in order to maintain existing
 behaviour. Where a change is required only to preserve existing behaviour it is noted in the explanation.
 
-#### Changes to variables
+### Changes to variables
 
 - ```lacUnitLabel``` and ```omUnitLabel``` should be provided in the services file to maintain the existing behaviour which displays 'lac verse' and 'om verse' respectively. The defaults have changed to 'lac unit' and 'om unit' to remove biblical verse assumption. The services choices can also be overridden in individual project settings if required.
 - The variable ```collationAlgorithmSettings``` has been introduced in this release which can be set in the services file and/or the project configurations. The previous defaults may not have been the best option for many projects but to maintain the previous behaviour the services file should set the ```collationAlgorithmSettings``` keys to 'auto', true, 2. The 'auto' setting for the algorithm means that the collation preprocessor will choose an algorithm based on the presence of gaps at the end of the data to be collated. The defaults are explained in the description of the setting above.
@@ -51,7 +51,7 @@ These variables can all be specified in the services file or in each project sep
 - To enable the new feature that allows witnesses to be added and/or removed from saved collations set the ```allowWitnessChangesInSavedCollations``` variable to ```true```. This can be set in either the services file or in the project configurations for the projects which need to use this feature.
 - The undo stack length can now be altered in the services file. The default is in the code and is set at six. The variable ```undoStackLength``` can be used to increase this. A full version of the data structure is held in browser memory for each position in the stack. If you have  a lot of witnesses and/or longer units then setting this too high may cause problems.  Because of the possible memory issues this can only be set in services and cannot be changed in project settings.
 
-#### Changes to functions and new required functions
+### Changes to functions and new required functions
 
 - changes to existing function ```getVerseData()```
   - ```getVerseData()``` function should be renamed to ```getUnitData()```.
@@ -63,7 +63,7 @@ These variables can all be specified in the services file or in each project sep
 - If the 'get apparatus' button is shown (the default) and ```getApparatusForContext()``` is not provided in the services file then the new variable ```apparatusServiceUrl``` must be set in the services to the full url at which the python service for the apparatus export is running.
 - If ```getApparatusForContext()``` is provided in the services file then the data exported should not be taken from the ```CL.data``` variable in the JavaScript. Instead the approved version of the unit should be retrieved from the database and the value of the *structure* key should be used as the export data. This is because the new button to show non-edition subreadings in the approved display changes the value of ```CL.data``` when it is used and means that the version of the data loaded into the interface is not always suitable for export. The version in the database will always be suitable as it cannot be saved except in the approval process itself.
 
-#### Optional changes
+### Optional changes
 
 - A new ```extractWordsForHeader()``` function can be specified in either the services file or project settings. The default option maintains current behaviour so it is unlikely that this will be needed for any existing projects. It is used to change the way the text above the numbers appears in all stages of the collation editor. It can be useful to add css classes to these words if some of them need to be highlighted or to display other text which is present in the data but which is not collated. This was introduced for the MUYA project, the first case is used to identifier main text and commentary text the second is used to display the ritual direction text.
 - The *set_rule_string* key of ```localPythonFunctions``` which was used in previous releases is no longer used in this release and can be deleted from the services file and the python files.
@@ -72,22 +72,22 @@ of the [legacy_regularisation repository](https://github.com/itsee-birmingham/le
 - The new variable ```collatexHost``` can be used to specify the location of the collateX microservices if they do not use the default of ```http://localhost:7369/collate```.
 - A new setting ```showGetApparatusButton``` will remove the 'get apparatus' button from the approved page if set to false. The default is to show the button which was always the case in previous versions so no change is required to maintain existing behaviour.
 
-### Changes  required to project settings
+## Changes required to project settings
 
 - rules classes specified in project settings should use the JSON key **ruleClasses** not **regularisation_classes**. This bring them in line with the services equivalent. Both were supported for projects in earlier versions.
 
-#### Other changes to be aware of but that do not necessarily require actions
+## Other changes to be aware of but that do not necessarily require actions
 
 - In all stages of the editor the select box for highlighting a witness will say 'highlight witness' rather than 'select' as was the case in 1.x There is no way to change this as it is seen as a positive change but your users might need to be aware and any screen shots in documentation may need updating.
 - Deleting a created rule before it had been applied by recollating used to delete the rule but then prevent the word from being regularised again until the unit had been recollated. This has now been fixed and if a rule is deleted before recollation another rule can be made for the same word straight away.
 - The code for the overlay and spinner code has changed to simplify it. Any calls to ```SPN.show_loading_overlay()``` and/or ```SPN.remove_loading_overlay()``` in the services file should be changed to ```spinner.showLoadingOverlay()``` and ```spinner.removeLoadingOverlay()```.
 
-### Changes required to Python services
+## Changes required to Python services
 
 - The collation service requirements have been simplified a lot in this release. Instead of having to unpack all of the data received from the JavaScript the collation service can now just pass it on to the collation editor python code. If you need to make changes at this stage you can still do so but if that is not necessary then the code can be much simpler. The minimum required code is provided as an example in the description of the collation service above.
 - An new service is required to apply settings and is described above in the Python/Server Services section under Settings Applier. It is called from the new JavaScript services function ```applySettings()``` (also documented above).
 
-### Exporter changes which may need action in inherited classes
+## Exporter changes which may need action in inherited classes
 
 The following changes relate to the ExporterFactory class in the collation editor code.
 

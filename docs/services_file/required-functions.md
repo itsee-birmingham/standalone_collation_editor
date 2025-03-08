@@ -3,9 +3,9 @@ id: required-functions
 title: Required Functions
 ---
 
-## Required Service File Functions
+# Required Service File Functions
 
-### ```initialiseEditor()```
+## ```initialiseEditor()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -19,7 +19,7 @@ If the index page is to be set up with JavaScript using the settings provided in
 
 If ```CL.loadIndexPage()``` is not used as part of the index page setup then this function also needs to add a button with the id *switch_project_button* and one with the id *project_summary* if those functions are required on the platform. In addition, if you want users to be able to change the collation algorithm settings then a button with the id *collation_settings* should also be added. Details of how to activate the buttons can be found in the relevant entries in the Optional Service File Functions section.
 
-### ```getUserInfo()```
+## ```getUserInfo()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -27,7 +27,7 @@ If ```CL.loadIndexPage()``` is not used as part of the index page setup then thi
 
 This function must get the current user details as a JSON object and call ```callback``` with the result. The user object itself must contain an **id** key. Any other data can be included in the object returned for use in your other service functions for example ```showLoginStatus``` might want to show the username.
 
-### ```getUserInfoByIds()```
+## ```getUserInfoByIds()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -45,7 +45,7 @@ Given the ids ```["JS", "RS"]``` the JSON object should be as follows (where nam
 }
 ```
 
-### ```applySettings()```
+## ```applySettings()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -56,7 +56,7 @@ The function should pass the data object to a Python service and run the callbac
 
 The Python service required is described in the Python services section below.
 
-### ```getCurrentEditingProject()```
+## ```getCurrentEditingProject()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -64,7 +64,7 @@ The Python service required is described in the Python services section below.
 
 This function must get the current project details as a JSON object and call ```callback``` with the result. The structure of the project JSON is discussed in the project configuration section.
 
-### ```getUnitData()```
+## ```getUnitData()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -86,7 +86,7 @@ When all of the data has been retrieved the callback should be run on the result
 
 **NB:** Until version 2.0.0 this function was called ```getVerseData()```, had a boolean ```private``` as the third argument before the callback and returned a list (which is now the list in the **results** key).
 
-### ```doCollation()```
+## ```doCollation()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -100,7 +100,7 @@ The python service required for the collation process is explained in the Python
 
 When the collation process has completed the JSON response from the Python collation system should be passed to resultCallback.
 
-### ```saveCollation()```
+## ```saveCollation()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -113,7 +113,7 @@ When the collation process has completed the JSON response from the Python colla
 
 This function needs to save the collation object in the database. It must be stored in such a way that the ```getSavedCollations()``` and ```loadSavedCollation()``` functions can retrieve it.
 
-### ```getSavedCollations()```
+## ```getSavedCollations()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -125,7 +125,7 @@ This should return all of the saved collations of the requested unit restricted 
 
 In future versions this function may include an optional projectId parameter rather than using the current project.
 
-### ```loadSavedCollation()```
+## ```loadSavedCollation()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |

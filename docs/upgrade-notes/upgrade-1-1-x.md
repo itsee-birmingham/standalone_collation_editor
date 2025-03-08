@@ -4,7 +4,7 @@ title: Upgrade to 1.1.x family from 1.0.x
 sidebar_label: Upgrading to 1.1.x
 ---
 
-## Upgrading to 1.1.x from 1.0.x
+# Upgrading to 1.1.x from 1.0.x
 
 In 1.1.0 the way regularisation rules are applied has been significantly altered because in some circumstances rules
 were not being applied as users (and the developer) intended. The problem stemmed from the way rules were divided into

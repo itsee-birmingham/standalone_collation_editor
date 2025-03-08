@@ -3,11 +3,11 @@ id: python-services
 title: Python Services
 ---
 
-## Python/Server Services
+# Python/Server Services
 
 To support the server side code packaged with the collation editor some urls are required to provide the connection between the python and the JavaScript. The code required for each service should be minimal as they largely serve to pass data from the client side to the server side.
 
-### Collation Service
+## Collation Service
 
 The collation service needs to respond to an ajax call from the ```doCollation()``` services function and start the collation process by initialising and calling the collation preprocessor. The preprocessor applies the regularisation rules, runs the collation with collateX using the provided settings and processes and formats the collateX export for display in the collation editor.
 
@@ -35,7 +35,7 @@ def collate(request):
     return JsonResponse(output)
 ```
 
-### Settings Applier
+## Settings Applier
 
 There is one point in the collation editor code where the JavaScript needs to be able to apply the current settings to a string. This code was overlooked in the initial abstraction of the code away from the New Testament Greek context in which it was developed and the original Greek settings remained hard coded into the JavaScript code. This meant that the correct settings were not being applied for most other projects. The hard coded settings have now been removed from the JavaScript but a Python service is now required in its place. No one has reported problems with the way this worked in versions before 2.0 so it is very unlikely that any existing projects were negatively affected by this.
 
@@ -57,7 +57,7 @@ def apply_settings(request):
     return JsonResponse({'tokens': tokens})
 ```
 
-### Apparatus Exporter
+## Apparatus Exporter
 
 The apparatus exporter should be available at the URL specified in the ```apparatusServiceUrl``` variable or
 the ```getApparatusForContext()``` function depending on which is used.

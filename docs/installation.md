@@ -3,9 +3,9 @@ id: installation
 title: Installation
 ---
 
-## Installation
+# Installation
 
-### Dependencies
+## Dependencies
 
 The following are required to run the collation editor code but are not provided in the repository.
 
@@ -16,11 +16,11 @@ The following are required to run the collation editor code but are not provided
 
 Other dependencies are provided in the repository.
 
-### Installation path
+## Installation path
 
 For the python import statements to work this repository must be a subdirectory of a folder with the name ```collation```.
 
-### Initialising the collation editor
+## Initialising the collation editor
 
 The HTML file which will contain the collation editor must load in all of the JavaScript and css dependencies listed
 above and the ```static/CE_core/js/collation_editor.js``` file.
@@ -50,7 +50,7 @@ An example of the initialisation code.
 </script>
 ```
 
-### Services File
+## Services File
 
 To connect the collation editor to your own database or platform, a services file must be provided. Some variables and
 functions are required, others are optional and additional configuration can also be added. The first two types are

@@ -3,9 +3,9 @@ id: optional-functions
 title: Optional Functions
 ---
 
-## Optional Service File Functions
+# Optional Service File Functions
 
-### ```showLoginStatus()```
+## ```showLoginStatus()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -13,7 +13,7 @@ title: Optional Functions
 
 This function can be used to display the currently logged in user. It is called when pages are displayed. It should get the current user and display the required details in the preferred way for the platform. There is a <div> element on each page that calls this function which has the id 'login_status' which should be used to display the user details. When this is done the function should run the callback if one was provided.
 
-### ```getSavedStageIds()```
+## ```getSavedStageIds()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -22,11 +22,11 @@ This function can be used to display the currently logged in user. It is called 
 
 This function populates the links to saved collations in the footer of the page. This function must get the saved collations for the context belonging to this user and the approved collation from the project even if it does not belong to this user. The callback must be run with the saved objects from the four collation stages as parameters in order of the stages (regularised, set variants, order readings, approved). If there are no saved objects for any of the stages this position in the parameters should be null.
 
-### ```addExtraFooterFunctions()```
+## ```addExtraFooterFunctions()```
 
 This is required if any extra footer buttons are specified in the services file variable ```extraFooterButtons```. It must attach onclick listeners to all of the buttons specified in the variable. This function must cover all buttons added in the services file and in any projects hosted on the system.
 
-### ```getAdjoiningUnit()```
+## ```getAdjoiningUnit()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -38,15 +38,15 @@ This function is used to provide the data needed move through the data by collat
 
 **NB** Prior to release 2.0.0 this function was named ```getAdjoiningVerse()```
 
-### ```switchProject()```
+## ```switchProject()```
 
 If this function is present in the services file and ```CL.loadIndexPage()``` is called by the services as part of the ```initialiseEditor()``` function in the services then a *switch project* button will be added to the footer of the index page and this function will be attached as an onclick event. The function itself should redirect the user to a page that allows them to select a project from the projects they are authorised to access and then return the user to the page they were viewing when they clicked the button.
 
-### ```viewProjectSummary()```
+## ```viewProjectSummary()```
 
 If this function is present in the services file and ```CL.loadIndexPage()``` is called by the services as part of the ```initialiseEditor()``` function in the services then a *view project summary* button will be added to the footer of the index page and this function will be attached as an onclick event. The function itself should redirect the user to a page that shows a summary of the work on the project. This might, for example, include how many of the collation units have been saved at each stage and how many have been approved.
 
-### ```witnessSort()```
+## ```witnessSort()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -58,7 +58,7 @@ If this function is present in the services file and ```CL.loadIndexPage()``` is
 
 This function is used to sort the witness sigla into the desired order. It is used for the hover overs on the readings and to sort menus that list sigla (such as the highlight witness menu). The function should return the sorted list of sigla.
 
-### ```getWitnessesFromInputForm()```
+## ```getWitnessesFromInputForm()```
 
 **There is a default in the core code which is explained below**
 
@@ -66,7 +66,7 @@ This function tells the collation editor how to extract the list of witnesses fr
 
 This default behaviour can be overridden by providing this function in the services. It cannot be overwritten in the project settings so the function must work for all projects you host. The function must return an array containing the ids of the documents selected for collation.
 
-### ```getApparatusForContext()```
+## ```getApparatusForContext()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -83,7 +83,7 @@ If this is the case, then the rule configurations must be provided in the 'optio
 
 The function has an optional success callback argument which should be run when the function is complete.
 
-### ```extractWordsForHeader()```
+## ```extractWordsForHeader()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -99,7 +99,7 @@ The function has an optional success callback argument which should be run when 
 
 The default does not add any extra text or classes and maintains the behaviour of previous releases. It extracts the words from the data in the selected base text using the 'original' key if that is present or 't' if it is not. It also adds any punctuation to the words based on the 'pc_before' and 'pc_after' keys.
 
-### ```prepareDisplayString()```
+## ```prepareDisplayString()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -115,7 +115,7 @@ This function is called every time a reading is displayed in the collation edito
 
 There are probably very few, if any, good reasons to use this. It is present to support some very early implementations while the system was being developed.
 
-### ```prepareNormalisedString()```
+## ```prepareNormalisedString()```
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |

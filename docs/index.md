@@ -3,14 +3,14 @@ id: index
 title: Introduction
 ---
 
-## Introduction
+# Introduction
 
 This code is the core of the collation editor. The code in this repository is not designed to run as it is. It needs to
 be embedded into a larger platform with a database or similar storage. The connections are made with a services file
 written in JavaScript. Further configuration of settings and other options can also be provided if needed. Data input
 is all in JSON.
 
-### Terminology
+## Terminology
 
 For the purposes of this documentation the Documents/Works/Texts model will be used.[^1]
 
@@ -18,7 +18,7 @@ For the purposes of this documentation the Documents/Works/Texts model will be u
 - **Work** - The work which is distilled from the texts that exist of it
 - **Text** - The version or versions of a work preserved in document
 
-### Configuration
+## Configuration
 
 The behaviour of the collation editor can be configured at both the service level (per installation) and the project level.
 Project configurations will override the service level configurations which will in turn override any default configurations provided.
@@ -26,7 +26,7 @@ The configurations available at the services level are documented in the Service
 project level it is mentioned in the services file documentation. Settings only available at project level are documented in the
 project settings section.
 
-### Acknowledgements
+## Acknowledgements
 
 The software was created by Catherine Smith at the Institute for Textual Scholarship and Electronic Editing (ITSEE) in
 the University of Birmingham. The restructuring required for the 1.0 release was completed by Catherine Smith and Troy
@@ -42,7 +42,7 @@ of sources and licenses are available in the headers of the relevant JavaScript 
 [redips drag and drop library](https://github.com/dbunic/REDIPS_drag) warrants special mention as it is used for all of
 the drag and drop interaction.
 
-### Referencing
+## Referencing
 
 To cite the collation editor core code please use the doi:
 [![DOI](https://zenodo.org/badge/142011800.svg)](https://zenodo.org/badge/latestdoi/142011800)

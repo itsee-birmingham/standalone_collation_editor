@@ -4,7 +4,7 @@ title: Upgrade to 1.0.x family from the deprecated version
 sidebar_label: Upgrading to 1.0.x
 ---
 
-## Upgrading to 1.0.x from deprecated version
+# Upgrading to 1.0.x from deprecated version
 
 This code is not backwards compatible with early versions of the code archived at
 [https://github.com/itsee-birmingham/collation_editor](https://github.com/itsee-birmingham/collation_editor)
@@ -19,27 +19,27 @@ deprecated so they will continue to work but support will be removed in future v
 The changes required immediately and those that are deprecated are listed below. If you find any other
 problems while upgrading please let me know by opening an issue in the GitHub repository.
 
-### Changes to the initialisation
+## Changes to the initialisation
 
 The inclusion of the editor and initialisation of the editor has changed. Please follow the initialisation instructions
 above to correct this.
 
-### New service functions required
+## New service functions required
 
 - getCurrentEditingProject - described in the service file section
 
-### New optional service functions
+## New optional service functions
 
 - getWitnessesFromInputForm - described in the service file section
 - getApparatusForContext - described in the service file section
 - localCollationFunction - described in the service file section
 
-### Changes to service functions
+## Changes to service functions
 
 - doCollation does not need context in the url provided for the collation server
 - getUserInfoByIds needs to return 'id' in user model rather than '\_id'
 
-### Changes to keys required/suggested in data models
+## Changes to keys required/suggested in data models
 
 Most of these are deprecated and carry warnings but will be removed in future versions.
 

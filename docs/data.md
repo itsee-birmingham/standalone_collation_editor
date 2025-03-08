@@ -3,7 +3,7 @@ id: data
 title: Data Preparation
 ---
 
-## Data structure required for collation input
+# Data structure required for collation input
 
 The data structure for each witness retrieved for collation by the ```getUnitData()``` function should a JSON object with the following keys:
 
@@ -30,7 +30,7 @@ Each token object must include the following keys
 
 Any number of additional keys can be included in this list. If you are going to customise the settings then you may need to encode extra data in the token such as punctuation for example. You may also want to encode information about gaps in the text which is explained in the next section.
 
-### Encoding Units which are Entirely Omitted or Lacunose
+## Encoding Units which are Entirely Omitted or Lacunose
 
 If an entire unit is omitted then the witnesses key value should either be ```null``` or an empty array (both are treated in the same way).
 
@@ -42,7 +42,7 @@ If an entire unit is lac and requires a special category label in the collation 
 - It can be encoded in the witnesses data by providing an empty array for the **tokens** key value and adding the key **gap_reading** which should contain the string value to be assigned to this lacunose reading in the collation editor.
 It is up to the platform developers to decide which is most appropriate in each circumstance. The result in the collation editor will be the same regardless of how the data is provided.
 
-### Encoding Gaps within a Collation Unit
+## Encoding Gaps within a Collation Unit
 
 Within a collation unit the collation editor assumes text is omitted unless your witnesses data tells it otherwise.
 
@@ -56,9 +56,9 @@ If this is a gap before the very first extant word in the given unit then you mu
 - **gap_before** *[boolean]* - should always be true.
 - **gap_before_details** *[string]* - the details of the gap which will appear between <> in the editor eg. lac 2 char
 
-### Examples
+## Examples
 
-#### Simple collation unit JSON example
+### Simple collation unit JSON example
 
 **Document siglum:** 01  
 **Text:** A simple example sentence
@@ -101,7 +101,7 @@ If this is a gap before the very first extant word in the given unit then you mu
 ]
 ```
 
-#### Complex collation unit JSON example
+### Complex collation unit JSON example
 
 **Document siglum:** 02
 **Text:** A ~~complex~~ <sup>corrected</sup> example [lac 7-8 char] with damage

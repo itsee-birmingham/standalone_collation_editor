@@ -3,9 +3,9 @@ id: required-variables
 title: Required Variables
 ---
 
-## Required Service File Variables
+# Required Service File Variables
 
-### ```supportedRuleScopes```
+## ```supportedRuleScopes```
 
 The collation editor supports four different rules scopes.
 

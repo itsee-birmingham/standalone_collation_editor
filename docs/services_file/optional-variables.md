@@ -4,13 +4,13 @@ title: Optional Variables
 ---
 
 
-## Optional Service File Variables
+# Optional Service File Variables
 
-### ```localJavaScript```
+## ```localJavaScript```
 
 This variable should be an array of strings giving the full url of any additional JavaScript you need the collation editor to load. These might be required run the services for your framework (an internal api file for example) or you might want to use additional files to store configuration functions that you call in the services. These files will be loaded as part of the collation editor initialisation functions called after the services have been set.
 
-### ```localCollationFunction```
+## ```localCollationFunction```
 
 **This variable can be overwritten in individual project settings (but this may not be advisable)**
 
@@ -28,13 +28,13 @@ The method will be provided with the data to collate in the JSON format required
 
 The reference python function should return the JSON output from collateX or equivalent.
 
-### ```collatexHost```
+## ```collatexHost```
 
 **There is a default in the core code which is explained below**
 
 This variable should be used if the system uses the collateX Java microservices and they are not running at the default location of ```http://localhost:7369/collate```. The variable should provide the full url at which the collateX microservices can be found. If the ```localCollationFunction``` has been set then that function will be used rather than the microservices and this variable will not be used.
 
-### ```collationAlgorithmSettings```
+## ```collationAlgorithmSettings```
 
 **This variable can be overwritten in individual project settings**
 
@@ -52,37 +52,37 @@ If ```CL.loadIndexPage()``` or a button with the id *collation_settings* was pro
 
 **NB:** this setting is new in version 2.0.0 and the default settings have changed from previous versions.
 
-### ```lacUnitLabel```
+## ```lacUnitLabel```
 
 **This variable can be overwritten in individual project settings**
 
 This variable should be a string and should be the text the collation editor needs to display for any witnesses which are lacunose for the entire collation unit. The default, which will be used if this variable is not present, is 'lac unit'. Until version 2.0.0 the default text was 'lac verse'.
 
-### ```omUnitLabel```
+## ```omUnitLabel```
 
 **This variable can be overwritten in individual project settings**
 
 This variable should be a string and should be the text the collation editor needs to display for any witnesses which omit the entire collation unit. The default, which will be used if this variable is not present, is 'om unit'. Until version 2.0.0 the default text was 'om verse'.
 
-### ```omCategories```
+## ```omCategories```
 
 **This variable can be overwritten in individual project settings**
 
 This variable should be an array of strings. If provided the editor will be give the option to categorise om readings using the labels in the array in the Order Readings screen.
 
-### ```allowCommentsOnRegRules```
+## ```allowCommentsOnRegRules```
 
 **This variable can be overwritten in individual project settings**
 
 This variable is a boolean which determines whether or not to show the comments text box in the regularisation rule menu. Nothing happens to these comments appart from them being saved along with the rule so the default is false. This setting should only be set to true if the platform using the collation editor has a mecahnism for using these comments in some way.
 
-### ```showCollapseAllUnitsButton```
+## ```showCollapseAllUnitsButton```
 
 **This variable can be overwritten in individual project settings**
 
 This variable is a boolean which determines whether or not to show the button in the footer of all stages of the collation editor which allows all the units to be collapsed to show only the a reading. The default is false. Until version 2.0.0  this button was included by default.
 
-### ```showGetApparatusButton```
+## ```showGetApparatusButton```
 
 **This variable can be overwritten in individual project settings**
 
@@ -90,7 +90,7 @@ This variable is a boolean which determines whether or not to show the button in
 
 The default is true which maintains the behaviour of earlier releases.
 
-### ```extraFooterButtons```
+## ```extraFooterButtons```
 
 **This variable can be overwritten in individual project settings on a stage by stage basis but addExtraFooterFunctions() in the services file must provide all the functions added in the projects**
 
@@ -114,7 +114,7 @@ extraFooterButtons = {
 };
 ```
 
-### ```preStageChecks```
+## ```preStageChecks```
 
 **This variable can be overwritten in individual project settings on a stage by stage basis**
 
@@ -158,7 +158,7 @@ The example below shows two checks added between set variants and order readings
   };
 ```
 
-### ```allowOutOfOrderWitnesses```
+## ```allowOutOfOrderWitnesses```
 
 **This variable can be overwritten in individual project settings**
 
@@ -168,13 +168,13 @@ The setting has no effect on the witnesses above overlapping units which are alw
 
 The default is false.
 
-### ```witnessesAllowedToBeOutOfOrder```
+## ```witnessesAllowedToBeOutOfOrder```
 
 This setting is only relevant if *allowOutOfOrderWitnesses* is true. It should contain a list of the witnesses (by transcription ID) that should be allowed to be out of order. If an empty list is provided then all witnesses are allowed to be out of order.
 
 The default is an empty list.
 
-### ```combineAllLacsInOR```
+## ```combineAllLacsInOR```
 
 **This variable can be overwritten in individual project settings**
 
@@ -184,7 +184,7 @@ The default is false.
 
 If you are using special category lac readings and you want these to appear in your final edition then this setting should not be used.
 
-### ```combineAllOmsInOR```
+## ```combineAllOmsInOR```
 
 **This variable can be overwritten in individual project settings**
 
@@ -192,7 +192,7 @@ This is a boolean variable. It works in the same was as ```combineAllLacsInOR```
 
 The default is false.
 
-### ```combineAllLacsInApproved```
+## ```combineAllLacsInApproved```
 
 **This variable can be overwritten in individual project settings**
 
@@ -202,7 +202,7 @@ The default is false.
 
 If you are using special category lac readings and you want these to appear in your final edition then this setting should not be used.
 
-### ```combineAllOmsInApproved```
+## ```combineAllOmsInApproved```
 
 **This variable can be overwritten in individual project settings**
 
@@ -210,7 +210,7 @@ This is a boolean variable. It works in the same was as ```combineAllLacsInAppro
 
 The default is false.
 
-### ```storeMultipleSupportLabelsAsParents```
+## ```storeMultipleSupportLabelsAsParents```
 
 **This variable can be overwritten in individual project settings**
 
@@ -218,7 +218,7 @@ This is a boolean variable. If it is set to false (the default) then the label e
 
 The default is false.
 
-### ```useZvForAllReadingsSupport```
+## ```useZvForAllReadingsSupport```
 
 **This variable can be overwritten in individual project settings**
 
@@ -226,7 +226,7 @@ This is a boolean variable which only has an impact on the collation editor if *
 
 The default is false.
 
-### ```allowJoiningAcrossCollationUnits```
+## ```allowJoiningAcrossCollationUnits```
 
 **This variable can be overwritten in individual project settings**
 
@@ -234,7 +234,7 @@ This is a boolean variable. If set to true the user is given the option to add a
 
 The default is false.
 
-### ```approvalSettings```
+## ```approvalSettings```
 
 **This variable can be overwritten in individual project settings**
 
@@ -255,11 +255,11 @@ approval_settings = {
 
 ```
 
-### ```apparatusServiceUrl```
+## ```apparatusServiceUrl```
 
 This variable specifies the location of the apparatus export service on this platform. If the ```showGetApparatusButton``` is set to true (or the default is used) and ```getApparatusForContext()``` is not used, then this url must be provided as it is used in the default code used to generate and export the apparatus. It should provide the full path to the apparatus export services as described in the Python services section.
 
-### ```overlappedOptions```
+## ```overlappedOptions```
 
 **This variable can be overwritten in individual project settings**
 
@@ -293,7 +293,7 @@ overlappedOptions = [{
 }];
 ```
 
-### ```contextInput```
+## ```contextInput```
 
 **This variable can be overwritten in individual project settings**
 
@@ -327,7 +327,7 @@ contextInput = {
    };
 ```
 
-### ```displaySettings```
+## ```displaySettings```
 
 **This variable can be overwritten in individual project settings**
 
@@ -378,7 +378,7 @@ class ApplySettings(object):
         return token
 ```
 
-### ```ruleClasses```
+## ```ruleClasses```
 
 **This variable can be overwritten in individual project settings**
 
@@ -402,7 +402,7 @@ Not all of the features make sense when combined and not all combinations will w
 
 For an example of the JavaScript configuration see the [default_settings.js](https://github.com/itsee-birmingham/standalone_collation_editor/blob/master/collation/core/static/CE_core/js/default_settings.js) file.
 
-### ```ruleConditions```
+## ```ruleConditions```
 
 **This variable can be overwritten in individual project settings**
 
@@ -462,7 +462,7 @@ class RuleConditions(object):
         return(decision_word, token_words)
 ```
 
-### ```exporterSettings```
+## ```exporterSettings```
 
 **This variable can be overwritten in individual project settings**
 
