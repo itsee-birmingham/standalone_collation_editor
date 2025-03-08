@@ -9,7 +9,7 @@ written in JavaScript. Some minimal Python services are also required. Further c
 options can also be provided if needed. Data input is all in JSON.
 
 If you are just looking to try out the collation editor or want to use it on a single machine rather than on a server, then
-please consider the [Standalone Collation Editor](https://github.com/itsee-birmingham/standalone_collation_editor) as an alterative.
+please consider the [Standalone Collation Editor](https://github.com/itsee-birmingham/standalone_collation_editor) as an alternative.
 
 ## Terminology
 
@@ -38,7 +38,7 @@ A. Griffitts. The software was developed for and supported by the following rese
 - MUYA (funded by the European Union Horizon 2020 Research and Innovation Programme under grant agreement 694612, 2016-2022)
 - CATENA (funded by the European Union Horizon 2020 Research and Innovation Programme under grant agreement 770816, 2018-2023)
 - GALaCSy (an AHRC/DFG collaborative project 2022-2025)
-- 1Cor (an FWO Odysseus Type I Project under grant agreement G0E9821N)
+- 1Cor (an FWO Odysseus Type I Project under grant agreement G0E9821N, 2022-2027)
 
 The collation editor makes use of several third party libraries written and made available by other developers. Details
 of sources and licenses are available in the headers of the relevant JavaScript files. The
