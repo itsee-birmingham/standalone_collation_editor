@@ -1,7 +1,7 @@
 ---
 id: upgrade-2-0-x
 title: Upgrade to 2.0.x family from 1.x
-sidebar_label: Upgrade to 2.0.x
+sidebar_label: Upgrading to 2.0.x
 ---
 
 ## Upgrading to collation_editor_core v2.0.x from collation_editor_core 1.1.x

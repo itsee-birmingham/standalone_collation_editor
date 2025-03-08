@@ -1,7 +1,7 @@
 ---
 id: upgrade-3-0-x
 title: Upgrade to 3.0.x family from 2.0.x
-sidebar_label: Upgrade to 3.0.x
+sidebar_label: Upgrading to 3.0.x
 ---
 
 ## Catena Dev branch changes (3.0.0 release candidate)

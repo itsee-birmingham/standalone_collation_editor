@@ -1,7 +1,7 @@
 ---
 id: upgrade-1-0-x
 title: Upgrade to 1.0.x family from the deprecated version
-sidebar_label: Upgrade to 1.0.x
+sidebar_label: Upgrading to 1.0.x
 ---
 
 ## Upgrading to collation_editor_core 1.0.x from deprecated collation_editor
