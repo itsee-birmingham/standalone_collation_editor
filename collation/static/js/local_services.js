@@ -515,11 +515,7 @@ local_services = (function() {
           if (status === 200) {
             approved = JSON.parse(result);
           }
-          console.log(approved);
-          
-
-          url = staticUrl + 'apparatus';
-         
+          url = staticUrl + 'apparatus';   
           settings = JSON.parse(CL.getExporterSettings());
           if (!settings.hasOwnProperty('options')) {
             settings.options = {};
