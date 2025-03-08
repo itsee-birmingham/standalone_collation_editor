@@ -12,7 +12,7 @@ sidebar:
        - optional-functions
   - python-services
   - project-settings
-  - label: Upgrading to a newer version
+  - label: Upgrading Versions
     children:
       - upgrade-3-0-x
       - upgrade-2-0-x
