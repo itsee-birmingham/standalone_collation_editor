@@ -18,6 +18,14 @@ For the purposes of this documentation the Documents/Works/Texts model will be u
 - **Work** - The work which is distilled from the texts that exist of it
 - **Text** - The version or versions of a work preserved in document
 
+### Configuration
+
+The behaviour of the collation editor can be configured at both the service level (per installation) and the project level.
+Project configurations will override the service level configurations which will in turn override any default configurations provided.
+The configurations available at the services level are documented in the Services File section. If a setting can also be used at the
+project level it is mentioned in the services file documentation. Settings only available at project level are documented in the
+project settings section.
+
 ### Acknowledgements
 
 The software was created by Catherine Smith at the Institute for Textual Scholarship and Electronic Editing (ITSEE) in
