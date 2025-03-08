@@ -1,5 +1,5 @@
 title: Collation Editor Core
-remote_theme: zendesk/jekyll-theme-zendesk-garden@main
+remote_theme: catsmith/jekyll-theme-zendesk-garden@main
 search_enabled: true
 sidebar:
   - index
