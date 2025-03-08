@@ -3,6 +3,7 @@ remote_theme: zendesk/jekyll-theme-zendesk-garden@main
 search_enabled: true
 sidebar:
   - introduction
+  - installation
   # - label: Installation
   #   children:
   #     - initialisation

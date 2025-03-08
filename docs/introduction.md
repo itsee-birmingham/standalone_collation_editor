@@ -30,8 +30,9 @@ A. Griffitts. The software was developed for and supported by the following rese
 - CATENA (funded by the European Union Horizon 2020 Research and Innovation Programme under grant agreement 770816, 2018-2023)
 
 The collation editor makes use of several third party libraries written and made available by other developers. Details
-of sources and licenses are available in the headers of the relevant JavaScript files. The [redips drag and drop library]
-(https://github.com/dbunic/REDIPS_drag) warrants special mention as it is used for all of the drag and drop interaction.
+of sources and licenses are available in the headers of the relevant JavaScript files. The
+[redips drag and drop library](https://github.com/dbunic/REDIPS_drag) warrants special mention as it is used for all of
+the drag and drop interaction.
 
 ### Referencing
 
