@@ -4,6 +4,10 @@ search_enabled: true
 sidebar:
   - introduction
   - installation
+  - label: Services File
+    children:
+       - services-required
+       - services-optional
   # - label: Installation
   #   children:
   #     - initialisation
