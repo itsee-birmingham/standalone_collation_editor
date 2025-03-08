@@ -1,19 +1,11 @@
 {
-    "tei": "<ab xmlns=\"http://www.tei-c.org/ns/1.0\" n=\"John.6.23\"><w>\u03b1\u03bb\u03bb\u03b1</w><w>\u03b4\u03b5</w><w>\u03b7\u03bb\u03b8\u03b5</w><w>\u03c0\u03bb\u03bf\u03b9\u03b1\u03c1\u03b9\u03b1</w><w>\u03b5\u03ba</w><w>\u03c4\u03b9\u03b2\u03b5\u03c1\u03b9\u03b1\u03b4<supplied reason=\"illegible\">\u03bf\u03c2</supplied></w>\n<pb xml:id=\"P196r-22\" n=\"196r\" type=\"folio\"/>\n<cb xml:id=\"P196rC1-22\" n=\"1\"/>\n<lb xml:id=\"P196rC1L1-22\" n=\"1\"/><w>\u03b5\u03b3\u03b3\u03c5\u03c2</w><w>\u03c4\u03bf\u03c5</w><w>\u03c4\u03bf\u03c0\u03bf\u03c5</w><w>\u03bf\u03c0\u03bf\u03c5</w><w>\u03b5\u03c6\u03b1\u03b3\u03bf\u03bd</w><w>\u03c4\u03bf\u03bd</w><w>\u03b1\u03c1\u03c4\u03bf\u03bd</w>\n<lb xml:id=\"P196rC1L2-22\" n=\"2\"/><w>\u03b5\u03c5\u03c7\u03b1\u03c1\u03b9\u03c3\u03c4\u03b7\u03c3\u03b1\u03bd\u03c4\u03bf\u03c2</w><w>\u03c4\u03bf\u03c5</w><w><abbr type=\"nomSac\"><hi rend=\"overline\">\u03ba\u03c5</hi></abbr></w></ab>\n",
-    "document_type": "minuscule",
     "transcription": "NT_GRC_22_John",
-    "language": "grc",
-    "chapter_number": 6,
-    "index": 235,
     "siglum": "22",
-    "n": "John.6.23",
     "witnesses": [
         {
             "tokens": [
                 {
                     "index": "2",
-                    "siglum": "22",
-                    "verse": "John.6.23",
                     "t": "\u03b1\u03bb\u03bb\u03b1",
                     "rule_match": [
                         "\u03b1\u03bb\u03bb\u03b1"
@@ -23,8 +15,6 @@
                 },
                 {
                     "index": "4",
-                    "siglum": "22",
-                    "verse": "John.6.23",
                     "t": "\u03b4\u03b5",
                     "rule_match": [
                         "\u03b4\u03b5"
@@ -34,8 +24,6 @@
                 },
                 {
                     "index": "6",
-                    "siglum": "22",
-                    "verse": "John.6.23",
                     "t": "\u03b7\u03bb\u03b8\u03b5",
                     "rule_match": [
                         "\u03b7\u03bb\u03b8\u03b5"
@@ -45,8 +33,6 @@
                 },
                 {
                     "index": "8",
-                    "siglum": "22",
-                    "verse": "John.6.23",
                     "t": "\u03c0\u03bb\u03bf\u03b9\u03b1\u03c1\u03b9\u03b1",
                     "rule_match": [
                         "\u03c0\u03bb\u03bf\u03b9\u03b1\u03c1\u03b9\u03b1"
@@ -56,8 +42,6 @@
                 },
                 {
                     "index": "10",
-                    "siglum": "22",
-                    "verse": "John.6.23",
                     "t": "\u03b5\u03ba",
                     "rule_match": [
                         "\u03b5\u03ba"
@@ -79,8 +63,6 @@
                 },
                 {
                     "index": "14",
-                    "siglum": "22",
-                    "verse": "John.6.23",
                     "t": "\u03b5\u03b3\u03b3\u03c5\u03c2",
                     "rule_match": [
                         "\u03b5\u03b3\u03b3\u03c5\u03c2"
@@ -90,8 +72,6 @@
                 },
                 {
                     "index": "16",
-                    "siglum": "22",
-                    "verse": "John.6.23",
                     "t": "\u03c4\u03bf\u03c5",
                     "rule_match": [
                         "\u03c4\u03bf\u03c5"
@@ -101,8 +81,6 @@
                 },
                 {
                     "index": "18",
-                    "siglum": "22",
-                    "verse": "John.6.23",
                     "t": "\u03c4\u03bf\u03c0\u03bf\u03c5",
                     "rule_match": [
                         "\u03c4\u03bf\u03c0\u03bf\u03c5"
@@ -112,8 +90,6 @@
                 },
                 {
                     "index": "20",
-                    "siglum": "22",
-                    "verse": "John.6.23",
                     "t": "\u03bf\u03c0\u03bf\u03c5",
                     "rule_match": [
                         "\u03bf\u03c0\u03bf\u03c5"
@@ -123,8 +99,6 @@
                 },
                 {
                     "index": "22",
-                    "siglum": "22",
-                    "verse": "John.6.23",
                     "t": "\u03b5\u03c6\u03b1\u03b3\u03bf\u03bd",
                     "rule_match": [
                         "\u03b5\u03c6\u03b1\u03b3\u03bf\u03bd"
@@ -134,8 +108,6 @@
                 },
                 {
                     "index": "24",
-                    "siglum": "22",
-                    "verse": "John.6.23",
                     "t": "\u03c4\u03bf\u03bd",
                     "rule_match": [
                         "\u03c4\u03bf\u03bd"
@@ -145,8 +117,6 @@
                 },
                 {
                     "index": "26",
-                    "siglum": "22",
-                    "verse": "John.6.23",
                     "t": "\u03b1\u03c1\u03c4\u03bf\u03bd",
                     "rule_match": [
                         "\u03b1\u03c1\u03c4\u03bf\u03bd"
@@ -156,8 +126,6 @@
                 },
                 {
                     "index": "28",
-                    "siglum": "22",
-                    "verse": "John.6.23",
                     "t": "\u03b5\u03c5\u03c7\u03b1\u03c1\u03b9\u03c3\u03c4\u03b7\u03c3\u03b1\u03bd\u03c4\u03bf\u03c2",
                     "rule_match": [
                         "\u03b5\u03c5\u03c7\u03b1\u03c1\u03b9\u03c3\u03c4\u03b7\u03c3\u03b1\u03bd\u03c4\u03bf\u03c2"
@@ -167,8 +135,6 @@
                 },
                 {
                     "index": "30",
-                    "siglum": "22",
-                    "verse": "John.6.23",
                     "t": "\u03c4\u03bf\u03c5",
                     "rule_match": [
                         "\u03c4\u03bf\u03c5"
@@ -178,8 +144,6 @@
                 },
                 {
                     "index": "32",
-                    "siglum": "22",
-                    "verse": "John.6.23",
                     "t": "\u03ba\u03c5",
                     "rule_match": [
                         "\u03ba\u03c5"
@@ -192,13 +156,6 @@
             "id": "22"
         }
     ],
-    "book_number": 4,
-    "verse_number": 23,
-    "context": "John.6.23",
-    "book_string": "John",
-    "transcription_siglum": "22",
-    "corpus": "NT",
     "id": "NT_GRC_22_John.6.23",
-    "page": "P195v-22",
     "document_id": "30022"
 }
