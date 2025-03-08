@@ -16,6 +16,8 @@ The collation editor has primarily been tested in Firefox but should also work i
 Installation and Start up
 ---
 
+Before trying to start the collation editor please ensure that there are no spaces in the directory name.
+
 ### On Mac and Linux
 
 To start the collation editor download the code from github and navigate to the collation_editor directory. From here run the start up script `startup.sh`. This script should start both collateX and the server that runs the collation editor.
