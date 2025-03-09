@@ -8,183 +8,183 @@
                 {
                     "index": "2",
                     "siglum": "basetext",
-                    "original": "\u03b1\u03bb\u03bb\u03b1",
+                    "original": "αλλα",
                     "verse": "John.6.23",
-                    "t": "\u03b1\u03bb\u03bb\u03b1",
+                    "t": "αλλα",
                     "rule_match": [
-                        "\u03b1\u03bb\u03bb\u03b1"
+                        "αλλα"
                     ],
                     "reading": "basetext",
-                    "original_old": "\u1f04\u03bb\u03bb\u03b1"
+                    "original_old": "ἄλλα"
                 },
                 {
                     "index": "4",
                     "siglum": "basetext",
-                    "original": "\u03b7\u03bb\u03b8\u03b5\u03bd",
+                    "original": "ηλθεν",
                     "verse": "John.6.23",
-                    "t": "\u03b7\u03bb\u03b8\u03b5\u03bd",
+                    "t": "ηλθεν",
                     "rule_match": [
-                        "\u03b7\u03bb\u03b8\u03b5\u03bd"
+                        "ηλθεν"
                     ],
                     "reading": "basetext",
-                    "original_old": "\u1f26\u03bb\u03b8\u03b5\u03bd"
+                    "original_old": "ἦλθεν"
                 },
                 {
                     "index": "6",
                     "siglum": "basetext",
-                    "original": "\u03c0\u03bb\u03bf\u03b9\u03b1\u03c1\u03b9\u03b1",
+                    "original": "πλοιαρια",
                     "verse": "John.6.23",
-                    "t": "\u03c0\u03bb\u03bf\u03b9\u03b1\u03c1\u03b9\u03b1",
+                    "t": "πλοιαρια",
                     "rule_match": [
-                        "\u03c0\u03bb\u03bf\u03b9\u03b1\u03c1\u03b9\u03b1"
+                        "πλοιαρια"
                     ],
                     "reading": "basetext",
-                    "original_old": "\u03c0\u03bb\u03bf\u03b9\u1f71[\u03c1\u03b9\u03b1]"
+                    "original_old": "πλοιά[ρια]"
                 },
                 {
                     "index": "8",
                     "siglum": "basetext",
-                    "original": "\u03b5\u03ba",
+                    "original": "εκ",
                     "verse": "John.6.23",
-                    "t": "\u03b5\u03ba",
+                    "t": "εκ",
                     "rule_match": [
-                        "\u03b5\u03ba"
+                        "εκ"
                     ],
                     "reading": "basetext",
-                    "original_old": "\u1f10\u03ba"
+                    "original_old": "ἐκ"
                 },
                 {
                     "index": "10",
                     "siglum": "basetext",
-                    "original": "\u03c4\u03b9\u03b2\u03b5\u03c1\u03b9\u03b1\u03b4\u03bf\u03c2",
+                    "original": "τιβεριαδος",
                     "verse": "John.6.23",
-                    "t": "\u03c4\u03b9\u03b2\u03b5\u03c1\u03b9\u03b1\u03b4\u03bf\u03c2",
+                    "t": "τιβεριαδος",
                     "rule_match": [
-                        "\u03c4\u03b9\u03b2\u03b5\u03c1\u03b9\u03b1\u03b4\u03bf\u03c2"
+                        "τιβεριαδος"
                     ],
                     "reading": "basetext",
-                    "original_old": "\u03a4\u03b9\u03b2\u03b5\u03c1\u03b9\u1f71\u03b4\u03bf\u03c2"
+                    "original_old": "Τιβεριάδος"
                 },
                 {
                     "index": "12",
                     "siglum": "basetext",
-                    "original": "\u03b5\u03b3\u03b3\u03c5\u03c2",
+                    "original": "εγγυς",
                     "verse": "John.6.23",
-                    "t": "\u03b5\u03b3\u03b3\u03c5\u03c2",
+                    "t": "εγγυς",
                     "rule_match": [
-                        "\u03b5\u03b3\u03b3\u03c5\u03c2"
+                        "εγγυς"
                     ],
                     "reading": "basetext",
-                    "original_old": "\u1f10\u03b3\u03b3\u1f7a\u03c2"
+                    "original_old": "ἐγγὺς"
                 },
                 {
                     "index": "14",
                     "siglum": "basetext",
-                    "original": "\u03c4\u03bf\u03c5",
+                    "original": "του",
                     "verse": "John.6.23",
-                    "t": "\u03c4\u03bf\u03c5",
+                    "t": "του",
                     "rule_match": [
-                        "\u03c4\u03bf\u03c5"
+                        "του"
                     ],
                     "reading": "basetext",
-                    "original_old": "\u03c4\u03bf\u1fe6"
+                    "original_old": "τοῦ"
                 },
                 {
                     "index": "16",
                     "siglum": "basetext",
-                    "original": "\u03c4\u03bf\u03c0\u03bf\u03c5",
+                    "original": "τοπου",
                     "verse": "John.6.23",
-                    "t": "\u03c4\u03bf\u03c0\u03bf\u03c5",
+                    "t": "τοπου",
                     "rule_match": [
-                        "\u03c4\u03bf\u03c0\u03bf\u03c5"
+                        "τοπου"
                     ],
                     "reading": "basetext",
-                    "original_old": "\u03c4\u1f79\u03c0\u03bf\u03c5"
+                    "original_old": "τόπου"
                 },
                 {
                     "index": "18",
                     "siglum": "basetext",
-                    "original": "\u03bf\u03c0\u03bf\u03c5",
+                    "original": "οπου",
                     "verse": "John.6.23",
-                    "t": "\u03bf\u03c0\u03bf\u03c5",
+                    "t": "οπου",
                     "rule_match": [
-                        "\u03bf\u03c0\u03bf\u03c5"
+                        "οπου"
                     ],
                     "reading": "basetext",
-                    "original_old": "\u1f45\u03c0\u03bf\u03c5"
+                    "original_old": "ὅπου"
                 },
                 {
                     "index": "20",
                     "siglum": "basetext",
-                    "original": "\u03b5\u03c6\u03b1\u03b3\u03bf\u03bd",
+                    "original": "εφαγον",
                     "verse": "John.6.23",
-                    "t": "\u03b5\u03c6\u03b1\u03b3\u03bf\u03bd",
+                    "t": "εφαγον",
                     "rule_match": [
-                        "\u03b5\u03c6\u03b1\u03b3\u03bf\u03bd"
+                        "εφαγον"
                     ],
                     "reading": "basetext",
-                    "original_old": "\u1f14\u03c6\u03b1\u03b3\u03bf\u03bd"
+                    "original_old": "ἔφαγον"
                 },
                 {
                     "index": "22",
                     "siglum": "basetext",
-                    "original": "\u03c4\u03bf\u03bd",
+                    "original": "τον",
                     "verse": "John.6.23",
-                    "t": "\u03c4\u03bf\u03bd",
+                    "t": "τον",
                     "rule_match": [
-                        "\u03c4\u03bf\u03bd"
+                        "τον"
                     ],
                     "reading": "basetext",
-                    "original_old": "\u03c4\u1f78\u03bd"
+                    "original_old": "τὸν"
                 },
                 {
                     "index": "24",
                     "siglum": "basetext",
-                    "original": "\u03b1\u03c1\u03c4\u03bf\u03bd",
+                    "original": "αρτον",
                     "verse": "John.6.23",
-                    "t": "\u03b1\u03c1\u03c4\u03bf\u03bd",
+                    "t": "αρτον",
                     "rule_match": [
-                        "\u03b1\u03c1\u03c4\u03bf\u03bd"
+                        "αρτον"
                     ],
                     "reading": "basetext",
-                    "original_old": "\u1f04\u03c1\u03c4\u03bf\u03bd"
+                    "original_old": "ἄρτον"
                 },
                 {
                     "index": "26",
                     "siglum": "basetext",
-                    "original": "\u03b5\u03c5\u03c7\u03b1\u03c1\u03b9\u03c3\u03c4\u03b7\u03c3\u03b1\u03bd\u03c4\u03bf\u03c2",
+                    "original": "ευχαριστησαντος",
                     "verse": "John.6.23",
-                    "t": "\u03b5\u03c5\u03c7\u03b1\u03c1\u03b9\u03c3\u03c4\u03b7\u03c3\u03b1\u03bd\u03c4\u03bf\u03c2",
+                    "t": "ευχαριστησαντος",
                     "rule_match": [
-                        "\u03b5\u03c5\u03c7\u03b1\u03c1\u03b9\u03c3\u03c4\u03b7\u03c3\u03b1\u03bd\u03c4\u03bf\u03c2"
+                        "ευχαριστησαντος"
                     ],
                     "reading": "basetext",
-                    "original_old": "\u03b5\u1f50\u03c7\u03b1\u03c1\u03b9\u03c3\u03c4\u1f75\u03c3\u03b1\u03bd\u03c4\u03bf\u03c2"
+                    "original_old": "εὐχαριστήσαντος"
                 },
                 {
                     "index": "28",
                     "siglum": "basetext",
-                    "original": "\u03c4\u03bf\u03c5",
+                    "original": "του",
                     "verse": "John.6.23",
-                    "t": "\u03c4\u03bf\u03c5",
+                    "t": "του",
                     "rule_match": [
-                        "\u03c4\u03bf\u03c5"
+                        "του"
                     ],
                     "reading": "basetext",
-                    "original_old": "\u03c4\u03bf\u1fe6"
+                    "original_old": "τοῦ"
                 },
                 {
                     "pc_after": ".",
                     "index": "30",
                     "siglum": "basetext",
-                    "original": "\u03ba\u03c5\u03c1\u03b9\u03bf\u03c5",
+                    "original": "κυριου",
                     "verse": "John.6.23",
-                    "t": "\u03ba\u03c5\u03c1\u03b9\u03bf\u03c5",
+                    "t": "κυριου",
                     "rule_match": [
-                        "\u03ba\u03c5\u03c1\u03b9\u03bf\u03c5"
+                        "κυριου"
                     ],
                     "reading": "basetext",
-                    "original_old": "\u03ba\u03c5\u03c1\u1f77\u03bf\u03c5"
+                    "original_old": "κυρίου"
                 }
             ],
             "id": "basetext"

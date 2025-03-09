@@ -7,147 +7,147 @@
             "tokens": [
                 {
                     "index": "2",
-                    "t": "\u03b1\u03bb\u03bb\u03b1",
+                    "t": "αλλα",
                     "rule_match": [
-                        "\u03b1\u03bb\u03bb\u03b1"
+                        "αλλα"
                     ],
                     "reading": "597",
-                    "original": "\u03b1\u03bb\u03bb\u03b1"
+                    "original": "αλλα"
                 },
                 {
                     "index": "4",
-                    "t": "\u03b4\u03b5",
+                    "t": "δε",
                     "rule_match": [
-                        "\u03b4\u03b5"
+                        "δε"
                     ],
                     "reading": "597",
-                    "original": "\u03b4\u03b5"
+                    "original": "δε"
                 },
                 {
                     "index": "6",
-                    "t": "\u03c0\u03bb\u03bf\u03b9\u03b1\u03c1\u03b9\u03b1",
+                    "t": "πλοιαρια",
                     "rule_match": [
-                        "\u03c0\u03bb\u03bf\u03b9\u03b1\u03c1\u03b9\u03b1"
+                        "πλοιαρια"
                     ],
                     "reading": "597",
-                    "original": "\u03c0\u03bb\u03bf\u03b9\u03b1\u03c1\u03b9\u03b1"
+                    "original": "πλοιαρια"
                 },
                 {
                     "index": "8",
-                    "t": "\u03b7\u03bb\u03b8\u03b5\u03bd",
+                    "t": "ηλθεν",
                     "rule_match": [
-                        "\u03b7\u03bb\u03b8\u03b5\u03bd"
+                        "ηλθεν"
                     ],
                     "reading": "597",
-                    "original": "\u03b7\u03bb\u03b8\u03b5\u03bd"
+                    "original": "ηλθεν"
                 },
                 {
                     "index": "10",
-                    "t": "\u03b5\u03ba",
+                    "t": "εκ",
                     "rule_match": [
-                        "\u03b5\u03ba"
+                        "εκ"
                     ],
                     "reading": "597",
-                    "original": "\u03b5\u03ba"
+                    "original": "εκ"
                 },
                 {
                     "index": "12",
-                    "t": "\u03c4\u03b9\u03b2\u03b5\u03c1\u03b9\u03b1\u03b4\u03bf\u03c2",
+                    "t": "τιβεριαδος",
                     "rule_match": [
-                        "\u03c4\u03b9\u03b2\u03b5\u03c1\u03b9\u03b1\u03b4\u03bf\u03c2"
+                        "τιβεριαδος"
                     ],
                     "reading": "597",
-                    "original": "\u03c4\u03b9\u03b2\u03b5\u03c1\u03b9\u03b1\u03b4\u03bf\u03c2"
+                    "original": "τιβεριαδος"
                 },
                 {
                     "index": "14",
-                    "t": "\u03b5\u03b3\u03b3\u03c5\u03c2",
+                    "t": "εγγυς",
                     "rule_match": [
-                        "\u03b5\u03b3\u03b3\u03c5\u03c2"
+                        "εγγυς"
                     ],
                     "reading": "597",
-                    "original": "\u03b5\u03b3\u03b3\u03c5\u03c2"
+                    "original": "εγγυς"
                 },
                 {
                     "index": "16",
-                    "t": "\u03c4\u03bf\u03c5",
+                    "t": "του",
                     "rule_match": [
-                        "\u03c4\u03bf\u03c5"
+                        "του"
                     ],
                     "reading": "597",
-                    "original": "\u03c4\u03bf\u03c5"
+                    "original": "του"
                 },
                 {
                     "index": "18",
-                    "t": "\u03c4\u03bf\u03c0\u03bf\u03c5",
+                    "t": "τοπου",
                     "rule_match": [
-                        "\u03c4\u03bf\u03c0\u03bf\u03c5"
+                        "τοπου"
                     ],
                     "reading": "597",
-                    "original": "\u03c4\u03bf\u03c0\u03bf\u03c5"
+                    "original": "τοπου"
                 },
                 {
                     "index": "20",
-                    "t": "\u03bf\u03c0\u03bf\u03c5",
+                    "t": "οπου",
                     "rule_match": [
-                        "\u03bf\u03c0\u03bf\u03c5"
+                        "οπου"
                     ],
                     "reading": "597",
-                    "original": "\u03bf\u03c0\u03bf\u03c5"
+                    "original": "οπου"
                 },
                 {
                     "index": "22",
-                    "t": "\u03b5\u03c6\u03b1\u03b3\u03bf\u03bd",
+                    "t": "εφαγον",
                     "rule_match": [
-                        "\u03b5\u03c6\u03b1\u03b3\u03bf\u03bd"
+                        "εφαγον"
                     ],
                     "reading": "597",
-                    "original": "\u03b5\u03c6\u03b1\u03b3\u03bf\u03bd"
+                    "original": "εφαγον"
                 },
                 {
                     "index": "24",
-                    "t": "\u03c4\u03bf\u03bd",
+                    "t": "τον",
                     "rule_match": [
-                        "\u03c4\u03bf\u03bd"
+                        "τον"
                     ],
                     "reading": "597",
-                    "original": "\u03c4\u03bf\u03bd"
+                    "original": "τον"
                 },
                 {
                     "index": "26",
-                    "t": "\u03b1\u03c1\u03c4\u03bf\u03bd",
+                    "t": "αρτον",
                     "rule_match": [
-                        "\u03b1\u03c1\u03c4\u03bf\u03bd"
+                        "αρτον"
                     ],
                     "reading": "597",
-                    "original": "\u03b1\u03c1\u03c4\u03bf\u03bd"
+                    "original": "αρτον"
                 },
                 {
                     "index": "28",
-                    "t": "\u03b5\u03c5\u03c7\u03b1\u03c1\u03b9\u03c3\u03c4\u03b7\u03c3\u03b1\u03bd\u03c4\u03bf\u03c2",
+                    "t": "ευχαριστησαντος",
                     "rule_match": [
-                        "\u03b5\u03c5\u03c7\u03b1\u03c1\u03b9\u03c3\u03c4\u03b7\u03c3\u03b1\u03bd\u03c4\u03bf\u03c2"
+                        "ευχαριστησαντος"
                     ],
                     "reading": "597",
-                    "original": "\u03b5\u03c5\u03c7\u03b1\u03c1\u03b9\u03c3\u03c4\u03b7\u03c3\u03b1\u03bd\u03c4\u03bf\u03c2"
+                    "original": "ευχαριστησαντος"
                 },
                 {
                     "index": "30",
-                    "t": "\u03c4\u03bf\u03c5",
+                    "t": "του",
                     "rule_match": [
-                        "\u03c4\u03bf\u03c5"
+                        "του"
                     ],
                     "reading": "597",
-                    "original": "\u03c4\u03bf\u03c5"
+                    "original": "του"
                 },
                 {
                     "index": "32",
-                    "t": "\u03ba\u03c5",
+                    "t": "κυ",
                     "rule_match": [
-                        "\u03ba\u03c5"
+                        "κυ"
                     ],
                     "reading": "597",
-                    "original": "\u03ba\u03c5",
+                    "original": "κυ",
                     "nomSac": true
                 }
             ],
