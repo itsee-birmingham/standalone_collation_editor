@@ -3777,6 +3777,9 @@ var CL = (function() {
               html.push('<td rowspan="' + userCount + '">' + approved.radio_button + '</td>');
             }
             firstRow = false;
+          } else if (firstRow === true) {
+            html.push('<td rowspan="' + userCount + '"></td>');
+            firstRow = false;
           }
           html.push('</tr>');
         }
@@ -3788,7 +3791,6 @@ var CL = (function() {
       }
       document.getElementById('saved_collations_div').innerHTML = html.join('');
       document.getElementById('header').innerHTML = CL.getHeaderHtml('Collation', context);
-      document.getElementById('header').className = '';
   
       if (Object.prototype.hasOwnProperty.call(CL.services, 'showLoginStatus')) {
         CL.services.showLoginStatus();
