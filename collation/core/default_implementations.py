@@ -4,14 +4,14 @@
 class RuleConditions(object):
 
     def ignore_unclear(self, decision_word, token_words):
-        decision_word = decision_word.replace('_', '')
-        token_words = [w.replace('_', '') for w in token_words]
-        return(decision_word, token_words)
+        decision_word = decision_word.replace('̣', '')
+        token_words = [w.replace('̣', '') for w in token_words]
+        return (decision_word, token_words)
 
     def ignore_supplied(self, decision_word, token_words):
         decision_word = decision_word.replace('[', '').replace(']', '')
         token_words = [w.replace('[', '').replace(']', '') for w in token_words]
-        return(decision_word, token_words)
+        return (decision_word, token_words)
 
 
 class ApplySettings(object):
@@ -25,5 +25,5 @@ class ApplySettings(object):
         return token
 
     def hide_unclear_text(self, token):
-        token['interface'] = token['interface'].replace('_', '')
+        token['interface'] = token['interface'].replace('̣', '')
         return token
