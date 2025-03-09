@@ -1,0 +1,22 @@
+title: Collation Editor Core
+remote_theme: catsmith/jekyll-theme-zendesk-garden@main
+search_enabled: true
+auto_page_title: true
+sidebar:
+  - index
+  - installation
+  - label: Services File
+    children:
+       - required-variables
+       - required-functions
+       - optional-variables
+       - optional-functions
+  - python-services
+  - project-settings
+  - data-format
+  - label: Upgrading Versions
+    children:
+      - upgrade-3-0-x
+      - upgrade-2-0-x
+      - upgrade-1-1-x
+      - upgrade-1-0-x

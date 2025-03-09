@@ -46,7 +46,6 @@ div#message_panel {
 	margin-top: 7px;
 	margin-left: 20px;
 	padding: 3px 3px 3px 3px;
-
 }
 
 div#message_panel.warning {
@@ -118,8 +117,6 @@ td div.spacer {
 	border: none;
 }
 
-
-
 .subreading_form {
 	position:fixed;
 	top:40px;
@@ -135,11 +132,24 @@ td div.spacer {
     position: fixed;
     background-color: whitesmoke;
     border: 1px solid black;
-
 }
 
 #label_change_form {
   padding: 5px;
+}
+
+#label_change_form .top_label {
+  vertical-align: top;
+  display: inline-block;
+  margin-top: 10px;
+}
+
+#label_change_form #parent_select {
+  margin-top: 10px;
+}
+
+#label_change_form .disabled {
+  color: LightGray;
 }
 
 .label_form #new_label {
@@ -384,7 +394,6 @@ table#saved_collations td.added, table#saved_collations td.removed, table#saved_
   	color: red;
 }
 
-
 li.highlighted > div {
   background: #FFBB55;
 }
@@ -454,7 +463,7 @@ table.variant_unit td {
 }
 
 
-div.highlighted_unit {
+div.error_unit {
 	border: 2px solid red;
 }
 

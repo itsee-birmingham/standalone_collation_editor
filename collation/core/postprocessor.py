@@ -2,13 +2,9 @@
 """Algorithm for post-collate processing.
 
 """
-from functools import partial
-from .exceptions import DataInputException
 import copy
-import decimal
-import re
 import sys
-import importlib
+from .exceptions import DataInputException
 from collation.core.regulariser import Regulariser
 from collation.core.settings_applier import SettingsApplier
 
@@ -71,14 +67,14 @@ class PostProcessor(Regulariser, SettingsApplier):
             new['text'].append(new_word)
         return new
 
-    def merge_extra_reading(self, text_list, witness, reading):
-        reading['witnesses'].append(witness)
-        for token in text_list:
-            if witness in token:
-                new_word[witness] = token[witness]
-            new_word['reading'].append(witness)
-            token['reading'].remove(witness)
-        return reading
+    # def merge_extra_reading(self, text_list, witness, reading):
+    #     reading['witnesses'].append(witness)
+    #     for token in text_list:
+    #         if witness in token:
+    #             new_word[witness] = token[witness]
+    #         new_word['reading'].append(witness)
+    #         token['reading'].remove(witness)
+    #     return reading
 
     # in the python we only care about embedded gaps not the ones at the edge of each unit
     # so we don't need to worry about gap_before as they are always before the first word and never embedded
@@ -243,7 +239,6 @@ class PostProcessor(Regulariser, SettingsApplier):
                 if row[0] != '_' and row[0] is not None:
                     lowest = min(len(row), lowest)
         if highest > 1:  # if at least one reading has more than one word
-            lengths = []
             # return self.split_unit_into_single_words(readings_list, matrix, highest)
             # TODO: remove this condition once split unit into single words works with differing lengths
             if lowest == highest:
@@ -262,8 +257,6 @@ class PostProcessor(Regulariser, SettingsApplier):
 
     def check_unit_splits(self, readings):
         """Works out whether any units need further splitting and sends them off to restructure_unit"""
-        token_matches = []
-        base_text = None
         # if we have at least two actual readings (not including empty readings)
         if ((len(readings.keys()) > 1 and ('_' not in readings.keys())) or
                 (len(readings.keys()) > 2 and ('_' in readings.keys()))):
@@ -294,14 +287,14 @@ class PostProcessor(Regulariser, SettingsApplier):
                     new_readings.append(saved[0])
                     saved = []
                 elif len(saved) > 0:
-                    new_readings.append(horizontal_combine(saved))
+                    new_readings.append(self.horizontal_combine(saved))
                     saved = []
                 new_readings.append(reading)
         if len(saved) == 1:
             new_readings.append(saved[0])
             saved = []
         elif len(saved) > 0:
-            new_readings.append(horizontal_combine(saved))
+            new_readings.append(self.horizontal_combine(saved))
             saved = []
         return new_readings
 
@@ -427,7 +420,9 @@ class PostProcessor(Regulariser, SettingsApplier):
                 'hand_id_map': self.hand_id_map}
 
     def process_witness_tokens(self, witness):
-        if not isinstance(witness, list):
+        if witness is None:
+            return []
+        elif not isinstance(witness, list):  # not sure what this one does but don't want to break anything
             return witness
         else:
             new_witness = []

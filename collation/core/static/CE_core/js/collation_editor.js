@@ -1,4 +1,6 @@
-collation_editor = (function() {
+/* exported collation_editor */
+/* global staticUrl, servicesFile */
+var collation_editor = (function() {
 
   //must be called when system is ready to load and critically *after* staticUrl has been set
   var init = function(callback) {
