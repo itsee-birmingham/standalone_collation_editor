@@ -25,6 +25,6 @@ then the project level settings are used.
 
 ### Functions
 
-[```witnessSort()```](optional-functions.md#witnessSort())
+[```witnessSort()```](services_file/optiona-functions.html#witnessSort)
 
 
