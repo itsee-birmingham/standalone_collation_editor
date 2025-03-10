@@ -38,7 +38,3 @@ If collate has started sucessfully you should be able to see it at:
 
 If the collation editor has started successfully you should be able to see the collation editor when you visit:
 `localhost:8080/collation`
-
-## Collate the Example Text
-
-

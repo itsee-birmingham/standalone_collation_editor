@@ -6,7 +6,7 @@ sidebar:
   - index
   - installation
   - collating-example
-  - label: collating-own
+  - label: Collating Your Data
     children:
       - text-repo-structure
       - data-format
