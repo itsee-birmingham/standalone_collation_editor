@@ -5,7 +5,8 @@ auto_page_title: true
 sidebar:
   - index
   - installation
-  - label: Text Repository
+  - collating-example
+  - label: collating-own
     children:
-      - text-repo
+      - text-repo-structure
       - data-format
