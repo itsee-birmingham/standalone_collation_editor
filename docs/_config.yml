@@ -5,4 +5,7 @@ auto_page_title: true
 sidebar:
   - index
   - installation
-  - data-format
+  - label: Text Repository
+    children:
+      - text-repo
+      - data-format
