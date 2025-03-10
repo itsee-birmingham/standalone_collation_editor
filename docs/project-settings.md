@@ -25,4 +25,6 @@ then the project level settings are used.
 
 ### Functions
 
+[```witnessSort()```](optional-functions.md#witnessSort())
+
 
