@@ -4,4 +4,5 @@ search_enabled: true
 auto_page_title: true
 sidebar:
   - index
+  - installation
   - data-format
