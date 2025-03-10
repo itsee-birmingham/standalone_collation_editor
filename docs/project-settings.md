@@ -22,9 +22,36 @@ then the project level settings are used.
 
 ### Variables
 
+- [```localCollationFunction```](services_file/optional-variables.html#localcollationfunction)
+- [```collationAlgorithmSettings```](services_file/optional-variables.html#collationalgorithmsettings)
+- [```lacUnitLabel```](services_file/optional-variables.html#lacunitlabel)
+- [```omUnitLabel```](services_file/optional-variables.html#omunitlabel)
+- [```omCategories```](services_file/optional-variables.html#omcategories)
+- [```allowCommentsOnRegRules```](services_file/optional-variables.html#allowcommentsonregrules)
+- [```showCollapseAllUnitsButton```](services_file/optional-variables.html#showcollapseallunitsbutton)
+- [```showGetApparatusButton```](services_file/optional-variables.html#showgetapparatusbutton)
+- [```extraFooterButtons```](services_file/optional-variables.html#extrafooterbuttons)
+- [```preStageChecks```](services_file/optional-variables.html#prestagechecks)
+- [```allowOutOfOrderWitnesses```](services_file/optional-variables.html#allowoutoforderwitnesses)
+- [```witnessesAllowedToBeOutOfOrder```](services_file/optional-variables.html#witnessesallowedtobeoutoforder)
+- [```combineAllLacsInOR```](services_file/optional-variables.html#combinealllacsinor)
+- [```combineAllOmsInOR```](services_file/optional-variables.html#combineallomsinor)
+- [```combineAllLacsInApproved```](services_file/optional-variables.html#combinealllacsinapproved)
+- [```combineAllOmsInApproved```](services_file/optional-variables.html#combineallomsinapproved)
+- [```storeMultipleSupportLabelsAsParents```](services_file/optional-variables.html#storemultiplesupportlabelsasparents)
+- [```useZvForAllReadingsSupport```](services_file/optional-variables.html#usezvforallreadingssupport)
+- [```allowJoiningAcrossCollationUnits```](services_file/optional-variables.html#allowjoiningacrosscollationunits)
+- [```approvalSettings```](services_file/optional-variables.html#approvalsettings)
+- [```overlappedOptions```](services_file/optional-variables.html#overlappedoptions)
+- [```contextInput```](services_file/optional-variables.html#contextinput)
+- [```displaySettings```](services_file/optional-variables.html#displaysettings)
+- [```ruleClasses```](services_file/optional-variables.html#ruleclasses)
+- [```ruleConditions```](services_file/optional-variables.html#ruleconditions)
+- [```exporterSettings```](services_file/optional-variables.html#exportersettings)
 
 ### Functions
 
-[```witnessSort()```](services_file/optiona-functions.html#witnessSort)
-
-
+- [```witnessSort()```](services_file/optional-functions.html#witnesssort)
+- [```extractWordsForHeader()```](services_file/optional-functions.html#extractwordsforheader)
+- [```prepareDisplayString()```](services_file/optional-functions.html#preparedisplaystring)
+- [```prepareNormalisedString()```](services_file/optional-functions.html#preparenormalisedstring)
