@@ -1,0 +1,7 @@
+title: Standalone Collation Editor
+remote_theme: catsmith/jekyll-theme-zendesk-garden@main
+search_enabled: true
+auto_page_title: true
+sidebar:
+  - index
+  - data-format
