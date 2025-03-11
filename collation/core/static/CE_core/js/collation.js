@@ -222,11 +222,7 @@ var CL = (function() {
             hands.push(key);
           }
         }
-        if (CL.project.witnessDecorators[i].superscript == true) {
-          CL.project.witnessDecorators[i].display = '<sup>' + CL.project.witnessDecorators[i].label + '</sup>';
-        } else {
-          CL.project.witnessDecorators[i].display = CL.project.witnessDecorators[i].label;
-        }
+        CL.project.witnessDecorators[i].display = CL.project.witnessDecorators[i].label;
         CL.project.witnessDecorators[i].hands = hands;
       }
     },

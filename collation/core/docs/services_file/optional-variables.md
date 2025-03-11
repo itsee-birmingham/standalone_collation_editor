@@ -168,6 +168,8 @@ The default is false.
 
 ## ```witnessesAllowedToBeOutOfOrder```
 
+**This variable can be overwritten in individual project settings**
+
 This setting is only relevant if *allowOutOfOrderWitnesses* is true. It should contain a list of the witnesses (by transcription ID) that should be allowed to be out of order. If an empty list is provided then all witnesses are allowed to be out of order.
 
 The default is an empty list.
@@ -240,8 +242,8 @@ The approval settings determine whether or not an approved version of a unit col
 
 The approvalSettings variable should be a JSON object with the following keys:
 
--  **allow_approval_overwrite** *[boolean]* - false if overwriting is not allowed, true if it is.
--  **no_overwrite_message** *[string]* - the string displayed to the user if an overwrite is requested but prevented by the settings, ideally it should give the user a suggestion as to how to proceed.
+- **allow_approval_overwrite** *[boolean]* - false if overwriting is not allowed, true if it is.
+- **no_overwrite_message** *[string]* - the string displayed to the user if an overwrite is requested but prevented by the settings, ideally it should give the user a suggestion as to how to proceed.
 
 An example is below:
 

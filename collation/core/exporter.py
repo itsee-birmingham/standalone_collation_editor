@@ -43,7 +43,9 @@ class Exporter(RestructureExportDataMixin, object):
                  consolidate_lac_verse=True,
                  include_lemma_when_no_variants=False,
                  exclude_lemma_entry=False,
-                 rule_classes={}):
+                 rule_classes={},
+                 witness_decorators=[],
+                 ):
 
         self.format = format
         self.include_punctuation = include_punctuation
@@ -58,6 +60,7 @@ class Exporter(RestructureExportDataMixin, object):
         self.include_lemma_when_no_variants = include_lemma_when_no_variants
         self.exclude_lemma_entry = exclude_lemma_entry
         self.rule_classes = rule_classes
+        self.witness_decorators = witness_decorators
         # set once in export_data
         self.overtext_siglum = None
 
@@ -76,9 +79,60 @@ class Exporter(RestructureExportDataMixin, object):
         self.overtext_siglum = data[0]['structure']['overtext_name']
         for collation_unit in data:
             restructured_collation_unit = self.clean_collation_unit(collation_unit)
+            if self.witness_decorators is not None:
+                restructured_collation_unit = self.add_witness_decorators(restructured_collation_unit)
             output.append(etree.tostring(self.get_unit_xml(restructured_collation_unit), 'utf-8').decode())
         return '<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0">{}' \
                '</TEI>'.format('\n'.join(output).replace('<?xml version=\'1.0\' encoding=\'utf-8\'?>', ''))
+
+    def add_witness_decorators(self, unit):
+        """Add any prescribed witness decorators to the specified witnesses.
+
+        Args:
+            unit (dict): The JSON data structure from the collation editor after restructuring.
+
+        Returns:
+            dict: The JSON data structure with the decorators added to witnesses.
+        """
+        all_decorators = {}
+        for decorator in self.witness_decorators:
+            decorated_hands = []
+            label = decorator['label']
+            for hand in unit['structure']['hand_id_map']:
+                if unit['structure']['hand_id_map'][hand] in decorator['witnesses'] and hand not in decorated_hands:
+                    decorated_hands.append(hand)
+            all_decorators[label] = decorated_hands
+        if 'lac_readings' in unit['structure']:
+            unit['structure']['lac_readings'] = self._decorate_witnesses(unit['structure']['lac_readings'],
+                                                                         all_decorators)
+        if 'om_readings' in unit['structure']:
+            unit['structure']['om_readings'] = self._decorate_witnesses(unit['structure']['om_readings'],
+                                                                        all_decorators)
+        for collation_unit in unit['structure']['apparatus']:
+            for reading in collation_unit['readings']:
+                reading['witnesses'] = self._decorate_witnesses(reading['witnesses'], all_decorators)
+                if 'subreadings' in reading:
+                    for type in reading['subreadings']:
+                        for subreading in reading['subreadings'][type]:
+                            subreading['witnesses'] = self._decorate_witnesses(subreading['witnesses'],
+                                                                               all_decorators)
+        return unit
+
+    def _decorate_witnesses(self, witnesses, all_decorators):
+        """Add the provided decorator(s) to the appropriate entries in the witness list provided.
+
+        Args:
+            witnesses (list): A list of witnesses from the collation structure.
+            all_decorators (dict): A dictionary containing the decorator label and the witnesses it applies to.
+
+        Returns:
+            list: The decorated witness list.
+        """
+        for i, witness in enumerate(witnesses):
+            for decorator in all_decorators:
+                if witness in all_decorators[decorator]:
+                    witnesses[i] = witnesses[i].replace(witness, f'{witness}{decorator}')
+        return witnesses
 
     def get_text(self, reading, is_subreading=False):
         """Extracts the text of the reading supplied and returns it as a string.
