@@ -509,6 +509,7 @@ local_services = (function() {
             settings.options = {};
           }
           settings.options.rule_classes = CL.ruleClasses;
+          settings.options.witness_decorators = CL.project.witnessDecorators;
           format = settings.options.format;
           if (format === undefined) {
             // use the default
