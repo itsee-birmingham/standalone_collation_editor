@@ -1,6 +1,6 @@
 ---
-id: installation
-title: Installation
+id: initialisation
+title: Initialisation
 ---
 
 ## Dependencies
@@ -17,6 +17,10 @@ Other dependencies are provided in the repository.
 ## Installation path
 
 For the python import statements to work this repository must be a subdirectory of a folder with the name ```collation```.
+
+## Other requirements
+
+
 
 ## Initialising the collation editor
 
@@ -54,10 +58,5 @@ To connect the collation editor to your own database or platform, a services fil
 functions are required, others are optional and additional configuration can also be added. The first two types are
 described in the services file section and the configuration additions are explained in the configuration section.
 
-On loading the services file must call ```CL.setServiceProvider()``` passing a reference to the service file object as
+On loading, the services file must call ```CL.setServiceProvider()``` passing a reference to the service file object as
 the argument.
-
-Example services files can be found in the contrib directory.
-
-Project configuration files should not contain JavaScript functions directly but should include references to
-functions available in the static files on the server and imported using the ```localJavaScript``` variable.

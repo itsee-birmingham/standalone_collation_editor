@@ -6,10 +6,9 @@ sidebar:
   - index
   - label: Setup
     children: 
-      - installation
+      - services-file
       - python-services
-      - required-variables
-      - required-functions
+      - initialisation
   - label: Configuration
     children:
       - optional-variables
