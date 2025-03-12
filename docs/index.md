@@ -15,6 +15,10 @@ please consider the [Standalone Collation Editor](https://github.com/itsee-birmi
 alternative. The standalone collation editor requires Python and a Java runtime environment but otherwise is packaged with
 everything needed to run the code and includes some example data.
 
+If you would like to see the collation editor in action Professor Hugh Houghton has made a video of it being used
+to edit a verse of Romans for the Editio Critica Maior. It is available on the [IGNTP YouTube Channel](https://www.youtube.com/watch?v=uhZrNm6Nmes).
+The collation editor section starts around [3:25](https://youtu.be/uhZrNm6Nmes?t=204). The bug seen at 31:10 has been fixed in v3.0.0.
+
 ## Documentation Overview
 
 This documentation covers the setup and configuration of the collation editor as part of a larger system. It also

@@ -7,8 +7,8 @@ sidebar:
   - label: Setup
     children:
       - initialisation
-      - services-file
       - python-services
+      - services-file
   - label: Configuration
     children:
       - optional-variables
