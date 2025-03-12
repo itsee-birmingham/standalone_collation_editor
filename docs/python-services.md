@@ -4,7 +4,7 @@ title: Python/Server Services
 sidebar_label: Python Services
 ---
 
-To support the server side code packaged with the collation editor some urls are required to provide the connection between the python and the JavaScript. The code required for each service should be minimal as they largely serve to pass data from the client side to the server side.
+To support the server side code packaged with the collation editor some urls are required to provide the connection between the python and the JavaScript. The code required for each service should be minimal as they largely serve to pass data from the client side to the server side. The examples in this documentation are taken from a Django Implementation. Examples of the same services in a bottle.py implementation can be found in the [bottle_server.py](https://github.com/itsee-birmingham/standalone_collation_editor/blob/main/bottle_server.py) file from the standalone_collation_editor.
 
 ## Collation Service
 
@@ -14,7 +14,7 @@ All of the settings required are provided by the JavaScript. They can be altered
 
 The service needs to create a PreProcessor object using the data passed in the request as as options.configs. In should then call the process_witness_list function of that object using the data passed in the request as options.data. It should then return the output of this process as JSON or, if something goes wrong, an error message.
 
-if the legacy regularisation system is also being used either this service or the ```doCollation()``` function can decide which one to create for the provided data. To use the legacy preprocessor the code requirements are the same but should use the legacy preprocessor object.
+If the legacy regularisation system is also being used either this service or the ```doCollation()``` function can decide which one to create for the provided data. To use the legacy preprocessor the code requirements are the same but should use the legacy preprocessor object.
 
 This example of the minimum code required for this service is taken from a Django implementation.
 
@@ -59,7 +59,7 @@ def apply_settings(request):
 ## Apparatus Exporter
 
 The apparatus exporter should be available at the URL specified in the ```apparatusServiceUrl``` variable or
-the ```getApparatusForContext()``` function depending on which is used.
+the ```getApparatusForContext()``` function, both in the services file, depending on which is used.
 
 The service is required to pass the data and configuration from the JavaScript into the ExporterFactory which in turn
 passes everything onto the exporter specified in the configuration.  The configuration is explained in the
@@ -71,9 +71,9 @@ configuration. It should then call the export_data function of the ExporterFacto
 then be returned to the user in a suitable way. Single units are usually processed quickly enough to enable the service
 to return the file to the user using a standard file download in an HTTP response. When processing larger volumes of
 data some kind of asynchronous task manager will probably be required. The code below shows an example of how to
-instantiate the classes but does not give an example of how to return the data. If no settings are provided then the
-ExporterFactory can be created with no arguments. If there is no **options** key in the settings then no options
-argument passed to the constructor.
+instantiate the classes but does not give an example of how to return the data as this will vary depending on the platform
+used. If no settings are provided then the ExporterFactory can be created with no arguments. If there is no **options**
+key in the settings then no options argument passed to the constructor.
 
 New exporters can be added by creating new classes from scratch or inheriting from the basic exporter class provided in
 the core code. Options are passed from the ExporterFactory to the exporter function as keyword arguments. Some exporter
