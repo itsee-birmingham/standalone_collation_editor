@@ -34,6 +34,16 @@ For the purposes of this documentation the Documents/Works/Texts model will be u
 - **Work** - The work which is distilled from the texts that exist of it
 - **Text** - The version or versions of a work preserved in document
 
+## Upgrading
+
+If you are upgrading from an earlier version of the collation editor please follow the guidance in the Upgrading section.
+It is recommended that you upgrade one release version at a time and ensure that each works before upgrading to the next.
+All changes in each version should be listed in the documentation with an indication of whether this will require mandatory
+changes in any of the supporting code or whether changes are only required to retain existing behaviour. New features
+and configuration options will also be listed in the Upgrade section but for fuller documentation you will also need to
+see the appropriate configuration documentation. The documentation should be linked from the upgrade section. If this
+is not the case then you can easily search the full documentation using the search option in the header.
+
 ## Acknowledgements
 
 The software was created by Catherine Smith at the Institute for Textual Scholarship and Electronic Editing (ITSEE) in
