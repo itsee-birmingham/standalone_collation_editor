@@ -5,10 +5,10 @@ auto_page_title: true
 sidebar:
   - index
   - label: Setup
-    children: 
+    children:
+      - initialisation
       - services-file
       - python-services
-      - initialisation
   - label: Configuration
     children:
       - optional-variables

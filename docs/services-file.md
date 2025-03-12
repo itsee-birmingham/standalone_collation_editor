@@ -1,6 +1,6 @@
 ---
 id: services-file
-title: Service File
+title: Services File
 ---
 
 The services file ...

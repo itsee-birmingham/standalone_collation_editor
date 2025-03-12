@@ -3,17 +3,19 @@ id: index
 title: Introduction
 ---
 
-This code is the core of the collation editor. The code in this repository is not designed to run as it is. It needs to
-be embedded into a larger platform with a database or similar storage. The connections are made with a services file
+This code is the core of the collation editor. The collation editor is a GUI wrapper around [collateX](https://collatex.net).
+The code in this repository is not designed to run as it is. It needs to be embedded into a larger platform with a
+database or similar storage. The connections to the platform are made with a services file
 written in JavaScript. Some minimal Python services are also required, basic code examples of which are provided in the
-documentation.
+documentation. CollateX is not provided in the repository and must be installed separately. By default the Java web
+services are used but the system can be configured to use the Python version of collateX instead.
 
 If you are just looking to try out the collation editor or want to use it on a single machine rather than on a server, then
 please consider the [Standalone Collation Editor](https://github.com/itsee-birmingham/standalone_collation_editor) as an
 alternative. The standalone collation editor requires Python and a Java runtime environment but otherwise is packaged with
 everything needed to run the code and includes some example data.
 
-## Overview
+## Documentation Overview
 
 This documentation covers the setup and configuration of the collation editor as part of a larger system. It also
 provides information about the data expected as input.
@@ -36,7 +38,7 @@ For the purposes of this documentation the Documents/Works/Texts model will be u
 
 ## Upgrading
 
-If you are upgrading from an earlier version of the collation editor please follow the guidance in the Upgrading section.
+If you are upgrading from an earlier version of the collation editor please follow the guidance in the Upgrading Versions section of the documentation.
 It is recommended that you upgrade one release version at a time and ensure that each works before upgrading to the next.
 All changes in each version should be listed in the documentation with an indication of whether this will require mandatory
 changes in any of the supporting code or whether changes are only required to retain existing behaviour. New features
