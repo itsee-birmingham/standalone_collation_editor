@@ -5,13 +5,28 @@ title: Introduction
 
 This code is the core of the collation editor. The code in this repository is not designed to run as it is. It needs to
 be embedded into a larger platform with a database or similar storage. The connections are made with a services file
-written in JavaScript. Some minimal Python services are also required. Further configuration of settings and other
-options can also be provided if needed. Data input is all in JSON.
+written in JavaScript. Some minimal Python services are also required, basic code examples of which are provided in the
+documentation.
 
 If you are just looking to try out the collation editor or want to use it on a single machine rather than on a server, then
-please consider the [Standalone Collation Editor](https://github.com/itsee-birmingham/standalone_collation_editor) as an alternative.
+please consider the [Standalone Collation Editor](https://github.com/itsee-birmingham/standalone_collation_editor) as an
+alternative. The standalone collation editor requires Python and a Java runtime environment but otherwise is packaged with
+everything needed to run the code and includes some example data.
 
-## Terminology
+## Overview
+
+This documentation covers the setup and configuration of the collation editor as part of a larger system. It also
+provides information about the data expected as input.
+
+As the collation editor is a web application it is not really installed in the traditional sense. Instead all of the
+necessary dependecies, html, JavaScript and supporting services are covered in the Setup section. This includes the variables and
+functions which must be provided in the JavaScript services file to link the collation editor to your platform and database.
+Additional optional configuration settings are covered in the configuration section. The behaviour of the collation
+editor can be configured at both the service level (per installation) and the project level. Project configurations will
+override the service level configurations which will in turn override any default configurations provided.
+
+The collation editor requires the data to be provided in JSON and details of what to provide and how it should be
+provided can be found in the Input Data section.
 
 For the purposes of this documentation the Documents/Works/Texts model will be used.[^1]
 
@@ -19,19 +34,14 @@ For the purposes of this documentation the Documents/Works/Texts model will be u
 - **Work** - The work which is distilled from the texts that exist of it
 - **Text** - The version or versions of a work preserved in document
 
-## Configuration
-
-The behaviour of the collation editor can be configured at both the service level (per installation) and the project level.
-Project configurations will override the service level configurations which will in turn override any default configurations provided.
-The configurations available at the services level are documented in the Services File section. If a setting can also be used at the
-project level it is mentioned in the services file documentation. Settings only available at project level are documented in the
-project settings section.
-
 ## Acknowledgements
 
 The software was created by Catherine Smith at the Institute for Textual Scholarship and Electronic Editing (ITSEE) in
 the University of Birmingham. The restructuring required for the 1.0 release was completed by Catherine Smith and Troy
-A. Griffitts. The software was developed for and supported by the following research projects:
+A. Griffitts. The software is currently developed by Catherine Smith now a member of the Research Software Group, part
+of Advanced Research Computing at the University of Birmingham.
+
+The software was developed for and supported by the following research projects:
 
 - The Workspace for Collaborative Editing (an AHRC/DFG collaborative project 2010-2013)
 - COMPAUL (funded by the European Union 7th Framework Programme under grant agreement 283302, 2011-2016)
