@@ -4,17 +4,17 @@ search_enabled: true
 auto_page_title: true
 sidebar:
   - index
-  - installation
+  - label: Setup
+    children: 
+      - installation
+      - python-services
+      - required-variables
+      - required-functions
   - label: Configuration
     children:
-    - label: Services File
-      children:
-        - required-variables
-        - required-functions
-        - optional-variables
-        - optional-functions
-    - python-services
-    - project-settings
+      - optional-variables
+      - optional-functions
+      - project-settings
   - label: Input Data
     children:
     - data-format
