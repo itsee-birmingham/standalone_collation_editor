@@ -14,8 +14,7 @@ the database, the file is also used to set the configuration options.
 In addition to the collation editor code you will also need a copy of CollateX. You can either use the Python version
 (which can be installed from PyPI) or the Java [collatex-tools](https://collatex.net/download/) package version. If you
 use the Java version then the collate web service must be running (the URL is configurable in the collation editor),
-this is not necessary for the Python version. Instructions for configuring the collation editor to work with either the
-Java or Python version of CollateX is provided in xxx.
+this is not necessary for the Python version.
 
 ## Python Services
 
