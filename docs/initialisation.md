@@ -31,7 +31,7 @@ The services file provides the key link between the collation editor and your ow
 are required in order for the system to run. These are covered in the [Services File](services-file.md) section. Optional
 [variables](optional-variables.md) and [functions](optional-functions.md) are covered in the configuration section.
 
-## Configure the CollateX Service
+## Configuring the CollateX Service
 
 By default the collation editor assumes that you are using the Java collatex-tools and that the service is running at
 the default URL `http://localhost:7369/collate`. If this is the case for your system then no addition configuration
@@ -82,11 +82,15 @@ An example of the initialisation code.
 
 ## Check List
 
-+ [ ] CollateX running as web service or available in Python environment
-+ [ ] Python services running
-  + [ ] [Collation Service](python-services.html#collation-service)
-  + [ ] [Settings Applier](python-services.html#settings-applier)
-  + [ ] [Apparatus Exporter](python-services.html#apparatus-exporter)
-+ [ ] [Services File](services-file.md) with all required variables and functions
-+ [ ] [Services Configured correctly for CollateX](#configure-the-collatex-service)
-+ [ ] [Initialise Collation Editor](#initialising-the-collation-editor)
++ CollateX running as web service or available in Python environment
++ Python services running
+  + [Collation Service](python-services.html#collation-service)
+  + [Settings Applier](python-services.html#settings-applier)
+  + [Apparatus Exporter](python-services.html#apparatus-exporter)
++ [Services File](services-file.md) with all required variables and functions
++ [Services Configured correctly for CollateX](#configuring-the-collatex-service)
++ [Initialise Collation Editor](#initialising-the-collation-editor)
+  + Load Javascipt dependencies
+  + Set staticUrl variable
+  + Set servicesFile variable
+  + Run ```collation_editor.init()```

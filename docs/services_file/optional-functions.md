@@ -4,6 +4,11 @@ title: Optional Service File Functions
 sidebar_label: Optional Functions
 ---
 
+In many cases this configuration can be set at different levels: in the services file, in which case they
+apply to the entire installation; in the project configuration, in which case they apply only to that project. Project
+settings will always be used over services file settings which will in turn override any default provided in the core code.
+The documentation clearly states at which level the setting can be used and, if applicable, what the default behaviour is. 
+
 ## ```showLoginStatus()```
 
 | Param  | Type                | Description  |
@@ -19,7 +24,7 @@ This function can be used to display the currently logged in user. It is called 
 | context | <code>string</code> | The reference for the unit required. |
 | callback | <code>function</code> |The function to be called on the returned data. |
 
-This function populates the links to saved collations in the footer of the page. This function must get the saved collations for the context belonging to this user and the approved collation from the project even if it does not belong to this user. The callback must be run with the saved objects from the four collation stages as parameters in order of the stages (regularised, set variants, order readings, approved). If there are no saved objects for any of the stages this position in the parameters should be null.
+This function populates the links to saved collations in the footer of the page. This function must get the saved collations for the context belonging to this user and the approved collation from the project even if it does not belong to this user. The callback must be run with the saved objects from the four collation stages as parameters in order of the stages (regularised, set variants, order readings, approved). If there are no saved objects for any of the stages the parameter for the missing stages should be null.
 
 ## ```addExtraFooterFunctions()```
 
@@ -33,7 +38,7 @@ This is required if any extra footer buttons are specified in the services file 
 | isPrevious | <code>boolean</code> | true if we are looking for the previous unit, false if we are looking for the next unit. |
 | callback | <code>function</code> |The function to be called on the unit identifier string for the next or previous unit. |
 
-This function is used to provide the data needed move through the data by collation unit using the arrows at the beginning and end of the overtext. It should return either the next (if isPrevious is false) or previous unit based on the provided context. The callback should be run on the string that represents the context string for the next/previous unit. Context here and in the parameters refers to the string used to identify the collation unit. i.e. what the user would type into the index page to run a collation for that unit. If no unit is found the callback should be run with ```null```.
+This function is used to provide the data needed move through the work using the arrows at the beginning and end of the overtext for each collation unit. It should return either the next (if isPrevious is false) or previous unit based on the provided context. The callback should be run on the string that represents the context string for the next/previous unit. Context here and in the parameters refers to the string used to identify the collation unit. i.e. what the user would type into the index page to run a collation for that unit. If no unit is found the callback should be run with ```null```.
 
 **NB** Prior to release 2.0.0 this function was named ```getAdjoiningVerse()```
 
@@ -63,7 +68,7 @@ This function is used to sort the witness sigla into the desired order. It is us
 
 This function tells the collation editor how to extract the list of witnesses from the index page. If there is an element on the page with the id *preselected_witnesses* the default code will take that value and split on commas. If there is no such element the default will assume that there is a form with the id *collation_form* which has a series of checkboxes for the witnesses and it will use any values that are selected.
 
-This default behaviour can be overridden by providing this function in the services. It cannot be overwritten in the project settings so the function must work for all projects you host. The function must return an array containing the ids of the documents selected for collation.
+This default behaviour can be overridden by providing this function in the services. It cannot be overridden in the project settings so the function must work for all projects you host. The function must return an array containing the ids of the documents selected for collation.
 
 ## ```getApparatusForContext()```
 
@@ -75,7 +80,7 @@ This default behaviour can be overridden by providing this function in the servi
 
 This function can be used to override the default export function in the collation editor core code. If this function is not provided and the default code used then the ```apparatusServiceUrl``` variable must be set so that the default code can find the python service. The default function will probably be good enough for many use cases as it generates the file download based on the settings specified in the ```exporterSettings``` variable in the services file. It can be useful to override the function if a CSRF token is required by the platform to download the output or to control other aspects of the export.
 
-*NB* If you do implement this function, the data exported should not be taken from the ```CL.data``` value. Instead the unit should be retrieved from the database and the 'structure' value from the collation object should be used for the data. This is because, in some circumstances, the data stored in the JavaScript variable ```CL.data``` is not suitable for export if the 'show non-edition subreadings' button has been used. The version of the data in the database is always correct as the approved version cannot be saved other than in the approval process itself.
+*NB* If you do implement this function, the data exported should not be taken from the current ```CL.data``` value. Instead the unit should be retrieved from the database and the 'structure' value from the collation object should be used for the data. This is because, in some circumstances, the data stored in the JavaScript variable ```CL.data``` is not suitable for export if the 'show non-edition subreadings' button has been used. The version of the data in the database is always correct as the approved version cannot be saved other than in the approval process itself.
 
 *NB* If you do implement this function there is a pre 2.0 version bug you need to be aware of should any of your user's projects make use of regularisation rules which have the 'keep_as_main_reading' option set to 'true'.
 If this is the case, then the rule configurations must be provided in the 'options' key in the exporterSettings as the display settings for these rules are added in the exporter. The rules are available in the ```CL.ruleClasses``` variable in the JavaScript. In collations approved using the 2.0 release this is no longer necessary as the required presentation data is stored in the collation data structure during the approval process for verse 2.0.0 onwards. If you provide functions to export larger volumes of data you also need to be aware of this and ensure that the rule configurations are provided to the exporter in this case.
@@ -88,7 +93,7 @@ The function has an optional success callback argument which should be run when 
 | ------ | ------------------- | ------------ |
 | data | <code>list</code> | The list of token objects from the base text |
 
-**This function can be overwritten in individual project settings**
+**This function can be overridden in individual project settings**
 
 **There is a default in the core code which is explained below**
 
@@ -96,7 +101,7 @@ The function has an optional success callback argument which should be run when 
 
  The function is given the token list of the base text. It should return a list of lists where the first item in the inner list is the string to display for the token and the second item in the inner list is a string representing the class values that should be added to the html. If multiple classes need to applied they can be put in a single string value separated by spaces. If not classes need to be added then the second item in the inner list should be an empty string. Any punctuation or other data which should be displayed on the screen should be combined into the display string for the token.
 
-The default does not add any extra text or classes and maintains the behaviour of previous releases. It extracts the words from the data in the selected base text using the 'original' key if that is present or 't' if it is not. It also adds any punctuation to the words based on the 'pc_before' and 'pc_after' keys.
+The default does not add any extra text or classes. It extracts the words from the data in the selected base text using the 'original' key if that is present or 't' if it is not. It also adds any punctuation to the words based on the 'pc_before' and 'pc_after' keys.
 
 ## ```prepareDisplayString()```
 
@@ -106,7 +111,7 @@ The default does not add any extra text or classes and maintains the behaviour o
 
 **This function should not be used unless there is a very good reason to do so**
 
-**This function can be overwritten in individual project settings**
+**This function can be overridden in individual project settings**
 
 **The default is to leave the provided string untouched**
 
@@ -122,7 +127,7 @@ There are probably very few, if any, good reasons to use this. It is present to 
 
 **This function must be provided if prepareDisplayString() is used**
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
 **The default is to leave the provided string untouched**
 

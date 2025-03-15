@@ -3416,6 +3416,7 @@ var CL = (function() {
     },
 
     _setLocalPythonFunctions: function(project) {
+      // only required for legacy regularisation
       if (Object.prototype.hasOwnProperty.call(project, 'localPythonImplementations')) {
         CL.localPythonFunctions = project.localPythonImplementations;
       } else if (Object.prototype.hasOwnProperty.call(CL.services, 'localPythonImplementations')) {
