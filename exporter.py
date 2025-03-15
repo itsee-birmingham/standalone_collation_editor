@@ -32,6 +32,8 @@ class Exporter(RestructureExportDataMixin, object):
             setting is True the apparatus will not have a <lem> tag for each entry. Defaults to False.
         rule_classes (dict, optional): This is the dictionary representing the rule classes used in the current
             editing project. Defaults to {}. Only needed for older data.
+        witness_decorators (list, optional): This is a list of JSON objects which define any decorators and the list of
+            witnesses to be decorated, this will always be set at project level. Defaults to [].
     """
 
     def __init__(self,
