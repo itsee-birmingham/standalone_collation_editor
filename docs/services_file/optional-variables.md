@@ -8,6 +8,12 @@ sidebar_label: Optional Variables
 
 This variable should be an array of strings giving the full url of any additional JavaScript you need the collation editor to load. These might be required run the services for your framework (an internal api file for example) or you might want to use additional files to store configuration functions that you call in the services. These files will be loaded as part of the collation editor initialisation functions called after the services have been set.
 
+## ```undoStackLength```
+
+This variable determines how many snapshots of the data are stored to enable to the undo button to work, in other words how many actions you are able to undo. A full version of the data structure is held in browser memory for each position in the stack. If you have  a lot of witnesses and/or longer units then setting this too high may cause problems.  Because of the possible memory issues this can only be set in services and cannot be changed in project settings.
+
+The default is 6.
+
 ## ```localCollationFunction```
 
 **This variable can be overridden in individual project settings (but this may not be advisable)**
@@ -73,6 +79,14 @@ This variable should be an array of strings. If provided the editor will be give
 **This variable can be overridden in individual project settings**
 
 This variable is a boolean which determines whether or not to show the comments text box in the regularisation rule menu. Nothing happens to these comments appart from them being saved along with the rule so the default is false. This setting should only be set to true if the platform using the collation editor has a mecahnism for using these comments in some way.
+
+## ```allowWitnessChangesInSavedCollations```
+
+**This variable can be overridden in individual project settings**
+
+This variable determines whether witnesses can be added to or removed from saved collations. If this variable is set to true and the current project witnesses do not match those in the saved collations the system will allow the user to add or remove witnesses until the witnesses saved match the witnesses in the project. This is only possible at the regularisation and set variants stage, order readings always needs to be redone with the new witness set.
+
+The default is false.
 
 ## ```showCollapseAllUnitsButton```
 

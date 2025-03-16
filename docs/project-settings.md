@@ -25,6 +25,7 @@ then the project level settings are used.
 
 ### Variables
 
+- [```allowWitnessChangesInSavedCollations```](services_file/optional-variables.html#allowwitnesschangesinsavedcollations)
 - [```localCollationFunction```](services_file/optional-variables.html#localcollationfunction)
 - [```collationAlgorithmSettings```](services_file/optional-variables.html#collationalgorithmsettings)
 - [```lacUnitLabel```](services_file/optional-variables.html#lacunitlabel)

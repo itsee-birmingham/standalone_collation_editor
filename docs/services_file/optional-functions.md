@@ -7,7 +7,13 @@ sidebar_label: Optional Functions
 In many cases this configuration can be set at different levels: in the services file, in which case they
 apply to the entire installation; in the project configuration, in which case they apply only to that project. Project
 settings will always be used over services file settings which will in turn override any default provided in the core code.
-The documentation clearly states at which level the setting can be used and, if applicable, what the default behaviour is. 
+The documentation clearly states at which level the setting can be used and, if applicable, what the default behaviour is.
+
+## ```getDebugSetting()```
+
+This function should return a boolean to determine whether the system should run in debug mode. Running in debug mode can help identify problems with the data before it is sent to collation. it is a function rather than a boolean so it is possible for a user to set this variable themselves, for example in the url of the home page.
+
+The default is false.
 
 ## ```showLoginStatus()```
 
