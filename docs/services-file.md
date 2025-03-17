@@ -161,12 +161,12 @@ When the collation process has completed the JSON response from the Python colla
 | ------ | ------------------- | ------------ |
 | context | string | The reference for the unit required. |
 | collation | JSON | The collation object to be saved. |
-| confirm_message | string | The message to display if the user is required to confirm the save. |
-| overwrite_allowed | boolean | A boolean to indicate if the settings say a user can or cannot overwrite an existing saved version. |
-| no_overwrite_message | string | The message to display if there is already a saved version and overwrite_allowed is false. |
+| confirmMessage | string | The message to display if the user is required to confirm the save. |
+| overwriteAllowed | boolean | A boolean to indicate if the settings say a user can or cannot overwrite an existing saved version. |
+| noOverwriteMessage | string | The message to display if there is already a saved version and overwriteAllowed is false. |
 | callback  | function | The function to be called when the save is complete. It should be called with ```true``` if the save was sucessful and ```false``` if it was not. |
 
-This function needs to save the collation object in the database. It must be stored in such a way that the ```getSavedCollations()``` and ```loadSavedCollation()``` functions can retrieve it.
+This function needs to save the collation object in the database repsecting the settings provided. It must be stored in such a way that the ```getSavedCollations()``` and ```loadSavedCollation()``` functions can retrieve it.
 
 ### ```getSavedCollations()```
 
