@@ -1,7 +1,7 @@
 ---
 id: optional-variables
-title: Optional Service File Variables
-sidebar_label: Service File Variables
+title: Optional Services File Variables
+sidebar_label: Services File Variables
 ---
 
 ## ```localJavaScript```
