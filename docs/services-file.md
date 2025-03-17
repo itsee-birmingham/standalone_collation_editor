@@ -8,6 +8,21 @@ must be defined in this file in order to work. In addition to this the services 
 the behaviour collation editor can be configured to meet the preferences of your users. The required items are covered
 on this page, the optional variables and functions are covered in the configuration section.
 
+On loading the services file must call ```CL.setServiceProvider()``` passing a reference to the services file object as the argument as in this example:
+
+```js
+  var my_services = (function() {
+
+    //function called on document ready
+    $(function () {
+      CL.setServiceProvider(my_services);
+    });
+
+    // remaining service variables and functions go here
+
+  } () );
+```
+
 ## Required Variables
 
 There is currently only one required service file variable, this must be set in order for the collation editor to function.
@@ -173,3 +188,63 @@ In future versions this function may include an optional projectId parameter rat
 | callback | function | The function to be called on the retrieved data. |
 
 This should retrieve the collation with the given id and run the callback on the result, if no collation object is found the callback should be run with ```null```. The id here is the unique identifier used by the database to refer to this collation.
+
+### ```getSiglumMap()```
+
+| Param  | Type                | Description  |
+| ------ | ------------------- | ------------ |
+| idList | array | An array of strings, each string the id to a document in the collation. |
+| callback | function | The function to be called with the created siglum map as the argument. |
+
+This function must take the list of ids provided, find its corresponding sigla and return a JSON object in which each sigla is the key to the document id. This function used in the collation editor to provide the mapping details for documents which are lacunose in the entire collation unit. For all other documents this mapping can be extracted from the data returned for collation but in lacunose units no data is returned so this additional function is used. If the idList is empty then the callback should be run on an empty JSON object.
+
+### ```updateRuleset()```
+
+| Param  | Type                | Description  |
+| ------ | ------------------- | ------------ |
+| forDeletion | array | An array of JSON objects each representing containing the id and scope of a rule to be deleted. |
+| forGlobalExceptions | array | An array of JSON objects each contining the id of a global rule which needs an exception adding. |
+| forAddition | array | An array of JSON objects each representing a rule to be added to the database. |
+| unitId | string | The identifier for the unit being collated. |
+| callback | function | The function to be called after saving the data. |
+
+This function must perform the appropriate action on each item in the three arrays of rules provided and then run the supplied callback. Each rule in the first list must be removed from the database, `id` and `scope` are provided to ensure the correct rule can be found. Those in the second list must have the `unitId` value added to the list of exceptions stored in the rule, only `id`is provided in this case as all of the rules will be global rules. The file array of rules contains the full rule JSON and each of these rules must be stored in the database. Any of the three arrays could be empty arrays. One the data as all been handled appropriately the provided callback must be run.
+
+### ```updateRules()```
+
+| Param  | Type                | Description  |
+| ------ | ------------------- | ------------ |
+| rules | array | An array of JSON objects each representing an updated rule. |
+| unitId | string | The identifier for the unit being collated. |
+| callback | function | The function to be called after saving the data. |
+
+This function needs to store all of the rules provided in the database. This function is only called when exceptions are being removed from rules so all of the rules will already exist and should be overwritten by the new data. If concurrency control is not something that needs to be considered in your system then unitId can be ignored as the unit reference has already been removed from the rules by the collation editor. If you do need to consider concurrency control then the ids from the rule array can be used to retrieve each of the rules in turn from the database, the unitId can then be removed from the list of exceptions before the rule is saved.
+
+### ```getRules()```
+
+| Param  | Type                | Description  |
+| ------ | ------------------- | ------------ |
+| unitId | string | The identifier for the unit being collated. |
+| callback | function | The function to be called on the retrieved data. |
+
+This function should retrieve all of the rules which are applicable to the unit identified by the provided unitId. Depending on your system you may need to filter the rules based of project and user as well as the provided verse. If this is the case then the service function ```getUserInfo()``` can be used to get the current user and ```CL.project.id``` stores the id of the current project (or the poject can be established by calling ```getCurrentEditingProject()```). The provided callback should then be called with the list of rules as the argument. The rules should be returned as an array of JSON objects and the JSON objects should have the same structure as that provided to ```updateRules()```.
+
+### ```getRulesByIds()```
+
+| Param  | Type                | Description  |
+| ------ | ------------------- | ------------ |
+| ids | array | The ids of the rules required. |
+| callback | function | The function to be called on the retrieved data. |
+
+This function should retrieve all of the rules which match the rules ids provided in the ids array and
+run the provided callback on the results. The rules should be returned as an array of JSON objects and the JSON objects
+should have the same structure as that provided to ```updateRules()```. User and project filters should not be required as these rules will be a subset of those returned by ```getRules()```.
+
+### ```getRuleExceptions()```
+
+| Param  | Type                | Description  |
+| ------ | ------------------- | ------------ |
+| unitId | string | The identifier for the unit being collated. |
+| callback | function | The function to be called on the retrieved data. |
+
+This function should retrieve all of the global rules for this user/project, those which have the `scope` set to *always*, and also have the provided unitId in the list of exceptions. The rules should be returned as an array of JSON items as with ```getRules()```, the provided callback should be run on the result. If your system does not use global rules then the callback can just be run on an empty array.
