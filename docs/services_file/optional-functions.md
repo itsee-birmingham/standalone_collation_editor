@@ -1,7 +1,7 @@
 ---
 id: optional-functions
 title: Optional Service File Functions
-sidebar_label: Optional Functions
+sidebar_label: Service File Functions
 ---
 
 In many cases this configuration can be set at different levels: in the services file, in which case they
