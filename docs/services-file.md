@@ -196,7 +196,7 @@ This should retrieve the collation with the given id and run the callback on the
 | idList | array | An array of strings, each string the id to a document in the collation. |
 | callback | function | The function to be called with the created siglum map as the argument. |
 
-This function must take the list of ids provided, find its corresponding sigla and return a JSON object in which each sigla is the key to the document id. This function used in the collation editor to provide the mapping details for documents which are lacunose in the entire collation unit. For all other documents this mapping can be extracted from the data returned for collation but in lacunose units no data is returned so this additional function is used. If the idList is empty then the callback should be run on an empty JSON object.
+This function must take the list of ids provided, find its corresponding sigla and return a JSON object in which each sigla is the key to the document id. This function used in the collation editor to provide the mapping details for documents which are lacunose in the entire collation unit. For all other documents this mapping can be extracted from the data returned for collation but in lacunose units no data is returned so this additional function is used. One the siglum map has been created the callback should be run using this as the argument. If the idList is empty then the callback should be run with an empty JSON object.
 
 ### ```updateRuleset()```
 
@@ -208,7 +208,7 @@ This function must take the list of ids provided, find its corresponding sigla a
 | unitId | string | The identifier for the unit being collated. |
 | callback | function | The function to be called after saving the data. |
 
-This function must perform the appropriate action on each item in the three arrays of rules provided and then run the supplied callback. Each rule in the first list must be removed from the database, `id` and `scope` are provided to ensure the correct rule can be found. Those in the second list must have the `unitId` value added to the list of exceptions stored in the rule, only `id`is provided in this case as all of the rules will be global rules. The file array of rules contains the full rule JSON and each of these rules must be stored in the database. Any of the three arrays could be empty arrays. One the data as all been handled appropriately the provided callback must be run.
+This function must perform the appropriate action on each item in the three arrays of rules provided and then run the supplied callback. Each rule in the first list must be removed from the database, `id` and `scope` are provided to ensure the correct rule can be found. Those in the second list must have the `unitId` value added to the list of exceptions stored in the rule, only `id`is provided in this case as all of the rules will be global rules. The file array of rules contains the full rule JSON and each of these rules must be stored in the database. Any of the three arrays could be empty arrays. Once the data as all been handled appropriately the provided callback must be run.
 
 ### ```updateRules()```
 
@@ -247,4 +247,4 @@ should have the same structure as that provided to ```updateRules()```. User and
 | unitId | string | The identifier for the unit being collated. |
 | callback | function | The function to be called on the retrieved data. |
 
-This function should retrieve all of the global rules for this user/project, those which have the `scope` set to *always*, and also have the provided unitId in the list of exceptions. The rules should be returned as an array of JSON items as with ```getRules()```, the provided callback should be run on the result. If your system does not use global rules then the callback can just be run on an empty array.
+This function should retrieve all of the global rules for this user/project, those which have the `scope` set to *always*, and also have the provided unitId in the list of exceptions. The rules should be returned as an array of JSON items as with ```getRules()```, the provided callback should be run with the result as the argument. If your system does not use global rules then the callback can just be run with an empty array.
