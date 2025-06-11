@@ -3552,20 +3552,26 @@ var CL = (function() {
             console.warn('\'_id\' is deprecated. Use \'id\' instead.');
             data[i].id = data[i]._id;
           }
+          date = null;
           if (Object.prototype.hasOwnProperty.call(data[i], '_meta')) {
             console.warn('\'_meta\' is deprecated. Use \'created_time\' and \'last_modified_time\' as keys on collation objects.');
             date = new Date(data[i]._meta._last_modified_time.$date);
           } else if (Object.prototype.hasOwnProperty.call(data[i], 'last_modified_time') && data[i].last_modified_time !== null) {
             date = new Date(data[i].last_modified_time);
-          } else {
+          } else if (Object.prototype.hasOwnProperty.call(data[i], 'last_created_time') && data[i].last_created_time !== null) {
             date = new Date(data[i].created_time);
           }
-          if (date.getMinutes() < 10) {
-            minutes = '0' + date.getMinutes();
+          if (date !== null) {
+            if (date.getMinutes() < 10) {
+              minutes = '0' + date.getMinutes();
+            } else {
+              minutes = String(date.getMinutes());
+            }
+            dateString = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + minutes;
           } else {
-            minutes = String(date.getMinutes());
+            dateString = '';
           }
-          dateString = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + minutes;
+
           if (Object.prototype.hasOwnProperty.call(data[i], 'user')) {
             user = data[i].user;
           } else {
