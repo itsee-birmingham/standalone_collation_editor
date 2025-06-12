@@ -1374,7 +1374,9 @@ var RG = (function() {
 
     _makeMenu: function(menuName) {
       if (menuName === 'regularised') {
-        document.getElementById('context_menu').innerHTML = '<li id="delete_rule"><span>Delete rule</span></li>';
+        // PR added menu options
+        document.getElementById('context_menu').innerHTML = '<li id="delete_rule"><span>Delete rule</span></li><li id="delete_all_reg"><span>Delete for all wit</span></li>';
+    //  document.getElementById('context_menu').innerHTML = '<li id="delete_rule"><span>Delete rule</span></li>';
       }
       if (menuName === 'regularised_global') {
         document.getElementById('context_menu').innerHTML = '<li id="add_exception"><span>Add exception</span></li>' +
