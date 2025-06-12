@@ -263,6 +263,10 @@ tr.deleted {
     color: red;
 }
 
+div.regselected {
+	color: green;
+}
+
 div.regularisation_staged {
 	color: gray;
 }

@@ -63,8 +63,12 @@ var RG = (function() {
         rowId = 'variant_unit_' + id + '_row_' + i;
         rowList.push(rowId);
         if (i === 0) {
-          cells.push('<tr><td class="redips-mark" colspan="MX_LN"><span id="toggle_variant_' + id +
-                    '" class="triangle">&#9650;</span></td></tr>');
+          // cells.push('<tr><td class="redips-mark" colspan="MX_LN"><span id="toggle_variant_' + id +
+          //           '" class="triangle">&#9650;</span></td></tr>');
+          cells.push('<tr><td class="mark" colspan="MX_LN"><img onclick="RG.doSelectAll(this)" id="'+i+
+                     '" class="selectall" src="'+staticUrl+'CE_core/images/checkall.png" height="16px">' +
+                     '<span id="toggle_variant_' + id + '" class="triangle">&#9650;</span></td></tr>');
+
         }
         classes = [];
         if (i === 0) {
@@ -427,6 +431,7 @@ var RG = (function() {
         row = document.getElementById(eventRows[i]);
         if (row !== null) {
           CL.addHoverEvents(row);
+          RG._addShiftKeyEvents(row); // PR added
         }
       }
       const unitEvents = temp[3];
@@ -435,6 +440,7 @@ var RG = (function() {
           row = document.getElementById(key);
           if (row) {
             CL.addHoverEvents(row, unitEvents[key]);
+            RG._addShiftKeyEvents(row); // PR added
           }
         }
       }
@@ -464,6 +470,29 @@ var RG = (function() {
         });
       });
     },
+
+    //PR added this so we can select all the regularizations at this point
+    doSelectAll: function(element) {
+      var rows=$($(element).parents("table")[0]).find("tr");
+      let url1=staticUrl + 'CE_core/images/checkall.png';
+      let url2=staticUrl + 'CE_core/images/allchecked.png';
+      if ($(element).attr("src") == url1) {
+      $(element).attr("src", url2)
+      $(".regselected").removeClass("regselected");
+      $.each(rows, function(i, row){
+        if (i==0) return;
+        if ($(row).hasClass("top")) return;
+        if ($($(row).children("td")[1]).hasClass("gap")) return;
+        if ($($(row).find("div")[1]).hasClass("regularised")) return;
+        if ($(row).children("td").length==1) return;
+        $($(row).find("div")[1]).addClass("regselected");
+      });
+      } else {
+      $(element).attr("src", url1)
+      $(".regselected").removeClass("regselected");
+      }
+    },
+    //End PR addition
 
     _getRulesForDisplay: function(rules, events, deletable, highlightedHand, rowIdBase) {
       let regClass, highlighted, ruleCells, subrowId;
@@ -1068,6 +1097,39 @@ var RG = (function() {
       const rd = REDIPS.drag;
       rd.init(id);
       rd.event.dropped = function() {
+
+        //adapted by PR May 2019 to do multiple regularizations selected by shift and click
+        //
+        var selreg=$(".regselected");
+        var thisColumnId=$(rd.td.target.childNodes[0]).parents("div").attr("id");
+        var target=$(rd.td.target.childNodes[0]).attr("id");
+        //we leave the original code as is, duplicating for all selected
+        // rd.obj.id might be for the child (endding with c0) or the parent (withut the co). Both must go
+
+        for (var i=0; i<selreg.length; i++) {
+          if ($(selreg[i]).parents("div").attr("id")!=thisColumnId) {
+          $(selreg[i]).removeClass("regselected");
+          selreg.splice(i, 1);
+          i--;
+          } else if ($(selreg[i]).attr("id")==rd.obj.id || $(selreg[i]).attr("id")+"c0"==rd.obj.id || $(selreg[i]).attr("id")== rd.obj.id.slice(0,-2) || target==$(selreg[i]).attr("id")) {
+            selreg.splice(i, 1);
+            i--;
+          }
+        }
+        for (var i=0; i<selreg.length; i++ ) { //get the data...
+          selreg[i].objOld={id:$(selreg[i]).attr("id")};
+          console.log("objold "+selreg[i].objOld);
+          selreg[i].unit_data=$(selreg[i]).attr("id");
+          selreg[i].original=$(selreg[i]).attr("id");
+          selreg[i].unit = parseInt(selreg[i].unit_data.substring(0, selreg[i].unit_data.indexOf('_r')).replace('variant_unit_', ''), 10);
+          selreg[i].reading = parseInt(selreg[i].unit_data.substring(selreg[i].unit_data.indexOf('_r') + 2, selreg[i].unit_data.indexOf('_w')), 10);
+          selreg[i].word = parseInt(selreg[i].unit_data.substring(selreg[i].unit_data.indexOf('_w') + 2), 10);
+          selreg[i].witnesses = CL.data.apparatus[selreg[i].unit].readings[selreg[i].reading].witnesses;
+          selreg[i].original_text = CL.data.apparatus[selreg[i].unit].readings[selreg[i].reading].text[selreg[i].word];
+        }
+        //end PR additions
+
+
         clone = document.getElementById(rd.obj.id);
         original = document.getElementById(rd.objOld.id);
         wordId = rd.objOld.id;
@@ -1116,6 +1178,17 @@ var RG = (function() {
         }
         originalText = CL.data.apparatus[unit].readings[reading].text[word];
         originalDisplayText = CL.data.apparatus[unit].readings[reading].text[word]['interface'];
+
+        //more PR stuff
+        if (selreg.length>0) {
+          for (var i=0; i<selreg.length; i++) {
+          originalDisplayText += " "+CL.data.apparatus[selreg[i].unit].readings[selreg[i].reading].text[selreg[i].word]['interface'];
+          }
+        }
+        //end PR stuff
+
+
+
         if (document.getElementById('reg_form') !== null) {
           document.getElementsByTagName('body')[0].removeChild(document.getElementById('reg_form'));
         }
@@ -1133,11 +1206,28 @@ var RG = (function() {
           }
           CL.services.getUserInfo(function(user) {
             _rules[wordId] = RG._createRule(data, user, originalText, normalisedText, unit, reading, word, witnesses);
+            // More PR - not marked in his version (commented out line is also in his version commented out)
+            for (var i=0; i<selreg.length; i++) {
+              _rules[selreg[i].objOld.id] = RG._createRule(data, user, selreg[i].original_text, normalisedText, selreg[i].unit, selreg[i].reading, selreg[i].word, selreg[i].witnesses);
+              //  RG._rules.push.apply(RG._rules, RG.create_rule(data, user, selreg[i].original_text, normalised_text, selreg[i].unit, selreg[i].reading, selreg[i].word, selreg[i].witnesses));
+		         }
+             // end PR
           });
           document.getElementsByTagName('body')[0].removeChild(document.getElementById('reg_form'));
           rd.enableDrag(false, rd.objOld);
           $(original).addClass('regularisation_staged');
           $(original.parentNode).addClass('redips-mark');
+
+          //More from PR
+	        if ($(original).hasClass("regselected")) $(original).removeClass("regselected");
+          for (var i=0; i<selreg.length; i++) {
+            $(selreg[i]).removeClass('regselected');
+            $(selreg[i]).addClass('regularisation_staged');
+            $(selreg[i].parentNode).addClass('mark');
+          };
+          //end PR
+
+
           // add witnesses to normalised form in data structure
           const newUnitData = rd.td.target.firstChild.id;
           if (newUnitData !== '') { //only try this if it is not a user added reading
@@ -1460,6 +1550,52 @@ var RG = (function() {
       }
     },
 
+    // PR - this one added by Peter
+    // need to discuss his handling of global rules - maybe this could just go in his services file as it related
+    // to his footer button.
+    _scheduleAllRuleDeletion: function() { 
+      var i, j, element, row, ruleId, unitNum, rowNum, wordNum, ruleType, wordData, key, witnessData, witnesses, x, ok;
+      element = SimpleContextMenu._target_element;
+      row = RG._getAncestorRow(element);
+      unitNum = row.id.substring(row.id.indexOf('_unit_') + 6, row.id.indexOf('_row_'));
+      rowNum = row.id.substring(row.id.indexOf('_row_') + 5, row.id.indexOf('_word_'));
+      wordNum = row.id.substring(row.id.indexOf('_word_') + 6, row.id.indexOf('_rule_'));
+      ruleId = row.id.substring(row.id.indexOf('_rule_') + 6);
+      wordData = CL.data.apparatus[unitNum].readings[rowNum].text[wordNum];
+      witnesses = wordData.reading;
+      ruleType = null;
+      i = 0;
+      while (i < witnesses.length && ruleType === null) {
+        witnessData = wordData[witnesses[i]];
+        if (witnessData.hasOwnProperty('decision_details')) {
+          j = 0;
+          while (j < witnessData.decision_details.length && ruleType === null) {
+            if (ruleId === witnessData.decision_details[j].id) {
+              ruleType = witnessData.decision_details[j].scope;
+            }
+            j += 1;
+          }
+        }
+        i += 1;
+      }
+      ok = confirm('You are asking to delete all regularizations of "'+witnessData.decision_details[0].t+'" to "'+witnessData.decision_details[0].n+'".\nAre you sure you want to delete this regularization in all witnesses in this block?')
+      if (ok) {
+        //right .. cruise through all the rows. warning: this uses the html structure to get information; change the html, this fails
+        var parent =$(row).parent();
+        var children=$(parent).children()
+        for (var i=0; i<children.length; i++) {
+        var child=children[i];
+        if ($(child).text().trim()==witnessData.decision_details[0].t+"  ▶  "+witnessData.decision_details[0].n) {
+          $(child).addClass('deleted');
+          _forDeletion.push({id : $(child).attr("id").slice($(child).attr("id").indexOf("verse_")), scope : "once" });
+        }
+        }
+      } else {
+        return;
+      }
+    },
+    // end PR
+
     _addContextMenuHandlers: function() {
       if (document.getElementById('delete_rule')) {
         $('#delete_rule').off('click.dr_c');
@@ -1471,6 +1607,14 @@ var RG = (function() {
           CL.hideTooltip();
         });
       }
+      //PR addition here
+      if (document.getElementById('delete_all_reg')) {
+        $('#delete_all_reg').off('click.dar_c');
+        $('#delete_all_reg').off('mouseover.dar_mo');
+        $('#delete_all_reg').on('click.dar_c', function() {RG._scheduleAllRuleDeletion();});
+        $('#delete_all_reg').on('mouseover.dar_mo', function() {CL.hideTooltip();});
+      }
+      // end PR 
       if (document.getElementById('add_exception')) {
         $('#add_exception').off('click.ae_c');
         $('#add_exception').off('mouseover.ae_mo');
@@ -1502,6 +1646,33 @@ var RG = (function() {
         });
       }
     },
+
+    // PR added
+    _addShiftKeyEvents: function (row) {
+      $(row).click(function(e) {
+        if (e.shiftKey || e.altKey) {
+          var thisEl;
+          //cjeck if there are already words in ohter columns selected..
+          var thisColumnId=$(e.target).parents("div").attr("id");
+          var prevSelected=$(".regselected")
+          $.each(prevSelected, function (i, selected) {
+            if ($(selected).parents("div").attr("id")!=thisColumnId) {
+              $(selected).removeClass("regselected");
+            }
+          })
+          if ($(e.target).hasClass("spanlike")) {
+            thisEl=$(e.target).closest("td").next("td").children("div")[0];
+          } else {
+            thisEl=$(e.target)[0];
+          }
+          if ($(thisEl).hasClass("regselected")) {
+            $(thisEl).removeClass("regselected");
+          }
+        else $(thisEl).addClass("regselected");
+        }
+      });
+    },
+    // end PR
 
     /* not currently used but can be useful in debugging */
     _showCollationTable: function(data, context, container) {
