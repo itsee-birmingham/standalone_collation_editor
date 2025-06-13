@@ -263,7 +263,7 @@ tr.deleted {
     color: red;
 }
 
-div.regselected {
+div.selected_reg_word {
 	color: green;
 }
 

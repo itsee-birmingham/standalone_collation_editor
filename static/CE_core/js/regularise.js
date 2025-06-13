@@ -431,7 +431,7 @@ var RG = (function() {
         row = document.getElementById(eventRows[i]);
         if (row !== null) {
           CL.addHoverEvents(row);
-          RG._addShiftKeyEvents(row); // PR added
+          RG._addMultipleSelectionEvents(row);
         }
       }
       const unitEvents = temp[3];
@@ -440,7 +440,7 @@ var RG = (function() {
           row = document.getElementById(key);
           if (row) {
             CL.addHoverEvents(row, unitEvents[key]);
-            RG._addShiftKeyEvents(row); // PR added
+            RG._addMultipleSelectionEvents(row);
           }
         }
       }
@@ -478,18 +478,18 @@ var RG = (function() {
       let url2=staticUrl + 'CE_core/images/allchecked.png';
       if ($(element).attr("src") == url1) {
       $(element).attr("src", url2)
-      $(".regselected").removeClass("regselected");
+      $(".selected_reg_word").removeClass("selected_reg_word");
       $.each(rows, function(i, row){
         if (i==0) return;
         if ($(row).hasClass("top")) return;
         if ($($(row).children("td")[1]).hasClass("gap")) return;
         if ($($(row).find("div")[1]).hasClass("regularised")) return;
         if ($(row).children("td").length==1) return;
-        $($(row).find("div")[1]).addClass("regselected");
+        $($(row).find("div")[1]).addClass("selected_reg_word");
       });
       } else {
       $(element).attr("src", url1)
-      $(".regselected").removeClass("regselected");
+      $(".selected_reg_word").removeClass("selected_reg_word");
       }
     },
     //End PR addition
@@ -1093,53 +1093,22 @@ var RG = (function() {
 
     _redipsInitRegularise: function(id) {
       let clone, original, wordId, normalisedForm, normalisedText, unitData, unit, reading, word, witnesses,
-          originalText, originalDisplayText, createFunction;
+          originalText, originalDisplayText, createFunction, variantUnit, collectedWitnesses;
       const rd = REDIPS.drag;
       rd.init(id);
       rd.event.dropped = function() {
-
-        //adapted by PR May 2019 to do multiple regularizations selected by shift and click
-        //
-        var selreg=$(".regselected");
-        var thisColumnId=$(rd.td.target.childNodes[0]).parents("div").attr("id");
-        var target=$(rd.td.target.childNodes[0]).attr("id");
-        //we leave the original code as is, duplicating for all selected
-        // rd.obj.id might be for the child (endding with c0) or the parent (withut the co). Both must go
-
-        for (var i=0; i<selreg.length; i++) {
-          if ($(selreg[i]).parents("div").attr("id")!=thisColumnId) {
-          $(selreg[i]).removeClass("regselected");
-          selreg.splice(i, 1);
-          i--;
-          } else if ($(selreg[i]).attr("id")==rd.obj.id || $(selreg[i]).attr("id")+"c0"==rd.obj.id || $(selreg[i]).attr("id")== rd.obj.id.slice(0,-2) || target==$(selreg[i]).attr("id")) {
-            selreg.splice(i, 1);
-            i--;
-          }
-        }
-        for (var i=0; i<selreg.length; i++ ) { //get the data...
-          selreg[i].objOld={id:$(selreg[i]).attr("id")};
-          console.log("objold "+selreg[i].objOld);
-          selreg[i].unit_data=$(selreg[i]).attr("id");
-          selreg[i].original=$(selreg[i]).attr("id");
-          selreg[i].unit = parseInt(selreg[i].unit_data.substring(0, selreg[i].unit_data.indexOf('_r')).replace('variant_unit_', ''), 10);
-          selreg[i].reading = parseInt(selreg[i].unit_data.substring(selreg[i].unit_data.indexOf('_r') + 2, selreg[i].unit_data.indexOf('_w')), 10);
-          selreg[i].word = parseInt(selreg[i].unit_data.substring(selreg[i].unit_data.indexOf('_w') + 2), 10);
-          selreg[i].witnesses = CL.data.apparatus[selreg[i].unit].readings[selreg[i].reading].witnesses;
-          selreg[i].original_text = CL.data.apparatus[selreg[i].unit].readings[selreg[i].reading].text[selreg[i].word];
-        }
-        //end PR additions
-
-
+        collectedWitnesses = [];
         clone = document.getElementById(rd.obj.id);
         original = document.getElementById(rd.objOld.id);
         wordId = rd.objOld.id;
         normalisedForm = rd.td.target.childNodes[0];
-        //if we are normalising to a typed in value
+        variantUnit = $(rd.td.target).closest('table')[0];
+        // if we are normalising to a typed in value
         if (normalisedForm.tagName === 'INPUT') {
           normalisedText = normalisedForm.value.trim();
-          if (/^\s*$/.test(normalisedText) === false) { //it there is at least one non-space character
-            if (/^\S+\s\S/.test(normalisedText) === true) { // if there are two or more strings separated by a space
-              //you have typed a space into the box with is not allowed, regularisation is single token to single token only!
+          if (/^\s*$/.test(normalisedText) === false) {  // it there is at least one non-space character
+            if (/^\S+\s\S/.test(normalisedText) === true) {  // if there are two or more strings separated by a space
+              // you have typed a space into the box with is not allowed, regularisation is single token to single token only!
               if (clone.parentNode !== null) {
                 clone.parentNode.removeChild(clone);
               }
@@ -1158,7 +1127,7 @@ var RG = (function() {
             }
             return;
           }
-        } else { // we are normalising to an existing value
+        } else {  // we are normalising to an existing value
           normalisedText = normalisedForm.childNodes[0].textContent;
         }
         normalisedText = CL.project.prepareNormalisedString(normalisedText);
@@ -1166,32 +1135,51 @@ var RG = (function() {
         if (clone.parentNode !== null) {
           clone.parentNode.removeChild(clone);
         }
-        unitData = rd.objOld.id;
-        // get the unit, reading and word data to lookup stuff in data structure
-        unit = parseInt(unitData.substring(0, unitData.indexOf('_r')).replace('variant_unit_', ''), 10);
-        reading = parseInt(unitData.substring(unitData.indexOf('_r') + 2, unitData.indexOf('_w')), 10);
-        word = parseInt(unitData.substring(unitData.indexOf('_w') + 2), 10);
-        if (CL.witnessAddingMode !== true) {
-          witnesses = CL.data.apparatus[unit].readings[reading].witnesses;
-        } else {
-          witnesses = CL.data.apparatus[unit].readings[reading].witnesses.filter(x => CL.witnessesAdded.includes(x));
-        }
-        originalText = CL.data.apparatus[unit].readings[reading].text[word];
-        originalDisplayText = CL.data.apparatus[unit].readings[reading].text[word]['interface'];
-
-        //more PR stuff
-        if (selreg.length>0) {
-          for (var i=0; i<selreg.length; i++) {
-          originalDisplayText += " "+CL.data.apparatus[selreg[i].unit].readings[selreg[i].reading].text[selreg[i].word]['interface'];
+        // get any selected words from this unit, if there are any then we use these alone, if none then just use the word at original
+        const selectedWords = $('#' + variantUnit.id + ' *.selected_reg_word');
+        for (let i = 0; i < selectedWords.length; i += 1 ) {
+          selectedWords[i].objOld={id:$(selectedWords[i]).attr("id")};
+          selectedWords[i].unit_data=$(selectedWords[i]).attr("id");
+          selectedWords[i].original=$(selectedWords[i]).attr("id");
+          selectedWords[i].unit = parseInt(selectedWords[i].unit_data.substring(0, selectedWords[i].unit_data.indexOf('_r')).replace('variant_unit_', ''), 10);
+          selectedWords[i].reading = parseInt(selectedWords[i].unit_data.substring(selectedWords[i].unit_data.indexOf('_r') + 2, selectedWords[i].unit_data.indexOf('_w')), 10);
+          selectedWords[i].word = parseInt(selectedWords[i].unit_data.substring(selectedWords[i].unit_data.indexOf('_w') + 2), 10);
+          selectedWords[i].original_text = CL.data.apparatus[selectedWords[i].unit].readings[selectedWords[i].reading].text[selectedWords[i].word];
+          if (CL.witnessAddingMode !== true) {
+            selectedWords[i].witnesses = CL.data.apparatus[selectedWords[i].unit].readings[selectedWords[i].reading].witnesses;
+          } else {
+            selectedWords[i].witnesses = CL.data.apparatus[selectedWords[i].unit].readings[selectedWords[i].reading].witnesses.filter(x => CL.witnessesAdded.includes(x));
           }
+          collectedWitnesses.push.apply(collectedWitnesses, selectedWords[i].witnesses);
         }
-        //end PR stuff
 
-
+        unitData = rd.objOld.id;
+        unit = parseInt(unitData.substring(0, unitData.indexOf('_r')).replace('variant_unit_', ''), 10);
+        
+        if (selectedWords.length > 0) {
+          let originalWords = []
+          for (let i = 0; i < selectedWords.length; i += 1) {
+            originalWords.push(CL.data.apparatus[selectedWords[i].unit].readings[selectedWords[i].reading].text[selectedWords[i].word]['interface']);
+          }
+          originalDisplayText = originalWords.join(', ');
+        } else {
+          // get the unit, reading and word data to lookup stuff in data structure
+          reading = parseInt(unitData.substring(unitData.indexOf('_r') + 2, unitData.indexOf('_w')), 10);
+          word = parseInt(unitData.substring(unitData.indexOf('_w') + 2), 10);
+          if (CL.witnessAddingMode !== true) {
+            witnesses = CL.data.apparatus[unit].readings[reading].witnesses;
+          } else {
+            witnesses = CL.data.apparatus[unit].readings[reading].witnesses.filter(x => CL.witnessesAdded.includes(x));
+          }
+          originalText = CL.data.apparatus[unit].readings[reading].text[word];
+          originalDisplayText = CL.data.apparatus[unit].readings[reading].text[word]['interface'];
+          collectedWitnesses.push.apply(collectedWitnesses, witnesses)
+        }
 
         if (document.getElementById('reg_form') !== null) {
           document.getElementsByTagName('body')[0].removeChild(document.getElementById('reg_form'));
         }
+        // function to create the rules - triggered from the form
         createFunction = function() {
           let newUnit, newReading, newWitnesses, suffix;
           // create the rule
@@ -1205,40 +1193,45 @@ var RG = (function() {
             data['class'] = 'none';
           }
           CL.services.getUserInfo(function(user) {
-            _rules[wordId] = RG._createRule(data, user, originalText, normalisedText, unit, reading, word, witnesses);
-            // More PR - not marked in his version (commented out line is also in his version commented out)
-            for (var i=0; i<selreg.length; i++) {
-              _rules[selreg[i].objOld.id] = RG._createRule(data, user, selreg[i].original_text, normalisedText, selreg[i].unit, selreg[i].reading, selreg[i].word, selreg[i].witnesses);
-              //  RG._rules.push.apply(RG._rules, RG.create_rule(data, user, selreg[i].original_text, normalised_text, selreg[i].unit, selreg[i].reading, selreg[i].word, selreg[i].witnesses));
-		         }
-             // end PR
+            if (selectedWords.length > 0) {
+              for (let i = 0; i < selectedWords.length; i += 1) {
+                _rules[selectedWords[i].objOld.id] = RG._createRule(
+                  data,
+                  user,
+                  selectedWords[i].original_text,
+                  normalisedText,
+                  selectedWords[i].unit,
+                  selectedWords[i].reading,
+                  selectedWords[i].word,
+                  selectedWords[i].witnesses
+                );
+              }
+            } else {
+              _rules[wordId] = RG._createRule(data, user, originalText, normalisedText, unit, reading, word, witnesses);
+            }
           });
           document.getElementsByTagName('body')[0].removeChild(document.getElementById('reg_form'));
           rd.enableDrag(false, rd.objOld);
           $(original).addClass('regularisation_staged');
           $(original.parentNode).addClass('redips-mark');
-
-          //More from PR
-	        if ($(original).hasClass("regselected")) $(original).removeClass("regselected");
-          for (var i=0; i<selreg.length; i++) {
-            $(selreg[i]).removeClass('regselected');
-            $(selreg[i]).addClass('regularisation_staged');
-            $(selreg[i].parentNode).addClass('mark');
+	        if ($(original).hasClass('selected_reg_word')) {
+            $(original).removeClass('selected_reg_word');
+          }
+          for (let i = 0; i < selectedWords.length; i += 1) {
+            $(selectedWords[i]).removeClass('selected_reg_word');
+            $(selectedWords[i]).addClass('regularisation_staged');
+            $(selectedWords[i].parentNode).addClass('mark');
           };
-          //end PR
-
 
           // add witnesses to normalised form in data structure
           const newUnitData = rd.td.target.firstChild.id;
-          if (newUnitData !== '') { //only try this if it is not a user added reading
+          if (newUnitData !== '') {  // only try this if it is not a user added reading
             newUnit = parseInt(newUnitData.substring(0, newUnitData.indexOf('_r')).replace('variant_unit_', ''), 10);
             newReading = parseInt(newUnitData.substring(newUnitData.indexOf('_r') + 2, newUnitData.indexOf('_w')), 10);
             if (CL.witnessAddingMode !== true) {
-              // TODO: check this isn't causing problems by not eliminating suffixes.
-              newWitnesses = CL.getReadingWitnesses(CL.data.apparatus[unit].readings[reading]);
+              newWitnesses = collectedWitnesses;
             } else {
-              // TODO: check this isn't causing problems by not eliminating suffixes.
-              newWitnesses = CL.getReadingWitnesses(CL.data.apparatus[unit].readings[reading]).filter(x => CL.witnessesAdded.includes(x));
+              newWitnesses = collectedWitnesses.filter(x => CL.witnessesAdded.includes(x));
             }
             if (Object.prototype.hasOwnProperty.call(CL.project, 'id')) {
               for (let i = 0; i < newWitnesses.length; i += 1) {
@@ -1247,7 +1240,7 @@ var RG = (function() {
               }
             }
           }
-        };
+        };  // end of createFunction
         $.get(staticUrl + 'CE_core/html_fragments/rule_menu.html', function(html) {
           let selected;
           const regMenu = document.createElement('div');
@@ -1649,32 +1642,31 @@ var RG = (function() {
       }
     },
 
-    // PR added
-    _addShiftKeyEvents: function (row) {
+    _addMultipleSelectionEvents: function (row) {
       $(row).click(function(e) {
         if (e.shiftKey || e.altKey) {
-          var thisEl;
-          //cjeck if there are already words in ohter columns selected..
-          var thisColumnId=$(e.target).parents("div").attr("id");
-          var prevSelected=$(".regselected")
+          let elem;
+          //check if there are already words in other variant units selected and remove them.
+          const thisVariantUnitId = $(e.target).parents('div').attr('id');
+          const prevSelected = $('.selected_reg_word');
           $.each(prevSelected, function (i, selected) {
-            if ($(selected).parents("div").attr("id")!=thisColumnId) {
-              $(selected).removeClass("regselected");
+            if ($(selected).parents('div').attr('id') != thisVariantUnitId) {
+              $(selected).removeClass('selected_reg_word');
             }
           })
-          if ($(e.target).hasClass("spanlike")) {
-            thisEl=$(e.target).closest("td").next("td").children("div")[0];
+          if ($(e.target).hasClass('spanlike')) {
+            elem = $(e.target).closest('td').next('td').children('div')[0];
           } else {
-            thisEl=$(e.target)[0];
+            elem = $(e.target)[0];
           }
-          if ($(thisEl).hasClass("regselected")) {
-            $(thisEl).removeClass("regselected");
+          if ($(elem).hasClass('selected_reg_word')) {
+            $(elem).removeClass('selected_reg_word');
+          } else {
+            $(elem).addClass('selected_reg_word');
           }
-        else $(thisEl).addClass("regselected");
         }
       });
     },
-    // end PR
 
     /* not currently used but can be useful in debugging */
     _showCollationTable: function(data, context, container) {
