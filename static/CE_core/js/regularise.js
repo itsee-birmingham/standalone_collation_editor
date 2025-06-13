@@ -10,6 +10,7 @@ var RG = (function() {
 
   return {
 
+    _allDeletableRules: {},
     showRegularisations: false,
 
     getCollationData: function(output, scrollOffset, callback) {
@@ -212,6 +213,12 @@ var RG = (function() {
               }
             }
             cells.push('</td>');
+          }
+          if (deletableRules) {
+            if (!Object.prototype.hasOwnProperty.call(RG._allDeletableRules, id)) {
+              RG._allDeletableRules[id] = {};
+            }
+            RG._allDeletableRules[id] = Object.assign(RG._allDeletableRules[id], deletableRules);
           }
         }
         cells.push('</tr>');
@@ -525,7 +532,7 @@ var RG = (function() {
             highlighted = 'highlighted ';
           }
           subrowId = rowIdBase + '_rule_' + key;
-          ruleCells.push('<tr class="' + regClass + highlighted + '" id="' + subrowId + '"><td>');
+          ruleCells.push('<tr class="' + regClass + highlighted + '" id="' + subrowId + '"><td id="' + key + '">');
           if (rules[key].witnesses.indexOf(highlightedHand) !== -1) {
             ruleCells.push('<div class="spanlike">');
           }
@@ -1367,9 +1374,8 @@ var RG = (function() {
 
     _makeMenu: function(menuName) {
       if (menuName === 'regularised') {
-        // PR added menu options
-        document.getElementById('context_menu').innerHTML = '<li id="delete_rule"><span>Delete rule</span></li><li id="delete_all_reg"><span>Delete for all wit</span></li>';
-    //  document.getElementById('context_menu').innerHTML = '<li id="delete_rule"><span>Delete rule</span></li>';
+        document.getElementById('context_menu').innerHTML = '<li id="delete_rule"><span>Delete rule</span></li>' +
+                                                            '<li id="delete_variant_unit_rules"><span>Delete rule for all witnesses</span></li>';
       }
       if (menuName === 'regularised_global') {
         document.getElementById('context_menu').innerHTML = '<li id="add_exception"><span>Add exception</span></li>' +
@@ -1497,34 +1503,16 @@ var RG = (function() {
     },
 
     _scheduleRuleDeletion: function(element) {
-      let i, j, ruleType, witnessData, ok;
       if (element === undefined) {
         element = SimpleContextMenu._target_element;
       }
       const row = RG._getAncestorRow(element);
       const unitNum = row.id.substring(row.id.indexOf('_unit_') + 6, row.id.indexOf('_row_'));
-      const rowNum = row.id.substring(row.id.indexOf('_row_') + 5, row.id.indexOf('_word_'));
-      const wordNum = row.id.substring(row.id.indexOf('_word_') + 6, row.id.indexOf('_rule_'));
       const ruleId = row.id.substring(row.id.indexOf('_rule_') + 6);
-      const wordData = CL.data.apparatus[unitNum].readings[rowNum].text[wordNum];
-      const witnesses = wordData.reading;
-      ruleType = null;
-      i = 0;
-      while (i < witnesses.length && ruleType === null) {
-        witnessData = wordData[witnesses[i]];
-        if (Object.prototype.hasOwnProperty.call(witnessData, 'decision_details')) {
-          j = 0;
-          while (j < witnessData.decision_details.length && ruleType === null) {
-            if (ruleId === witnessData.decision_details[j].id) {
-              ruleType = witnessData.decision_details[j].scope;
-            }
-            j += 1;
-          }
-        }
-        i += 1;
-      }
+      const rule = RG._allDeletableRules[unitNum][ruleId];
+      const ruleType = rule.scope;
       if (ruleType === 'always') {
-        ok = confirm('You are asking to delete a global rule.\nDeleting this rule will mean it is deleted everywhere ' +
+        const ok = confirm('You are asking to delete a global rule.\nDeleting this rule will mean it is deleted everywhere ' +
                      'in your project for all editors.\nIf you just want the rule to be ignored in this verse you can ' +
                      'add an exception.\nAre you sure you want to delete this rule?');
         if (ok) {
@@ -1545,51 +1533,31 @@ var RG = (function() {
       }
     },
 
-    // PR - this one added by Peter
-    // need to discuss his handling of global rules - maybe this could just go in his services file as it related
-    // to his footer button.
-    _scheduleAllRuleDeletion: function() { 
-      var i, j, element, row, ruleId, unitNum, rowNum, wordNum, ruleType, wordData, key, witnessData, witnesses, x, ok;
-      element = SimpleContextMenu._target_element;
-      row = RG._getAncestorRow(element);
-      unitNum = row.id.substring(row.id.indexOf('_unit_') + 6, row.id.indexOf('_row_'));
-      rowNum = row.id.substring(row.id.indexOf('_row_') + 5, row.id.indexOf('_word_'));
-      wordNum = row.id.substring(row.id.indexOf('_word_') + 6, row.id.indexOf('_rule_'));
-      ruleId = row.id.substring(row.id.indexOf('_rule_') + 6);
-      wordData = CL.data.apparatus[unitNum].readings[rowNum].text[wordNum];
-      witnesses = wordData.reading;
-      ruleType = null;
-      i = 0;
-      while (i < witnesses.length && ruleType === null) {
-        witnessData = wordData[witnesses[i]];
-        if (witnessData.hasOwnProperty('decision_details')) {
-          j = 0;
-          while (j < witnessData.decision_details.length && ruleType === null) {
-            if (ruleId === witnessData.decision_details[j].id) {
-              ruleType = witnessData.decision_details[j].scope;
-            }
-            j += 1;
-          }
-        }
-        i += 1;
-      }
-      ok = confirm('You are asking to delete all regularizations of "'+witnessData.decision_details[0].t+'" to "'+witnessData.decision_details[0].n+'".\nAre you sure you want to delete this regularization in all witnesses in this block?')
+    _scheduleAllRuleDeletion: function() {
+      /* schedule the deletion of all rules in the unit which match the n, t and scope of the clicked rule */
+      const element = SimpleContextMenu._target_element;
+      const row = RG._getAncestorRow(element);
+      const unitNum = row.id.substring(row.id.indexOf('_unit_') + 6, row.id.indexOf('_row_'));
+      const ruleId = row.id.substring(row.id.indexOf('_rule_') + 6);
+      const rule = RG._allDeletableRules[unitNum][ruleId];
+      const ok = confirm(
+        'You are asking to delete all regularisations of "' + rule.t + '" to "' + rule.n + '".\n' +
+        'Are you sure you want to delete this regularisation in all witnesses in this variant unit?'
+      );
       if (ok) {
-        //right .. cruise through all the rows. warning: this uses the html structure to get information; change the html, this fails
-        var parent =$(row).parent();
-        var children=$(parent).children()
-        for (var i=0; i<children.length; i++) {
-        var child=children[i];
-        if ($(child).text().trim()==witnessData.decision_details[0].t+"  ▶  "+witnessData.decision_details[0].n) {
-          $(child).addClass('deleted');
-          _forDeletion.push({id : $(child).attr("id").slice($(child).attr("id").indexOf("verse_")), scope : "once" });
-        }
+        // find all the rules we need to delete
+        for (let key in RG._allDeletableRules[unitNum]) {
+          if (RG._allDeletableRules[unitNum][key].n === rule.n &&
+              RG._allDeletableRules[unitNum][key].t === rule.t &&
+              RG._allDeletableRules[unitNum][key].scope === rule.scope) {
+            $('#' + key).closest('tr').addClass('deleted');
+            _forDeletion.push({id: key, scope: rule.scope});
+          }
         }
       } else {
         return;
       }
     },
-    // end PR
 
     _addContextMenuHandlers: function() {
       if (document.getElementById('delete_rule')) {
@@ -1602,14 +1570,12 @@ var RG = (function() {
           CL.hideTooltip();
         });
       }
-      //PR addition here
-      if (document.getElementById('delete_all_reg')) {
-        $('#delete_all_reg').off('click.dar_c');
-        $('#delete_all_reg').off('mouseover.dar_mo');
-        $('#delete_all_reg').on('click.dar_c', function() {RG._scheduleAllRuleDeletion();});
-        $('#delete_all_reg').on('mouseover.dar_mo', function() {CL.hideTooltip();});
+      if (document.getElementById('delete_variant_unit_rules')) {
+        $('#delete_variant_unit_rules').off('click.dar_c');
+        $('#delete_variant_unit_rules').off('mouseover.dar_mo');
+        $('#delete_variant_unit_rules').on('click.dar_c', function() {RG._scheduleAllRuleDeletion();});
+        $('#delete_variant_unit_rules').on('mouseover.dar_mo', function() {CL.hideTooltip();});
       }
-      // end PR 
       if (document.getElementById('add_exception')) {
         $('#add_exception').off('click.ae_c');
         $('#add_exception').off('mouseover.ae_mo');
