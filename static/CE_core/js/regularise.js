@@ -184,11 +184,7 @@ var RG = (function() {
               keysToSort = ruleCells[0];
               cellsDict = ruleCells[1];
               events = ruleCells[2];
-              if (Object.keys(deletableRules).length > 1) {
-                cells.push('<table><tbody id="' + rowIdBase + '_selectable' + '" class="selectable selectable-container">');
-              } else {
-                cells.push('<table><tbody>');
-              }
+              cells.push('<table><tbody>');
               keysToSort = CL.sortWitnesses(keysToSort);
               for (let k = 0; k < keysToSort.length; k += 1) {
                 if (Object.prototype.hasOwnProperty.call(cellsDict, keysToSort[k])) {
@@ -197,7 +193,7 @@ var RG = (function() {
               }
               cells.push('</tbody></table>');
               if (Object.keys(nonDeletableRules).length > 1) {
-                cells.push('<table class="unselectable"><tbody>');
+                cells.push('<table><tbody>');
                 ruleCells = RG._getRulesForDisplay(nonDeletableRules, events, false, highlightedHand, rowIdBase);
                 keysToSort = ruleCells[0];
                 cellsDict = ruleCells[1];
@@ -282,7 +278,7 @@ var RG = (function() {
       options.sort = true;
       SimpleContextMenu.setup({'preventDefault': true, 'preventForms': false});
       if (CL.witnessEditingMode === false || CL.witnessAddingMode === true) {
-        SimpleContextMenu.attach('ui-selected', function() {
+        SimpleContextMenu.attach('selected_rule', function() {
           return RG._makeMenu('group_delete');
         });
         SimpleContextMenu.attach('regularised', function() {
@@ -478,7 +474,7 @@ var RG = (function() {
       });
     },
 
-    //PR added this so we can select all the regularizations at this point
+    //PR added this so we can select all the regularisable readings at this point
     doSelectAll: function(element) {
       var rows=$($(element).parents("table")[0]).find("tr");
       let url1=staticUrl + 'CE_core/images/checkall.png';
@@ -512,7 +508,7 @@ var RG = (function() {
             if (rules[key].scope === 'always') {
               regClass = 'regularised_global ';
             } else {
-              regClass = 'ui-selectable regularised ';
+              regClass = 'deletable_rule regularised ';
             }
             if (RG._hasDeletionScheduled(key)) {
               regClass += 'deleted ';
@@ -557,24 +553,55 @@ var RG = (function() {
     },
 
     _addMultiSelectionFunctions: function () {
-      const selectableContainers = [];
-      const selectables = [];
-      $('.selectable-container').each(function () {
-        selectableContainers.push(this);
-        selectables.push(new Selectable({
-          filter: this.querySelectorAll('.ui-selectable'),
-          appendTo: this,
-          toggle: true
-        }));
+      // NB: in this function we need to add and remove the regularised class because of how the context menus are attached
+      $('.deletable_rule').on('click', function (e) {
+        if (e.shiftKey || e.altKey) {
+          // check if there are already words in other variant units selected and remove them.
+          const thisVariantUnitId = $(e.target).parents('div').attr('id');
+          const prevSelected = $('.selected_rule');
+          $.each(prevSelected, function (i, selected) {
+            if ($(selected).parents('div').attr('id') != thisVariantUnitId) {
+              $(selected).removeClass('selected_rule');
+              $(selected).addClass('regularised');
+            }
+          })
+          const tr = $(e.target).closest('tr');
+          if ($(tr).hasClass('selected_rule')) {
+            // we are deselecting this so remove the colour and add regularised
+            $(tr).removeClass('selected_rule');
+            $(tr).addClass('regularised');
+          } else {
+            $(tr).addClass('selected_rule');
+            $(tr).removeClass('regularised');
+          }
+        }
       });
-      for (let i = 0; i < selectables.length; i += 1) {
-        selectables[i].on('selecteditem', function(item) {
-          $(item.node).removeClass('regularised');
-        });
-        selectables[i].on('deselecteditem', function(item) {
-          $(item.node).addClass('regularised');
-        });
-      }
+    },
+
+    _addMultipleSelectionEvents: function (row) {
+      $(row).click(function(e) {
+        if (e.shiftKey || e.altKey) {
+          let elem;
+          // check if there are already words in other variant units selected and remove them.
+          const thisVariantUnitId = $(e.target).parents('div').attr('id');
+          const prevSelected = $('.selected_reg_word');
+          $.each(prevSelected, function (i, selected) {
+            if ($(selected).parents('div').attr('id') != thisVariantUnitId) {
+              $(selected).removeClass('selected_reg_word');
+            }
+          })
+          if ($(e.target).hasClass('spanlike')) {
+            elem = $(e.target).closest('td').next('td').children('div')[0];
+          } else {
+            elem = $(e.target)[0];
+          }
+          if ($(elem).hasClass('selected_reg_word')) {
+            $(elem).removeClass('selected_reg_word');
+          } else {
+            $(elem).addClass('selected_reg_word');
+          }
+        }
+      });
     },
 
     /** highlight a witness that has been added or highlight all added witnesses with 'all' 
@@ -1495,10 +1522,10 @@ var RG = (function() {
       row = RG._getAncestorRow(element);
       tbody = row.parentNode;
       selectableId = tbody.id;
-      $('#' + selectableId + ' > tr.ui-selected').each(function () {
+      $('tr.selected_rule').each(function () {
         RG._scheduleRuleDeletion(this);
         // remove the class so it is not selected again if we delete more
-        $(this).removeClass('ui-selected');
+        $(this).removeClass('selected_rule');
       });
     },
 
@@ -1606,32 +1633,6 @@ var RG = (function() {
           CL.hideTooltip();
         });
       }
-    },
-
-    _addMultipleSelectionEvents: function (row) {
-      $(row).click(function(e) {
-        if (e.shiftKey || e.altKey) {
-          let elem;
-          //check if there are already words in other variant units selected and remove them.
-          const thisVariantUnitId = $(e.target).parents('div').attr('id');
-          const prevSelected = $('.selected_reg_word');
-          $.each(prevSelected, function (i, selected) {
-            if ($(selected).parents('div').attr('id') != thisVariantUnitId) {
-              $(selected).removeClass('selected_reg_word');
-            }
-          })
-          if ($(e.target).hasClass('spanlike')) {
-            elem = $(e.target).closest('td').next('td').children('div')[0];
-          } else {
-            elem = $(e.target)[0];
-          }
-          if ($(elem).hasClass('selected_reg_word')) {
-            $(elem).removeClass('selected_reg_word');
-          } else {
-            $(elem).addClass('selected_reg_word');
-          }
-        }
-      });
     },
 
     /* not currently used but can be useful in debugging */

@@ -20,16 +20,8 @@ form {
     padding: 7px;
 }
 
-tr.ui-selected  {
+tr.selected_rule  {
   color: salmon;
-}
-
-tr.ui-unselecting {
-  color: gray;
-}
-
-tr.ui-selecting  {
-  background: darkgray;
 }
 
 td.nav {
@@ -39,7 +31,6 @@ td.nav {
 div#drag {
 	padding: 0px 0px 0px 0px;
 }
-
 
 div#message_panel {
 	float: left;
