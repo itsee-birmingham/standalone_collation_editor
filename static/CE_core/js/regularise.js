@@ -417,7 +417,7 @@ var RG = (function() {
           i += 1;
         }
       }
-      RG._addMultiSelectionFunctions();
+      RG._addMultipleRuleDeletionEvents();
   
       $('#highlighted').on('change', function(event) {
         RG._highlightWitness(event.target.value);
@@ -434,7 +434,7 @@ var RG = (function() {
         row = document.getElementById(eventRows[i]);
         if (row !== null) {
           CL.addHoverEvents(row);
-          RG._addMultipleSelectionEvents(row);
+          RG._addMultipleWordSelectionEvents(row);
         }
       }
       const unitEvents = temp[3];
@@ -443,7 +443,7 @@ var RG = (function() {
           row = document.getElementById(key);
           if (row) {
             CL.addHoverEvents(row, unitEvents[key]);
-            RG._addMultipleSelectionEvents(row);
+            RG._addMultipleWordSelectionEvents(row);
           }
         }
       }
@@ -552,7 +552,7 @@ var RG = (function() {
       return [keysToSort, cellsDict, events];
     },
 
-    _addMultiSelectionFunctions: function () {
+    _addMultipleRuleDeletionEvents: function () {
       // NB: in this function we need to add and remove the regularised class because of how the context menus are attached
       $('.deletable_rule').on('click', function (e) {
         if (e.shiftKey || e.altKey) {
@@ -578,7 +578,7 @@ var RG = (function() {
       });
     },
 
-    _addMultipleSelectionEvents: function (row) {
+    _addMultipleWordSelectionEvents: function (row) {
       $(row).click(function(e) {
         if (e.shiftKey || e.altKey) {
           let elem;
