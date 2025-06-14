@@ -1,5 +1,5 @@
 /* exported RG */
-/* global CL, SV, SR, spinner, cforms, SimpleContextMenu, staticUrl, Selectable, drag, REDIPS */
+/* global CL, SV, SR, spinner, cforms, SimpleContextMenu, staticUrl, drag, REDIPS */
 var RG = (function() {
 
 
@@ -1517,11 +1517,6 @@ var RG = (function() {
     },
 
     _scheduleSelectedRulesDeletion: function () {
-      var element, row, tbody, selectableId;
-      element = SimpleContextMenu._target_element;
-      row = RG._getAncestorRow(element);
-      tbody = row.parentNode;
-      selectableId = tbody.id;
       $('tr.selected_rule').each(function () {
         RG._scheduleRuleDeletion(this);
         // remove the class so it is not selected again if we delete more
