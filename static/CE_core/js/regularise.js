@@ -64,12 +64,11 @@ var RG = (function() {
         rowId = 'variant_unit_' + id + '_row_' + i;
         rowList.push(rowId);
         if (i === 0) {
-          // cells.push('<tr><td class="redips-mark" colspan="MX_LN"><span id="toggle_variant_' + id +
-          //           '" class="triangle">&#9650;</span></td></tr>');
-          cells.push('<tr><td class="mark" colspan="MX_LN"><img onclick="RG.doSelectAll(this)" id="'+i+
-                     '" class="selectall" src="'+staticUrl+'CE_core/images/checkall.png" height="16px">' +
-                     '<span id="toggle_variant_' + id + '" class="triangle">&#9650;</span></td></tr>');
-
+            cells.push('<tr><td class="redips-mark" colspan="MX_LN">');
+            if (CL.project.showSelectAllVariantsOption === true) {
+              cells.push('<img class="select_all" src="' + staticUrl + 'CE_core/images/checkall.png" height="16px">');
+            }
+            cells.push('<span id="toggle_variant_' + id + '" class="triangle">&#9650;</span></td></tr>');
         }
         classes = [];
         if (i === 0) {
@@ -437,6 +436,11 @@ var RG = (function() {
           RG._addMultipleWordSelectionEvents(row);
         }
       }
+      if (CL.project.showSelectAllVariantsOption === true) {
+        $('.select_all').on('click', function (event) {
+          RG._doSelectAll(event.target);
+        });
+      }
       const unitEvents = temp[3];
       for (const key in unitEvents) {
         if (Object.prototype.hasOwnProperty.call(unitEvents, key)) {
@@ -474,28 +478,17 @@ var RG = (function() {
       });
     },
 
-    //PR added this so we can select all the regularisable readings at this point
-    doSelectAll: function(element) {
-      var rows=$($(element).parents("table")[0]).find("tr");
-      let url1=staticUrl + 'CE_core/images/checkall.png';
-      let url2=staticUrl + 'CE_core/images/allchecked.png';
-      if ($(element).attr("src") == url1) {
-      $(element).attr("src", url2)
+    _doSelectAll: function(element) {
+      const variantUnit = $(element).parents('table')[0];
+      const unselectedImage = staticUrl + 'CE_core/images/checkall.png';
+      const selectedImage = staticUrl + 'CE_core/images/allchecked.png';
+      // first reset all the other images to unselected and unselect any selected words
+      $('.select_all').attr('src', unselectedImage);
       $(".selected_reg_word").removeClass("selected_reg_word");
-      $.each(rows, function(i, row){
-        if (i==0) return;
-        if ($(row).hasClass("top")) return;
-        if ($($(row).children("td")[1]).hasClass("gap")) return;
-        if ($($(row).find("div")[1]).hasClass("regularised")) return;
-        if ($(row).children("td").length==1) return;
-        $($(row).find("div")[1]).addClass("selected_reg_word");
-      });
-      } else {
-      $(element).attr("src", url1)
-      $(".selected_reg_word").removeClass("selected_reg_word");
-      }
+      // now change the selected one and select the words
+      $(element).attr('src', selectedImage);
+      $('#' + variantUnit.id + ' .reg_word').addClass("selected_reg_word");
     },
-    //End PR addition
 
     _getRulesForDisplay: function(rules, events, deletable, highlightedHand, rowIdBase) {
       let regClass, highlighted, ruleCells, subrowId;

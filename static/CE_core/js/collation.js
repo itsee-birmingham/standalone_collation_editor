@@ -3222,6 +3222,15 @@ var CL = (function() {
         // default is false
         CL.project.showCollapseAllUnitsButton = false;
       }
+      // setting for selecting all variants words in a unit
+      if (Object.prototype.hasOwnProperty.call(project, 'showSelectAllVariantsOption')) {
+        CL.project.showSelectAllVariantsOption = project.showSelectAllVariantsOption;
+      } else if (Object.prototype.hasOwnProperty.call(CL.services, 'showSelectAllVariantsOption')) {
+        CL.project.showSelectAllVariantsOption = CL.services.showSelectAllVariantsOption;
+      } else {
+        // default is false
+        CL.project.showSelectAllVariantsOption = false;
+      }
       // settings for get apparatus button in approved view
       if (Object.prototype.hasOwnProperty.call(project, 'showGetApparatusButton')) {
         CL.project.showGetApparatusButton = project.showGetApparatusButton;
