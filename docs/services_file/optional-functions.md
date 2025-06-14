@@ -66,7 +66,7 @@ If this function is present in the services file and ```CL.loadIndexPage()``` is
 
 **There is a default in the core code which just sorts the witnesses as strings**
 
-This function is used to sort the witness sigla into the desired order. It is used for the hover overs on the readings and to sort menus that list sigla (such as the highlight witness menu). The function should return the sorted list of sigla.
+This function is used to sort the witness sigla into the desired order. It is used for the hover overs on the readings and to sort menus that list sigla (such as the highlight witness menu). The function should sort the list in place rather than returning the list.
 
 ## ```getWitnessesFromInputForm()```
 

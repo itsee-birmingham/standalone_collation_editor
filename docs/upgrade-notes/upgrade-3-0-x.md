@@ -18,6 +18,7 @@ these should not cause any problems. Any exporters inherting from the core expor
 - Optional services and project setting *allowJoiningAcrossCollationUnits* added which, if set to true, allows readings to be joined across collation unit boundaries. The collation editor itself only sets a flag on the reading to identify the join. It is up to all exporters to respect this in the export. There is no sanity checking on the flags, they rely on the editor being accurate.
 - Optional services and project setting *allowCommentsOnRegRules* added. This is a boolean which determines whether or not to show the comments box in the regularisation rule menu. This also involves a change in the default behaviour which will not show the comments box. To maintain existing beaviour this boolean should be set to true.
 - Optional services and project setting *allowOutOfOrderWitnesses* added along with *witnessesAllowedToBeOutOfOrder*. These settings are explained in the service file documentation. The defaults maintain existing behaviour.
+- Optional services and project setting *showSelectAllVariantsOption* added. This setting is explained in the service file documentation. The default maintains existing behaviour.
 
 ## Additional project only settings
 
@@ -27,6 +28,15 @@ these should not cause any problems. Any exporters inherting from the core expor
 
 - There is a very small change to the way pre-stage checks are implemented. If no message is provided in the configuration of the pre-stagechecks then no alert will be displayed. The result of the check will still be followed so if a test fails the unit will not progress to the next stage. This was done so that confirm boxes can be used in the code of the check itself to use warnings that can be overridden by the user, in these cases it should be the result of the confirmation which is passed back as the results of the checks.
 - The message on a successful save has been changed from 'Save successful' to 'Last saved:' with a time stamp.
+
+## Additions and changes to the regularisation options
+
+There are some additional features in the regularisation screen and a small change to the way rules can be selected for deletion. There is no option to maintain existing behaviour for most of these as they are unobtrusive and users can just not to use them if they are not relevant. Thanks to Peter Robinson for these suggestions and the draft code to implement them.
+
+- When regularising there is now an option to select multiple tokens from the same unit to regularise to the same word. To do this hold down the shift or alt key, click on all the words that should be selected and then drag one of them to the work you want to regularise them to.
+- The way in which multiple rules can be selected for deletion has been changed to match the new function for selecting multiple rules for deletion, to select multiple rules you should now hold down the shift or alt key as they are clicked.
+- There is an additional way to delete regularisation rules which have been applied individually to multiple witnesses. Right clicking on a single rule will bring up the deletion menu which now has an additional option *Delete rule for all witnesses* which will find all of the rules that have the same original form and regularised form and select all of those rules for deletion.
+- There is also an optional setting on the service or project level which adds a button to the top line of each variant unit that selects all of the regularisable tokens in that unit so they can be regularised to the same token in one drag move. This option is explained in the options section above and in the service file documentation.
 
 ## Changes to the exporter
 

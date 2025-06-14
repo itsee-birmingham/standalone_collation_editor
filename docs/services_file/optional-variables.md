@@ -80,6 +80,14 @@ This variable should be an array of strings. If provided the editor will be give
 
 This variable is a boolean which determines whether or not to show the comments text box in the regularisation rule menu. Nothing happens to these comments appart from them being saved along with the rule so the default is false. This setting should only be set to true if the platform using the collation editor has a mecahnism for using these comments in some way.
 
+## ```showSelectAllVariantsOption```
+
+**This variable can be overridden in individual project settings**
+
+**The default is false**
+
+This variable is a boolean which determines whether ot not to show the button to select all variants in the variant unit for regularisation to the same token. This can be useful for texts with large numbers of spelling variants. The collation editor (from v3) also allows multiple selection of tokens by holding shift/alt and clicking on each one, this is an additional option to select them all with a single click.
+
 ## ```allowWitnessChangesInSavedCollations```
 
 **This variable can be overridden in individual project settings**
