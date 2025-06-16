@@ -3567,7 +3567,7 @@ var CL = (function() {
             date = new Date(data[i]._meta._last_modified_time.$date);
           } else if (Object.prototype.hasOwnProperty.call(data[i], 'last_modified_time') && data[i].last_modified_time !== null) {
             date = new Date(data[i].last_modified_time);
-          } else if (Object.prototype.hasOwnProperty.call(data[i], 'last_created_time') && data[i].last_created_time !== null) {
+          } else if (Object.prototype.hasOwnProperty.call(data[i], 'created_time') && data[i].created_time !== null) {
             date = new Date(data[i].created_time);
           }
           if (date !== null) {
@@ -3578,7 +3578,7 @@ var CL = (function() {
             }
             dateString = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + minutes;
           } else {
-            dateString = '';
+            dateString = 'no date available';
           }
 
           if (Object.prototype.hasOwnProperty.call(data[i], 'user')) {
