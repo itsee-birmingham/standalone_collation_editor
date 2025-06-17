@@ -479,15 +479,21 @@ var RG = (function() {
     },
 
     _doSelectAll: function(element) {
+      let currentState = 'unselected';
       const variantUnit = $(element).parents('table')[0];
       const unselectedImage = staticUrl + 'CE_core/images/checkall.png';
       const selectedImage = staticUrl + 'CE_core/images/allchecked.png';
+      if ($(element).attr('src') === selectedImage) {
+        currentState = 'selected';
+      }
       // first reset all the other images to unselected and unselect any selected words
       $('.select_all').attr('src', unselectedImage);
       $(".selected_reg_word").removeClass("selected_reg_word");
-      // now change the selected one and select the words
-      $(element).attr('src', selectedImage);
-      $('#' + variantUnit.id + ' .reg_word').addClass("selected_reg_word");
+      // now change the selected one and select the words or don't if we are unselecting it
+      if (currentState === 'unselected') {
+        $(element).attr('src', selectedImage);
+        $('#' + variantUnit.id + ' .reg_word').addClass("selected_reg_word");
+      }
     },
 
     _getRulesForDisplay: function(rules, events, deletable, highlightedHand, rowIdBase) {
