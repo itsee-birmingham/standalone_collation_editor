@@ -1901,6 +1901,10 @@ var CL = (function() {
               witnessList.push(key);
             }
           }
+          if (witnessList.length === 0) {
+            alert('You must select some of the witnesses.');
+            return;
+          }
           if (data.parent_reading === 'other') {
             //if the reading that is being created is not the same as the a reading when we are in an overlapped reading
             if (readingDetails.app_id === 'apparatus' ||
