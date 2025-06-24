@@ -100,6 +100,9 @@ var OR = (function() {
       SimpleContextMenu.attach('overlap_unit', function() {
         return OR._makeMenu('overlap_unit');
       });
+      SimpleContextMenu.attach('topline_unit', function() {
+        return OR._makeMenu('topline_unit');
+      });
       SimpleContextMenu.attach('reading_label', function() {
         return OR._makeMenu('reading_label');
       });
@@ -155,8 +158,9 @@ var OR = (function() {
       if (Object.prototype.hasOwnProperty.call(CL.project, 'showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
         footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
       }
-      footerHtml.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">' +
-                      showHideSubreadingsButtonText + '</button>');
+      footerHtml.push(
+        '<button class="pure-button left_foot" id="show_hide_subreadings_button">' + showHideSubreadingsButtonText + '</button>'
+      );
       footerHtml.push('<span id="extra_buttons"></span>');
       footerHtml.push('<span id="stage_links"></span>');
 
@@ -275,7 +279,7 @@ var OR = (function() {
       }
       document.getElementById('header').className = 'approved_header';
       container.innerHTML = '<div id="scroller" class="fillPage"><table class="collation_overview">' +
-        html.join('') + '</table></div><div id="single_witness_reading"></div>';
+                            html.join('') + '</table></div><div id="single_witness_reading"></div>';
       CL.expandFillPageClients();
       // sort out footer stuff
       if (CL.showSubreadings === true) {
@@ -287,8 +291,9 @@ var OR = (function() {
       if (Object.prototype.hasOwnProperty.call(CL.project, 'showCollapseAllUnitsButton') && CL.project.showCollapseAllUnitsButton === true) {
         footerHtml.push('<button class="pure-button left_foot" id="expand_collapse_button">collapse all</button>');
       }
-      footerHtml.push('<button class="pure-button left_foot" id="show_hide_subreadings_button">' +
-                      showHideSubreadingsButtonText + '</button>');
+      footerHtml.push(
+        '<button class="pure-button left_foot" id="show_hide_subreadings_button">' + showHideSubreadingsButtonText + '</button>'
+      );
       footerHtml.push('<span id="extra_buttons"></span>');
       footerHtml.push('<span id="stage_links"></span>');
       if (CL.project.showGetApparatusButton === true) {
@@ -363,7 +368,7 @@ var OR = (function() {
                   '<div class="drag_div" id="drag_unit_' + id + '">');
       }
       if (!overlap) {
-        html.push('<table class="variant_unit" id="variant_unit_' + id + '">');
+        html.push('<table class="variant_unit topline_unit" id="variant_unit_' + id + '">');
       } else {
         html.push('<table class="variant_unit overlap_unit" id="variant_unit_' + id + '">');
       }
@@ -1227,7 +1232,10 @@ var OR = (function() {
         document.getElementById('context_menu').innerHTML = menu.join('');
       } else if (menuName === 'overlap_unit') {
         document.getElementById('context_menu').innerHTML = '<li id="move_up"><span>Move unit up</span></li>' +
-                                                            '<li id="move_down"><span>Move unit down</span></li>';
+                                                            '<li id="move_down"><span>Move unit down</span></li>' +
+                                                            '<li id="merge_shared_readings"><span>Merge shared readings</span></li>';
+      } else if (menuName === 'topline_unit') {
+        document.getElementById('context_menu').innerHTML = '<li id="merge_shared_readings"><span>Merge shared readings</span></li>';
       } else if (menuName === 'reading_label') {
         document.getElementById('context_menu').innerHTML = '<li id="edit_label"><span>Edit label</span></li>';
       }
@@ -1612,6 +1620,30 @@ var OR = (function() {
           OR._moveOverlapDown(div);
         });
         $('#move_down').on('mouseover.md_mo', function() {
+          CL.hideTooltip();
+        });
+      }
+      if (document.getElementById('merge_shared_readings')) {
+        $('#merge_shared_readings').off('click.msr_c');
+        $('#merge_shared_readings').off('mouseover.msr_mo');
+        $('#merge_shared_readings').on('click.msr_c', function() {
+          let idString, appId, unitNumber;
+          const element = SimpleContextMenu._target_element;
+          const table = CL.getSpecifiedAncestor(element, 'TABLE');
+          idString = table.id;
+          if (idString.indexOf('_app_') === -1) {
+            appId = 'apparatus';
+            unitNumber = parseInt(idString.substring(idString.indexOf('unit_') + 5));
+          } else {
+            unitNumber = parseInt(idString.substring(idString.indexOf('unit_') + 5, idString.indexOf('_app_')));
+            appId = 'apparatus' + idString.substring(idString.indexOf('_app_') + 5);
+          }
+          SV.prepareForOperation();
+          SV.unsplitUnitWitnesses(unitNumber, appId);
+          SV.unprepareForOperation();
+          OR.showOrderReadings({'container': CL.container});
+        });
+        $('#merge_shared_readings').on('mouseover.msr_mo', function() {
           CL.hideTooltip();
         });
       }
