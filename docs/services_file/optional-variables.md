@@ -246,6 +246,14 @@ This is a boolean variable which only has an impact on the collation editor if *
 
 The default is false.
 
+## ```numberEditionSubreadings``
+
+**This variable can be overridden in individual project settings**
+
+This is a boolean variable. If set to true subreadings that share a parent reading and  which have the same labels will also be given a number in order to differentiate them. For example if there are two subreadings for a reading labelled 'a' which share the same label suffix, for example 'o' and therefore all have the label 'ao' in the interface will be shown as 'ao1', 'ao2' etc. These number are added in the approval process and are only shown in the approved screen.
+
+The default is false.
+
 ## ```allowJoiningAcrossCollationUnits```
 
 **This variable can be overridden in individual project settings**

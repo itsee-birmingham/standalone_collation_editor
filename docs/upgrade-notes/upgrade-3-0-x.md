@@ -19,6 +19,7 @@ these should not cause any problems. Any exporters inherting from the core expor
 - Optional services and project setting *allowCommentsOnRegRules* added. This is a boolean which determines whether or not to show the comments box in the regularisation rule menu. This also involves a change in the default behaviour which will not show the comments box. To maintain existing beaviour this boolean should be set to true.
 - Optional services and project setting *allowOutOfOrderWitnesses* added along with *witnessesAllowedToBeOutOfOrder*. These settings are explained in the service file documentation. The defaults maintain existing behaviour.
 - Optional services and project setting *showSelectAllVariantsOption* added. This setting is explained in the service file documentation. The default maintains existing behaviour.
+- Optional services and project setting *numberEditionSubreadings* added. This setting is explained in the service file documentation. The default maintains existing behaviour.
 
 ## Additional project only settings
 
