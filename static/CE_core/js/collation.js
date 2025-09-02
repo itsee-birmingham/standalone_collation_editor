@@ -894,6 +894,17 @@ var CL = (function() {
       }
     },
 
+    getSubreadingLabel: function (parentLabel, subreading) {
+      const labelComponents = [parentLabel];
+      if (Object.prototype.hasOwnProperty.call(subreading, 'suffix')) {
+        labelComponents.push(subreading.suffix);
+      }
+      if (Object.prototype.hasOwnProperty.call(subreading, 'position_suffix')) {
+        labelComponents.push(subreading.position_suffix);
+      }
+      return labelComponents.join('');
+    },
+
     getReadingLabel: function(readingPos, reading, rules) {
       let labelSuffix, readingLabel;
       readingLabel = '';
@@ -3327,6 +3338,15 @@ var CL = (function() {
       } else {
         // default is false
         CL.project.allowWitnessChangesInSavedCollations = false;
+      }
+      // setting to add number in edition subreadings at the approve stage (needed for ECM)
+      if (Object.prototype.hasOwnProperty.call(project, 'numberEditionSubreadings')) {
+        CL.project.numberEditionSubreadings = project.numberEditionSubreadings;
+      } else if (Object.prototype.hasOwnProperty.call(CL.services, 'numberEditionSubreadings')) {
+        CL.project.numberEditionSubreadings = CL.services.numberEditionSubreadings;
+      } else {
+        // default is false
+        CL.project.numberEditionSubreadings = false;
       }
       // settings for label storage in later stages
       if (Object.prototype.hasOwnProperty.call(project, 'storeMultipleSupportLabelsAsParents')) {

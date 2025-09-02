@@ -950,6 +950,9 @@ var OR = (function() {
           SR.loseSubreadings();  // always lose before finding
           SR.findSubreadings({'rule_classes': CL.getRuleClasses('subreading', true,
                                                                 'value', ['identifier', 'subreading'])});
+          if (CL.project.numberEditionSubreadings === true) {
+            OR._numberEditionSubreadings();
+          }
           OR._getSiglaSuffixes();
           // TODO: fosilise the reading suffixes and main reading label suffixes here
           // then make output dependent on these not being present
@@ -1015,6 +1018,31 @@ var OR = (function() {
                         } else {
                           reading.reading_suffix = ruleClasses[reading.reading_classes[k]][0];
                         }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    _numberEditionSubreadings: function () {
+      let unit, reading;
+      for (const key in CL.data) {
+        if (Object.prototype.hasOwnProperty.call(CL.data, key)) {
+          if (key.indexOf('apparatus') != -1) {
+            for (let i = 0; i < CL.data[key].length; i += 1) {
+              unit = CL.data[key][i];
+              for (let j = 0; j < unit.readings.length; j += 1) {
+                reading = unit.readings[j];
+                if (Object.prototype.hasOwnProperty.call(reading, 'subreadings')) {
+                  for (const type in reading.subreadings) {
+                    if (reading.subreadings[type].length > 1) {
+                      for (let k = 0; k < reading.subreadings[type].length; k += 1) {
+                        reading.subreadings[type][k].position_suffix = String(k + 1);
                       }
                     }
                   }
@@ -1120,7 +1148,7 @@ var OR = (function() {
             } else if (parentLabel === 'zv') {
               html.push('<td><div class="spanlike">?' + data[type][i].suffix + '.</td></td>');
             } else {
-              html.push('<td><div class="spanlike">' + parentLabel + data[type][i].suffix + '.</td></td>');
+              html.push('<td><div class="spanlike">' + CL.getSubreadingLabel(parentLabel, data[type][i]) + '.</td></td>');
             }
             html.push('<td><div class="spanlike">' + data[type][i].text_string + '</div></td>');
             html.push('</tr>');
