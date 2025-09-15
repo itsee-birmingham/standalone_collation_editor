@@ -48,18 +48,18 @@ provided in the repository the collation editor requires JQuery and Pure CSS to 
 dependecies are loaded from CDNs, you can download them and load them from the local system if you prefer.
 
 The HTML file which will contain the collation editor must load in JQuery, Pure CSS and the
-```static/CE_core/js/collation_editor.js``` file.
+`static/CE_core/js/collation_editor.js` file.
 
-The variable ```staticUrl``` must be set to the full path to the static files on the system.
+The variable `staticUrl` must be set to the full path to the static files on the system.
 
 You will also need a services file as described below to make the connections to your own platform. The path from
-staticUrl to the services file must be specified in a ```servicesFile``` variable.
+staticUrl to the services file must be specified in a `servicesFile` variable.
 
-Once these two variables have been set you need to call ```collation_editor.init()```. This will load in all of the
+Once these two variables have been set you need to call `collation_editor.init()`. This will load in all of the
 other JavaScript and CSS files required for the collation editor to work. You may also supply a callback function which
 will be run on the completion of the file loading.
 
-Once the services file has loaded it must call ```CL.setServiceProvider()``` providing itself as the argument. Setting
+Once the services file has loaded it must call `CL.setServiceProvider()` providing itself as the argument. Setting
 this will trigger the initialisation of the editor.
 
 An example of the initialisation code.
@@ -93,4 +93,4 @@ An example of the initialisation code.
   + Load Javascipt dependencies
   + Set staticUrl variable
   + Set servicesFile variable
-  + Run ```collation_editor.init()```
+  + Run `collation_editor.init()`

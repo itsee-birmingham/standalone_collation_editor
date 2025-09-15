@@ -8,13 +8,13 @@ To support the server side code packaged with the collation editor some urls are
 
 ## Collation Service
 
-The collation service needs to respond to an ajax call from the ```doCollation()``` services function and start the collation process by initialising and calling the collation preprocessor. The preprocessor applies the regularisation rules, runs the collation with collateX using the provided settings and processes and formats the collateX export for display in the collation editor.
+The collation service needs to respond to an ajax call from the `doCollation()` services function and start the collation process by initialising and calling the collation preprocessor. The preprocessor applies the regularisation rules, runs the collation with collateX using the provided settings and processes and formats the collateX export for display in the collation editor.
 
 All of the settings required are provided by the JavaScript. They can be altered here if needed but in most cases that will not be necessary.
 
 The service needs to create a PreProcessor object using the data passed in the request as as options.configs. In should then call the process_witness_list function of that object using the data passed in the request as options.data. It should then return the output of this process as JSON or, if something goes wrong, an error message.
 
-If the legacy regularisation system is also being used either this service or the ```doCollation()``` function can decide which one to create for the provided data. To use the legacy preprocessor the code requirements are the same but should use the legacy preprocessor object.
+If the legacy regularisation system is also being used either this service or the `doCollation()` function can decide which one to create for the provided data. To use the legacy preprocessor the code requirements are the same but should use the legacy preprocessor object.
 
 This example of the minimum code required for this service is taken from a Django implementation.
 
@@ -40,9 +40,9 @@ There is one point in the collation editor code where the JavaScript needs to be
 
 The collation editor provides a SettingsApplier class which uses the same configuration and Python support code as is used in the display settings configuration applied during the collation process.
 
-The function should create an instance of the SettingsApplier class using the data in the *options* key of the request data object and then call the ```apply_settings_to_token_list()``` function from that objects using the data in the *tokens* key of the request data object.
+The function should create an instance of the SettingsApplier class using the data in the *options* key of the request data object and then call the `apply_settings_to_token_list()` function from that objects using the data in the *tokens* key of the request data object.
 
-The service will be called by the ```applySettings()``` function in the services file.
+The service will be called by the `applySettings()` function in the services file.
 
 This example of the minimum code required for this service is taken from a Django implementation.
 
@@ -58,12 +58,12 @@ def apply_settings(request):
 
 ## Apparatus Exporter
 
-The apparatus exporter should be available at the URL specified in the ```apparatusServiceUrl``` variable or
-the ```getApparatusForContext()``` function, both in the services file, depending on which is used.
+The apparatus exporter should be available at the URL specified in the `apparatusServiceUrl` variable or
+the `getApparatusForContext()` function, both in the services file, depending on which is used.
 
 The service is required to pass the data and configuration from the JavaScript into the ExporterFactory which in turn
 passes everything onto the exporter specified in the configuration.  The configuration is explained in the
-documentation for the ```exporterSettings``` variable.
+documentation for the `exporterSettings` variable.
 
 The service needs to accept the data to export and the settings for the exporter. It should instantiate the
 ExporterFactory class using the exporter settings passed in and, if present, the **options** object from the
