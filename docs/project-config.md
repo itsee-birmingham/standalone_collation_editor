@@ -19,11 +19,11 @@ The minimum information required in the project configuration is:
 - **name** *[string]* - the name of the project to be displayed in the collation editor.
 - **managing_editor** *[string]* - this is the id of the user in charge of this project. For the standalone version leave this as 'default'.
 - **editors** *[array]* - a list of all users with permission to edit this project. For the standalone version leave this as a list with just 'default' in it.
-- **witnesses** *[array]* - a list of all of the documents whose text is to be collated. The string used should be the one you chose for the directory name and the \_id value in  the metadata.json file (this is described in the [text Repository section](text-repo-structure.md)).
+- **witnesses** *[array]* - a list of all of the documents whose text is to be collated. The string used should be the one you chose for the directory name and the \_id value in  the metadata.json file (this is described in the [text repository section](text-repo-structure.md)).
 - **base_text** *[string]* - the id of the document you want to use as a base text. This must be one of the documents in the list of witnesses for the project.
 
 Many other settings and configurations can be specified in this file. They are covered in the configuration section of the documentation.
-Several of the functions and variables that can be specified in the services file can also be configured at the project level. The relevant settings are linked from the [Project Settings page](project-settings.md). Unless you are sure about what you are doing it is best to stick with configuring the standalone system in the project settings, however, the services file can also be used for installation wide settings if you choose.
+Several of the functions and variables that can be specified in the services file can also be configured at the project level. The relevant settings are linked from the [project settings page](project-settings.md). Unless you are sure about what you are doing it is best to stick with configuring the standalone system in the project settings, however, the services file can also be used for installation wide settings if you choose.
 
 ## Simple project configuration example
 

@@ -41,7 +41,7 @@ If the collation editor has started successfully you should be able to see the c
 
 Further Documentation
 ---
-For details of how to collate the example and prepare your own data for use in the standalone collation editor see the project wiki https://github.com/itsee-birmingham/standalone_collation_editor/wiki
+For details of how to collate the example and prepare your own data for use in the standalone collation editor see [the documentation](https://itsee-birmingham.github.io/standalone_collation_editor/).
 
 Referencing
 ---
