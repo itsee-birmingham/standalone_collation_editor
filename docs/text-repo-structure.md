@@ -39,7 +39,11 @@ Example:
 
 Each unit for collation also needs its own file in the relevant document folders.
 
-The work you are editing needs to be divided into collatable chunks and each of these chunks or units must be given a label so you can refer to them. In the directory for each document you need a JSON file for each of the units that is extant in that particular document (lacunose and omitted units are discussed later). The file name should be the label for the unit and the file extension should be `.json`.
+The work you are editing needs to be divided into collation units and each of these units must be given a unique label so you can refer to them. In the directory for each document you need a JSON file for each of the units that is extant in that particular document. The file name should be the label for the unit and the file extension should be `.json`.
+
+The JSON structure required for each of these files is described in the [Collation Unit](collation-unit.md) documentation.
+
+Units which are lacunose or omitted in a document require special treatment.
 
 #### Lacunose and Omitted Units
 
@@ -48,3 +52,29 @@ The collation editor can make a distinction between lacunose sections of text an
 If a document is Lacunose for an entire collation unit then you should not create a JSON file for the unit in that document directory. The collation editor will interpret this as a lacunose passage in this document.
 
 If a document omits an entire collation unit then the JSON file should be created for the unit unit but there should be no witnesses key in the JSON object. The collation editor will interpret the lack of the witnesses key as an omission.
+
+### Overview of the File Structure
+
+This is an example of a posisble structure for the data structure. This example contains two projects called `default` and `experiment`. Three documents for collation in two units, one of which is lacunose in `document_2`.
+
+```
+data/
+├── project/
+│   ├── default/
+│   │   └── config.json
+│   └── experiment/
+│       └── config.json
+└── textrepo/
+    └── json/
+        ├── document_1/
+        │   ├── metadata.json
+        │   ├── collation_unit_1.json
+        │   └── collation_unit_2.json  
+        ├── document_2/
+        │   ├── metadata.json
+        │   └── collation_unit_1.json
+        └── document_3/
+            ├── metadata.json
+            ├── collation_unit_1.json
+            └── collation_unit_2.json
+```
