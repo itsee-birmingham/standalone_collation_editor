@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@v4  
       - name: Copy Core Pages
         run: |
-          cp collation/core/docs/data-format.md ./docs/data/
+          cp collation/core/docs/collation-unit.md ./docs/data/
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Build with Jekyll
