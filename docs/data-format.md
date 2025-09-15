@@ -4,10 +4,10 @@ title: Data Structure Required for Collation Input
 sidebar_label: Data Format
 ---
 
-The data structure for each witness retrieved for collation by the `getUnitData()` function should follow the
+The data structure for each document retrieved for collation by the `getUnitData()` function should follow the
 structure outlined in the [collation unit section](collation-unit.md).
 
-Units which are lacunose or omitted in a witness require special treatment.
+Units which are lacunose or omitted in a document require special treatment.
 
 ## Omitted Units
 
