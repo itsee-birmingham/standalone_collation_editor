@@ -6,6 +6,16 @@ local_services = (function() {
     CL.setServiceProvider(local_services);
   });
 
+   _local_user = {
+    id: 'default',
+  };
+
+  _current_project = 'default';
+
+  _data_repo = staticUrl + 'data/';
+
+  _data_store_service_url = staticUrl + 'datastore/';
+
   //compulsory settings
 
 	const supportedRuleScopes = {'once': 'This place, these wits',
@@ -365,17 +375,6 @@ local_services = (function() {
       });
     });
   };
-
-  //internal service functions/values
-  _local_user = {
-    id: 'default',
-  };
-
-  _current_project = 'default';
-
-  _data_repo = staticUrl + 'data/';
-
-  _data_store_service_url = staticUrl + 'datastore/';
 
   _generate_uuid = function () {
                         var new_uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
