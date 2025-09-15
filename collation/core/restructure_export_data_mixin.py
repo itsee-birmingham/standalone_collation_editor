@@ -93,11 +93,6 @@ class RestructureExportDataMixin(object):
         Args:
             reading (dict): The JSON dictionary representing the reading which is modified in place.
         """
-        # now backfill any missing data in the older structures
-        # make the text_string if it doesn't exist
-        if 'text_string' not in reading:
-            reading['text_string'] = ' '.join([i['interface'] for i in reading['text']])
-        # make the label_suffix and the reading_suffix values if we need them and they don't exist
         if 'reading_classes' in reading and len(reading['reading_classes']) > 0:
             if 'label_suffix' not in reading:
                 label_suffixes = []

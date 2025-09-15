@@ -32,6 +32,8 @@ class Exporter(RestructureExportDataMixin, object):
             setting is True the apparatus will not have a <lem> tag for each entry. Defaults to False.
         rule_classes (dict, optional): This is the dictionary representing the rule classes used in the current
             editing project. Defaults to {}. Only needed for older data.
+        witness_decorators (list, optional): This is a list of JSON objects which define any decorators and the list of
+            witnesses to be decorated, this will always be set at project level. Defaults to [].
     """
 
     def __init__(self,
@@ -324,6 +326,15 @@ class Exporter(RestructureExportDataMixin, object):
         """
         return unit['end']
 
+    def get_subreading_label(self, parent_label, subreading):
+        """Work out the subreading label and return it as a string."""
+        label = [parent_label]
+        if 'suffix' in subreading:
+            label.append(self.fix_subreading_suffix(subreading['suffix']))
+        if 'position_suffix' in subreading:
+            label.append(subreading['position_suffix'])
+        return ''.join(label)
+
     def get_app_units(self, apparatus, overtext, context, missing):
         """Function to take the JSON apparatus and turn it into a list of ElementTree.Elements with each entry
         representing one variant unit in TEI XML.
@@ -376,10 +387,8 @@ class Exporter(RestructureExportDataMixin, object):
                                 wits = self.get_witnesses(subreading, missing)
                                 if len(wits) > 0:
                                     readings = True
-                                    subreading_label = '{}{}'.format(reading['label'],
-                                                                     self.fix_subreading_suffix(subreading['suffix']))
-                                    app.append(self.make_reading(subreading, i, subreading_label,
-                                                                 wits, True, key))
+                                    subreading_label = self.get_subreading_label(reading['label'], subreading)
+                                    app.append(self.make_reading(subreading, i, subreading_label, wits, True, key))
 
                 else:
                     if ((len(wits) > 0 or reading['label'] == 'a' or 'subreadings' in reading)
@@ -398,10 +407,8 @@ class Exporter(RestructureExportDataMixin, object):
                                 wits = self.get_witnesses(subreading, missing)
                                 if len(wits) > 0:
                                     readings = True
-                                    subreading_label = '{}{}'.format(reading['label'],
-                                                                     self.fix_subreading_suffix(subreading['suffix']))
-                                    app.append(self.make_reading(subreading, i, subreading_label,
-                                                                 wits, True, key))
+                                    subreading_label = self.get_subreading_label(reading['label'], subreading)
+                                    app.append(self.make_reading(subreading, i, subreading_label, wits, True, key))
 
             if readings:
                 app_list.append(app)

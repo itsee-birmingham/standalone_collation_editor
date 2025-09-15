@@ -4310,6 +4310,7 @@ var SV = (function() {
                                 }) === data.marked_readings[type][k].parent_text) {
                                 parent = readings[j];
                                 rowNum = j;
+                                break;
                               }
                             } else {
                               if (readings[j].text.length === 0) {
@@ -4317,9 +4318,11 @@ var SV = (function() {
                                       !Object.prototype.hasOwnProperty.call(readings[j], 'details')) {
                                   parent = readings[j];
                                   rowNum = j;
+                                  break;
                                 } else if (readings[j].details === data.marked_readings[type][k].om_details) {
                                   parent = readings[j];
                                   rowNum = j;
+                                  break;
                                 }
                               }
                             }

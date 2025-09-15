@@ -1,16 +1,22 @@
 ---
 id: optional-variables
-title: Optional Service File Variables
-sidebar_label: Optional Variables
+title: Optional Services File Variables
+sidebar_label: Services File Variables
 ---
 
 ## ```localJavaScript```
 
 This variable should be an array of strings giving the full url of any additional JavaScript you need the collation editor to load. These might be required run the services for your framework (an internal api file for example) or you might want to use additional files to store configuration functions that you call in the services. These files will be loaded as part of the collation editor initialisation functions called after the services have been set.
 
+## ```undoStackLength```
+
+This variable determines how many snapshots of the data are stored to enable to the undo button to work, in other words how many actions you are able to undo. A full version of the data structure is held in browser memory for each position in the stack. If you have  a lot of witnesses and/or longer units then setting this too high may cause problems.  Because of the possible memory issues this can only be set in services and cannot be changed in project settings.
+
+The default is 6.
+
 ## ```localCollationFunction```
 
-**This variable can be overwritten in individual project settings (but this may not be advisable)**
+**This variable can be overridden in individual project settings (but this may not be advisable)**
 
 **There is a default provided in core code which uses the collateX Java microservices**
 
@@ -24,7 +30,7 @@ the configuration should be provided as a JSON object with the following keys:
 
 The method will be provided with the data to collate in the JSON format required by collateX and an optional dictionary of collateX settings requested by the user such as what algorithm to use and whether or not to use the Levenshtein distance matching.
 
-The reference python function should return the JSON output from collateX or equivalent.
+The referenced python function should return the JSON output from collateX or equivalent.
 
 ## ```collatexHost```
 
@@ -34,7 +40,7 @@ This variable should be used if the system uses the collateX Java microservices 
 
 ## ```collationAlgorithmSettings```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
 **There is a default in the core code which is explained below**
 
@@ -48,49 +54,63 @@ The default setting in the code will use the Dekker algorithm with fuzzy matchin
 
 If ```CL.loadIndexPage()``` or a button with the id *collation_settings* was provided on the index page then the user can override these settings on a unit by unit basis.
 
-**NB:** this setting is new in version 2.0.0 and the default settings have changed from previous versions.
+**NB:** this setting was new in version 2.0.0 and the default settings have changed from previous versions.
 
 ## ```lacUnitLabel```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
 This variable should be a string and should be the text the collation editor needs to display for any witnesses which are lacunose for the entire collation unit. The default, which will be used if this variable is not present, is 'lac unit'. Until version 2.0.0 the default text was 'lac verse'.
 
 ## ```omUnitLabel```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
 This variable should be a string and should be the text the collation editor needs to display for any witnesses which omit the entire collation unit. The default, which will be used if this variable is not present, is 'om unit'. Until version 2.0.0 the default text was 'om verse'.
 
 ## ```omCategories```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
 This variable should be an array of strings. If provided the editor will be give the option to categorise om readings using the labels in the array in the Order Readings screen.
 
 ## ```allowCommentsOnRegRules```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
 This variable is a boolean which determines whether or not to show the comments text box in the regularisation rule menu. Nothing happens to these comments appart from them being saved along with the rule so the default is false. This setting should only be set to true if the platform using the collation editor has a mecahnism for using these comments in some way.
 
+## ```showSelectAllVariantsOption```
+
+**This variable can be overridden in individual project settings**
+
+**The default is false**
+
+This variable is a boolean which determines whether ot not to show the button to select all variants in the variant unit for regularisation to the same token. This can be useful for texts with large numbers of spelling variants. The collation editor (from v3) also allows multiple selection of tokens by holding shift/alt and clicking on each one, this is an additional option to select them all with a single click.
+
+## ```allowWitnessChangesInSavedCollations```
+
+**This variable can be overridden in individual project settings**
+
+This variable determines whether witnesses can be added to or removed from saved collations. If this variable is set to true and the current project witnesses do not match those in the saved collations the system will allow the user to add or remove witnesses until the witnesses saved match the witnesses in the project. This is only possible at the regularisation and set variants stage, order readings always needs to be redone with the new witness set.
+
+The default is false.
+
 ## ```showCollapseAllUnitsButton```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
 This variable is a boolean which determines whether or not to show the button in the footer of all stages of the collation editor which allows all the units to be collapsed to show only the a reading. The default is false. Until version 2.0.0  this button was included by default.
 
 ## ```showGetApparatusButton```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
-This variable is a boolean which determines whether or not to show the button in the footer of the approved stage of the collation editor. When present the button allows the user to download an export of the current unit apparatus based on the settings provided in the ```exporterSettings``` variable. If this variable is set to true (or the default is being used) then either ```getApparatusForContext()``` or ```apparatusServiceUrl``` must also be provided in the services file. If neither of these items are available then the get apparatus button will not be shown.
-
-The default is true which maintains the behaviour of earlier releases.
+This variable is a boolean which determines whether or not to show the button in the footer of the approved stage of the collation editor. When present the button allows the user to download an export of the current unit apparatus based on the settings provided in the ```exporterSettings``` variable. If this variable is set to true (or the default is being used) then either ```getApparatusForContext()``` or ```apparatusServiceUrl``` must also be provided in the services file. If neither of these items are available then the get apparatus button will not be shown even if this variable is set to true. The default is true.
 
 ## ```extraFooterButtons```
 
-**This variable can be overwritten in individual project settings on a stage by stage basis but addExtraFooterFunctions() in the services file must provide all the functions added in the projects**
+**This variable can be overridden in individual project settings on a stage by stage basis but addExtraFooterFunctions() in the services file must provide all the functions added in the projects**
 
 This variable can be used to add your own custom buttons to the footer of the display in the four stages of the collation editor. Each stage is treated separately. The data should be structured as a JSON object with the stage/s to be modified as the top level key/s using the following values: regularised, set, ordered, approved. The value for each key should be an array of objects where each object has the following two keys:
 
@@ -114,7 +134,7 @@ extraFooterButtons = {
 
 ## ```preStageChecks```
 
-**This variable can be overwritten in individual project settings on a stage by stage basis**
+**This variable can be overridden in individual project settings on a stage by stage basis**
 
 This variable can be used to add additional checks before moving to the next stage of the collation editor. It can be used to enforce particular editorial rules for example.
 
@@ -158,7 +178,7 @@ The example below shows two checks added between set variants and order readings
 
 ## ```allowOutOfOrderWitnesses```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
 A boolean to determine whether witnesses are allowed to be out of order (have rearranged words) in the collation. It works with *witnessesAllowedToBeOutOfOrder* which can limit the selection of witnesses allowed to be out of order. Any witness/es allowed to be out of order will not appear in the warnings in the Set Variants stage and moving to Order Readings will also be allowed if those witnesses are out of order.
 
@@ -168,7 +188,7 @@ The default is false.
 
 ## ```witnessesAllowedToBeOutOfOrder```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
 This setting is only relevant if *allowOutOfOrderWitnesses* is true. It should contain a list of the witnesses (by transcription ID) that should be allowed to be out of order. If an empty list is provided then all witnesses are allowed to be out of order.
 
@@ -176,7 +196,7 @@ The default is an empty list.
 
 ## ```combineAllLacsInOR```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
 This variable is a boolean. If it is set to true then in the move to order readings any lac readings, whatever their text value on the screen, will be automatically regularised to '<lac>' in every unit. For example '<ill 4 char>' and '<lac 4 char>' would both be regularised to '<lac>'. These regularised readings work as subreadings and can be viewed like all other subreadings in the interface.
 
@@ -186,7 +206,7 @@ If you are using special category lac readings and you want these to appear in y
 
 ## ```combineAllOmsInOR```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
 This is a boolean variable. It works in the same was as ```combineAllLacsInOR``` but with om readings.
 
@@ -194,7 +214,7 @@ The default is false.
 
 ## ```combineAllLacsInApproved```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
 This is a boolean variable. It works in the same was as ```combineAllLacsInOR``` but is applied in the approval process. If this change has already been applied in the move to order readings then this boolean, regardless of its settings, has no influence.
 
@@ -204,7 +224,7 @@ If you are using special category lac readings and you want these to appear in y
 
 ## ```combineAllOmsInApproved```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
 This is a boolean variable. It works in the same was as ```combineAllLacsInApproved``` but with om readings. If this change has already been applied in the move to order readings then this boolean, regardless of its settings, has no influence.
 
@@ -212,7 +232,7 @@ The default is false.
 
 ## ```storeMultipleSupportLabelsAsParents```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
 This is a boolean variable. If it is set to false (the default) then the label editing is completely free and the editor can type anything they want into the reading label box. If it is set to true then readings which could support multiple other readings can be recorded with links to the supported readings. The advantage of using this setting is that when the readings are reordered the labels supporting multiple other readings can be preserved and updated.
 
@@ -220,15 +240,23 @@ The default is false.
 
 ## ```useZvForAllReadingsSupport```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
-This is a boolean variable which only has an impact on the collation editor if *storeMultipleSupportLabelsAsParents* is set to true. If this boolean is also true then if all possible parent readings are selected from the list when editing a label in order readings, the label itself will be stored as 'zv' and the reading label in the collation editor will be ?. 
+This is a boolean variable which only has an impact on the collation editor if *storeMultipleSupportLabelsAsParents* is set to true. If this boolean is also true then if all possible parent readings are selected from the list when editing a label in order readings, the label itself will be stored as 'zv' and the reading label in the collation editor will be ?.
+
+The default is false.
+
+## ```numberEditionSubreadings``
+
+**This variable can be overridden in individual project settings**
+
+This is a boolean variable. If set to true subreadings that share a parent reading and  which have the same labels will also be given a number in order to differentiate them. For example if there are two subreadings for a reading labelled 'a' which share the same label suffix, for example 'o' and therefore all have the label 'ao' in the interface will be shown as 'ao1', 'ao2' etc. These number are added in the approval process and are only shown in the approved screen.
 
 The default is false.
 
 ## ```allowJoiningAcrossCollationUnits```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
 This is a boolean variable. If set to true the user is given the option to add a flag to readings at the extremities of collation units to indicate that the reading should be joined to the corresponding reading in the previous or following unit. The collation editor only sets flags on the readings (join_backwards and join_forwards) which are set to true if the join has been made. All exporters must respect these flags in the exporting if they are used. There is no sanity checking on this, it requires the editor to make the joins accurately.
 
@@ -236,7 +264,7 @@ The default is false.
 
 ## ```approvalSettings```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
 The approval settings determine whether or not an approved version of a unit collation can be overwritten. The default setting is that it can be so this only needs to be added if you want to set it to false as default for all projects in the environment. Individual projects can override this explicitly in their own configurations.
 
@@ -261,7 +289,7 @@ This variable specifies the location of the apparatus export service on this pla
 
 ## ```overlappedOptions```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
 **There is a default in the core code which just gives the option to treat the reading as a main reading** (this option is always shown even if this variable is provided in services or project)
 
@@ -295,7 +323,7 @@ overlappedOptions = [{
 
 ## ```contextInput```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
 **There is a default in the core code**
 
@@ -329,7 +357,7 @@ contextInput = {
 
 ## ```displaySettings```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
 **There is a default provided in default_settings.js**
 
@@ -380,7 +408,7 @@ class ApplySettings(object):
 
 ## ```ruleClasses```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
 **There is a default provided in default_settings.js**
 
@@ -404,7 +432,7 @@ For an example of the JavaScript configuration see the [default_settings.js](htt
 
 ## ```ruleConditions```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
 **There is a default provided in default_settings.js**
 
@@ -464,11 +492,11 @@ class RuleConditions(object):
 
 ## ```exporterSettings```
 
-**This variable can be overwritten in individual project settings**
+**This variable can be overridden in individual project settings**
 
 **There is a default provided in the core exporter factory code**
 
-The exporter settings are used to control the export of data from the approved collation screen when the 'Get Apparatus' button is present. If the function is not required then the button can be hidden by setting the ```showGetApparatusButton``` variable to false. This export is simply intended to be a check point for editors and should be set to provide the best export format for this task. The project summary page or a similar page in the overall platform should also provide options to export much larger units of text and more options can be provided to users in these export functions.
+The exporter settings are used to control the export of data from the approved collation screen when the 'Get Apparatus' button is present. If the function is not required then the button can be hidden by setting the ```showGetApparatusButton``` variable to false. This export is simply intended to be a check point for editors and should be set to provide the best export format for this task. The project summary page or a similar page in the overall platform should provide options to export much larger units of text and more options can be provided to users in these export functions.
 
 If this variable is used then the following keys must be provided.
 
@@ -490,7 +518,10 @@ In addition to these keys an **options** key can be provided which should contai
       "overlap_status_to_ignore": ["overlapped", "deleted"],
       "consolidate_om_verse": true,
       "consolidate_lac_verse": true,
-      "include_lemma_when_no_variants": false
+      "include_lemma_when_no_variants": false,
+      "exclude_lemma_entry": false,
+      "rule_classes": {},
+      "witness_decorators": []
     }
 }
 ```

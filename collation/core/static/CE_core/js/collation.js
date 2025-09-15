@@ -894,6 +894,17 @@ var CL = (function() {
       }
     },
 
+    getSubreadingLabel: function (parentLabel, subreading) {
+      const labelComponents = [parentLabel];
+      if (Object.prototype.hasOwnProperty.call(subreading, 'suffix')) {
+        labelComponents.push(subreading.suffix);
+      }
+      if (Object.prototype.hasOwnProperty.call(subreading, 'position_suffix')) {
+        labelComponents.push(subreading.position_suffix);
+      }
+      return labelComponents.join('');
+    },
+
     getReadingLabel: function(readingPos, reading, rules) {
       let labelSuffix, readingLabel;
       readingLabel = '';
@@ -1900,6 +1911,10 @@ var CL = (function() {
             } else if (key !== 'parent_reading' && Object.prototype.hasOwnProperty.call(data, key) && data[key] !== null) {
               witnessList.push(key);
             }
+          }
+          if (witnessList.length === 0) {
+            alert('You must select some of the witnesses.');
+            return;
           }
           if (data.parent_reading === 'other') {
             //if the reading that is being created is not the same as the a reading when we are in an overlapped reading
@@ -3222,6 +3237,15 @@ var CL = (function() {
         // default is false
         CL.project.showCollapseAllUnitsButton = false;
       }
+      // setting for selecting all variants words in a unit
+      if (Object.prototype.hasOwnProperty.call(project, 'showSelectAllVariantsOption')) {
+        CL.project.showSelectAllVariantsOption = project.showSelectAllVariantsOption;
+      } else if (Object.prototype.hasOwnProperty.call(CL.services, 'showSelectAllVariantsOption')) {
+        CL.project.showSelectAllVariantsOption = CL.services.showSelectAllVariantsOption;
+      } else {
+        // default is false
+        CL.project.showSelectAllVariantsOption = false;
+      }
       // settings for get apparatus button in approved view
       if (Object.prototype.hasOwnProperty.call(project, 'showGetApparatusButton')) {
         CL.project.showGetApparatusButton = project.showGetApparatusButton;
@@ -3314,6 +3338,15 @@ var CL = (function() {
       } else {
         // default is false
         CL.project.allowWitnessChangesInSavedCollations = false;
+      }
+      // setting to add number in edition subreadings at the approve stage (needed for ECM)
+      if (Object.prototype.hasOwnProperty.call(project, 'numberEditionSubreadings')) {
+        CL.project.numberEditionSubreadings = project.numberEditionSubreadings;
+      } else if (Object.prototype.hasOwnProperty.call(CL.services, 'numberEditionSubreadings')) {
+        CL.project.numberEditionSubreadings = CL.services.numberEditionSubreadings;
+      } else {
+        // default is false
+        CL.project.numberEditionSubreadings = false;
       }
       // settings for label storage in later stages
       if (Object.prototype.hasOwnProperty.call(project, 'storeMultipleSupportLabelsAsParents')) {
@@ -3416,6 +3449,7 @@ var CL = (function() {
     },
 
     _setLocalPythonFunctions: function(project) {
+      // only required for legacy regularisation
       if (Object.prototype.hasOwnProperty.call(project, 'localPythonImplementations')) {
         CL.localPythonFunctions = project.localPythonImplementations;
       } else if (Object.prototype.hasOwnProperty.call(CL.services, 'localPythonImplementations')) {
@@ -3551,20 +3585,26 @@ var CL = (function() {
             console.warn('\'_id\' is deprecated. Use \'id\' instead.');
             data[i].id = data[i]._id;
           }
+          date = null;
           if (Object.prototype.hasOwnProperty.call(data[i], '_meta')) {
             console.warn('\'_meta\' is deprecated. Use \'created_time\' and \'last_modified_time\' as keys on collation objects.');
             date = new Date(data[i]._meta._last_modified_time.$date);
           } else if (Object.prototype.hasOwnProperty.call(data[i], 'last_modified_time') && data[i].last_modified_time !== null) {
             date = new Date(data[i].last_modified_time);
-          } else {
+          } else if (Object.prototype.hasOwnProperty.call(data[i], 'created_time') && data[i].created_time !== null) {
             date = new Date(data[i].created_time);
           }
-          if (date.getMinutes() < 10) {
-            minutes = '0' + date.getMinutes();
+          if (date !== null) {
+            if (date.getMinutes() < 10) {
+              minutes = '0' + date.getMinutes();
+            } else {
+              minutes = String(date.getMinutes());
+            }
+            dateString = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + minutes;
           } else {
-            minutes = String(date.getMinutes());
+            dateString = 'no date available';
           }
-          dateString = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + minutes;
+
           if (Object.prototype.hasOwnProperty.call(data[i], 'user')) {
             user = data[i].user;
           } else {

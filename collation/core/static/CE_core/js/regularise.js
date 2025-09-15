@@ -1,5 +1,5 @@
 /* exported RG */
-/* global CL, SV, SR, spinner, cforms, SimpleContextMenu, staticUrl, Selectable, drag, REDIPS */
+/* global CL, SV, SR, spinner, cforms, SimpleContextMenu, staticUrl, drag, REDIPS */
 var RG = (function() {
 
 
@@ -10,6 +10,7 @@ var RG = (function() {
 
   return {
 
+    _allDeletableRules: {},
     showRegularisations: false,
 
     getCollationData: function(output, scrollOffset, callback) {
@@ -63,8 +64,11 @@ var RG = (function() {
         rowId = 'variant_unit_' + id + '_row_' + i;
         rowList.push(rowId);
         if (i === 0) {
-          cells.push('<tr><td class="redips-mark" colspan="MX_LN"><span id="toggle_variant_' + id +
-                    '" class="triangle">&#9650;</span></td></tr>');
+            cells.push('<tr><td class="redips-mark" colspan="MX_LN">');
+            if (CL.project.showSelectAllVariantsOption === true) {
+              cells.push('<img class="select_all" src="' + staticUrl + 'CE_core/images/checkall.png" height="16px">');
+            }
+            cells.push('<span id="toggle_variant_' + id + '" class="triangle">&#9650;</span></td></tr>');
         }
         classes = [];
         if (i === 0) {
@@ -179,11 +183,7 @@ var RG = (function() {
               keysToSort = ruleCells[0];
               cellsDict = ruleCells[1];
               events = ruleCells[2];
-              if (Object.keys(deletableRules).length > 1) {
-                cells.push('<table><tbody id="' + rowIdBase + '_selectable' + '" class="selectable selectable-container">');
-              } else {
-                cells.push('<table><tbody>');
-              }
+              cells.push('<table><tbody>');
               keysToSort = CL.sortWitnesses(keysToSort);
               for (let k = 0; k < keysToSort.length; k += 1) {
                 if (Object.prototype.hasOwnProperty.call(cellsDict, keysToSort[k])) {
@@ -192,7 +192,7 @@ var RG = (function() {
               }
               cells.push('</tbody></table>');
               if (Object.keys(nonDeletableRules).length > 1) {
-                cells.push('<table class="unselectable"><tbody>');
+                cells.push('<table><tbody>');
                 ruleCells = RG._getRulesForDisplay(nonDeletableRules, events, false, highlightedHand, rowIdBase);
                 keysToSort = ruleCells[0];
                 cellsDict = ruleCells[1];
@@ -208,6 +208,12 @@ var RG = (function() {
               }
             }
             cells.push('</td>');
+          }
+          if (deletableRules) {
+            if (!Object.prototype.hasOwnProperty.call(RG._allDeletableRules, id)) {
+              RG._allDeletableRules[id] = {};
+            }
+            RG._allDeletableRules[id] = Object.assign(RG._allDeletableRules[id], deletableRules);
           }
         }
         cells.push('</tr>');
@@ -271,7 +277,7 @@ var RG = (function() {
       options.sort = true;
       SimpleContextMenu.setup({'preventDefault': true, 'preventForms': false});
       if (CL.witnessEditingMode === false || CL.witnessAddingMode === true) {
-        SimpleContextMenu.attach('ui-selected', function() {
+        SimpleContextMenu.attach('selected_rule', function() {
           return RG._makeMenu('group_delete');
         });
         SimpleContextMenu.attach('regularised', function() {
@@ -410,7 +416,7 @@ var RG = (function() {
           i += 1;
         }
       }
-      RG._addMultiSelectionFunctions();
+      RG._addMultipleRuleDeletionEvents();
   
       $('#highlighted').on('change', function(event) {
         RG._highlightWitness(event.target.value);
@@ -427,7 +433,13 @@ var RG = (function() {
         row = document.getElementById(eventRows[i]);
         if (row !== null) {
           CL.addHoverEvents(row);
+          RG._addMultipleWordSelectionEvents(row);
         }
+      }
+      if (CL.project.showSelectAllVariantsOption === true) {
+        $('.select_all').on('click', function (event) {
+          RG._doSelectAll(event.target);
+        });
       }
       const unitEvents = temp[3];
       for (const key in unitEvents) {
@@ -435,6 +447,7 @@ var RG = (function() {
           row = document.getElementById(key);
           if (row) {
             CL.addHoverEvents(row, unitEvents[key]);
+            RG._addMultipleWordSelectionEvents(row);
           }
         }
       }
@@ -465,6 +478,24 @@ var RG = (function() {
       });
     },
 
+    _doSelectAll: function(element) {
+      let currentState = 'unselected';
+      const variantUnit = $(element).parents('table')[0];
+      const unselectedImage = staticUrl + 'CE_core/images/checkall.png';
+      const selectedImage = staticUrl + 'CE_core/images/allchecked.png';
+      if ($(element).attr('src') === selectedImage) {
+        currentState = 'selected';
+      }
+      // first reset all the other images to unselected and unselect any selected words
+      $('.select_all').attr('src', unselectedImage);
+      $(".selected_reg_word").removeClass("selected_reg_word");
+      // now change the selected one and select the words or don't if we are unselecting it
+      if (currentState === 'unselected') {
+        $(element).attr('src', selectedImage);
+        $('#' + variantUnit.id + ' .reg_word').addClass("selected_reg_word");
+      }
+    },
+
     _getRulesForDisplay: function(rules, events, deletable, highlightedHand, rowIdBase) {
       let regClass, highlighted, ruleCells, subrowId;
       const keysToSort = [];
@@ -476,7 +507,7 @@ var RG = (function() {
             if (rules[key].scope === 'always') {
               regClass = 'regularised_global ';
             } else {
-              regClass = 'ui-selectable regularised ';
+              regClass = 'deletable_rule regularised ';
             }
             if (RG._hasDeletionScheduled(key)) {
               regClass += 'deleted ';
@@ -496,7 +527,7 @@ var RG = (function() {
             highlighted = 'highlighted ';
           }
           subrowId = rowIdBase + '_rule_' + key;
-          ruleCells.push('<tr class="' + regClass + highlighted + '" id="' + subrowId + '"><td>');
+          ruleCells.push('<tr class="' + regClass + highlighted + '" id="' + subrowId + '"><td id="' + key + '">');
           if (rules[key].witnesses.indexOf(highlightedHand) !== -1) {
             ruleCells.push('<div class="spanlike">');
           }
@@ -520,25 +551,56 @@ var RG = (function() {
       return [keysToSort, cellsDict, events];
     },
 
-    _addMultiSelectionFunctions: function () {
-      const selectableContainers = [];
-      const selectables = [];
-      $('.selectable-container').each(function () {
-        selectableContainers.push(this);
-        selectables.push(new Selectable({
-          filter: this.querySelectorAll('.ui-selectable'),
-          appendTo: this,
-          toggle: true
-        }));
+    _addMultipleRuleDeletionEvents: function () {
+      // NB: in this function we need to add and remove the regularised class because of how the context menus are attached
+      $('.deletable_rule').on('click', function (e) {
+        if (e.shiftKey || e.altKey) {
+          // check if there are already words in other variant units selected and remove them.
+          const thisVariantUnitId = $(e.target).parents('div').attr('id');
+          const prevSelected = $('.selected_rule');
+          $.each(prevSelected, function (i, selected) {
+            if ($(selected).parents('div').attr('id') != thisVariantUnitId) {
+              $(selected).removeClass('selected_rule');
+              $(selected).addClass('regularised');
+            }
+          })
+          const tr = $(e.target).closest('tr');
+          if ($(tr).hasClass('selected_rule')) {
+            // we are deselecting this so remove the colour and add regularised
+            $(tr).removeClass('selected_rule');
+            $(tr).addClass('regularised');
+          } else {
+            $(tr).addClass('selected_rule');
+            $(tr).removeClass('regularised');
+          }
+        }
       });
-      for (let i = 0; i < selectables.length; i += 1) {
-        selectables[i].on('selecteditem', function(item) {
-          $(item.node).removeClass('regularised');
-        });
-        selectables[i].on('deselecteditem', function(item) {
-          $(item.node).addClass('regularised');
-        });
-      }
+    },
+
+    _addMultipleWordSelectionEvents: function (row) {
+      $(row).click(function(e) {
+        if (e.shiftKey || e.altKey) {
+          let elem;
+          // check if there are already words in other variant units selected and remove them.
+          const thisVariantUnitId = $(e.target).parents('div').attr('id');
+          const prevSelected = $('.selected_reg_word');
+          $.each(prevSelected, function (i, selected) {
+            if ($(selected).parents('div').attr('id') != thisVariantUnitId) {
+              $(selected).removeClass('selected_reg_word');
+            }
+          })
+          if ($(e.target).hasClass('spanlike')) {
+            elem = $(e.target).closest('td').next('td').children('div')[0];
+          } else {
+            elem = $(e.target)[0];
+          }
+          if ($(elem).hasClass('selected_reg_word')) {
+            $(elem).removeClass('selected_reg_word');
+          } else {
+            $(elem).addClass('selected_reg_word');
+          }
+        }
+      });
     },
 
     /** highlight a witness that has been added or highlight all added witnesses with 'all' 
@@ -1064,20 +1126,22 @@ var RG = (function() {
 
     _redipsInitRegularise: function(id) {
       let clone, original, wordId, normalisedForm, normalisedText, unitData, unit, reading, word, witnesses,
-          originalText, originalDisplayText, createFunction;
+          originalText, originalDisplayText, createFunction, variantUnit, collectedWitnesses;
       const rd = REDIPS.drag;
       rd.init(id);
       rd.event.dropped = function() {
+        collectedWitnesses = [];
         clone = document.getElementById(rd.obj.id);
         original = document.getElementById(rd.objOld.id);
         wordId = rd.objOld.id;
         normalisedForm = rd.td.target.childNodes[0];
-        //if we are normalising to a typed in value
+        variantUnit = $(rd.td.target).closest('table')[0];
+        // if we are normalising to a typed in value
         if (normalisedForm.tagName === 'INPUT') {
           normalisedText = normalisedForm.value.trim();
-          if (/^\s*$/.test(normalisedText) === false) { //it there is at least one non-space character
-            if (/^\S+\s\S/.test(normalisedText) === true) { // if there are two or more strings separated by a space
-              //you have typed a space into the box with is not allowed, regularisation is single token to single token only!
+          if (/^\s*$/.test(normalisedText) === false) {  // it there is at least one non-space character
+            if (/^\S+\s\S/.test(normalisedText) === true) {  // if there are two or more strings separated by a space
+              // you have typed a space into the box with is not allowed, regularisation is single token to single token only!
               if (clone.parentNode !== null) {
                 clone.parentNode.removeChild(clone);
               }
@@ -1096,7 +1160,7 @@ var RG = (function() {
             }
             return;
           }
-        } else { // we are normalising to an existing value
+        } else {  // we are normalising to an existing value
           normalisedText = normalisedForm.childNodes[0].textContent;
         }
         normalisedText = CL.project.prepareNormalisedString(normalisedText);
@@ -1104,21 +1168,51 @@ var RG = (function() {
         if (clone.parentNode !== null) {
           clone.parentNode.removeChild(clone);
         }
-        unitData = rd.objOld.id;
-        // get the unit, reading and word data to lookup stuff in data structure
-        unit = parseInt(unitData.substring(0, unitData.indexOf('_r')).replace('variant_unit_', ''), 10);
-        reading = parseInt(unitData.substring(unitData.indexOf('_r') + 2, unitData.indexOf('_w')), 10);
-        word = parseInt(unitData.substring(unitData.indexOf('_w') + 2), 10);
-        if (CL.witnessAddingMode !== true) {
-          witnesses = CL.data.apparatus[unit].readings[reading].witnesses;
-        } else {
-          witnesses = CL.data.apparatus[unit].readings[reading].witnesses.filter(x => CL.witnessesAdded.includes(x));
+        // get any selected words from this unit, if there are any then we use these alone, if none then just use the word at original
+        const selectedWords = $('#' + variantUnit.id + ' *.selected_reg_word');
+        for (let i = 0; i < selectedWords.length; i += 1 ) {
+          selectedWords[i].objOld={id:$(selectedWords[i]).attr("id")};
+          selectedWords[i].unit_data=$(selectedWords[i]).attr("id");
+          selectedWords[i].original=$(selectedWords[i]).attr("id");
+          selectedWords[i].unit = parseInt(selectedWords[i].unit_data.substring(0, selectedWords[i].unit_data.indexOf('_r')).replace('variant_unit_', ''), 10);
+          selectedWords[i].reading = parseInt(selectedWords[i].unit_data.substring(selectedWords[i].unit_data.indexOf('_r') + 2, selectedWords[i].unit_data.indexOf('_w')), 10);
+          selectedWords[i].word = parseInt(selectedWords[i].unit_data.substring(selectedWords[i].unit_data.indexOf('_w') + 2), 10);
+          selectedWords[i].original_text = CL.data.apparatus[selectedWords[i].unit].readings[selectedWords[i].reading].text[selectedWords[i].word];
+          if (CL.witnessAddingMode !== true) {
+            selectedWords[i].witnesses = CL.data.apparatus[selectedWords[i].unit].readings[selectedWords[i].reading].witnesses;
+          } else {
+            selectedWords[i].witnesses = CL.data.apparatus[selectedWords[i].unit].readings[selectedWords[i].reading].witnesses.filter(x => CL.witnessesAdded.includes(x));
+          }
+          collectedWitnesses.push.apply(collectedWitnesses, selectedWords[i].witnesses);
         }
-        originalText = CL.data.apparatus[unit].readings[reading].text[word];
-        originalDisplayText = CL.data.apparatus[unit].readings[reading].text[word]['interface'];
+
+        unitData = rd.objOld.id;
+        unit = parseInt(unitData.substring(0, unitData.indexOf('_r')).replace('variant_unit_', ''), 10);
+        
+        if (selectedWords.length > 0) {
+          let originalWords = []
+          for (let i = 0; i < selectedWords.length; i += 1) {
+            originalWords.push(CL.data.apparatus[selectedWords[i].unit].readings[selectedWords[i].reading].text[selectedWords[i].word]['interface']);
+          }
+          originalDisplayText = originalWords.join(', ');
+        } else {
+          // get the unit, reading and word data to lookup stuff in data structure
+          reading = parseInt(unitData.substring(unitData.indexOf('_r') + 2, unitData.indexOf('_w')), 10);
+          word = parseInt(unitData.substring(unitData.indexOf('_w') + 2), 10);
+          if (CL.witnessAddingMode !== true) {
+            witnesses = CL.data.apparatus[unit].readings[reading].witnesses;
+          } else {
+            witnesses = CL.data.apparatus[unit].readings[reading].witnesses.filter(x => CL.witnessesAdded.includes(x));
+          }
+          originalText = CL.data.apparatus[unit].readings[reading].text[word];
+          originalDisplayText = CL.data.apparatus[unit].readings[reading].text[word]['interface'];
+          collectedWitnesses.push.apply(collectedWitnesses, witnesses)
+        }
+
         if (document.getElementById('reg_form') !== null) {
           document.getElementsByTagName('body')[0].removeChild(document.getElementById('reg_form'));
         }
+        // function to create the rules - triggered from the form
         createFunction = function() {
           let newUnit, newReading, newWitnesses, suffix;
           // create the rule
@@ -1132,23 +1226,45 @@ var RG = (function() {
             data['class'] = 'none';
           }
           CL.services.getUserInfo(function(user) {
-            _rules[wordId] = RG._createRule(data, user, originalText, normalisedText, unit, reading, word, witnesses);
+            if (selectedWords.length > 0) {
+              for (let i = 0; i < selectedWords.length; i += 1) {
+                _rules[selectedWords[i].objOld.id] = RG._createRule(
+                  data,
+                  user,
+                  selectedWords[i].original_text,
+                  normalisedText,
+                  selectedWords[i].unit,
+                  selectedWords[i].reading,
+                  selectedWords[i].word,
+                  selectedWords[i].witnesses
+                );
+              }
+            } else {
+              _rules[wordId] = RG._createRule(data, user, originalText, normalisedText, unit, reading, word, witnesses);
+            }
           });
           document.getElementsByTagName('body')[0].removeChild(document.getElementById('reg_form'));
           rd.enableDrag(false, rd.objOld);
           $(original).addClass('regularisation_staged');
           $(original.parentNode).addClass('redips-mark');
+	        if ($(original).hasClass('selected_reg_word')) {
+            $(original).removeClass('selected_reg_word');
+          }
+          for (let i = 0; i < selectedWords.length; i += 1) {
+            $(selectedWords[i]).removeClass('selected_reg_word');
+            $(selectedWords[i]).addClass('regularisation_staged');
+            $(selectedWords[i].parentNode).addClass('mark');
+          };
+
           // add witnesses to normalised form in data structure
           const newUnitData = rd.td.target.firstChild.id;
-          if (newUnitData !== '') { //only try this if it is not a user added reading
+          if (newUnitData !== '') {  // only try this if it is not a user added reading
             newUnit = parseInt(newUnitData.substring(0, newUnitData.indexOf('_r')).replace('variant_unit_', ''), 10);
             newReading = parseInt(newUnitData.substring(newUnitData.indexOf('_r') + 2, newUnitData.indexOf('_w')), 10);
             if (CL.witnessAddingMode !== true) {
-              // TODO: check this isn't causing problems by not eliminating suffixes.
-              newWitnesses = CL.getReadingWitnesses(CL.data.apparatus[unit].readings[reading]);
+              newWitnesses = collectedWitnesses;
             } else {
-              // TODO: check this isn't causing problems by not eliminating suffixes.
-              newWitnesses = CL.getReadingWitnesses(CL.data.apparatus[unit].readings[reading]).filter(x => CL.witnessesAdded.includes(x));
+              newWitnesses = collectedWitnesses.filter(x => CL.witnessesAdded.includes(x));
             }
             if (Object.prototype.hasOwnProperty.call(CL.project, 'id')) {
               for (let i = 0; i < newWitnesses.length; i += 1) {
@@ -1157,7 +1273,7 @@ var RG = (function() {
               }
             }
           }
-        };
+        };  // end of createFunction
         $.get(staticUrl + 'CE_core/html_fragments/rule_menu.html', function(html) {
           let selected;
           const regMenu = document.createElement('div');
@@ -1284,7 +1400,8 @@ var RG = (function() {
 
     _makeMenu: function(menuName) {
       if (menuName === 'regularised') {
-        document.getElementById('context_menu').innerHTML = '<li id="delete_rule"><span>Delete rule</span></li>';
+        document.getElementById('context_menu').innerHTML = '<li id="delete_rule"><span>Delete rule</span></li>' +
+                                                            '<li id="delete_variant_unit_rules"><span>Delete rule for all witnesses</span></li>';
       }
       if (menuName === 'regularised_global') {
         document.getElementById('context_menu').innerHTML = '<li id="add_exception"><span>Add exception</span></li>' +
@@ -1399,47 +1516,24 @@ var RG = (function() {
     },
 
     _scheduleSelectedRulesDeletion: function () {
-      var element, row, tbody, selectableId;
-      element = SimpleContextMenu._target_element;
-      row = RG._getAncestorRow(element);
-      tbody = row.parentNode;
-      selectableId = tbody.id;
-      $('#' + selectableId + ' > tr.ui-selected').each(function () {
+      $('tr.selected_rule').each(function () {
         RG._scheduleRuleDeletion(this);
         // remove the class so it is not selected again if we delete more
-        $(this).removeClass('ui-selected');
+        $(this).removeClass('selected_rule');
       });
     },
 
     _scheduleRuleDeletion: function(element) {
-      let i, j, ruleType, witnessData, ok;
       if (element === undefined) {
         element = SimpleContextMenu._target_element;
       }
       const row = RG._getAncestorRow(element);
       const unitNum = row.id.substring(row.id.indexOf('_unit_') + 6, row.id.indexOf('_row_'));
-      const rowNum = row.id.substring(row.id.indexOf('_row_') + 5, row.id.indexOf('_word_'));
-      const wordNum = row.id.substring(row.id.indexOf('_word_') + 6, row.id.indexOf('_rule_'));
       const ruleId = row.id.substring(row.id.indexOf('_rule_') + 6);
-      const wordData = CL.data.apparatus[unitNum].readings[rowNum].text[wordNum];
-      const witnesses = wordData.reading;
-      ruleType = null;
-      i = 0;
-      while (i < witnesses.length && ruleType === null) {
-        witnessData = wordData[witnesses[i]];
-        if (Object.prototype.hasOwnProperty.call(witnessData, 'decision_details')) {
-          j = 0;
-          while (j < witnessData.decision_details.length && ruleType === null) {
-            if (ruleId === witnessData.decision_details[j].id) {
-              ruleType = witnessData.decision_details[j].scope;
-            }
-            j += 1;
-          }
-        }
-        i += 1;
-      }
+      const rule = RG._allDeletableRules[unitNum][ruleId];
+      const ruleType = rule.scope;
       if (ruleType === 'always') {
-        ok = confirm('You are asking to delete a global rule.\nDeleting this rule will mean it is deleted everywhere ' +
+        const ok = confirm('You are asking to delete a global rule.\nDeleting this rule will mean it is deleted everywhere ' +
                      'in your project for all editors.\nIf you just want the rule to be ignored in this verse you can ' +
                      'add an exception.\nAre you sure you want to delete this rule?');
         if (ok) {
@@ -1460,6 +1554,32 @@ var RG = (function() {
       }
     },
 
+    _scheduleAllRuleDeletion: function() {
+      /* schedule the deletion of all rules in the unit which match the n, t and scope of the clicked rule */
+      const element = SimpleContextMenu._target_element;
+      const row = RG._getAncestorRow(element);
+      const unitNum = row.id.substring(row.id.indexOf('_unit_') + 6, row.id.indexOf('_row_'));
+      const ruleId = row.id.substring(row.id.indexOf('_rule_') + 6);
+      const rule = RG._allDeletableRules[unitNum][ruleId];
+      const ok = confirm(
+        'You are asking to delete all regularisations of "' + rule.t + '" to "' + rule.n + '".\n' +
+        'Are you sure you want to delete this regularisation in all witnesses in this variant unit?'
+      );
+      if (ok) {
+        // find all the rules we need to delete
+        for (let key in RG._allDeletableRules[unitNum]) {
+          if (RG._allDeletableRules[unitNum][key].n === rule.n &&
+              RG._allDeletableRules[unitNum][key].t === rule.t &&
+              RG._allDeletableRules[unitNum][key].scope === rule.scope) {
+            $('#' + key).closest('tr').addClass('deleted');
+            _forDeletion.push({id: key, scope: rule.scope});
+          }
+        }
+      } else {
+        return;
+      }
+    },
+
     _addContextMenuHandlers: function() {
       if (document.getElementById('delete_rule')) {
         $('#delete_rule').off('click.dr_c');
@@ -1470,6 +1590,12 @@ var RG = (function() {
         $('#delete_rule').on('mouseover.dr_mo', function() {
           CL.hideTooltip();
         });
+      }
+      if (document.getElementById('delete_variant_unit_rules')) {
+        $('#delete_variant_unit_rules').off('click.dar_c');
+        $('#delete_variant_unit_rules').off('mouseover.dar_mo');
+        $('#delete_variant_unit_rules').on('click.dar_c', function() {RG._scheduleAllRuleDeletion();});
+        $('#delete_variant_unit_rules').on('mouseover.dar_mo', function() {CL.hideTooltip();});
       }
       if (document.getElementById('add_exception')) {
         $('#add_exception').off('click.ae_c');

@@ -4,16 +4,20 @@ search_enabled: true
 auto_page_title: true
 sidebar:
   - index
-  - installation
-  - label: Services File
+  - label: Setup
     children:
-       - required-variables
-       - required-functions
-       - optional-variables
-       - optional-functions
-  - python-services
-  - project-settings
-  - data-format
+      - initialisation
+      - python-services
+      - services-file
+  - label: Configuration
+    children:
+      - optional-variables
+      - optional-functions
+      - project-settings
+  - label: Input Data
+    children:
+    - data-format
+    - collation-unit
   - label: Upgrading Versions
     children:
       - upgrade-3-0-x
