@@ -10,6 +10,7 @@ sidebar:
     children:
       - text-repo-structure
       - collation-unit
+      - project-config
   - label: Configuration
     children:
       - optional-variables
