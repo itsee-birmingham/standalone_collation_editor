@@ -23,7 +23,10 @@ The behaviour of the collation editor can be configured at both the service leve
 Project configurations will override the service level configurations which will in turn override any default configurations provided.
 The configurations available at the services level are documented in the Services File section. If a setting can also be used at the
 project level it is mentioned in the services file documentation. Settings only available at project level are documented in the
-project settings section. Not all configuration options from the core code are available in the standalone version, for example the file based system offered in the standalone collation editor only supports two scopes (once and always) due to the storage and retrieval limitations.
+project settings section. 
+
+Not all configuration options from the core code are available in the standalone version, for example the file based system
+offered in the standalone collation editor only supports two scopes (once and always) due to the storage and retrieval limitations.
 
 ## Acknowledgements
 

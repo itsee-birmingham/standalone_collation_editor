@@ -9,4 +9,9 @@ sidebar:
   - label: Collating Your Data
     children:
       - text-repo-structure
-      - data-format
+      - collation-unit
+  - label: Configuration
+    children:
+      - optional-variables
+      - optional-functions
+      - project-settings
