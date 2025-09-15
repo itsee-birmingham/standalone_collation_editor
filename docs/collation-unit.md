@@ -10,7 +10,7 @@ The data structure for each collation unit should be a JSON object with the foll
 - **transcription_identifier** *[string]* [optional] If the value of the **transcription** key is not the same as the value used in the index form to request the transcriptions then that value should be provided here.
 - **siglum** *[string]* The siglum for the manuscript represented by this object.
 - **duplicate_position** *[integer]* [optional] The position of the unit in relation to other instances of this same unit if this unit appears multiple.
-- **witnesses** *[array]* An array of witness object, an empty array or ```null``` depending on the unit, this and the data structure expected is explained below.
+- **witnesses** *[array]* An array of witness object, an empty array or `null` depending on the unit, this and the data structure expected is explained below.
 
 Other keys can be included if they are needed for other functions in the platform.
 
