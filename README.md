@@ -7,7 +7,7 @@ The collation editor is a GUI wrapper around [collateX](https://collatex.net/). 
 
 Requirements
 ---
-The collation editor requires Python3. It should work with python 3.9 - 3.12, it does not work with 3.13.
+The collation editor requires Python3. It should work with python 3.10 - 3.13.
 
 The version of collateX packaged with this code requires Java Runtime Environment (JRE) version 8 or higher.
 
@@ -41,7 +41,7 @@ If the collation editor has started successfully you should be able to see the c
 
 Further Documentation
 ---
-For details of how to collate the example and prepare your own data for use in the standalone collation editor see the project wiki https://github.com/itsee-birmingham/standalone_collation_editor/wiki
+For details of how to collate the example and prepare your own data for use in the standalone collation editor see [the documentation](https://itsee-birmingham.github.io/standalone_collation_editor/).
 
 Referencing
 ---

@@ -9,7 +9,7 @@
  *
  * As long as you leave the copyright notice of the original script, or link back to this website, you can use any of
  * the content published on this website free of charge for any use: commercial or noncommercial. However, under the
- * license they are released through there are limitations to what you may or may not do.
+ * license (CC BY 2.0 UK) they are released through there are limitations to what you may or may not do.
  *
  * You Can:
  * Use the resources in your personal work, in whole or part.
@@ -74,7 +74,7 @@ var SimpleContextMenu = {
       SimpleContextMenu._menus[classNames] = menuId;
     }
     if (typeof(classNames) == "object") {
-      for (x = 0; x < classNames.length; x += 1) {
+      for (let x = 0; x < classNames.length; x += 1) {
         SimpleContextMenu._menus[classNames[x]] = menuId;
       }
     }
@@ -93,7 +93,7 @@ var SimpleContextMenu = {
       if (typeof(className) != "undefined") {
         className = className.replace(/^\s+/g, "").replace(/\s+$/g, "");
         var classArray = className.split(/[ ]+/g);
-        for (i = 0; i < classArray.length; i += 1) {
+        for (let i = 0; i < classArray.length; i += 1) {
           if (SimpleContextMenu._menus[classArray[i]]) {
             return SimpleContextMenu._menus[classArray[i]];
           }
@@ -140,7 +140,7 @@ var SimpleContextMenu = {
 
   // private method. Shows context menu
   _show: function(e) {
-    var menuElementId, m, s, element, div, row_elem, row, type, subrow;
+    var menuElementId, m, s, element;
     SimpleContextMenu._hide();
     menuElementId = SimpleContextMenu._getMenuElementId(e);
     if (menuElementId !== null) {
@@ -150,12 +150,14 @@ var SimpleContextMenu = {
         s = SimpleContextMenu._getScrollPosition(e);
         SimpleContextMenu._menuElement = document.getElementById(menuElementId);
         SimpleContextMenu._menuElement.style.left = (m.x - 10) + s.x + 'px';
-        //110 here is the hard coded width set in simplecontextmenu in css
-        if (parseInt(SimpleContextMenu._menuElement.style.left) - document.getElementById('scroller').scrollLeft +
-                                                                  110 > window.innerWidth) {
-          SimpleContextMenu._menuElement.style.left = window.innerWidth +
-                                                      document.getElementById('scroller').scrollLeft -
-                                                      (110 + 35) + 'px';
+        if (document.getElementById('scroller')) {
+          // 110 here is the hard coded width set in simplecontextmenu in css
+          if (parseInt(SimpleContextMenu._menuElement.style.left) - document.getElementById('scroller').scrollLeft +
+                                                                    110 > window.innerWidth) {
+            SimpleContextMenu._menuElement.style.left = window.innerWidth +
+                                                        document.getElementById('scroller').scrollLeft -
+                                                        (110 + 35) + 'px';
+          }
         }
         SimpleContextMenu._menuElement.style.top = (m.y - 70) + s.y + 'px';
         element = document.elementFromPoint(m.x, m.y);

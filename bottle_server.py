@@ -20,7 +20,6 @@ def start_point():
 @route('/<app>', method=['GET', 'POST'])
 @route('/<app>/', method=['GET', 'POST'])
 def home(app):
-    # print('%s/%s/static' % (basedir, app))
     return static_file('index.html', root='%s/%s/static' % (basedir, app))
 
 
@@ -32,11 +31,6 @@ def core_static_files(app, core, static_type, filename):
 @route('/<app>/<static_type>/<filename:re:.*(js|css)>', method=['GET', 'POST'])
 def static_files(app, static_type, filename):
     return static_file(filename, root='%s/%s/static/%s/' % (basedir, app, static_type))
-
-
-# @route('/sitedomain.js')
-# def site_domain():
-#     return static_file('sitedomain.js', root='%s/static/' % (basedir))
 
 
 # the Store handler
@@ -101,11 +95,8 @@ def apply_settings():
 @route('/collation/apparatus/', method=['POST'])
 def apparatus():
     data = json.loads(request.params.data)
-    print(data)
     exporter_settings = request.params.settings
-    print(exporter_settings)
     options = request.params.options
-    print(options)
     if exporter_settings == 'null':
         exf = ExporterFactory()
         # assume default from core exporter

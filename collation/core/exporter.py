@@ -1,12 +1,40 @@
-# -*- coding: utf-8 -*-
 import re
-import codecs
-import json
-# using etree rather than lxml here to reduce dependencies in core code
 import xml.etree.ElementTree as etree
+from .restructure_export_data_mixin import RestructureExportDataMixin
 
 
-class Exporter(object):
+class Exporter(RestructureExportDataMixin, object):
+    """The basic exporter to export a collation unit apparatus to TEI XML.
+
+    This exporter offers a basic conversion of the collation editor aparatus format to an almost TEI compliant format
+    of XML. It works only one unit a time and does not include a header since the output will not be sufficient for
+    real world use. This exporter should be used as the base for a more complex exporter suitable for the text
+    being edited or the output from this exporter can be manually edited to produce the format required. The mixin
+    restructures the data from collation data into a simpler stripped down format to use for exporting and also
+    backfills some data which may be missing in collations produced in the early versions of the collation editor.
+
+    Args:
+        format (str, optional): The output format requires. options are [negative_xml|positive_xml].
+            Defaults to positive_xml.
+        include_punctuation (bool, optional): Indicates whether or not to include punctuation in the lemma.
+            Defaults to False.
+        ignore_basetext (bool, optional): Indicates whether or not to report the base text as a witness.
+        overlap_status_to_ignore (list, optional): A list of strings representing the overlap status categories
+            that should be ignored in the export. Defaults to ['overlapped','deleted'].
+        consolidate_om_verse (bool, optional): Indicates whether or not witnesses omitted in the entire collation
+            unit are listed once at the start of the apparatus or indicated in each variant unit. Defaults to True.
+        consolidate_lac_verse (bool, optional): Indicates whether or not witnesses which are lac for the entire
+            collation unit are listed once at the start of the apparatus or indicated in each variant unit.
+            Defaults to True.
+        include_lemma_when_no_variants (bool, optional): Indicates whether or not to include the lemma in the export
+            if it has no variant readings. Defaults to False.
+        exclude_lemma_entry (bool, optional): Indicates if the lemma entry in the apparatus should be excluded. If the
+            setting is True the apparatus will not have a <lem> tag for each entry. Defaults to False.
+        rule_classes (dict, optional): This is the dictionary representing the rule classes used in the current
+            editing project. Defaults to {}. Only needed for older data.
+        witness_decorators (list, optional): This is a list of JSON objects which define any decorators and the list of
+            witnesses to be decorated, this will always be set at project level. Defaults to [].
+    """
 
     def __init__(self,
                  format='positive_xml',
@@ -16,7 +44,10 @@ class Exporter(object):
                  consolidate_om_verse=True,
                  consolidate_lac_verse=True,
                  include_lemma_when_no_variants=False,
-                 rule_classes={}):
+                 exclude_lemma_entry=False,
+                 rule_classes={},
+                 witness_decorators=[],
+                 ):
 
         self.format = format
         self.include_punctuation = include_punctuation
@@ -29,96 +60,226 @@ class Exporter(object):
         self.consolidate_om_verse = consolidate_om_verse
         self.consolidate_lac_verse = consolidate_lac_verse
         self.include_lemma_when_no_variants = include_lemma_when_no_variants
+        self.exclude_lemma_entry = exclude_lemma_entry
         self.rule_classes = rule_classes
+        self.witness_decorators = witness_decorators
+        # set once in export_data
+        self.overtext_siglum = None
 
     def export_data(self, data):
+        """Takes the JSON data from the collation editor process it into TEI XML and returns that as a string.
+
+        The main function called by ExporterFactory.
+
+        Args:
+            data (dict): The JSON data structure from the collation editor.
+
+        Returns:
+            str: A string representing the serialised XML apparatus.
+        """
         output = []
-        for unit in data:
-            output.append(etree.tostring(self.get_unit_xml(unit), 'utf-8').decode())
+        self.overtext_siglum = data[0]['structure']['overtext_name']
+        for collation_unit in data:
+            restructured_collation_unit = self.clean_collation_unit(collation_unit)
+            if self.witness_decorators is not None:
+                restructured_collation_unit = self.add_witness_decorators(restructured_collation_unit)
+            output.append(etree.tostring(self.get_unit_xml(restructured_collation_unit), 'utf-8').decode())
         return '<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0">{}' \
                '</TEI>'.format('\n'.join(output).replace('<?xml version=\'1.0\' encoding=\'utf-8\'?>', ''))
 
-    def get_text(self, reading, type=None):
-        if type == 'subreading':
+    def add_witness_decorators(self, unit):
+        """Add any prescribed witness decorators to the specified witnesses.
+
+        Args:
+            unit (dict): The JSON data structure from the collation editor after restructuring.
+
+        Returns:
+            dict: The JSON data structure with the decorators added to witnesses.
+        """
+        all_decorators = {}
+        for decorator in self.witness_decorators:
+            decorated_hands = []
+            label = decorator['label']
+            for hand in unit['structure']['hand_id_map']:
+                if unit['structure']['hand_id_map'][hand] in decorator['witnesses'] and hand not in decorated_hands:
+                    decorated_hands.append(hand)
+            all_decorators[label] = decorated_hands
+        if 'lac_readings' in unit['structure']:
+            unit['structure']['lac_readings'] = self._decorate_witnesses(unit['structure']['lac_readings'],
+                                                                         all_decorators)
+        if 'om_readings' in unit['structure']:
+            unit['structure']['om_readings'] = self._decorate_witnesses(unit['structure']['om_readings'],
+                                                                        all_decorators)
+        for collation_unit in unit['structure']['apparatus']:
+            for reading in collation_unit['readings']:
+                reading['witnesses'] = self._decorate_witnesses(reading['witnesses'], all_decorators)
+                if 'subreadings' in reading:
+                    for type in reading['subreadings']:
+                        for subreading in reading['subreadings'][type]:
+                            subreading['witnesses'] = self._decorate_witnesses(subreading['witnesses'],
+                                                                               all_decorators)
+        return unit
+
+    def _decorate_witnesses(self, witnesses, all_decorators):
+        """Add the provided decorator(s) to the appropriate entries in the witness list provided.
+
+        Args:
+            witnesses (list): A list of witnesses from the collation structure.
+            all_decorators (dict): A dictionary containing the decorator label and the witnesses it applies to.
+
+        Returns:
+            list: The decorated witness list.
+        """
+        for i, witness in enumerate(witnesses):
+            for decorator in all_decorators:
+                if witness in all_decorators[decorator]:
+                    witnesses[i] = witnesses[i].replace(witness, f'{witness}{decorator}')
+        return witnesses
+
+    def get_text(self, reading, is_subreading=False):
+        """Extracts the text of the reading supplied and returns it as a string.
+
+        Args:
+            reading (dict): The JSON segment representing a reading in the collation editor apparatus.
+            is_subreading (bool, optional): Set to true if this reading is a subreading and not a main reading.
+                Defaults to False.
+
+        Returns:
+            list: A list with at most two items, the first is a string of the text of the reading, the second an
+                optional string representing the type of the reading in the case of a reading with no text (such as a
+                lac or om reading).
+        """
+        if is_subreading is True:
             return [reading['text_string'].replace('&lt;', '<').replace('&gt;', '>')]
         if len(reading['text']) > 0:
-            if 'text_string' in reading:
-                return [reading['text_string'].replace('&lt;', '<').replace('&gt;', '>')]
-            return [' '.join(i['interface'] for i in reading['text'])]
-        else:
-            if 'overlap_status' in reading.keys() and (reading['overlap_status'] in self.overlap_status_to_ignore):
-                text = ['', reading['overlap_status']]
-            # TODO: make sure this works for special category readings
-            elif 'type' in reading.keys() and reading['type'] in ['om_verse', 'om']:
-                if 'details' in reading.keys():
-                    text = [reading['details'], reading['type']]
-                else:
-                    text = ['om', reading['type']]
-            elif 'type' in reading.keys() and reading['type'] in ['lac_verse', 'lac']:
-                if 'details' in reading.keys():
-                    text = [reading['details'], reading['type']]
-                else:
-                    text = ['lac', reading['type']]
-        return text
+            return [reading['text_string'].replace('&lt;', '<').replace('&gt;', '>')]
+        if 'overlap_status' in reading.keys():
+            if reading['overlap_status'] in self.overlap_status_to_ignore:
+                return ['', reading['overlap_status']]
+            return [reading['overlap_status'], 'overlapped']
+        if 'type' in reading.keys() and reading['type'] in ['om_verse', 'om']:
+            if 'details' in reading.keys():
+                return [reading['details'], 'om']
+            return ['om.', 'om']
+        if 'type' in reading.keys() and reading['type'] in ['lac_verse', 'lac']:
+            if 'details' in reading.keys():
+                return [reading['details'], 'lac']
+            else:
+                return ['lac.', 'lac']
 
     def get_lemma_text(self, overtext, start, end):
+        """Function to get the text of the lemma within the specified range in the overtext.
+
+        Args:
+            overtext (dict): The JSON segment representing the overtext tokens for this unit. The data should be
+                wrapped in a dictionary as the value to the key 'current'
+                eg. {'current': [{'index': 2, 'original': 'word1'}, {'index': 4, 'original': 'word2}]}
+            start (str): The start index for the current lemma required.
+            end (str): The end index for the current lemma required.
+
+        Returns:
+            list: A list of up to two items, the first is the string representing the overtext for this range,
+                the optional second item is the string 'om' if the first item is an empty string.
+        """
+        start = int(start)
+        end = int(end)
         if start == end and start % 2 == 1:
             return ['', 'om']
+        if start % 2 == 1:
+            start += 1
         real_start = int(start/2)-1
         real_end = int(end/2)-1
         if real_start < 0:
             real_start = 0
-        word_list = [x['original'] for x in overtext['tokens']]
-        return [' '.join(word_list[real_start:real_end+1])]
+        required_text = overtext['current'][real_start:real_end+1]
+        words = []
+        for token in required_text:
+            word = []
+            if self.include_punctuation and 'pc_before' in token:
+                word.append(token['pc_before'])
+            word.append(token['original'])
+            if self.include_punctuation and 'pc_after' in token:
+                word.append(token['pc_after'])
+            words.append(''.join(word))
+        return [' '.join(words)]
 
-    def get_witnesses(self, reading, missing):
+    def get_witnesses(self, reading, to_remove):
+        """Function to return the witnesses that should be reported for the given reading.
+
+        Args:
+            reading (dict): The JSON segment representing the reading.
+            to_remove (list): A list of witnesses which should be excluded from the output.
+
+        Returns:
+            list: The list of witnesses to this reading once the witnesses in the to_remove list have been removed.
+        """
+        # suffixes can be joined to witnesses before removing the unrequired witnesses because the unrequired witnesses
+        # will not have edited text and therefore not have suffixes. They will be lac, om or the basetext.
         witnesses = ['{}{}'.format(x, reading['suffixes'][i]) for i, x in enumerate(reading['witnesses'])]
-        for miss in missing:
-            if miss in witnesses:
-                witnesses.remove(miss)
+        for wit in to_remove:
+            if wit in witnesses:
+                witnesses.remove(wit)
         return witnesses
 
-    def get_label(self, label, type, subtype, reading):
-        if type == 'subreading':
-            return label
-        if subtype is None:
+    def get_label(self, label, is_subreading, reading):
+        """Function to get the correct label to display for the reading.
+
+        Args:
+            label (str): The current label of the reading (the basic form for a main reading or the full label
+                for a subreading).
+            is_subreading (bool): A boolean to say whether or not this is a subreading.
+            reading (dict): The JSON segment representing the reading.
+
+        Returns:
+            str: The label to display for the reading.
+        """
+        if is_subreading is True:
             return label
         if 'label_suffix' in reading:
             return '{}{}'.format(label, reading['label_suffix'])
-        for entry in self.rule_classes:
-            if entry['value'] == subtype:
-                if entry['suffixed_label'] is True:
-                    return '{}{}'.format(label, entry['identifier'])
-                break
         return label
 
-    def check_for_suffixed_reading_marker(self, text, subtype, reading):
-        if subtype is None:
-            return text
+    def check_for_suffixed_reading_marker(self, text, reading):
+        """Function to add any required reading suffixes to the text of the reading.
+
+        Args:
+            text (str): The extracted text of the current reading.
+            reading (dict): The JSON segment representing the reading.
+
+        Returns:
+            str: The text of the reading as it should now be displayed including any suffixes.
+        """
         if 'reading_suffix' in reading:
             text[0] = '{} ({})'.format(text[0], reading['reading_suffix'])
             return text
-        for entry in self.rule_classes:
-            if entry['value'] == subtype:
-                if entry['suffixed_reading'] is True:
-                    text[0] = '{} ({})'.format(text[0], entry['identifier'])
-                    return text
-                break
         return text
 
-    def make_reading(self, reading, i, label, witnesses, type=None, subtype=None):
+    def make_reading(self, reading, index_position, label, witnesses, is_subreading=False, subtype=None):
+        """Function to make the TEI XML version of a reading.
+
+        Args:
+            reading (dict): The JSON segment representing the reading.
+            index_position (int): The position of this reading in the apparatus unit.
+            label (str): The current label of the reading (the basic form).
+            witnesses (list): A list of witnesses for this reading.
+            is_subreading (bool, optional): A boolean indicating if this reading is a subreading. Defaults to False.
+            subtype (str, optional): The subtype category of this reading. Defaults to None.
+
+        Returns:
+            ElementTree.Element: The XML structure as an element tree rdg element.
+        """
         rdg = etree.Element('rdg')
-        rdg.set('n', self.get_label(label, type, subtype, reading))
-        text = self.get_text(reading, type)
-        text = self.check_for_suffixed_reading_marker(text, subtype, reading)
-        if type:
-            rdg.set('type', type)
+        rdg.set('n', self.get_label(label, is_subreading, reading))
+        text = self.get_text(reading, is_subreading)
+        text = self.check_for_suffixed_reading_marker(text, reading)
+        if is_subreading is True:
+            rdg.set('type', 'subreading')
         elif len(text) > 1:
             rdg.set('type', text[1])
         if subtype:
             rdg.set('cause', subtype)
         rdg.text = text[0]
-        pos = i+1
+        pos = index_position + 1  # add one because of 0-indexing
         rdg.set('varSeq', '{}'.format(pos))
         if len(witnesses) > 0:
             rdg.set('wit', ' '.join(witnesses))
@@ -130,9 +291,19 @@ class Exporter(object):
             rdg.append(wit)
         return rdg
 
-    # This function removes any duplicate letters in the subreading suffix. Version 2.0 prevents this from happening
-    # in the data when items are approved but before that duplication could have been saved in the data.
     def fix_subreading_suffix(self, suffix):
+        """This function removes duplicate letters from the supplied subreading suffix.
+
+        This function removes any duplicate letters in the supplied subreading suffix. Version 2.0 of the collation
+        editor prevents this from happening in the data when items are approved but before that duplication could have
+        been saved in the data.
+
+        Args:
+            suffix (str): The subreading suffix.
+
+        Returns:
+            str: The subreading suffix with duplicate letters removed.
+        """
         if len(suffix) <= 1:
             return suffix
         new_label = []
@@ -141,19 +312,57 @@ class Exporter(object):
                 new_label.append(char)
         return ''.join(new_label)
 
+    def get_required_end(self, unit, context):
+        """This is a function which is not important when working on a single unit where the end value is taken
+        directly from the unit. It is a separate function so inheriting classes, which may be joining readings
+        over multiple units, can overwrite it to provide the end value required.
+
+        Args:
+            unit (dict): The current apparatus unit being processed.
+            context (str): The context of this collation unit (used in inheriting classes to recognise joined readings)
+
+        Returns:
+            str: The string to use for the end value in the apparatus <app> tag.
+        """
+        return unit['end']
+
+    def get_subreading_label(self, parent_label, subreading):
+        """Work out the subreading label and return it as a string."""
+        label = [parent_label]
+        if 'suffix' in subreading:
+            label.append(self.fix_subreading_suffix(subreading['suffix']))
+        if 'position_suffix' in subreading:
+            label.append(subreading['position_suffix'])
+        return ''.join(label)
+
     def get_app_units(self, apparatus, overtext, context, missing):
+        """Function to take the JSON apparatus and turn it into a list of ElementTree.Elements with each entry
+        representing one variant unit in TEI XML.
+
+        Args:
+            apparatus (dict): The JSON segment representing the apparatus for this unit.
+            overtext (dict): The JSON segment representing the overtext for this unit. The data should be wrapped in a
+                             dictionary as the value to the key 'current'
+                             eg. {'current': [{'id': 'basetext', 'tokens': []}]}
+            context (str): The reference for this apparatus unit context.
+            missing (list): The list of witnesses to exclude from this apparatus.
+
+        Returns:
+            list: A list of XML elements which make up the apparatus for this unit.
+        """
         app_list = []
         for unit in apparatus:
             start = unit['start']
-            end = unit['end']
+            end = self.get_required_end(unit, context)
             app = etree.fromstring('<app type="main" n="%s" from="%s" to="%s"></app>' % (context, start, end))
-            lem = etree.Element('lem')
-            lem.set('wit', overtext['id'])
-            text = self.get_lemma_text(overtext, int(start), int(end))
-            lem.text = text[0]
-            if len(text) > 1:
-                lem.set('type', text[1])
-            app.append(lem)
+            if self.exclude_lemma_entry is not True:
+                lem = etree.Element('lem')
+                lem.set('wit', self.overtext_siglum)
+                text = self.get_lemma_text(overtext, start, end)
+                lem.text = text[0]
+                if len(text) > 1:
+                    lem.set('type', text[1])
+                app.append(lem)
             readings = False
             if self.include_lemma_when_no_variants:
                 readings = True
@@ -169,18 +378,17 @@ class Exporter(object):
                             readings = True
                         subtype = None
                         if 'reading_classes' in reading:
-                            subtype = ' '.join(reading['reading_classes'])
+                            subtype = '|'.join(reading['reading_classes'])
                         app.append(self.make_reading(reading, i, reading['label'], wits, subtype=subtype))
+
                     if 'subreadings' in reading:
                         for key in reading['subreadings']:
                             for subreading in reading['subreadings'][key]:
                                 wits = self.get_witnesses(subreading, missing)
                                 if len(wits) > 0:
                                     readings = True
-                                    subreading_label = '{}{}'.format(reading['label'],
-                                                                     self.fix_subreading_suffix(subreading['suffix']))
-                                    app.append(self.make_reading(subreading, i, subreading_label,
-                                                                 wits, 'subreading', key))
+                                    subreading_label = self.get_subreading_label(reading['label'], subreading)
+                                    app.append(self.make_reading(subreading, i, subreading_label, wits, True, key))
 
                 else:
                     if ((len(wits) > 0 or reading['label'] == 'a' or 'subreadings' in reading)
@@ -192,47 +400,57 @@ class Exporter(object):
                         if 'reading_classes' in reading:
                             subtype = ' '.join(reading['reading_classes'])
                         app.append(self.make_reading(reading, i, reading['label'], wits, subtype=subtype))
+
                     if 'subreadings' in reading:
                         for key in reading['subreadings']:
                             for subreading in reading['subreadings'][key]:
                                 wits = self.get_witnesses(subreading, missing)
                                 if len(wits) > 0:
                                     readings = True
-                                    subreading_label = '{}{}'.format(reading['label'],
-                                                                     self.fix_subreading_suffix(subreading['suffix']))
-                                    app.append(self.make_reading(subreading, i, subreading_label,
-                                                                 wits, 'subreading', key))
+                                    subreading_label = self.get_subreading_label(reading['label'], subreading)
+                                    app.append(self.make_reading(subreading, i, subreading_label, wits, True, key))
 
             if readings:
                 app_list.append(app)
         return app_list
 
+    def get_overtext_data(self, entry):
+        return {'current': entry['structure']['overtext']}
+
+    def sort_units(self, unit):
+        return (unit['start'], -unit['end'])
+
     def get_unit_xml(self, entry):
+        """Function to turn the JSON apparatus of the collation unit into TEI XML.
+
+        Args:
+            entry (dict): The JSON fragment representing the apparatus of a collation unit.
+
+        Returns:
+            ElementTree.Element: The root element of a tree representing this collation unit in TEI XML.
+        """
         context = entry['context']
-        basetext_siglum = entry['structure']['overtext'][0]['id']
+        basetext_siglum = self.overtext_siglum
 
         apparatus = entry['structure']['apparatus'][:]
 
-        # make sure we append lines in order
-        ordered_keys = []
+        # add all the apparatus line data into one line (order doesn't matter as we sort the units later)
         for key in entry['structure']:
             if re.match(r'apparatus\d+', key) is not None:
-                ordered_keys.append(int(key.replace('apparatus', '')))
-        ordered_keys.sort()
+                apparatus.extend(entry['structure'][key])
 
-        for num in ordered_keys:
-            apparatus.extend(entry['structure']['apparatus{}'.format(num)])
-
-        vtree = etree.fromstring('<ab xml:id="{}-APP"></ab>'.format(context))
+        vtree = etree.fromstring('<ab n="{}-APP"></ab>'.format(context))
         # here deal with the whole verse lac and om and only use witnesses elsewhere not in these lists
         missing = []
         if self.consolidate_om_verse or self.consolidate_lac_verse:
             app = etree.fromstring('<app type="lac" n="{}">'
                                    '<lem wit="editorial">Whole verse</lem>'
                                    '</app>'.format(context))
+            add_whole_verse_app = False
 
             if self.consolidate_lac_verse:
                 if len(entry['structure']['lac_readings']) > 0:
+                    add_whole_verse_app = True
                     rdg = etree.Element('rdg')
 
                     rdg.set('type', 'lac')
@@ -250,6 +468,7 @@ class Exporter(object):
 
             if self.consolidate_om_verse:
                 if len(entry['structure']['om_readings']) > 0:
+                    add_whole_verse_app = True
                     rdg = etree.Element('rdg')
                     rdg.set('type', 'lac')
                     rdg.text = 'Om.'
@@ -263,16 +482,16 @@ class Exporter(object):
                     rdg.append(wit)
                     app.append(rdg)
                 missing.extend(entry['structure']['om_readings'])
-
-            vtree.append(app)
+            if add_whole_verse_app:
+                vtree.append(app)
 
         # if we are ignoring the basetext add it to our missing list so it isn't listed (except in lemma)
         if self.ignore_basetext:
             missing.append(basetext_siglum)
-        # this sort will change the order of the overlap units so longest starting at each index point comes first
-        apparatus = sorted(apparatus, key=lambda d: (d['start'], -d['end']))
+        apparatus = sorted(apparatus, key=self.sort_units)
+        overtext = self.get_overtext_data(entry)
 
-        app_units = self.get_app_units(apparatus, entry['structure']['overtext'][0], context, missing)
+        app_units = self.get_app_units(apparatus, overtext, context, missing)
         for app in app_units:
             vtree.append(app)
 

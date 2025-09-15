@@ -1,0 +1,18 @@
+title: Standalone Collation Editor
+remote_theme: catsmith/jekyll-theme-zendesk-garden@main
+search_enabled: true
+auto_page_title: true
+sidebar:
+  - index
+  - installation
+  - collating-example
+  - label: Collating Your Data
+    children:
+      - text-repo-structure
+      - collation-unit
+      - project-config
+  - label: Configuration
+    children:
+      - optional-variables
+      - optional-functions
+      - project-settings

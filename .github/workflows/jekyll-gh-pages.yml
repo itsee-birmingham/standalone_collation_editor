@@ -27,7 +27,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4  
+      - name: Copy Core Pages
+        run: |
+          cp collation/core/docs/collation-unit.md ./docs/
+          cp collation/core/docs/services_file/optional-functions.md ./docs/services_file/
+          cp collation/core/docs/services_file/optional-variables.md ./docs/services_file/
+          cp collation/core/docs/project-settings.md ./docs/
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Build with Jekyll

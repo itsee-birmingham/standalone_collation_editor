@@ -1,0 +1,39 @@
+name: ci-eslint
+
+on: [push]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: "20.10.0"
+
+      # Speed up subsequent runs with caching
+      - name: Cache node modules
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-node-modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      # install eslint
+      - name: Install eslint
+        run: npm i eslint 
+      
+      - name: Install plugin
+        run: npm i @stylistic/eslint-plugin
+
+      # lint the files
+      - name: Do the linting
+        run: node_modules/eslint/bin/eslint.js static/CE_core/js/*.js --ignore-pattern "**/*.min.js"
+

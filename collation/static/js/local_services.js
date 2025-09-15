@@ -6,6 +6,16 @@ local_services = (function() {
     CL.setServiceProvider(local_services);
   });
 
+   _local_user = {
+    id: 'default',
+  };
+
+  _current_project = 'default';
+
+  _data_repo = staticUrl + 'data/';
+
+  _data_store_service_url = staticUrl + 'datastore/';
+
   //compulsory settings
 
 	const supportedRuleScopes = {'once': 'This place, these wits',
@@ -56,7 +66,8 @@ local_services = (function() {
 	  });
 	};
 
-  // if verse is passed, then verse rule; otherwise global
+  // this is only used when we are removing an existing global exception
+  // the collation editor does the removal so we only need to save this as there are no concurrecy issues
 	updateRules = function(rules, verse, success_callback) {
 	  updateRuleset([], [], rules, verse, success_callback);
   },
@@ -84,7 +95,7 @@ local_services = (function() {
           _last_modified_by_display: user.name
         };
         _put_resource(_get_rule_type(for_addition[j], verse), for_addition[j], function(result) {
-          // we know how special we are and we always and only update a rule when we are adding an exception
+          // we know how special we are and we always and only update a rule when we are adding an exception (no other rules are ever edited)
           return updateRuleset(for_deletion, for_global_exceptions, for_addition, verse, success_callback, i, ++j, k);
         });
       });
@@ -364,17 +375,6 @@ local_services = (function() {
       });
     });
   };
-
-  //internal service functions/values
-  _local_user = {
-    id: 'default',
-  };
-
-  _current_project = 'default';
-
-  _data_repo = staticUrl + 'data/';
-
-  _data_store_service_url = staticUrl + 'datastore/';
 
   _generate_uuid = function () {
                         var new_uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
