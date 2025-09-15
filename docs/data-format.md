@@ -7,10 +7,13 @@ sidebar_label: Data Format
 The data structure for each witness retrieved for collation by the ```getUnitData()``` function should follow the 
 structure outlined in the [collation unit section](collation-unit.md).
 
+Units which are lacunose or omitted in a witness require special treatment. 
 
-## Encoding Units which are Entirely Omitted or Lacunose
+## ommitted units
 
-If an entire unit is omitted then the witnesses key value should either be ```null``` or an empty array (both are treated in the same way).
+If an entire unit is omitted then a collation unit should be returned but the `witnesses` key value should either be ```null``` or an empty array (both are treated in the same way).
+
+## lacunose units
 
 If an entire unit is lac and does not require any special category label in the collation editor then it should not be returned in the data.
 
