@@ -31,8 +31,8 @@ jobs:
       - name: Copy Core Pages
         run: |
           cp collation/core/docs/collation-unit.md ./docs/data/
-          cp collation/core/docs/optional-functions.md ./docs/data/
-          cp collation/core/docs/optional-variables.md ./docs/data/
+          cp collation/core/docs/services_file/optional-functions.md ./docs/data/
+          cp collation/core/docs/services_file/optional-variables.md ./docs/data/
           cp collation/core/docs/project-settings.md ./docs/data/
       - name: Setup Pages
         uses: actions/configure-pages@v5
