@@ -4,17 +4,17 @@ title: Optional Services File Variables
 sidebar_label: Services File Variables
 ---
 
-## ```localJavaScript```
+## `localJavaScript`
 
 This variable should be an array of strings giving the full url of any additional JavaScript you need the collation editor to load. These might be required run the services for your framework (an internal api file for example) or you might want to use additional files to store configuration functions that you call in the services. These files will be loaded as part of the collation editor initialisation functions called after the services have been set.
 
-## ```undoStackLength```
+## `undoStackLength`
 
 This variable determines how many snapshots of the data are stored to enable to the undo button to work, in other words how many actions you are able to undo. A full version of the data structure is held in browser memory for each position in the stack. If you have  a lot of witnesses and/or longer units then setting this too high may cause problems.  Because of the possible memory issues this can only be set in services and cannot be changed in project settings.
 
 The default is 6.
 
-## ```localCollationFunction```
+## `localCollationFunction`
 
 **This variable can be overridden in individual project settings (but this may not be advisable)**
 
@@ -32,13 +32,13 @@ The method will be provided with the data to collate in the JSON format required
 
 The referenced python function should return the JSON output from collateX or equivalent.
 
-## ```collatexHost```
+## `collatexHost`
 
 **There is a default in the core code which is explained below**
 
-This variable should be used if the system uses the collateX Java microservices and they are not running at the default location of ```http://localhost:7369/collate```. The variable should provide the full url at which the collateX microservices can be found. If the ```localCollationFunction``` has been set then that function will be used rather than the microservices and this variable will not be used.
+This variable should be used if the system uses the collateX Java microservices and they are not running at the default location of `http://localhost:7369/collate`. The variable should provide the full url at which the collateX microservices can be found. If the `localCollationFunction` has been set then that function will be used rather than the microservices and this variable will not be used.
 
-## ```collationAlgorithmSettings```
+## `collationAlgorithmSettings`
 
 **This variable can be overridden in individual project settings**
 
@@ -52,35 +52,35 @@ This variable is used to set the starting point for the algorithm settings to be
 
 The default setting in the code will use the Dekker algorithm with fuzzy matching turned on and a distance of 2.
 
-If ```CL.loadIndexPage()``` or a button with the id *collation_settings* was provided on the index page then the user can override these settings on a unit by unit basis.
+If `CL.loadIndexPage()` or a button with the id *collation_settings* was provided on the index page then the user can override these settings on a unit by unit basis.
 
 **NB:** this setting was new in version 2.0.0 and the default settings have changed from previous versions.
 
-## ```lacUnitLabel```
+## `lacUnitLabel`
 
 **This variable can be overridden in individual project settings**
 
 This variable should be a string and should be the text the collation editor needs to display for any witnesses which are lacunose for the entire collation unit. The default, which will be used if this variable is not present, is 'lac unit'. Until version 2.0.0 the default text was 'lac verse'.
 
-## ```omUnitLabel```
+## `omUnitLabel`
 
 **This variable can be overridden in individual project settings**
 
 This variable should be a string and should be the text the collation editor needs to display for any witnesses which omit the entire collation unit. The default, which will be used if this variable is not present, is 'om unit'. Until version 2.0.0 the default text was 'om verse'.
 
-## ```omCategories```
+## `omCategories`
 
 **This variable can be overridden in individual project settings**
 
 This variable should be an array of strings. If provided the editor will be give the option to categorise om readings using the labels in the array in the Order Readings screen.
 
-## ```allowCommentsOnRegRules```
+## `allowCommentsOnRegRules`
 
 **This variable can be overridden in individual project settings**
 
 This variable is a boolean which determines whether or not to show the comments text box in the regularisation rule menu. Nothing happens to these comments appart from them being saved along with the rule so the default is false. This setting should only be set to true if the platform using the collation editor has a mecahnism for using these comments in some way.
 
-## ```showSelectAllVariantsOption```
+## `showSelectAllVariantsOption`
 
 **This variable can be overridden in individual project settings**
 
@@ -88,7 +88,7 @@ This variable is a boolean which determines whether or not to show the comments 
 
 This variable is a boolean which determines whether ot not to show the button to select all variants in the variant unit for regularisation to the same token. This can be useful for texts with large numbers of spelling variants. The collation editor (from v3) also allows multiple selection of tokens by holding shift/alt and clicking on each one, this is an additional option to select them all with a single click.
 
-## ```allowWitnessChangesInSavedCollations```
+## `allowWitnessChangesInSavedCollations`
 
 **This variable can be overridden in individual project settings**
 
@@ -96,19 +96,19 @@ This variable determines whether witnesses can be added to or removed from saved
 
 The default is false.
 
-## ```showCollapseAllUnitsButton```
+## `showCollapseAllUnitsButton`
 
 **This variable can be overridden in individual project settings**
 
 This variable is a boolean which determines whether or not to show the button in the footer of all stages of the collation editor which allows all the units to be collapsed to show only the a reading. The default is false. Until version 2.0.0  this button was included by default.
 
-## ```showGetApparatusButton```
+## `showGetApparatusButton`
 
 **This variable can be overridden in individual project settings**
 
-This variable is a boolean which determines whether or not to show the button in the footer of the approved stage of the collation editor. When present the button allows the user to download an export of the current unit apparatus based on the settings provided in the ```exporterSettings``` variable. If this variable is set to true (or the default is being used) then either ```getApparatusForContext()``` or ```apparatusServiceUrl``` must also be provided in the services file. If neither of these items are available then the get apparatus button will not be shown even if this variable is set to true. The default is true.
+This variable is a boolean which determines whether or not to show the button in the footer of the approved stage of the collation editor. When present the button allows the user to download an export of the current unit apparatus based on the settings provided in the `exporterSettings` variable. If this variable is set to true (or the default is being used) then either `getApparatusForContext()` or `apparatusServiceUrl` must also be provided in the services file. If neither of these items are available then the get apparatus button will not be shown even if this variable is set to true. The default is true.
 
-## ```extraFooterButtons```
+## `extraFooterButtons`
 
 **This variable can be overridden in individual project settings on a stage by stage basis but addExtraFooterFunctions() in the services file must provide all the functions added in the projects**
 
@@ -132,7 +132,7 @@ extraFooterButtons = {
 };
 ```
 
-## ```preStageChecks```
+## `preStageChecks`
 
 **This variable can be overridden in individual project settings on a stage by stage basis**
 
@@ -142,7 +142,7 @@ The data should be structured as a JSON object with the stage/s to be modified a
 
 The value of this key should be an array of JSON objects each with the following three keys:
 
-- **function** *[string]* - the function to run. The can either be the function itself (in the services file only) or, as in the example below a reference to a function elsewhere such as the JavaScript files listed in the ```localJavaScript``` variable.
+- **function** *[string]* - the function to run. The can either be the function itself (in the services file only) or, as in the example below a reference to a function elsewhere such as the JavaScript files listed in the `localJavaScript` variable.
 - **pass_condition** *[boolean]* - the boolean returned from the function if the test has passed and the user may continue to the next stage.
 - **fail_message** *[string]* - the string displayed to the user if a test condition fails and they are prevented from moving to the next stage.
 
@@ -176,7 +176,7 @@ The example below shows two checks added between set variants and order readings
   };
 ```
 
-## ```allowOutOfOrderWitnesses```
+## `allowOutOfOrderWitnesses`
 
 **This variable can be overridden in individual project settings**
 
@@ -186,7 +186,7 @@ The setting has no effect on the witnesses above overlapping units which are alw
 
 The default is false.
 
-## ```witnessesAllowedToBeOutOfOrder```
+## `witnessesAllowedToBeOutOfOrder`
 
 **This variable can be overridden in individual project settings**
 
@@ -194,7 +194,7 @@ This setting is only relevant if *allowOutOfOrderWitnesses* is true. It should c
 
 The default is an empty list.
 
-## ```combineAllLacsInOR```
+## `combineAllLacsInOR`
 
 **This variable can be overridden in individual project settings**
 
@@ -204,33 +204,33 @@ The default is false.
 
 If you are using special category lac readings and you want these to appear in your final edition then this setting should not be used.
 
-## ```combineAllOmsInOR```
+## `combineAllOmsInOR`
 
 **This variable can be overridden in individual project settings**
 
-This is a boolean variable. It works in the same was as ```combineAllLacsInOR``` but with om readings.
+This is a boolean variable. It works in the same was as `combineAllLacsInOR` but with om readings.
 
 The default is false.
 
-## ```combineAllLacsInApproved```
+## `combineAllLacsInApproved`
 
 **This variable can be overridden in individual project settings**
 
-This is a boolean variable. It works in the same was as ```combineAllLacsInOR``` but is applied in the approval process. If this change has already been applied in the move to order readings then this boolean, regardless of its settings, has no influence.
+This is a boolean variable. It works in the same was as `combineAllLacsInOR` but is applied in the approval process. If this change has already been applied in the move to order readings then this boolean, regardless of its settings, has no influence.
 
 The default is false.
 
 If you are using special category lac readings and you want these to appear in your final edition then this setting should not be used.
 
-## ```combineAllOmsInApproved```
+## `combineAllOmsInApproved`
 
 **This variable can be overridden in individual project settings**
 
-This is a boolean variable. It works in the same was as ```combineAllLacsInApproved``` but with om readings. If this change has already been applied in the move to order readings then this boolean, regardless of its settings, has no influence.
+This is a boolean variable. It works in the same was as `combineAllLacsInApproved` but with om readings. If this change has already been applied in the move to order readings then this boolean, regardless of its settings, has no influence.
 
 The default is false.
 
-## ```storeMultipleSupportLabelsAsParents```
+## `storeMultipleSupportLabelsAsParents`
 
 **This variable can be overridden in individual project settings**
 
@@ -238,7 +238,7 @@ This is a boolean variable. If it is set to false (the default) then the label e
 
 The default is false.
 
-## ```useZvForAllReadingsSupport```
+## `useZvForAllReadingsSupport`
 
 **This variable can be overridden in individual project settings**
 
@@ -246,7 +246,7 @@ This is a boolean variable which only has an impact on the collation editor if *
 
 The default is false.
 
-## ```numberEditionSubreadings``
+## `numberEditionSubreadings``
 
 **This variable can be overridden in individual project settings**
 
@@ -254,7 +254,7 @@ This is a boolean variable. If set to true subreadings that share a parent readi
 
 The default is false.
 
-## ```allowJoiningAcrossCollationUnits```
+## `allowJoiningAcrossCollationUnits`
 
 **This variable can be overridden in individual project settings**
 
@@ -262,7 +262,7 @@ This is a boolean variable. If set to true the user is given the option to add a
 
 The default is false.
 
-## ```approvalSettings```
+## `approvalSettings`
 
 **This variable can be overridden in individual project settings**
 
@@ -283,11 +283,11 @@ approval_settings = {
 
 ```
 
-## ```apparatusServiceUrl```
+## `apparatusServiceUrl`
 
-This variable specifies the location of the apparatus export service on this platform. If the ```showGetApparatusButton``` is set to true (or the default is used) and ```getApparatusForContext()``` is not used, then this url must be provided as it is used in the default code used to generate and export the apparatus. It should provide the full path to the apparatus export services as described in the Python services section.
+This variable specifies the location of the apparatus export service on this platform. If the `showGetApparatusButton` is set to true (or the default is used) and `getApparatusForContext()` is not used, then this url must be provided as it is used in the default code used to generate and export the apparatus. It should provide the full path to the apparatus export services as described in the Python services section.
 
-## ```overlappedOptions```
+## `overlappedOptions`
 
 **This variable can be overridden in individual project settings**
 
@@ -321,19 +321,19 @@ overlappedOptions = [{
 }];
 ```
 
-## ```contextInput```
+## `contextInput`
 
 **This variable can be overridden in individual project settings**
 
 **There is a default in the core code**
 
 This variable is used to control the way the collation unit is provided to and retrieved from the initial index page of
-the collation editor. There is a default in the core code which will use the form at ```CE_core/html_fragments/default_index_input.html```
+the collation editor. There is a default in the core code which will use the form at `CE_core/html_fragments/default_index_input.html`
 and take the collation unit context from the value of the HTML element with the id 'context'.
 
 The data should be structured as a JSON object with any of the following option keys as required:
 
-- **form** *[string]* - The string representing the location of the html index file. This value will be appended to the value of ```staticUrl```.
+- **form** *[string]* - The string representing the location of the html index file. This value will be appended to the value of `staticUrl`.
 - **result_provider** *[function]* - The function to use to construct the collation context required from the form provided.
 - **onload_function** *[function]* - The function to run when the form loads (for example, this can be used to populate menus from the database).
 
@@ -355,7 +355,7 @@ contextInput = {
    };
 ```
 
-## ```displaySettings```
+## `displaySettings`
 
 **This variable can be overridden in individual project settings**
 
@@ -376,7 +376,7 @@ Each JSON object in the **configs** array should have the following keys:
 - **function** *[string]* - The name of the method of the python class to run for this setting. Requirements of the python method are given below.
 - **apply_when** *[boolean]* - A boolean that states whether the method should be run if the setting is selected (in which case the boolean should be true), or unselected (in which case the boolean should be false)
 - **check_by_default** *[boolean]* - A boolean to determine if this setting should be selected by default or not.
-- **menu_pos** *[integer]* - An integer to describe where in the list of settings this one should appear on the settings menu (use ```null``` if this is to run behind the scenes and therefore not appear on the menu).
+- **menu_pos** *[integer]* - An integer to describe where in the list of settings this one should appear on the settings menu (use `null` if this is to run behind the scenes and therefore not appear on the menu).
 - **execution_pos** *[integer]* - An integer to determine the order in which settings functions are applied. This can be important in some cases as the settings can interact in different ways depending on the order in which they are applied.
 
 For an example of the JavaScript configuration see the [default_settings.js](https://github.com/itsee-birmingham/standalone_collation_editor/blob/master/collation/core/static/CE_core/js/default_settings.js) file.
@@ -387,7 +387,7 @@ For an example of the JavaScript configuration see the [default_settings.js](htt
 
 All of the python methods required for the display settings must be supplied in a single class. That means if you want to add to the defaults with your own functions you should copy the default code into your own python class.
 
-If a settings is required to run behind the scenes then ```null``` can be provided as the menu_pos value and it will not appear in the menu.
+If a settings is required to run behind the scenes then `null` can be provided as the menu_pos value and it will not appear in the menu.
 
 An example of the python functions can be seen in the [default_implementations.py](https://github.com/itsee-birmingham/collation_editor_core/blob/master/default_implementations.py) file but  a sample of the two methods described above can also be seen below:
 
@@ -406,7 +406,7 @@ class ApplySettings(object):
         return token
 ```
 
-## ```ruleClasses```
+## `ruleClasses`
 
 **This variable can be overridden in individual project settings**
 
@@ -430,7 +430,7 @@ Not all of the features make sense when combined and not all combinations will w
 
 For an example of the JavaScript configuration see the [default_settings.js](https://github.com/itsee-birmingham/standalone_collation_editor/blob/master/collation/core/static/CE_core/js/default_settings.js) file.
 
-## ```ruleConditions```
+## `ruleConditions`
 
 **This variable can be overridden in individual project settings**
 
@@ -465,7 +465,7 @@ If you specify new rule conditions in the JavaScript they need to be supported b
 
 The data provided to, and the data returned from, the method differ depending on the method type specified in the config.
 
-If the method is a boolean type it will be provided with two pieces of data: the JSON for the token and the JSON for the rule. The method should return ```True``` if the given rule should be applied to the given token and ```False``` if it should not. For example if a rule has a condition that says it should only be applied to nomena sacra and this token does not have a flag to say that it is one then false would be returned.
+If the method is a boolean type it will be provided with two pieces of data: the JSON for the token and the JSON for the rule. The method should return `True` if the given rule should be applied to the given token and `False` if it should not. For example if a rule has a condition that says it should only be applied to nomena sacra and this token does not have a flag to say that it is one then false would be returned.
 
 If the method is a string_application type then it will be provided with two pieces of data: the string match for the rule and an array of all the possible matches for the token. **NB:** please note that the data is provided in reverse order in this type of method than with the boolean type. This may be rectified in future releases.) This type of method must return a tuple of the modified data having applied the condition. The rule match must come first followed by the array of token words. For example if the condition is to ignore supplied markers when applying this rule and the supplied text in your project is indicated by [] then all instances of [ and ] must be removed from the rule match string and all of the token match strings before they are returned.
 
@@ -490,13 +490,13 @@ class RuleConditions(object):
         return(decision_word, token_words)
 ```
 
-## ```exporterSettings```
+## `exporterSettings`
 
 **This variable can be overridden in individual project settings**
 
 **There is a default provided in the core exporter factory code**
 
-The exporter settings are used to control the export of data from the approved collation screen when the 'Get Apparatus' button is present. If the function is not required then the button can be hidden by setting the ```showGetApparatusButton``` variable to false. This export is simply intended to be a check point for editors and should be set to provide the best export format for this task. The project summary page or a similar page in the overall platform should provide options to export much larger units of text and more options can be provided to users in these export functions.
+The exporter settings are used to control the export of data from the approved collation screen when the 'Get Apparatus' button is present. If the function is not required then the button can be hidden by setting the `showGetApparatusButton` variable to false. This export is simply intended to be a check point for editors and should be set to provide the best export format for this task. The project summary page or a similar page in the overall platform should provide options to export much larger units of text and more options can be provided to users in these export functions.
 
 If this variable is used then the following keys must be provided.
 

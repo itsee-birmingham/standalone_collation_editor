@@ -8,7 +8,7 @@ must be defined in this file in order to work. In addition to this the services 
 the behaviour collation editor can be configured to meet the preferences of your users. The required items are covered
 on this page, the optional variables and functions are covered in the configuration section.
 
-On loading the services file must call ```CL.setServiceProvider()``` passing a reference to the services file object as the argument as in this example:
+On loading the services file must call `CL.setServiceProvider()` passing a reference to the services file object as the argument as in this example:
 
 ```js
   var my_services = (function() {
@@ -27,7 +27,7 @@ On loading the services file must call ```CL.setServiceProvider()``` passing a r
 
 There is currently only one required service file variable, this must be set in order for the collation editor to function.
 
-### ```supportedRuleScopes```
+### `supportedRuleScopes`
 
 The collation editor supports four different rules scopes.
 
@@ -60,7 +60,7 @@ in future releases to be more generic (verse and manuscript in particular).
 
 These functions are all required in order for the collation editor to function.
 
-### ```initialiseEditor()```
+### `initialiseEditor()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -68,21 +68,21 @@ These functions are all required in order for the collation editor to function.
 
 This function is called as part of the initialisation sequence.
 
-The only requirement for this function is that it set ```CL.managingEditor``` to either ```true``` or ```false``` depending on whether the current user is the managing editor of the current project.
+The only requirement for this function is that it set `CL.managingEditor` to either `true` or `false` depending on whether the current user is the managing editor of the current project.
 
-If the index page is to be set up with JavaScript using the optional settings provided in the ```contextInput``` variable in the services file then the function should call ```CL.loadIndexPage()``` with the current project as the only argument. If the index page is to be provided in an alternative way they this function must show the index page and set any other platform requirements for its use.
+If the index page is to be set up with JavaScript using the optional settings provided in the `contextInput` variable in the services file then the function should call `CL.loadIndexPage()` with the current project as the only argument. If the index page is to be provided in an alternative way they this function must show the index page and set any other platform requirements for its use.
 
-If ```CL.loadIndexPage()``` is not used as part of the index page setup then this function also needs to add a button with the id *switch_project_button* and one with the id *project_summary* if those functions are required on the platform. In addition, if you want users to be able to change the collation algorithm settings then a button with the id *collation_settings* should also be added. Details of how to activate the buttons can be found in the relevant entries in the Optional Functions page in the configuration section.
+If `CL.loadIndexPage()` is not used as part of the index page setup then this function also needs to add a button with the id *switch_project_button* and one with the id *project_summary* if those functions are required on the platform. In addition, if you want users to be able to change the collation algorithm settings then a button with the id *collation_settings* should also be added. Details of how to activate the buttons can be found in the relevant entries in the Optional Functions page in the configuration section.
 
-### ```getUserInfo()```
+### `getUserInfo()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
 | callback  | function | function to be called on the user data |
 
-This function must get the current user details as a JSON object and call ```callback``` with the result. The user object itself must contain an **id** key. Any other data can be included in the object returned for use in your other service functions for example ```showLoginStatus``` might want to show the username.
+This function must get the current user details as a JSON object and call `callback` with the result. The user object itself must contain an **id** key. Any other data can be included in the object returned for use in your other service functions for example `showLoginStatus` might want to show the username.
 
-### ```getUserInfoByIds()```
+### `getUserInfoByIds()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -91,7 +91,7 @@ This function must get the current user details as a JSON object and call ```cal
 
 This function must resolve a list of user ids into basic user objects and run the callback on the data. The user data should be a JSON object with each provided id as the key to another JSON object which must at a minimum contain an **id** key which should match the top level key and ideally a **name** key to provide the name of the user.
 
-Given the ids ```["JS", "RS"]``` the JSON object should be as follows (where name keys are technically optional):
+Given the ids `["JS", "RS"]` the JSON object should be as follows (where name keys are technically optional):
 
 ```json
 {
@@ -100,7 +100,7 @@ Given the ids ```["JS", "RS"]``` the JSON object should be as follows (where nam
 }
 ```
 
-### ```applySettings()```
+### `applySettings()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -111,15 +111,15 @@ The function should pass the data object to a Python service and run the callbac
 
 The Python service required is described in the [Python services](python-services.md) section.
 
-### ```getCurrentEditingProject()```
+### `getCurrentEditingProject()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
 | callback  | function | function to be called on the project data |
 
-This function must get the current project details as a JSON object and call ```callback``` with the result. The structure of the project JSON is discussed in the project configuration section.
+This function must get the current project details as a JSON object and call `callback` with the result. The structure of the project JSON is discussed in the project configuration section.
 
-### ```getUnitData()```
+### `getUnitData()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -139,9 +139,9 @@ This function must find all of the JSON data for this context in each of the doc
 
 When all of the data has been retrieved the callback should be run on the resulting object.
 
-**NB:** Until version 2.0.0 this function was called ```getVerseData()```, had a boolean ```private``` as the third argument before the callback and returned a list (which is now the list in the **results** key).
+**NB:** Until version 2.0.0 this function was called `getVerseData()`, had a boolean `private` as the third argument before the callback and returned a list (which is now the list in the **results** key).
 
-### ```doCollation()```
+### `doCollation()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -155,7 +155,7 @@ The python service required for the collation process is explained in the Python
 
 When the collation process has completed the JSON response from the Python collation system should be passed to resultCallback.
 
-### ```saveCollation()```
+### `saveCollation()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -164,11 +164,11 @@ When the collation process has completed the JSON response from the Python colla
 | confirmMessage | string | The message to display if the user is required to confirm the save. |
 | overwriteAllowed | boolean | A boolean to indicate if the settings say a user can or cannot overwrite an existing saved version. |
 | noOverwriteMessage | string | The message to display if there is already a saved version and overwriteAllowed is false. |
-| callback  | function | The function to be called when the save is complete. It should be called with ```true``` if the save was sucessful and ```false``` if it was not. |
+| callback  | function | The function to be called when the save is complete. It should be called with `true` if the save was sucessful and `false` if it was not. |
 
-This function needs to save the collation object in the database repsecting the settings provided. It must be stored in such a way that the ```getSavedCollations()``` and ```loadSavedCollation()``` functions can retrieve it.
+This function needs to save the collation object in the database repsecting the settings provided. It must be stored in such a way that the `getSavedCollations()` and `loadSavedCollation()` functions can retrieve it.
 
-### ```getSavedCollations()```
+### `getSavedCollations()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -180,16 +180,16 @@ This should return all of the saved collations of the requested unit restricted 
 
 In future versions this function may include an optional projectId parameter rather than using the current project.
 
-### ```loadSavedCollation()```
+### `loadSavedCollation()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
 | id | string/int | Id of collation object required. |
 | callback | function | The function to be called on the retrieved data. |
 
-This should retrieve the collation with the given id and run the callback on the result, if no collation object is found the callback should be run with ```null```. The id here is the unique identifier used by the database to refer to this collation.
+This should retrieve the collation with the given id and run the callback on the result, if no collation object is found the callback should be run with `null`. The id here is the unique identifier used by the database to refer to this collation.
 
-### ```getSiglumMap()```
+### `getSiglumMap()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -198,7 +198,7 @@ This should retrieve the collation with the given id and run the callback on the
 
 This function must take the list of ids provided, find its corresponding sigla and return a JSON object in which each sigla is the key to the document id. This function used in the collation editor to provide the mapping details for documents which are lacunose in the entire collation unit. For all other documents this mapping can be extracted from the data returned for collation but in lacunose units no data is returned so this additional function is used. One the siglum map has been created the callback should be run using this as the argument. If the idList is empty then the callback should be run with an empty JSON object.
 
-### ```updateRuleset()```
+### `updateRuleset()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -210,7 +210,7 @@ This function must take the list of ids provided, find its corresponding sigla a
 
 This function must perform the appropriate action on each item in the three arrays of rules provided and then run the supplied callback. Each rule in the first list must be removed from the database, `id` and `scope` are provided to ensure the correct rule can be found. Those in the second list must have the `unitId` value added to the list of exceptions stored in the rule, only `id`is provided in this case as all of the rules will be global rules. The file array of rules contains the full rule JSON and each of these rules must be stored in the database. Any of the three arrays could be empty arrays. Once the data as all been handled appropriately the provided callback must be run.
 
-### ```updateRules()```
+### `updateRules()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -220,16 +220,16 @@ This function must perform the appropriate action on each item in the three arra
 
 This function needs to store all of the rules provided in the database. This function is only called when exceptions are being removed from rules so all of the rules will already exist and should be overwritten by the new data. If concurrency control is not something that needs to be considered in your system then unitId can be ignored as the unit reference has already been removed from the rules by the collation editor. If you do need to consider concurrency control then the ids from the rule array can be used to retrieve each of the rules in turn from the database, the unitId can then be removed from the list of exceptions before the rule is saved.
 
-### ```getRules()```
+### `getRules()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
 | unitId | string | The identifier for the unit being collated. |
 | callback | function | The function to be called on the retrieved data. |
 
-This function should retrieve all of the rules which are applicable to the unit identified by the provided unitId. Depending on your system you may need to filter the rules based of project and user as well as the provided verse. If this is the case then the service function ```getUserInfo()``` can be used to get the current user and ```CL.project.id``` stores the id of the current project (or the poject can be established by calling ```getCurrentEditingProject()```). The provided callback should then be called with the list of rules as the argument. The rules should be returned as an array of JSON objects and the JSON objects should have the same structure as that provided to ```updateRules()```.
+This function should retrieve all of the rules which are applicable to the unit identified by the provided unitId. Depending on your system you may need to filter the rules based of project and user as well as the provided verse. If this is the case then the service function `getUserInfo()` can be used to get the current user and `CL.project.id` stores the id of the current project (or the poject can be established by calling `getCurrentEditingProject()`). The provided callback should then be called with the list of rules as the argument. The rules should be returned as an array of JSON objects and the JSON objects should have the same structure as that provided to `updateRules()`.
 
-### ```getRulesByIds()```
+### `getRulesByIds()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -238,13 +238,13 @@ This function should retrieve all of the rules which are applicable to the unit 
 
 This function should retrieve all of the rules which match the rules ids provided in the ids array and
 run the provided callback on the results. The rules should be returned as an array of JSON objects and the JSON objects
-should have the same structure as that provided to ```updateRules()```. User and project filters should not be required as these rules will be a subset of those returned by ```getRules()```.
+should have the same structure as that provided to `updateRules()`. User and project filters should not be required as these rules will be a subset of those returned by `getRules()`.
 
-### ```getRuleExceptions()```
+### `getRuleExceptions()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
 | unitId | string | The identifier for the unit being collated. |
 | callback | function | The function to be called on the retrieved data. |
 
-This function should retrieve all of the global rules for this user/project, those which have the `scope` set to *always*, and also have the provided unitId in the list of exceptions. The rules should be returned as an array of JSON items as with ```getRules()```, the provided callback should be run with the result as the argument. If your system does not use global rules then the callback can just be run with an empty array.
+This function should retrieve all of the global rules for this user/project, those which have the `scope` set to *always*, and also have the provided unitId in the list of exceptions. The rules should be returned as an array of JSON items as with `getRules()`, the provided callback should be run with the result as the argument. If your system does not use global rules then the callback can just be run with an empty array.

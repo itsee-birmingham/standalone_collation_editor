@@ -9,13 +9,13 @@ apply to the entire installation; in the project configuration, in which case th
 settings will always be used over services file settings which will in turn override any default provided in the core code.
 The documentation clearly states at which level the setting can be used and, if applicable, what the default behaviour is.
 
-## ```getDebugSetting()```
+## `getDebugSetting()`
 
 This function should return a boolean to determine whether the system should run in debug mode. Running in debug mode can help identify problems with the data before it is sent to collation. it is a function rather than a boolean so it is possible for a user to set this variable themselves, for example in the url of the home page.
 
 The default is false.
 
-## ```showLoginStatus()```
+## `showLoginStatus()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -23,7 +23,7 @@ The default is false.
 
 This function can be used to display the currently logged in user. It is called when pages are displayed. It should get the current user and display the required details in the preferred way for the platform. There is a <div> element on each page that calls this function which has the id 'login_status' which should be used to display the user details. When this is done the function should run the callback if one was provided.
 
-## ```getSavedStageIds()```
+## `getSavedStageIds()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -32,11 +32,11 @@ This function can be used to display the currently logged in user. It is called 
 
 This function populates the links to saved collations in the footer of the page. This function must get the saved collations for the context belonging to this user and the approved collation from the project even if it does not belong to this user. The callback must be run with the saved objects from the four collation stages as parameters in order of the stages (regularised, set variants, order readings, approved). If there are no saved objects for any of the stages the parameter for the missing stages should be null.
 
-## ```addExtraFooterFunctions()```
+## `addExtraFooterFunctions()`
 
-This is required if any extra footer buttons are specified in the services file variable ```extraFooterButtons```. It must attach onclick listeners to all of the buttons specified in the variable. This function must cover all buttons added in the services file and in any projects hosted on the system.
+This is required if any extra footer buttons are specified in the services file variable `extraFooterButtons`. It must attach onclick listeners to all of the buttons specified in the variable. This function must cover all buttons added in the services file and in any projects hosted on the system.
 
-## ```getAdjoiningUnit()```
+## `getAdjoiningUnit()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -44,19 +44,19 @@ This is required if any extra footer buttons are specified in the services file 
 | isPrevious | <code>boolean</code> | true if we are looking for the previous unit, false if we are looking for the next unit. |
 | callback | <code>function</code> |The function to be called on the unit identifier string for the next or previous unit. |
 
-This function is used to provide the data needed move through the work using the arrows at the beginning and end of the overtext for each collation unit. It should return either the next (if isPrevious is false) or previous unit based on the provided context. The callback should be run on the string that represents the context string for the next/previous unit. Context here and in the parameters refers to the string used to identify the collation unit. i.e. what the user would type into the index page to run a collation for that unit. If no unit is found the callback should be run with ```null```.
+This function is used to provide the data needed move through the work using the arrows at the beginning and end of the overtext for each collation unit. It should return either the next (if isPrevious is false) or previous unit based on the provided context. The callback should be run on the string that represents the context string for the next/previous unit. Context here and in the parameters refers to the string used to identify the collation unit. i.e. what the user would type into the index page to run a collation for that unit. If no unit is found the callback should be run with `null`.
 
-**NB** Prior to release 2.0.0 this function was named ```getAdjoiningVerse()```
+**NB** Prior to release 2.0.0 this function was named `getAdjoiningVerse()`
 
-## ```switchProject()```
+## `switchProject()`
 
-If this function is present in the services file and ```CL.loadIndexPage()``` is called by the services as part of the ```initialiseEditor()``` function in the services then a *switch project* button will be added to the footer of the index page and this function will be attached as an onclick event. The function itself should redirect the user to a page that allows them to select a project from the projects they are authorised to access and then return the user to the page they were viewing when they clicked the button.
+If this function is present in the services file and `CL.loadIndexPage()` is called by the services as part of the `initialiseEditor()` function in the services then a *switch project* button will be added to the footer of the index page and this function will be attached as an onclick event. The function itself should redirect the user to a page that allows them to select a project from the projects they are authorised to access and then return the user to the page they were viewing when they clicked the button.
 
-## ```viewProjectSummary()```
+## `viewProjectSummary()`
 
-If this function is present in the services file and ```CL.loadIndexPage()``` is called by the services as part of the ```initialiseEditor()``` function in the services then a *view project summary* button will be added to the footer of the index page and this function will be attached as an onclick event. The function itself should redirect the user to a page that shows a summary of the work on the project. This might, for example, include how many of the collation units have been saved at each stage and how many have been approved.
+If this function is present in the services file and `CL.loadIndexPage()` is called by the services as part of the `initialiseEditor()` function in the services then a *view project summary* button will be added to the footer of the index page and this function will be attached as an onclick event. The function itself should redirect the user to a page that shows a summary of the work on the project. This might, for example, include how many of the collation units have been saved at each stage and how many have been approved.
 
-## ```witnessSort()```
+## `witnessSort()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -68,7 +68,7 @@ If this function is present in the services file and ```CL.loadIndexPage()``` is
 
 This function is used to sort the witness sigla into the desired order. It is used for the hover overs on the readings and to sort menus that list sigla (such as the highlight witness menu). The function should sort the list in place rather than returning the list.
 
-## ```getWitnessesFromInputForm()```
+## `getWitnessesFromInputForm()`
 
 **There is a default in the core code which is explained below**
 
@@ -76,7 +76,7 @@ This function tells the collation editor how to extract the list of witnesses fr
 
 This default behaviour can be overridden by providing this function in the services. It cannot be overridden in the project settings so the function must work for all projects you host. The function must return an array containing the ids of the documents selected for collation.
 
-## ```getApparatusForContext()```
+## `getApparatusForContext()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -84,16 +84,16 @@ This default behaviour can be overridden by providing this function in the servi
 
 **There is a default in the core code which is explained below**
 
-This function can be used to override the default export function in the collation editor core code. If this function is not provided and the default code used then the ```apparatusServiceUrl``` variable must be set so that the default code can find the python service. The default function will probably be good enough for many use cases as it generates the file download based on the settings specified in the ```exporterSettings``` variable in the services file. It can be useful to override the function if a CSRF token is required by the platform to download the output or to control other aspects of the export.
+This function can be used to override the default export function in the collation editor core code. If this function is not provided and the default code used then the `apparatusServiceUrl` variable must be set so that the default code can find the python service. The default function will probably be good enough for many use cases as it generates the file download based on the settings specified in the `exporterSettings` variable in the services file. It can be useful to override the function if a CSRF token is required by the platform to download the output or to control other aspects of the export.
 
-*NB* If you do implement this function, the data exported should not be taken from the current ```CL.data``` value. Instead the unit should be retrieved from the database and the 'structure' value from the collation object should be used for the data. This is because, in some circumstances, the data stored in the JavaScript variable ```CL.data``` is not suitable for export if the 'show non-edition subreadings' button has been used. The version of the data in the database is always correct as the approved version cannot be saved other than in the approval process itself.
+*NB* If you do implement this function, the data exported should not be taken from the current `CL.data` value. Instead the unit should be retrieved from the database and the 'structure' value from the collation object should be used for the data. This is because, in some circumstances, the data stored in the JavaScript variable `CL.data` is not suitable for export if the 'show non-edition subreadings' button has been used. The version of the data in the database is always correct as the approved version cannot be saved other than in the approval process itself.
 
 *NB* If you do implement this function there is a pre 2.0 version bug you need to be aware of should any of your user's projects make use of regularisation rules which have the 'keep_as_main_reading' option set to 'true'.
-If this is the case, then the rule configurations must be provided in the 'options' key in the exporterSettings as the display settings for these rules are added in the exporter. The rules are available in the ```CL.ruleClasses``` variable in the JavaScript. In collations approved using the 2.0 release this is no longer necessary as the required presentation data is stored in the collation data structure during the approval process for verse 2.0.0 onwards. If you provide functions to export larger volumes of data you also need to be aware of this and ensure that the rule configurations are provided to the exporter in this case.
+If this is the case, then the rule configurations must be provided in the 'options' key in the exporterSettings as the display settings for these rules are added in the exporter. The rules are available in the `CL.ruleClasses` variable in the JavaScript. In collations approved using the 2.0 release this is no longer necessary as the required presentation data is stored in the collation data structure during the approval process for verse 2.0.0 onwards. If you provide functions to export larger volumes of data you also need to be aware of this and ensure that the rule configurations are provided to the exporter in this case.
 
 The function has an optional success callback argument which should be run when the function is complete.
 
-## ```extractWordsForHeader()```
+## `extractWordsForHeader()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -109,7 +109,7 @@ The function has an optional success callback argument which should be run when 
 
 The default does not add any extra text or classes. It extracts the words from the data in the selected base text using the 'original' key if that is present or 't' if it is not. It also adds any punctuation to the words based on the 'pc_before' and 'pc_after' keys.
 
-## ```prepareDisplayString()```
+## `prepareDisplayString()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -125,7 +125,7 @@ This function is called every time a reading is displayed in the collation edito
 
 There are probably very few, if any, good reasons to use this. It is present to support some very early implementations while the system was being developed.
 
-## ```prepareNormalisedString()```
+## `prepareNormalisedString()`
 
 | Param  | Type                | Description  |
 | ------ | ------------------- | ------------ |
@@ -137,4 +137,4 @@ There are probably very few, if any, good reasons to use this. It is present to 
 
 **The default is to leave the provided string untouched**
 
-This function is required if ```prepareDisplayString()``` is used. It must exactly reverse the changes made to the string by that function. It is used when making regularisation rules to ensure the stored strings are what is expected and can be transformed by ```prepareNormalisedString()``` correctly in the display.
+This function is required if `prepareDisplayString()` is used. It must exactly reverse the changes made to the string by that function. It is used when making regularisation rules to ensure the stored strings are what is expected and can be transformed by `prepareNormalisedString()` correctly in the display.
