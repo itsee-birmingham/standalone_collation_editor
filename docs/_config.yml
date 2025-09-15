@@ -17,6 +17,7 @@ sidebar:
   - label: Input Data
     children:
     - data-format
+    - collation-unit
   - label: Upgrading Versions
     children:
       - upgrade-3-0-x
