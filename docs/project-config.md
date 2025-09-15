@@ -7,8 +7,7 @@ The project configurations are located at `collation/data/project`.
 
 In this directory there can be a number of different project directories each must contain a `config.json` file. The project supplied for the example is called `default`. You can replace this configuration with your own or add a new directory for a second project. If you add a new project then you will need to edit the `_current_project` variable near the top of the services file (`collation/static/js/local_services.js`) which reads
 
-
-```JavaScript
+```js
 _current_project = 'default';  
 ```
 
@@ -24,7 +23,7 @@ The minimum information required in the project configuration is:
 - **base_text** *[string]* - the id of the document you want to use as a base text. This must be one of the documents in the list of witnesses for the project.
 
 Many other settings and configurations can be specified in this file. They are covered in the configuration section of the documentation.
-Several of the functions and variables that can be specified in the services file can also be configured at the project level. The relevant settings are linked from the [Project Settings page](project-settings.md).
+Several of the functions and variables that can be specified in the services file can also be configured at the project level. The relevant settings are linked from the [Project Settings page](project-settings.md). Unless you are sure about what you are doing it is best to stick with configuring the standalone system in the project settings, however, the services file can also be used for installation wide settings if you choose.
 
 ## Simple project configuration example
 
